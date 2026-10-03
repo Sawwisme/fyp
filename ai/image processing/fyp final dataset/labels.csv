@@ -1,0 +1,1270 @@
+filename,species,healthy,plaque,gingivitis,calculus,mask_healthy,mask_plaque,mask_gingivitis,mask_calculus,sources,notes
+cat_0001.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0002.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0003.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0004.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0005.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0006.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0007.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0008.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0009.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0010.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0011.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0012.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0013.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0014.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0015.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0016.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0017.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0018.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0019.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0020.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0021.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0022.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0023.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0024.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0025.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0026.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0027.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0028.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0029.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0030.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0031.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0032.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0033.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0034.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0035.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0036.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0037.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0038.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0039.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0040.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0041.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0042.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0043.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0044.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0045.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0046.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0047.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0048.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0049.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0050.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0051.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0052.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0053.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0054.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0055.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0056.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0057.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0058.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0059.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0060.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0061.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0062.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0063.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0064.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0065.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0066.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0067.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0068.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0069.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0070.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0071.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0072.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0073.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0074.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0075.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0076.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0077.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0078.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0079.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0080.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0081.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0082.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0083.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0084.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0085.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0086.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0087.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0088.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0089.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0090.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0091.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0092.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0093.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0094.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0095.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0096.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0097.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0098.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0099.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0100.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0101.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0102.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0103.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0104.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0105.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0106.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0107.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0108.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0109.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0110.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0111.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0112.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0113.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0114.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0115.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0116.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0117.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0118.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0119.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0120.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0121.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0122.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0123.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0124.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0125.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0126.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0127.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0128.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0129.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0130.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0131.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0132.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0133.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0134.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0135.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0136.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0137.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0138.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0139.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0140.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0141.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0142.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0143.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0144.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0145.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0146.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0147.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0148.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0149.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0150.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0151.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0152.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0153.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0154.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0155.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0156.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0157.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0158.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0159.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0160.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0161.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0162.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0163.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0164.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0165.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0166.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0167.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0168.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0169.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0170.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0171.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0172.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0173.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0174.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0175.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0176.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0177.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0178.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0179.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0180.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0181.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0182.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0183.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0184.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0185.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0186.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0187.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0188.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0189.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0190.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0191.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0192.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0193.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0194.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0195.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0196.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0197.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0198.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0199.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0200.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0201.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0202.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0203.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0204.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0205.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0206.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0207.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0208.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0209.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0210.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0211.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0212.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0213.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0214.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0215.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0216.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0217.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0218.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0219.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0220.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0221.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0222.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0223.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0224.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0225.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0226.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0227.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0228.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0229.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0230.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0231.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0232.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0233.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0234.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0235.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0236.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0237.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0238.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0239.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0240.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0241.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0242.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0243.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0244.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0245.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0246.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0247.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0248.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0249.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0250.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0251.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0252.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0253.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0254.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0255.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0256.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0257.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0258.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0259.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0260.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0261.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0262.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0263.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0264.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0265.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0266.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0267.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0268.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0269.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0270.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0271.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0272.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0273.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0274.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0275.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0276.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0277.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0278.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0279.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0280.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0281.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0282.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0283.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0284.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0285.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0286.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0287.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0288.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0289.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0290.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0291.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0292.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0293.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0294.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0295.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0296.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0297.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0298.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0299.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0300.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0301.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0302.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0303.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0304.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0305.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0306.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0307.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0308.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0309.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0310.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0311.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0312.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0313.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0314.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0315.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0316.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0317.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0318.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0319.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0320.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0321.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0322.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0323.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0324.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0325.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0326.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0327.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0328.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0329.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0330.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0331.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0332.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0333.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0334.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0335.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0336.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0337.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0338.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0339.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0340.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0341.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0342.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0343.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0344.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0345.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0346.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0347.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0348.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0349.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0350.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0351.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0352.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0353.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0354.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0355.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0356.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0357.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0358.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0359.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0360.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0361.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0362.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0363.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0364.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0365.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0366.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0367.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0368.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0369.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0370.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0371.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0372.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0373.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0374.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0375.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0376.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0377.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0378.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0379.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0380.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0381.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0382.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0383.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0384.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0385.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0386.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0387.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0388.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0389.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0390.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0391.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0392.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0393.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0394.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0395.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0396.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0397.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0398.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0399.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0400.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0401.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0402.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0403.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0404.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0405.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0406.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0407.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0408.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0409.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0410.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0411.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0412.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0413.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0414.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0415.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0416.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0417.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0418.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0419.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0420.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0421.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0422.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0423.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0424.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0425.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0426.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0427.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0428.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0429.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0430.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0431.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0432.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0433.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0434.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0435.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0436.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0437.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0438.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0439.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0440.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0441.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0442.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0443.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0444.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0445.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0446.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0447.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0448.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0449.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0450.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0451.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0452.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0453.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0454.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0455.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0456.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0457.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0458.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0459.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0460.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0461.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0462.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0463.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0464.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0465.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0466.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0467.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0468.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0469.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0470.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0471.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0472.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0473.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0474.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0475.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0476.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0477.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0478.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0479.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0480.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0481.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0482.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0483.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0484.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0485.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0486.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0487.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0488.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0489.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0490.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0491.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0492.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0493.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0494.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0495.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0496.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0497.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0498.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0499.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0500.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0501.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0502.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0503.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0504.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0505.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0506.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0507.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0508.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0509.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0510.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0511.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0512.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0513.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0514.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0515.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0516.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0517.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0518.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0519.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0520.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0521.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0522.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0523.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0524.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0525.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0526.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0527.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0528.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0529.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0530.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0531.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0532.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0533.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0534.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0535.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0536.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0537.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0538.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0539.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0540.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0541.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0542.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0543.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0544.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0545.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0546.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0547.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0548.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0549.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0550.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0551.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0552.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0553.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0554.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0555.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0556.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0557.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0558.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0559.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0560.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0561.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0562.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0563.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0564.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0565.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0566.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0567.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0568.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0569.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0570.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0571.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0572.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0573.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0574.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0575.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0576.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0577.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0578.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0579.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0580.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0581.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0582.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0583.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0584.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0585.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0586.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0587.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0588.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0589.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0590.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0591.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0592.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0593.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0594.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0595.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0596.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0597.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0598.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0599.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0600.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0601.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0602.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0603.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0604.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0605.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0606.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0607.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0608.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0609.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0610.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0611.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0612.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0613.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0614.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0615.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0616.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0617.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0618.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0619.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0620.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0621.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0622.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0623.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0624.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0625.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0626.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0627.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0628.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0629.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0630.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0631.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0632.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0633.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0634.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0635.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0636.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0637.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0638.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0639.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0640.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0641.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0642.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0643.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0644.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0645.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0646.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0647.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0648.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0649.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0650.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0651.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0652.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0653.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0654.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0655.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0656.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0657.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0658.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0659.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0660.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0661.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0662.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0663.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0664.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0665.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0666.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0667.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0668.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0669.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0670.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0671.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0672.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0673.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0674.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0675.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0676.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0677.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0678.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0679.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0680.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0681.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0682.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0683.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0684.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0685.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0686.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0687.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0688.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0689.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0690.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0691.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0692.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0693.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0694.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0695.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0696.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0697.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0698.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0699.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0700.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0701.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0702.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0703.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0704.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0705.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0706.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0707.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0708.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0709.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0710.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0711.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0712.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0713.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0714.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0715.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0716.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0717.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0718.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0719.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0720.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0721.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0722.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0723.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0724.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0725.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0726.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0727.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0728.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0729.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0730.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0731.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0732.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0733.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0734.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0735.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0736.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0737.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0738.jpg,cat,0,1,0,0,1,1,1,0,cat_dental_classification,Original class: plaque; calculus unannotated in this source.
+cat_0739.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0740.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0741.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0742.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0743.jpg,cat,1,0,0,0,1,1,1,0,cat_dental_classification,Original class: healthy; calculus unannotated in this source.
+cat_0744.jpg,cat,0,0,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis; calculus unannotated in this source.
+cat_0745.jpg,cat,0,1,1,0,1,1,1,0,cat_dental_classification,Original class: gingivitis_plaque; calculus unannotated in this source.
+cat_0746.jpg,cat,0,0,1,1,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0747.jpg,cat,0,0,1,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0748.jpg,cat,1,0,0,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0749.jpg,cat,0,0,0,1,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0750.jpg,cat,0,0,1,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0751.jpg,cat,0,0,0,1,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0752.jpg,cat,0,0,1,1,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0753.jpg,cat,0,0,1,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0754.jpg,cat,0,0,1,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0755.jpg,cat,0,0,1,1,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0756.jpg,cat,1,0,0,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0757.jpg,cat,0,0,0,1,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0758.jpg,cat,0,0,1,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0759.jpg,cat,1,0,0,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0760.jpg,cat,0,0,0,1,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0761.jpg,cat,0,0,0,1,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0762.jpg,cat,1,0,0,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0763.jpg,cat,1,0,0,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0764.jpg,cat,1,0,0,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0765.jpg,cat,1,0,0,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0766.jpg,cat,0,0,1,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0767.jpg,cat,1,0,0,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0768.jpg,cat,0,0,1,1,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0769.jpg,cat,1,0,0,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0770.jpg,cat,0,0,1,1,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0771.jpg,cat,0,0,1,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0772.jpg,cat,1,0,0,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0773.jpg,cat,0,0,1,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0774.jpg,cat,1,0,0,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0775.jpg,cat,1,0,0,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0776.jpg,cat,0,0,0,1,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+cat_0777.jpg,cat,1,0,0,0,1,1,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0778.jpg,dog,0,0,1,1,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0779.jpg,dog,1,0,0,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0780.jpg,dog,1,0,0,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0781.jpg,dog,0,0,0,1,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0782.jpg,dog,1,0,0,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0783.jpg,dog,0,0,1,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0784.jpg,dog,0,0,1,1,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0785.jpg,dog,1,0,0,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0786.jpg,dog,1,0,0,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0787.jpg,dog,1,0,0,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0788.jpg,dog,1,0,0,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0789.jpg,dog,1,0,0,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0790.jpg,dog,0,0,0,1,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0791.jpg,dog,1,0,0,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0792.jpg,dog,0,0,1,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0793.jpg,dog,0,0,1,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0794.jpg,dog,0,0,1,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0795.jpg,dog,0,0,0,1,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0796.jpg,dog,0,0,0,1,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0797.jpg,dog,0,0,1,1,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0798.jpg,dog,0,0,1,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0799.jpg,dog,1,0,0,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0800.jpg,dog,1,0,0,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0801.jpg,dog,0,0,1,1,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0802.jpg,dog,0,0,1,1,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0803.jpg,dog,1,0,0,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0804.jpg,dog,1,0,0,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0805.jpg,dog,0,0,1,1,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0806.jpg,dog,0,0,1,1,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0807.jpg,dog,1,0,0,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0808.jpg,dog,1,0,0,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0809.jpg,dog,0,0,0,1,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0810.jpg,dog,0,0,1,0,1,0,1,1,generic_manual_screening,Manual visual screening candidate; excluded/uncertain images omitted.
+dog_0811.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0812.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_0813.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0814.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0815.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0816.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0817.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0818.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_0819.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0820.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0821.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0822.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0823.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0824.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0825.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0826.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0827.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0828.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0829.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0830.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0831.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0832.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0833.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0834.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0835.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0836.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0837.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0838.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0839.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0840.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0841.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0842.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0843.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0844.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0845.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0846.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0847.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0848.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0849.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0850.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_0851.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0852.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0853.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0854.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0855.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_0856.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0857.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0858.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0859.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0860.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0861.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0862.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0863.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0864.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0865.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0866.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0867.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0868.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0869.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0870.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0871.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0872.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0873.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0874.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0875.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0876.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0877.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0878.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0879.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0880.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0881.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0882.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0883.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0884.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0885.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0886.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0887.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0888.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0889.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0890.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0891.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0892.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0893.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0894.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0895.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0896.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0897.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_0898.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0899.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0900.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0901.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0902.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0903.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0904.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_0905.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0906.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0907.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0908.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0909.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_0910.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0911.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_0912.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_0913.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0914.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0915.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0916.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0917.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0918.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0919.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0920.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0921.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0922.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0923.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0924.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0925.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0926.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0927.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0928.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0929.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_0930.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0931.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0932.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0933.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0934.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0935.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0936.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0937.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0938.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0939.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_0940.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0941.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0942.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0943.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0944.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0945.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0946.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0947.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0948.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0949.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0950.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0951.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0952.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0953.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0954.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0955.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0956.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0957.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0958.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0959.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0960.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0961.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0962.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0963.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0964.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0965.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0966.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0967.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0968.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0969.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0970.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0971.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0972.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0973.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0974.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0975.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0976.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0977.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0978.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0979.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0980.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0981.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0982.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0983.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0984.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0985.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0986.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0987.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0988.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0989.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0990.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_0991.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0992.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0993.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_0994.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0995.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0996.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0997.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_0998.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_0999.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1000.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1001.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1002.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1003.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1004.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1005.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1006.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1007.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1008.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1009.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1010.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1011.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1012.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1013.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1014.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1015.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1016.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1017.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1018.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1019.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1020.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1021.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1022.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1023.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1024.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1025.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1026.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1027.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1028.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1029.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1030.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1031.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1032.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1033.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1034.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1035.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1036.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1037.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_1038.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1039.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1040.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1041.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1042.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1043.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1044.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1045.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1046.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1047.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1048.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1049.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1050.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1051.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1052.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1053.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1054.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1055.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1056.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1057.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1058.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1059.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1060.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1061.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1062.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1063.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1064.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1065.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1066.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1067.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1068.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1069.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1070.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1071.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1072.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1073.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1074.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1075.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1076.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1077.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_1078.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1079.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1080.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1081.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1082.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1083.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1084.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1085.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1086.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1087.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1088.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1089.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1090.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1091.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1092.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1093.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1094.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1095.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1096.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_1097.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1098.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1099.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1100.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_1101.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1102.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1103.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1104.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1105.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1106.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_1107.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_1108.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1109.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1110.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1111.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1112.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1113.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1114.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1115.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1116.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1117.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1118.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1119.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1120.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1121.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1122.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1123.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1124.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1125.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_1126.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_1127.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1128.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1129.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1130.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1131.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1132.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1133.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1134.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1135.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1136.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1137.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1138.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1139.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1140.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1141.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1142.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_1143.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1144.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1145.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1146.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1147.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1148.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1149.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_1150.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1151.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1152.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1153.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1154.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1155.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1156.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1157.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1158.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1159.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1160.jpg,dog,0,0,1,1,1,0,1,1,pawpawhealth,"COCO annotations: gingi,sarro; dog plaque intentionally unsupported."
+dog_1161.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_1162.jpg,dog,0,0,1,0,1,0,1,1,pawpawhealth,COCO annotations: gingi; dog plaque intentionally unsupported.
+dog_1163.jpg,dog,0,0,0,1,1,0,1,1,pawpawhealth,COCO annotations: sarro; dog plaque intentionally unsupported.
+dog_1164.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1165.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1166.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1167.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1168.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1169.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1170.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1171.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1172.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1173.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1174.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1175.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1176.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1177.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1178.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1179.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1180.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1181.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1182.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1183.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1184.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1185.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1186.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1187.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1188.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1189.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1190.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1191.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1192.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1193.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1194.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1195.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1196.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1197.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1198.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1199.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1200.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1201.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1202.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1203.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1204.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1205.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1206.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1207.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1208.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1209.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1210.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1211.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1212.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1213.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1214.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1215.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1216.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1217.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1218.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1219.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1220.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1221.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1222.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1223.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1224.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1225.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1226.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1227.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1228.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1229.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1230.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1231.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1232.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1233.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1234.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1235.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1236.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1237.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1238.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1239.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1240.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1241.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1242.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1243.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1244.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1245.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1246.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1247.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1248.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1249.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1250.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1251.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1252.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1253.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1254.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1255.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1256.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1257.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1258.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1259.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1260.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1261.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1262.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1263.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1264.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1265.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1266.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1267.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1268.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.
+dog_1269.jpg,dog,1,0,0,0,1,0,1,1,screened_healthy_dog,Manually screened healthy dog candidate; dog plaque intentionally unsupported.

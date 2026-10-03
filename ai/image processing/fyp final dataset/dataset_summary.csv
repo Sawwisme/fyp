@@ -1,0 +1,9 @@
+species,label,positive,known_negative,masked_unknown,total_species_images
+cat,healthy,146,631,0,777
+cat,plaque,294,483,0,777
+cat,gingivitis,485,292,0,777
+cat,calculus,11,21,745,777
+dog,healthy,121,371,0,492
+dog,plaque,0,0,492,492
+dog,gingivitis,287,205,0,492
+dog,calculus,340,152,0,492
