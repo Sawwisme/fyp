@@ -1,3 +1,7 @@
+from typing import Literal
+
+from app.schemas.user import UserResponse
+
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -45,3 +49,9 @@ class LoginRequest(BaseModel):
         if len(value.get_secret_value().encode("utf-8")) > 72:
             raise ValueError("Password must not exceed 72 UTF-8 bytes")
         return value
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: Literal["bearer"] = "bearer"
+    expires_in: int
+    user: UserResponse
