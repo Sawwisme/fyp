@@ -7,11 +7,24 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:owner_mobile/main.dart';
+import 'package:owner_mobile/screens/login.dart';
+import 'package:owner_mobile/services/api_client.dart';
+import 'package:owner_mobile/services/auth_service.dart';
+import 'package:owner_mobile/services/token_storage.dart';
 
 void main() {
   testWidgets('Login requires email and password', (tester) async {
-    await tester.pumpWidget(const MyApp());
+    final api = ApiClient(tokenStorage: TokenStorage());
+    addTearDown(api.close);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: LoginScreen(
+          auth: AuthService(api),
+          onLoggedIn: (_) {},
+        ),
+      ),
+    );
 
     expect(find.text('Welcome back'), findsOneWidget);
 

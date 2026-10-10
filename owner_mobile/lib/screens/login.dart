@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../services/api_client.dart';
 import '../services/auth_service.dart';
+import 'register.dart';
 
 class LoginScreen extends StatefulWidget {
   final AuthService auth;
@@ -54,6 +55,22 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() => _loading = false);
       }
     }
+  }
+
+    Future<void> _openRegistration() async {
+    final created = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => RegisterScreen(auth: widget.auth),
+      ),
+    );
+
+    if (!mounted || created != true) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Account created. You can now log in.'),
+      ),
+    );
   }
 
   @override
@@ -153,6 +170,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           : const Text('Log in'),
                     ),
                   ),
+                    const SizedBox(height: 12),
+                    TextButton(
+                        onPressed: _loading ? null : _openRegistration,
+                        child: const Text('Create an account'),
+                    ),
                 ],
               ),
             ),

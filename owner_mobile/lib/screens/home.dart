@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../services/auth_service.dart';
+import '../services/pet_service.dart';
+import 'pets.dart';
 
 class HomeScreen extends StatefulWidget {
   final Map<String, dynamic> user;
@@ -46,6 +48,16 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+    void _openPets() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => PetsScreen(
+          service: PetService(widget.auth.api),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,6 +92,15 @@ class _HomeScreenState extends State<HomeScreen> {
               subtitle: Text(
                 widget.user['phone_number'] as String? ?? 'Not provided',
               ),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.pets),
+              title: const Text('My pets'),
+              subtitle: const Text('View your registered pets'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: _loggingOut ? null : _openPets,
             ),
           ),
         ],
