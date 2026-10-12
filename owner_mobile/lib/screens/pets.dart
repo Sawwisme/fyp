@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../services/api_client.dart';
 import '../services/pet_service.dart';
+import 'pet_form.dart';
+import 'pet_detail.dart';
 
 class PetsScreen extends StatefulWidget {
   final PetService service;
@@ -65,6 +67,31 @@ class _PetsScreenState extends State<PetsScreen> {
     }
   }
 
+    Future<void> _openRegistration() async {
+    final created = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => PetFormScreen(service: widget.service),
+      ),
+    );
+
+    if (!mounted || created != true) return;
+    await _loadPets(reset: true);
+  }
+
+  Future<void> _openDetails(int petId) async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => PetDetailScreen(
+          petId: petId,
+          service: widget.service,
+        ),
+      ),
+    );
+
+    if (!mounted) return;
+    await _loadPets(reset: true);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,11 +105,16 @@ class _PetsScreenState extends State<PetsScreen> {
           ),
         ],
       ),
+        floatingActionButton: FloatingActionButton(
+        onPressed: _loading ? null : _openRegistration,
+        tooltip: 'Register pet',
+        child: const Icon(Icons.add),
+      ),
       body: RefreshIndicator(
         onRefresh: () => _loadPets(reset: true),
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
           children: [
             if (_error != null) ...[
               Text(
@@ -111,6 +143,8 @@ class _PetsScreenState extends State<PetsScreen> {
                 child: ListTile(
                   leading: const Icon(Icons.pets),
                   title: Text(pet['pet_name'] as String),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => _openDetails(pet['pet_id'] as int),
                   subtitle: Text(
                     '${pet['species']}'
                     '${pet['breed'] == null ? '' : ' • ${pet['breed']}'}',
