@@ -74,4 +74,28 @@ class AuthService {
   Future<void> logout() {
     return api.tokenStorage.clearToken();
   }
+
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    await api.post('/auth/change-password', {
+      'current_password': currentPassword,
+      'new_password': newPassword,
+    });
+  }
+
+  Future<String> requestPasswordReset(String email) async {
+    final data = await api.post(
+      '/auth/forgot-password',
+      {'email': email.trim()},
+      authenticated: false,
+    );
+
+    if (data is! Map<String, dynamic> || data['message'] is! String) {
+      throw const ApiException('Invalid password-reset response.');
+    }
+
+    return data['message'] as String;
+  }
 }

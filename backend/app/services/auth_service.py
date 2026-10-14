@@ -6,10 +6,17 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models import PetOwner, User
-from app.schemas.auth import LoginRequest, OwnerRegister
+
+from app.schemas.auth import (
+    LoginRequest,
+    OwnerRegister,
+    PasswordChangeRequest,
+)
 
 import bcrypt
 import jwt
+import hashlib
+import hmac
 
 from app.config import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
@@ -48,7 +55,27 @@ def verify_password(password: str, password_hash: str) -> bool:
         return False
 
 
-def create_access_token(user_id: int) -> str:
+def password_version(password_hash: str) -> str:
+    return hmac.new(
+        JWT_SECRET_KEY.encode("utf-8"),
+        ("access:" + password_hash).encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+
+
+def token_version_matches(payload: dict, password_hash: str) -> bool:
+    version = payload.get("pwd_version")
+
+    if not isinstance(version, str) or len(version) != 64:
+        return False
+
+    return hmac.compare_digest(
+        version.encode("utf-8"),
+        password_version(password_hash).encode("utf-8"),
+    )
+
+
+def create_access_token(user_id: int, password_hash: str) -> str:
     if isinstance(user_id, bool) or user_id <= 0:
         raise ValueError("A valid user ID is required.")
 
@@ -62,6 +89,7 @@ def create_access_token(user_id: int) -> str:
         "jti": str(uuid4()),
         "iss": JWT_ISSUER,
         "aud": JWT_AUDIENCE,
+        "pwd_version": password_version(password_hash),
     }
 
     return jwt.encode(
@@ -69,7 +97,6 @@ def create_access_token(user_id: int) -> str:
         JWT_SECRET_KEY,
         algorithm=JWT_ALGORITHM,
     )
-
 
 def decode_access_token(token: str) -> dict:
     payload = jwt.decode(
@@ -87,6 +114,7 @@ def decode_access_token(token: str) -> dict:
                 "jti",
                 "iss",
                 "aud",
+                "pwd_version",
             ],
         },
     )
@@ -154,6 +182,42 @@ def register_owner(db: Session, data: OwnerRegister) -> User:
 
     db.refresh(user)
     return user
+
+def change_password(
+    db: Session,
+    current_user: User,
+    data: PasswordChangeRequest,
+) -> None:
+    try:
+        # Lock and reload the account while changing its password.
+        db.refresh(current_user, with_for_update=True)
+
+        if current_user.status != "active":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="This account is not active.",
+            )
+
+        current_password = data.current_password.get_secret_value()
+        new_password = data.new_password.get_secret_value()
+
+        if not verify_password(current_password, current_user.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Current password is incorrect.",
+            )
+
+        if verify_password(new_password, current_user.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Choose a different new password.",
+            )
+
+        current_user.password_hash = hash_password(new_password)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
 
 def authenticate_user(db: Session, data: LoginRequest) -> User:
     user = db.scalar(

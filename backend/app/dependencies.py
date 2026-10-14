@@ -5,7 +5,11 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import User
-from app.services.auth_service import decode_access_token
+
+from app.services.auth_service import (
+    decode_access_token,
+    token_version_matches,
+)
 
 
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -39,6 +43,8 @@ def get_current_user(
     user = db.get(User, user_id)
 
     if user is None:
+        raise unauthorized
+    if not token_version_matches(payload, user.password_hash):
         raise unauthorized
 
     if user.status != "active":

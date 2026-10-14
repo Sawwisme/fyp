@@ -169,8 +169,21 @@ class _MyAppState extends State<MyApp> {
       title: 'Veterinary Dental Care',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF176B32),
+          primary: const Color(0xFF176B32),
+        ),
+        scaffoldBackgroundColor: const Color(0xFFF5F7F5),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFFF5F7F5),
+          foregroundColor: Color(0xFF176B32),
+          elevation: 0,
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+        ),
       ),
       home: _buildHome(),
     );

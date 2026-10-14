@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/api_client.dart';
 import '../services/auth_service.dart';
 import 'register.dart';
+import 'forgot_password.dart';
 
 class LoginScreen extends StatefulWidget {
   final AuthService auth;
@@ -24,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _password = TextEditingController();
 
   bool _loading = false;
+  bool _obscurePassword = true;
   String? _error;
 
   Future<void> _login() async {
@@ -55,6 +57,14 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() => _loading = false);
       }
     }
+  }
+
+  void _openForgotPassword() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ForgotPasswordScreen(auth: widget.auth),
+      ),
+    );
   }
 
     Future<void> _openRegistration() async {
@@ -94,7 +104,11 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Icon(Icons.pets, size: 64),
+                  Icon(
+                    Icons.pets,
+                    size: 64,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   const SizedBox(height: 20),
                   Text(
                     'Welcome back',
@@ -130,12 +144,29 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextFormField(
                     controller: _password,
                     enabled: !_loading,
-                    obscureText: true,
+                    obscureText: _obscurePassword,
                     autocorrect: false,
                     enableSuggestions: false,
-                    decoration: const InputDecoration(
-                      labelText: 'Password',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                    labelText: 'Password',
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      tooltip: _obscurePassword
+                            ? 'Show password'
+                            : 'Hide password',
+                      onPressed: _loading
+                            ? null
+                            : () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                      ),
                     ),
                     onFieldSubmitted: (_) => _login(),
                     validator: (value) {
@@ -155,6 +186,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                   const SizedBox(height: 24),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: _loading ? null : _openForgotPassword,
+                      child: const Text('Forgot password?'),
+                    ),
+                  ),
                   FilledButton(
                     onPressed: _loading ? null : _login,
                     child: Padding(
