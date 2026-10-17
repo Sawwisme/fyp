@@ -16,6 +16,14 @@ MODEL_PATH = os.path.join(
     "dental_classifier.keras"
 )
 
+OUTPUT_DIR = os.path.join(
+    BASE_DIR,
+    "models",
+    "gradcam_outputs"
+)
+
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
 IMAGE_SIZE = (224, 224)
 
 LABELS = [
@@ -34,7 +42,7 @@ THRESHOLDS = {
 
 
 # =========================================================
-# Load trained model
+# Load model
 # =========================================================
 
 print("Loading model...")
@@ -82,7 +90,7 @@ def load_image(image_path):
 
 
 # =========================================================
-# Find final convolutional layer inside EfficientNet
+# Find last convolutional layer
 # =========================================================
 
 def find_last_conv_layer(base_model):
@@ -113,7 +121,6 @@ def generate_gradcam(
     class_index
 ):
 
-    # EfficientNet backbone
     base_model = model.get_layer(
         "efficientnetb0"
     )
@@ -131,14 +138,11 @@ def generate_gradcam(
         last_conv_layer_name
     )
 
-    # Model from EfficientNet input
-    # to final conv layer
     conv_model = tf.keras.Model(
         inputs=base_model.input,
         outputs=last_conv_layer.output
     )
 
-    # Get classifier layers after EfficientNet
     global_pool = model.get_layer(
         "global_average_pooling2d"
     )
@@ -163,7 +167,6 @@ def generate_gradcam(
             conv_output
         )
 
-        # Disable dropout during inference
         x = dropout_layer(
             x,
             training=False
@@ -191,8 +194,7 @@ def generate_gradcam(
     conv_output = conv_output[0]
 
     heatmap = tf.reduce_sum(
-        conv_output
-        * pooled_gradients,
+        conv_output * pooled_gradients,
         axis=-1
     )
 
@@ -256,18 +258,92 @@ def overlay_heatmap(
 
 
 # =========================================================
-# Run Grad-CAM
+# Save Grad-CAM result
 # =========================================================
 
-def run_gradcam(
-    image_path,
-    target_condition
+def save_gradcam_result(
+    original_image,
+    overlay,
+    condition,
+    confidence,
+    image_name
 ):
 
-    if target_condition not in LABELS:
-        raise ValueError(
-            f"Invalid condition: {target_condition}"
-        )
+    plt.figure(
+        figsize=(10, 4)
+    )
+
+    plt.subplot(
+        1,
+        2,
+        1
+    )
+
+    plt.imshow(
+        original_image
+    )
+
+    plt.title(
+        "Original Image"
+    )
+
+    plt.axis(
+        "off"
+    )
+
+    plt.subplot(
+        1,
+        2,
+        2
+    )
+
+    plt.imshow(
+        overlay
+    )
+
+    plt.title(
+        f"Grad-CAM: {condition}\n"
+        f"Confidence: {confidence:.4f}"
+    )
+
+    plt.axis(
+        "off"
+    )
+
+    plt.tight_layout()
+
+    output_filename = (
+        f"{image_name}_{condition}_gradcam.png"
+    )
+
+    output_path = os.path.join(
+        OUTPUT_DIR,
+        output_filename
+    )
+
+    plt.savefig(
+        output_path,
+        dpi=200,
+        bbox_inches="tight"
+    )
+
+    print(
+        "Saved:",
+        output_path
+    )
+
+    plt.show()
+
+    plt.close()
+
+
+# =========================================================
+# Automatic multi-label Grad-CAM
+# =========================================================
+
+def run_automatic_gradcam(
+    image_path
+):
 
     original_image, input_image = load_image(
         image_path
@@ -280,13 +356,19 @@ def run_gradcam(
 
     print("\nPredictions:")
 
-    for i, label in enumerate(LABELS):
+    positive_conditions = []
+
+    for i, label in enumerate(
+        LABELS
+    ):
 
         confidence = float(
             predictions[i]
         )
 
-        threshold = THRESHOLDS[label]
+        threshold = THRESHOLDS[
+            label
+        ]
 
         status = (
             "POSITIVE"
@@ -301,57 +383,85 @@ def run_gradcam(
             f"{status}"
         )
 
-    class_index = LABELS.index(
-        target_condition
-    )
+        if confidence >= threshold:
 
-    heatmap = generate_gradcam(
-        model,
-        input_image,
-        class_index
-    )
+            positive_conditions.append(
+                (
+                    label,
+                    confidence,
+                    i
+                )
+            )
 
-    overlay = overlay_heatmap(
-        original_image,
-        heatmap
-    )
+    print("\nDetected positive conditions:")
+
+    if len(
+        positive_conditions
+    ) == 0:
+
+        print(
+            "No condition exceeded its threshold."
+        )
+
+        return
+
+    for condition, confidence, class_index in positive_conditions:
+
+        print(
+            f"- {condition}: "
+            f"{confidence:.4f}"
+        )
+
+    image_name = os.path.splitext(
+        os.path.basename(
+            image_path
+        )
+    )[0]
 
     # =====================================================
-    # Display result
+    # Generate Grad-CAM for every positive condition
     # =====================================================
 
-    plt.figure(figsize=(10, 4))
+    for condition, confidence, class_index in positive_conditions:
 
-    plt.subplot(1, 2, 1)
-    plt.imshow(original_image)
-    plt.title("Original Image")
-    plt.axis("off")
+        print(
+            f"\nGenerating Grad-CAM for: "
+            f"{condition}"
+        )
 
-    plt.subplot(1, 2, 2)
-    plt.imshow(overlay)
-    plt.title(
-        f"Grad-CAM: {target_condition}"
-    )
-    plt.axis("off")
+        heatmap = generate_gradcam(
+            model,
+            input_image,
+            class_index
+        )
 
-    plt.tight_layout()
-    plt.show()
+        overlay = overlay_heatmap(
+            original_image,
+            heatmap
+        )
+
+        save_gradcam_result(
+            original_image,
+            overlay,
+            condition,
+            confidence,
+            image_name
+        )
 
 
 # =========================================================
-# Example usage
+# Main
 # =========================================================
 
 if __name__ == "__main__":
 
     IMAGE_PATH = os.path.join(
         BASE_DIR,
-        "test_image.jpg"
+        "fyp final dataset",
+        "images",
+        "cat_0741.jpg"
     )
 
-    TARGET_CONDITION = "gingivitis"
-
-    run_gradcam(
-        IMAGE_PATH,
-        TARGET_CONDITION
+    run_automatic_gradcam(
+        IMAGE_PATH
     )
