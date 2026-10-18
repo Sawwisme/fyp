@@ -79,6 +79,7 @@ def create_schedule(
                 Schedule.end_time > data.start_time,
             )
             .limit(1)
+            .with_for_update()
         )
 
         if overlapping is not None:
