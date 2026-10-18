@@ -2,6 +2,9 @@
     const isStaffPage =
         window.location.pathname.endsWith('/user_management.html');
 
+    const isSchedulePage =
+        window.location.pathname.endsWith('/schedules.html');
+
     const sidebar = document.getElementById('shared-sidebar');
     const topbar = document.getElementById('shared-topbar');
 
@@ -28,9 +31,10 @@
                 User Management
             </a>
 
-            <button class="nav-item" type="button" disabled>
-                Appointment Schedule <small>Coming soon</small>
-            </button>
+            <a class="nav-item" href="/web/admin/schedules.html"
+            data-page="schedules">
+                Appointment Schedule
+            </a>
 
             <button class="nav-item" type="button" disabled>
                 Products <small>Coming soon</small>
@@ -77,11 +81,13 @@
     `;
 
     function highlightNavigation() {
-        const activePage = isStaffPage
-            ? 'staff'
-            : window.location.hash === '#profile'
-                ? 'profile'
-                : 'dashboard';
+        const activePage = isSchedulePage
+            ? 'schedules'
+            : isStaffPage
+                ? 'staff'
+                : window.location.hash === '#profile'
+                    ? 'profile'
+                    : 'dashboard';
 
         sidebar.querySelectorAll('[data-page]').forEach(link => {
             const active = link.dataset.page === activePage;

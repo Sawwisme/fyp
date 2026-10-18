@@ -1,4 +1,5 @@
 from datetime import date, time
+from typing import Literal
 
 from pydantic import (
     BaseModel,
@@ -62,3 +63,8 @@ class ScheduleResponse(BaseModel):
     end_time: time
     status: str
     time_slots: list[TimeSlotResponse]
+
+class SlotStatusUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    status: Literal["available", "blocked"]

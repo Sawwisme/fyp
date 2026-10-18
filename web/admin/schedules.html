@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VetDental — Appointment Schedule</title>
+
+    <link rel="stylesheet" href="/web/styles.css">
+    <link rel="stylesheet" href="/web/admin/dashboard.css">
+    <link rel="stylesheet" href="/web/admin/layout.css">
+
+    <script src="/web/admin/layout.js" defer></script>
+    <script src="/web/admin/schedules.js" defer></script>
+</head>
+
+<body>
+    <div id="schedule-loading" class="loading">
+        <p id="schedule-loading-message" role="status">
+            Loading schedules…
+        </p>
+        <button id="schedule-retry" class="secondary" type="button" hidden>
+            Try again
+        </button>
+        <a href="/web/">Back to staff login</a>
+    </div>
+
+    <div id="schedule-workspace" class="workspace" hidden>
+        <aside id="shared-sidebar" class="sidebar"></aside>
+
+        <div class="content-area">
+            <header id="shared-topbar" class="topbar"></header>
+
+            <main class="main-content">
+                <div class="page-heading">
+                    <h1>Appointment Schedule</h1>
+                    <p class="subtitle">
+                        Set veterinarian working hours and generate booking slots.
+                        All times use Malaysia time.
+                    </p>
+                </div>
+
+                <section class="panel" aria-labelledby="create-title">
+                    <h2 id="create-title">Create schedule</h2>
+
+                    <form id="schedule-form">
+                        <fieldset id="schedule-fields" class="staff-form-grid">
+                            <div>
+                                <label class="field-label" for="schedule-vet">
+                                    Veterinarian
+                                </label>
+                                <select id="schedule-vet" required></select>
+                            </div>
+
+                            <div>
+                                <label class="field-label" for="schedule-date">
+                                    Date
+                                </label>
+                                <input id="schedule-date" type="date" required>
+                            </div>
+
+                            <div>
+                                <label class="field-label" for="schedule-start">
+                                    Start time
+                                </label>
+                                <input id="schedule-start" type="time" step="60" value="09:00" required>
+                            </div>
+
+                            <div>
+                                <label class="field-label" for="schedule-end">
+                                    End time
+                                </label>
+                                <input id="schedule-end" type="time" step="60" value="12:00" required>
+                            </div>
+
+                            <div>
+                                <label class="field-label" for="schedule-duration">
+                                    Slot length
+                                </label>
+                                <select id="schedule-duration" required>
+                                    <option value="15">15 minutes</option>
+                                    <option value="30" selected>30 minutes</option>
+                                    <option value="45">45 minutes</option>
+                                    <option value="60">60 minutes</option>
+                                </select>
+                            </div>
+                        </fieldset>
+
+                        <p id="schedule-message" class="message" role="status" aria-live="polite"></p>
+
+                        <div class="staff-actions">
+                            <button id="create-schedule" class="primary compact-button" type="submit">
+                                Create schedule
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="panel section-panel" aria-labelledby="schedule-list-title">
+                    <div class="staff-heading">
+                        <div>
+                            <h2 id="schedule-list-title">Schedules and time slots</h2>
+                            <p class="muted">
+                                For the selected veterinarian and date.
+                            </p>
+                        </div>
+
+                        <button id="refresh-schedules" class="secondary compact-button" type="button">
+                            Refresh
+                        </button>
+                    </div>
+
+                    <p id="schedule-list-message" role="status" aria-live="polite"></p>
+
+                    <div id="schedule-list"></div>
+                </section>
+            </main>
+        </div>
+    </div>
+</body>
+
+</html>
