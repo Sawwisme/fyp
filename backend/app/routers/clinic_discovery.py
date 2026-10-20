@@ -37,5 +37,18 @@ def search_clinics(
 )
 def search_clinics_by_name(
     q: str = Query(min_length=3, max_length=150),
+    state: str = Query(min_length=2, max_length=50),
 ):
-    return clinic_discovery_service.search_clinics_by_name(q)
+    return clinic_discovery_service.search_clinics_by_name(
+        q,
+        state,
+    )
+
+@router.get(
+    "/by-state",
+    response_model=list[DiscoveredClinic],
+)
+def list_saved_clinics(
+    state: str = Query(min_length=2, max_length=50),
+):
+    return clinic_discovery_service.list_saved_clinics(state)

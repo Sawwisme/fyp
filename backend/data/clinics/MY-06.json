@@ -1,0 +1,32 @@
+{
+  "state": "Pahang",
+  "state_code": "MY-06",
+  "downloaded_at": "2026-10-20T19:07:30.837447+00:00",
+  "source": "OpenStreetMap contributors",
+  "clinics": [
+    {
+      "osm_type": "way",
+      "osm_id": 694261861,
+      "clinic_name": "Pejabat Perkhidmatan Veterinar",
+      "address": null,
+      "latitude": 4.17844,
+      "longitude": 102.042207
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1414195169,
+      "clinic_name": "Pejabat Perkhidmatan Veterinar Daerah Cameron Highlands",
+      "address": null,
+      "latitude": 4.469628,
+      "longitude": 101.381096
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1073797390,
+      "clinic_name": "Pejabat PerkhidmatanVeterinar Daerah Bera",
+      "address": null,
+      "latitude": 3.27134,
+      "longitude": 102.46343
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "state": "Kedah",
+  "state_code": "MY-02",
+  "downloaded_at": "2026-10-20T17:55:22.747307+00:00",
+  "source": "OpenStreetMap contributors",
+  "clinics": [
+    {
+      "osm_type": "node",
+      "osm_id": 3839261673,
+      "clinic_name": "AS Ecovet",
+      "address": null,
+      "latitude": 6.146109,
+      "longitude": 100.39587
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6589264486,
+      "clinic_name": "Furmily",
+      "address": null,
+      "latitude": 6.255688,
+      "longitude": 100.418754
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4565301199,
+      "clinic_name": "Jabatan Perkhidmatan Veterinar",
+      "address": null,
+      "latitude": 5.801548,
+      "longitude": 100.480104
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 7319616961,
+      "clinic_name": "Klinik Haiwan & Surgeri AOR",
+      "address": null,
+      "latitude": 6.105657,
+      "longitude": 100.361195
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6006835385,
+      "clinic_name": "Klinik Haiwan Angsana",
+      "address": "Changloon",
+      "latitude": 6.412969,
+      "longitude": 100.427945
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4553209790,
+      "clinic_name": "Klinik Haiwan Cenang",
+      "address": null,
+      "latitude": 6.308915,
+      "longitude": 99.724374
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1012142281,
+      "clinic_name": "Klinik Haiwan Jalan Datuk Kumbar",
+      "address": null,
+      "latitude": 6.120534,
+      "longitude": 100.392025
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5861478846,
+      "clinic_name": "Klinik Haiwan Jitra",
+      "address": null,
+      "latitude": 6.231006,
+      "longitude": 100.419956
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 14023629327,
+      "clinic_name": "Klinik Haiwan Perdana Heights",
+      "address": null,
+      "latitude": 5.672889,
+      "longitude": 100.506874
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 419306766,
+      "clinic_name": "Pejabat Perkhidmatan Veterinar",
+      "address": null,
+      "latitude": 6.281853,
+      "longitude": 100.420625
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1066614525,
+      "clinic_name": "Pejabat Perkhidmatan Veterinar Daerah Pokok Sena",
+      "address": null,
+      "latitude": 6.163329,
+      "longitude": 100.532067
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6978550376,
+      "clinic_name": "Pejabat Perkhidmatan Veterinar Daerah Yan",
+      "address": null,
+      "latitude": 5.795374,
+      "longitude": 100.371996
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4806001148,
+      "clinic_name": "Pusat Perkhidmatan Veterinar",
+      "address": null,
+      "latitude": 5.653743,
+      "longitude": 100.499906
+    }
+  ]
+}

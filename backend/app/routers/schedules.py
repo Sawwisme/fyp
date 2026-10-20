@@ -10,9 +10,10 @@ from app.schemas.schedule import (
     ScheduleCreate,
     ScheduleResponse,
     SlotStatusUpdate,
+    BulkScheduleCreate,
+    BulkScheduleResponse,
 )
-from app.services import schedule_service
-
+from app.services import schedule_service, bulk_schedule_service
 
 router = APIRouter(
     prefix="/schedules",
@@ -116,4 +117,22 @@ def update_slot_status(
         schedule_id,
         slot_id,
         data.status,
+    )
+
+@router.post(
+    "/generate",
+    response_model=BulkScheduleResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def generate_schedules(
+    data: BulkScheduleCreate,
+    current_user: User = Depends(
+        require_roles("clinic_administrator")
+    ),
+    db: Session = Depends(get_db),
+):
+    return bulk_schedule_service.generate_schedules(
+        db,
+        current_user,
+        data,
     )

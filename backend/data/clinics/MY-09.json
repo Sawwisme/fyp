@@ -1,0 +1,16 @@
+{
+  "state": "Perlis",
+  "state_code": "MY-09",
+  "downloaded_at": "2026-10-20T17:58:41.048931+00:00",
+  "source": "OpenStreetMap contributors",
+  "clinics": [
+    {
+      "osm_type": "node",
+      "osm_id": 3567976474,
+      "clinic_name": "Perkhidmatan Veterinar Negeri Perlis",
+      "address": null,
+      "latitude": 6.41277,
+      "longitude": 100.200187
+    }
+  ]
+}

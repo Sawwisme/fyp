@@ -1,8 +1,9 @@
+import hashlib
+
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-import hashlib
 
 from app.models import Clinic, ClinicAdministrator, User
 from app.schemas.admin_registration import AdminRegistrationRequest
@@ -26,181 +27,160 @@ def list_registration_clinics(
     )
 
 
-def resolve_registration_clinic(
-    db: Session,
-    data: AdminRegistrationRequest,
-) -> Clinic:
-    if data.clinic_id is not None:
-        clinic = db.scalar(
-            select(Clinic)
-            .where(
-                Clinic.clinic_id == data.clinic_id,
-                Clinic.status == "active",
-            )
-            .with_for_update()
-        )
-
-        if clinic is None:
-            raise HTTPException(
-                status_code=400,
-                detail="Select an available clinic.",
-            )
-
-        return clinic
-
-    if data.manual_clinic is not None:
-        return resolve_manual_clinic(db, data.manual_clinic)
-
-    selected = verify_selection(
-        data.selection_token.get_secret_value()
-    )
-
-    query = select(Clinic).where(
-        Clinic.osm_type == selected.osm_type,
-        Clinic.osm_id == selected.osm_id,
-    )
-
-    clinic = db.scalar(query.with_for_update())
-
-    if clinic is None:
-        clinic = Clinic(
-            clinic_code=(
-                f"OSM-{selected.osm_type.upper()}-{selected.osm_id}"
-            ),
-            clinic_name=selected.clinic_name,
-            address=selected.address,
-            latitude=selected.latitude,
-            longitude=selected.longitude,
-            osm_type=selected.osm_type,
-            osm_id=selected.osm_id,
-            status="pending",
-        )
-
-        try:
-            # Preserve the outer transaction if another registration
-            # creates the same map clinic concurrently.
-            with db.begin_nested():
-                db.add(clinic)
-                db.flush()
-        except IntegrityError:
-            clinic = db.scalar(
-                query.execution_options(
-                    populate_existing=True
-                ).with_for_update()
-            )
-
-            if clinic is None:
-                raise
-
-    if clinic.status not in {"active", "pending"}:
-        raise HTTPException(
-            status_code=400,
-            detail="This clinic is not accepting registrations.",
-        )
-
-    return clinic
-
-
 def register_administrator(
     db: Session,
     data: AdminRegistrationRequest,
 ) -> None:
     try:
+        email = str(data.email).strip().lower()
+
         existing_user = db.scalar(
             select(User.user_id).where(
-                User.email == str(data.email)
+                func.lower(User.email) == email
             )
         )
 
         if existing_user is not None:
             raise HTTPException(
                 status_code=409,
-                detail="An account with this email already exists.",
+                detail=(
+                    "This email is already registered. "
+                    "Use a different email for this account."
+                ),
             )
 
-        clinic = resolve_registration_clinic(db, data)
+        # Public registration cannot join an existing clinic.
+        if data.clinic_id is not None:
+            raise HTTPException(
+                status_code=409,
+                detail=(
+                    "This clinic is already registered. "
+                    "Contact your clinic administrator."
+                ),
+            )
+
+        if data.manual_clinic is not None:
+            details = data.manual_clinic
+
+            identity = (
+                f"{details.clinic_name.casefold()}\n"
+                f"{details.address.casefold()}"
+            )
+
+            fingerprint = hashlib.sha256(
+                identity.encode("utf-8")
+            ).hexdigest()[:32]
+
+            values = {
+                "clinic_code": f"MANUAL-{fingerprint}",
+                "clinic_name": details.clinic_name,
+                "address": details.address,
+            }
+
+        else:
+            selected = verify_selection(
+                data.selection_token.get_secret_value()
+            )
+
+            values = {
+                "clinic_code": (
+                    f"OSM-{selected.osm_type.upper()}-{selected.osm_id}"
+                ),
+                "clinic_name": selected.clinic_name,
+                "address": selected.address,
+                "latitude": selected.latitude,
+                "longitude": selected.longitude,
+                "osm_type": selected.osm_type,
+                "osm_id": selected.osm_id,
+            }
+
+        conditions = [
+            Clinic.clinic_code == values["clinic_code"]
+        ]
+
+        if values.get("osm_id") is not None:
+            conditions.append(
+                (Clinic.osm_type == values["osm_type"])
+                & (Clinic.osm_id == values["osm_id"])
+            )
+
+        # Also catch matching manual/map submissions where
+        # both the clinic name and address are the same.
+        if values.get("address"):
+            conditions.append(
+                (
+                    func.lower(func.trim(Clinic.clinic_name))
+                    == values["clinic_name"].strip().lower()
+                )
+                & (
+                    func.lower(func.trim(Clinic.address))
+                    == values["address"].strip().lower()
+                )
+            )
+
+        existing_clinic = db.scalar(
+            select(Clinic.clinic_id)
+            .where(or_(*conditions))
+            .with_for_update()
+        )
+
+        if existing_clinic is not None:
+            raise HTTPException(
+                status_code=409,
+                detail=(
+                    "This clinic is already registered. "
+                    "Contact your clinic administrator."
+                ),
+            )
+
+        clinic = Clinic(
+            **values,
+            status="active",
+        )
+
+        db.add(clinic)
+        db.flush()
 
         user = User(
             full_name=data.full_name,
-            email=str(data.email),
+            email=email,
             phone_number=data.phone_number,
             password_hash=hash_password(
                 data.password.get_secret_value()
             ),
             role="clinic_administrator",
-            status="pending",
+            status="active",
         )
 
         user.clinic_administrator = ClinicAdministrator(
             clinic_id=clinic.clinic_id,
             clinic_name=clinic.clinic_name,
-            membership_status="pending",
+            membership_status="approved",
         )
 
         db.add(user)
         db.commit()
-    except IntegrityError as exc:
+
+    except IntegrityError as error:
         db.rollback()
 
-        if exc.orig.args and exc.orig.args[0] == 1062:
+        error_code = getattr(error.orig, "args", (None,))[0]
+
+        if error_code == 1062:
             raise HTTPException(
                 status_code=409,
-                detail="An account with this email already exists.",
+                detail=(
+                    "This email or clinic is already registered. "
+                    "Use your existing account or contact "
+                    "your clinic administrator."
+                ),
             ) from None
 
         raise HTTPException(
             status_code=500,
-            detail="Unable to submit administrator registration.",
+            detail="Unable to register your clinic.",
         ) from None
+
     except Exception:
         db.rollback()
         raise
-
-def resolve_manual_clinic(db: Session, details) -> Clinic:
-    # Reuse identical manual submissions without relying on clinic name alone.
-    identity = (
-        f"{details.clinic_name.casefold()}\n"
-        f"{details.address.casefold()}"
-    )
-
-    fingerprint = hashlib.sha256(
-        identity.encode("utf-8")
-    ).hexdigest()[:32]
-
-    clinic_code = f"MANUAL-{fingerprint}"
-
-    query = select(Clinic).where(
-        Clinic.clinic_code == clinic_code
-    )
-
-    clinic = db.scalar(query.with_for_update())
-
-    if clinic is None:
-        clinic = Clinic(
-            clinic_code=clinic_code,
-            clinic_name=details.clinic_name,
-            address=details.address,
-            status="pending",
-        )
-
-        try:
-            with db.begin_nested():
-                db.add(clinic)
-                db.flush()
-        except IntegrityError:
-            clinic = db.scalar(
-                query.execution_options(
-                    populate_existing=True
-                ).with_for_update()
-            )
-
-            if clinic is None:
-                raise
-
-    if clinic.status not in {"active", "pending"}:
-        raise HTTPException(
-            status_code=400,
-            detail="This clinic is not accepting registrations.",
-        )
-
-    return clinic

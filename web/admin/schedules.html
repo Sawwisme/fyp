@@ -40,9 +40,68 @@
                     </p>
                 </div>
 
-                <section class="panel" aria-labelledby="create-title">
-                    <h2 id="create-title">Create schedule</h2>
+                <section class="panel section-panel">
+                    <h2>Generate schedules from clinic hours</h2>
 
+                    <p class="muted">
+                        Select veterinarians and a date range.
+                        Opening hours and breaks follow your saved clinic settings.
+                        Closed days are skipped.
+                    </p>
+
+                    <form id="bulk-schedule-form">
+                        <fieldset id="bulk-schedule-fields">
+                            <fieldset class="bulk-vet-picker">
+                                <legend>Veterinarians</legend>
+                                <div id="bulk-vet-options"></div>
+                            </fieldset>
+
+                            <div class="staff-form-grid">
+                                <div>
+                                    <label class="field-label" for="bulk-start-date">
+                                        Start date
+                                    </label>
+                                    <input id="bulk-start-date" type="date" required>
+                                </div>
+
+                                <div>
+                                    <label class="field-label" for="bulk-end-date">
+                                        End date
+                                    </label>
+                                    <input id="bulk-end-date" type="date" required>
+                                </div>
+
+                                <div>
+                                    <label class="field-label" for="bulk-slot-duration">
+                                        Slot length
+                                    </label>
+                                    <select id="bulk-slot-duration" required>
+                                        <option value="15">15 minutes</option>
+                                        <option value="30" selected>30 minutes</option>
+                                        <option value="45">45 minutes</option>
+                                        <option value="60">60 minutes</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <p class="muted">
+                            Maximum 20 veterinarians and 31 days per batch.
+                            Existing overlapping schedules must be resolved first.
+                        </p>
+
+                        <p id="bulk-schedule-message" class="message" role="status" aria-live="polite"></p>
+
+                        <div class="staff-actions">
+                            <button id="generate-schedules" class="primary compact-button" type="submit">
+                                Generate schedules
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="panel" aria-labelledby="create-title">
+                    <h2 id="create-title">Create an individual schedule</h2>
                     <form id="schedule-form">
                         <fieldset id="schedule-fields" class="staff-form-grid">
                             <div>

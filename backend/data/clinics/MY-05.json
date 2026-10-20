@@ -1,0 +1,40 @@
+{
+  "state": "Negeri Sembilan",
+  "state_code": "MY-05",
+  "downloaded_at": "2026-10-20T19:06:23.819623+00:00",
+  "source": "OpenStreetMap contributors",
+  "clinics": [
+    {
+      "osm_type": "way",
+      "osm_id": 577860578,
+      "clinic_name": "Jabatan Perkhidmatan Veterinar Negeri Sembilan",
+      "address": null,
+      "latitude": 2.757764,
+      "longitude": 101.993116
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4868320145,
+      "clinic_name": "Klinik Haiwan & Surgeri Port Dickson",
+      "address": "Port Dickson",
+      "latitude": 2.551206,
+      "longitude": 101.805978
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11389240894,
+      "clinic_name": "Klinik Veterinar Dan Surgeri Rembau",
+      "address": null,
+      "latitude": 2.591634,
+      "longitude": 102.092941
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1025836234,
+      "clinic_name": "Pejabat Perkhidmatan Veterinar",
+      "address": null,
+      "latitude": 2.744462,
+      "longitude": 102.247601
+    }
+  ]
+}

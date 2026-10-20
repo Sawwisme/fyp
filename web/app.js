@@ -162,14 +162,15 @@ form.addEventListener('submit', async event => {
 
     const credentials = {
         email: email.value.trim(),
-        password: password.value
+        password: password.value,
+        role: selectedRole
     };
 
     message.textContent = '';
     setLoginBusy(true);
 
     try {
-        const data = await apiRequest('/auth/login', {
+        const data = await apiRequest('/auth/staff-login', {
             body: credentials
         });
 

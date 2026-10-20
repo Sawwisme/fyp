@@ -45,7 +45,7 @@ def register_administrator(
 
     return MessageResponse(
         message=(
-            "Registration submitted. Your clinic membership must be "
-            "approved before you can log in."
-        )
+            "Your clinic and administrator account have been created. "
+            "You can now sign in using Clinic Administrator."
+        ),
     )

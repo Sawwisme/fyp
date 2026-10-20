@@ -1,0 +1,80 @@
+{
+  "state": "Terengganu",
+  "state_code": "MY-11",
+  "downloaded_at": "2026-10-20T18:01:36.493906+00:00",
+  "source": "OpenStreetMap contributors",
+  "clinics": [
+    {
+      "osm_type": "node",
+      "osm_id": 10949201811,
+      "clinic_name": "Klinik Haiwan dan Surgeri MHI",
+      "address": null,
+      "latitude": 5.775062,
+      "longitude": 102.550961
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6624664742,
+      "clinic_name": "Klinik Haiwan Kemaman",
+      "address": null,
+      "latitude": 4.235677,
+      "longitude": 103.421702
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 705783723,
+      "clinic_name": "Klinik Haiwan Kemaman",
+      "address": null,
+      "latitude": 4.237725,
+      "longitude": 103.411331
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11751055055,
+      "clinic_name": "Klinik Veterinar Dr Nor",
+      "address": null,
+      "latitude": 5.314185,
+      "longitude": 103.141022
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 984872371,
+      "clinic_name": "Pejabat Perkhidmatan Veterinar Daerah Dungun",
+      "address": null,
+      "latitude": 4.770976,
+      "longitude": 103.410786
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4537023796,
+      "clinic_name": "Pusat Perkhidmatan Veterinar",
+      "address": null,
+      "latitude": 5.798598,
+      "longitude": 102.517962
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1228773033,
+      "clinic_name": "Pusat Perkhidmatan Veterinar Kerteh",
+      "address": "24300",
+      "latitude": 4.51553,
+      "longitude": 103.444184
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 394273481,
+      "clinic_name": "Pusat Veterinar Paka",
+      "address": null,
+      "latitude": 4.635351,
+      "longitude": 103.435581
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13944274801,
+      "clinic_name": "Tawakkal Veterinary klinik",
+      "address": "Lot 97E Jalan Kuala Berang, 21400",
+      "latitude": 5.260192,
+      "longitude": 103.096993
+    }
+  ]
+}

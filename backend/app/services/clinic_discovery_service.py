@@ -9,6 +9,7 @@ from urllib.error import URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from pydantic import ValidationError
+from pathlib import Path
 from app.schemas.clinic_discovery import ClinicSelectionData
 
 import jwt
@@ -16,6 +17,11 @@ from fastapi import HTTPException
 
 from app.config import JWT_ALGORITHM, JWT_ISSUER, JWT_SECRET_KEY
 from app.schemas.clinic_discovery import DiscoveredClinic
+
+from app.states import (
+    MALAYSIAN_STATES,
+    matches_selected_state,
+)
 
 
 OVERPASS_URL = os.getenv(
@@ -257,7 +263,7 @@ def verify_selection(token: str) -> ClinicSelectionData:
             detail="Clinic selection expired or is invalid. Search again.",
         ) from None
 
-def search_clinics_by_name(query_text: str):
+def search_clinics_by_name(query_text: str, state_name: str):
     global _last_request, _search_running
 
     query_text = " ".join(query_text.split())
@@ -268,7 +274,13 @@ def search_clinics_by_name(query_text: str):
             detail="Enter between 3 and 150 characters.",
         )
 
-    key = ("name", query_text.casefold())
+    if state_name not in MALAYSIAN_STATES:
+        raise HTTPException(
+            status_code=400,
+            detail="Select a valid Malaysian state.",
+        )
+
+    key = ("name", state_name, query_text.casefold())
     now = monotonic()
 
     with _lock:
@@ -290,7 +302,7 @@ def search_clinics_by_name(query_text: str):
 
     try:
         parameters = urlencode({
-            "q": query_text,
+            "q": f"{query_text} {MALAYSIAN_STATES[state_name][0]} Malaysia",
             "countrycode": "MY",
             "osm_tag": "amenity:veterinary",
             "limit": 10,
@@ -310,7 +322,7 @@ def search_clinics_by_name(query_text: str):
         )
 
         try:
-            with urlopen(request, timeout=15) as response:
+            with urlopen(request, timeout=8) as response:
                 raw = response.read(1_000_001)
 
             if len(raw) > 1_000_000:
@@ -324,7 +336,14 @@ def search_clinics_by_name(query_text: str):
             ):
                 raise ValueError("Invalid search response")
 
-        except (URLError, TimeoutError, ValueError):
+        except (URLError, TimeoutError, ValueError) as error:
+            print(
+                "Clinic search provider failed:",
+                type(error).__name__,
+                str(error),
+                flush=True,
+            )
+
             raise HTTPException(
                 status_code=503,
                 detail=(
@@ -342,6 +361,9 @@ def search_clinics_by_name(query_text: str):
 
             properties = feature.get("properties") or {}
             geometry = feature.get("geometry") or {}
+
+            if not matches_selected_state(properties, state_name):
+                continue
 
             if (
                 properties.get("osm_key") != "amenity"
@@ -416,3 +438,79 @@ def search_clinics_by_name(query_text: str):
     finally:
         with _lock:
             _search_running = False
+
+def list_saved_clinics(state_name: str):
+    state_codes = {
+        "Johor": "MY-01",
+        "Kedah": "MY-02",
+        "Kelantan": "MY-03",
+        "Melaka": "MY-04",
+        "Negeri Sembilan": "MY-05",
+        "Pahang": "MY-06",
+        "Pulau Pinang": "MY-07",
+        "Perak": "MY-08",
+        "Perlis": "MY-09",
+        "Selangor": "MY-10",
+        "Terengganu": "MY-11",
+        "Sabah": "MY-12",
+        "Sarawak": "MY-13",
+        "W.P. Kuala Lumpur": "MY-14",
+        "W.P. Labuan": "MY-15",
+        "W.P. Putrajaya": "MY-16",
+    }
+
+    if state_name not in state_codes:
+        raise HTTPException(
+            status_code=400,
+            detail="Select a valid Malaysian state.",
+        )
+
+    source = (
+        Path(__file__).resolve().parents[2]
+        / "data"
+        / "clinics"
+        / f"{state_codes[state_name]}.json"
+    )
+
+    try:
+        document = json.loads(source.read_text(encoding="utf-8"))
+
+        if (
+            not isinstance(document, dict)
+            or document.get("state") != state_name
+            or not isinstance(document.get("clinics"), list)
+        ):
+            raise ValueError("Invalid saved directory.")
+
+        clinics = [
+            ClinicSelectionData.model_validate(record).model_dump()
+            for record in document["clinics"]
+        ]
+
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "The clinic directory for this state is not ready. "
+                "Select Enter clinic details manually."
+            ),
+        ) from None
+
+    except (OSError, ValueError, TypeError, ValidationError):
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "The saved clinic directory could not be loaded. "
+                "Select Enter clinic details manually."
+            ),
+        ) from None
+
+    clinics.sort(key=lambda item: item["clinic_name"].casefold())
+
+    return [
+        DiscoveredClinic(
+            **clinic,
+            selection_token=sign_selection(clinic),
+        ).model_dump()
+        for clinic in clinics
+    ]

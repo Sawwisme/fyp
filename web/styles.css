@@ -583,13 +583,6 @@ dialog::backdrop {
     font-size: 13px;
 }
 
-#clinic-map-results {
-    display: grid;
-    gap: 8px;
-    max-height: 240px;
-    overflow-y: auto;
-}
-
 .clinic-search-result {
     display: grid;
     gap: 5px;
@@ -686,4 +679,98 @@ dialog::backdrop {
 
 .clinic-search-credit a {
     color: inherit;
+}
+
+#clinic-state,
+#clinic-entry-mode {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid #ccd6ce;
+    border-radius: 8px;
+    background: #fafbf9;
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+}
+
+#manual-clinic-fields legend {
+    padding: 0 8px;
+    color: var(--green);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+#manual-clinic-fields:disabled {
+    opacity: .6;
+}
+
+#clinic-state:focus-visible,
+#clinic-entry-mode:focus-visible {
+    outline: 3px solid #91c49e;
+    outline-offset: 2px;
+}
+
+.clinic-combobox {
+    position: relative;
+}
+
+#clinic-name-query {
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.clinic-combobox #clinic-map-results {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 5px);
+    left: 0;
+    right: 0;
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 5px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: white;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 10%);
+}
+
+#clinic-map-results[hidden] {
+    display: none;
+}
+
+.clinic-option {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border: 0;
+    border-radius: 6px;
+    background: white;
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.clinic-option:hover,
+.clinic-option[aria-selected="true"] {
+    background: #e7f2e9;
+}
+
+.clinic-option strong,
+.clinic-option span {
+    display: block;
+}
+
+.clinic-option span {
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.clinic-empty {
+    margin: 0;
+    padding: 12px;
+    color: var(--muted);
+    font-size: 13px;
 }

@@ -1,0 +1,56 @@
+{
+  "state": "Sabah",
+  "state_code": "MY-12",
+  "downloaded_at": "2026-10-20T17:59:43.703428+00:00",
+  "source": "OpenStreetMap contributors",
+  "clinics": [
+    {
+      "osm_type": "node",
+      "osm_id": 2483167405,
+      "clinic_name": "Century Animals Medical Centre",
+      "address": "Block C, Ground Floor, Lot 25 Jalan Pintas Penampang, Penampang, Kota Kinabalu, Sabah, 89500",
+      "latitude": 5.926288,
+      "longitude": 116.077243
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2483150046,
+      "clinic_name": "Century Pets",
+      "address": null,
+      "latitude": 5.92633,
+      "longitude": 116.07703
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11827082815,
+      "clinic_name": "Companion Animal Clinic",
+      "address": null,
+      "latitude": 5.932062,
+      "longitude": 116.070909
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 9922919269,
+      "clinic_name": "Jabatan Perkhidamtan Veterinar",
+      "address": null,
+      "latitude": 5.882202,
+      "longitude": 118.055024
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2483167409,
+      "clinic_name": "Klinik Haiwan Hill's",
+      "address": "Jalan Pintas Penampang, Penampang, Kota Kinabalu, Sabah, 89500",
+      "latitude": 5.926286,
+      "longitude": 116.077277
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5966309786,
+      "clinic_name": "Loch 11",
+      "address": null,
+      "latitude": 5.992484,
+      "longitude": 116.111954
+    }
+  ]
+}

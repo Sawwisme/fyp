@@ -91,3 +91,6 @@ class ResetPasswordRequest(BaseModel):
         if len(value.get_secret_value().encode("utf-8")) > 72:
             raise ValueError("Password must not exceed 72 UTF-8 bytes")
         return value
+
+class StaffLoginRequest(LoginRequest):
+    role: Literal["clinic_administrator", "veterinarian"]

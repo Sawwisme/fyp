@@ -72,3 +72,46 @@ class VeterinarianResponse(BaseModel):
     approval_status: str
     clinic_name: str | None
     user: UserResponse
+
+class AdministratorCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    full_name: str = Field(min_length=1, max_length=150)
+    email: EmailStr = Field(max_length=255)
+    password: SecretStr = Field(min_length=8, max_length=72)
+    phone_number: str | None = Field(default=None, max_length=20)
+
+    @field_validator("full_name", mode="before")
+    @classmethod
+    def validate_name(cls, value):
+        if isinstance(value, str):
+            value = value.strip()
+            if not value:
+                raise ValueError("Full name cannot be blank")
+        return value
+
+    @field_validator("phone_number", mode="before")
+    @classmethod
+    def normalize_phone(cls, value):
+        if isinstance(value, str):
+            return value.strip() or None
+        return value
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, value: SecretStr) -> SecretStr:
+        if len(value.get_secret_value().encode("utf-8")) > 72:
+            raise ValueError(
+                "Password must not exceed 72 UTF-8 bytes"
+            )
+        return value
+
+
+class AdministratorResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    clinic_administrator_id: int
+    clinic_id: int
+    clinic_name: str
+    membership_status: str
+    user: UserResponse

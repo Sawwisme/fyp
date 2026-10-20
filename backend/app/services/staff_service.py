@@ -1,10 +1,10 @@
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload
 
-from app.models import User, Veterinarian
-from app.schemas.staff import VeterinarianCreate
+from app.models import User, Veterinarian, ClinicAdministrator
+from app.schemas.staff import VeterinarianCreate, AdministratorCreate
 from app.services.admin_profile_service import get_admin_record
 from app.services.auth_service import hash_password
 
@@ -110,6 +110,100 @@ def list_veterinarians(
             Veterinarian.clinic_id == administrator.clinic_id,
         )
         .order_by(Veterinarian.veterinarian_id.desc())
+        .offset(offset)
+        .limit(limit)
+    )
+
+    return list(db.scalars(statement).all())
+
+def create_administrator(
+    db: Session,
+    current_user: User,
+    data: AdministratorCreate,
+) -> ClinicAdministrator:
+    try:
+        administrator = get_admin_record(db, current_user)
+        email = str(data.email).strip().lower()
+
+        existing_email = db.scalar(
+            select(User.user_id).where(
+                func.lower(User.email) == email
+            )
+        )
+
+        if existing_email is not None:
+            raise HTTPException(
+                status_code=409,
+                detail="An account with this email already exists.",
+            )
+
+        user = User(
+            full_name=data.full_name,
+            email=email,
+            phone_number=data.phone_number,
+            password_hash=hash_password(
+                data.password.get_secret_value()
+            ),
+            role="clinic_administrator",
+            status="active",
+        )
+
+        record = ClinicAdministrator(
+            user=user,
+            clinic_id=administrator.clinic_id,
+            clinic_name=administrator.clinic.clinic_name,
+            membership_status="approved",
+        )
+
+        db.add(record)
+        db.commit()
+
+        db.refresh(record)
+        db.refresh(user)
+
+        return record
+
+    except IntegrityError as error:
+        db.rollback()
+
+        error_code = getattr(error.orig, "args", (None,))[0]
+
+        if error_code == 1062:
+            raise HTTPException(
+                status_code=409,
+                detail="An account with this email already exists.",
+            ) from None
+
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to create the administrator account.",
+        ) from None
+
+    except Exception:
+        db.rollback()
+        raise
+
+
+def list_administrators(
+    db: Session,
+    current_user: User,
+    offset: int,
+    limit: int,
+) -> list[ClinicAdministrator]:
+    administrator = get_admin_record(db, current_user)
+
+    statement = (
+        select(ClinicAdministrator)
+        .join(ClinicAdministrator.user)
+        .options(joinedload(ClinicAdministrator.user))
+        .where(
+            ClinicAdministrator.clinic_id
+            == administrator.clinic_id,
+            User.role == "clinic_administrator",
+        )
+        .order_by(
+            ClinicAdministrator.clinic_administrator_id.desc()
+        )
         .offset(offset)
         .limit(limit)
     )

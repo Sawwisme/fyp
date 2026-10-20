@@ -67,57 +67,6 @@ async function registrationRequest(path, body) {
     }
 }
 
-async function loadRegistrationClinics() {
-    if (registrationBusy) return;
-
-    registrationBusy = true;
-    registrationClinicsReady = false;
-    registrationFields.disabled = true;
-    registrationRetry.hidden = true;
-    registrationMessage.textContent = 'Loading available clinics…';
-    registrationClinic.replaceChildren();
-
-    try {
-        const clinics = [];
-
-        for (let offset = 0; ; offset += 100) {
-            const page = await registrationRequest(
-                `/admin-registration/clinics?offset=${offset}&limit=100`
-            );
-
-            if (!Array.isArray(page)) {
-                throw new Error('Invalid clinic directory response.');
-            }
-
-            clinics.push(...page);
-
-            if (page.length < 100) break;
-        }
-
-        const placeholder = document.createElement('option');
-        placeholder.value = '';
-        placeholder.textContent = 'Select your clinic';
-        registrationClinic.appendChild(placeholder);
-
-        for (const clinic of clinics) {
-            const option = document.createElement('option');
-            option.value = clinic.clinic_id;
-            option.textContent = clinic.address
-                ? `${clinic.clinic_name} — ${clinic.address}`
-                : clinic.clinic_name;
-            registrationClinic.appendChild(option);
-        }
-
-        registrationClinicsReady = true;
-        registrationMessage.textContent = '';
-    } catch (error) {
-        registrationMessage.textContent = error.message;
-        registrationRetry.hidden = false;
-    } finally {
-        registrationBusy = false;
-        registrationFields.disabled = !registrationClinicsReady;
-    }
-}
 
 document.querySelectorAll('[data-registration-password]').forEach(button => {
     button.addEventListener('click', () => {
@@ -152,8 +101,7 @@ for (const input of [
 registrationForm.addEventListener('submit', async event => {
     event.preventDefault();
 
-    if (registrationBusy || !registrationClinicsReady || window.clinicMapSearching)
-        return;
+    if (registrationBusy || !registrationClinicsReady || (window.clinicMapSearching && !window.clinicManualMode)) return;
 
     registrationName.setCustomValidity(
         registrationName.value.trim() ? '' : 'Full name cannot be blank.'
@@ -201,10 +149,6 @@ registrationForm.addEventListener('submit', async event => {
         clinicChoice = {
             selection_token: mapSelection.selection_token
         };
-    } else if (registrationClinic.value) {
-        clinicChoice = {
-            clinic_id: Number(registrationClinic.value)
-        };
     } else {
         registrationMessage.textContent =
             'Select a clinic result or enter your clinic manually.';
@@ -243,12 +187,13 @@ registrationForm.addEventListener('submit', async event => {
         body.password = '';
         registrationBusy = false;
         registrationFields.disabled = !registrationClinicsReady;
-        registrationSubmit.textContent = 'Submit registration';
+        registrationSubmit.textContent = 'Register Clinic';
     }
 });
 
-registrationRetry.addEventListener('click', loadRegistrationClinics);
-loadRegistrationClinics();
+registrationClinicsReady = true;
+registrationFields.disabled = false;
+registrationRetry.hidden = true;
 
 for (const id of ['manual-clinic-name', 'manual-clinic-address']) {
     document.getElementById(id).addEventListener('input', event => {

@@ -25,9 +25,9 @@
 
             <section id="registration-section">
                 <span class="eyebrow">CLINIC ADMINISTRATOR</span>
-                <h1>Create an account</h1>
+                <h1>Register your clinic</h1>
                 <p class="subtitle">
-                    Select your clinic and submit your administrator application.
+                    Create your clinic’s first administrator account.
                 </p>
 
                 <form id="admin-registration-form">
@@ -50,34 +50,64 @@
                         <div class="registration-clinic-picker">
                             <h2>Your veterinary clinic</h2>
 
-                            <label class="field-label" for="clinic-name-query">
-                                Search clinic name
+                            <label class="field-label" for="clinic-state">
+                                State / Federal Territory
                             </label>
+                            <select id="clinic-state">
+                                <option value="">Select your state</option>
+                                <option>Johor</option>
+                                <option>Kedah</option>
+                                <option>Kelantan</option>
+                                <option>Melaka</option>
+                                <option>Negeri Sembilan</option>
+                                <option>Pahang</option>
+                                <option>Pulau Pinang</option>
+                                <option>Perak</option>
+                                <option>Perlis</option>
+                                <option>Sabah</option>
+                                <option>Sarawak</option>
+                                <option>Selangor</option>
+                                <option>Terengganu</option>
+                                <option>W.P. Kuala Lumpur</option>
+                                <option>W.P. Labuan</option>
+                                <option>W.P. Putrajaya</option>
+                            </select>
 
-                            <div class="clinic-name-search">
-                                <input id="clinic-name-query" type="text" maxlength="150"
-                                    placeholder="Clinic name and town, e.g. Happy Vet Penang">
-                                <button id="search-clinic-name" class="secondary compact-button" type="button">
-                                    Search
-                                </button>
+                            <label class="field-label" for="clinic-entry-mode">
+                                How would you like to enter your clinic?
+                            </label>
+                            <select id="clinic-entry-mode">
+                                <option value="search">Search for my clinic</option>
+                                <option value="manual">Enter clinic details manually</option>
+                            </select>
+
+                            <div id="clinic-search-fields">
+                                <label class="field-label" for="clinic-name-query">
+                                    Select your clinic
+                                </label>
+
+                                <div class="clinic-combobox">
+                                    <input id="clinic-name-query" type="text" maxlength="255"
+                                        placeholder="Select a state first" autocomplete="off" role="combobox"
+                                        aria-autocomplete="list" aria-expanded="false"
+                                        aria-controls="clinic-map-results" disabled>
+
+                                    <div id="clinic-map-results" role="listbox" aria-label="Veterinary clinics" hidden>
+                                    </div>
+                                </div>
+
+                                <p id="clinic-map-message" class="message" role="status" aria-live="polite"></p>
+
+                                <p class="clinic-search-credit">
+                                    Clinic data:
+                                    <a href="https://www.openstreetmap.org/copyright" target="_blank"
+                                        rel="noopener">OpenStreetMap contributors</a>
+                                    · Saved clinic directory
+                                </p>
                             </div>
 
-                            <p id="clinic-map-message" class="message" role="status" aria-live="polite"></p>
-
-                            <div id="clinic-map-results"></div>
-
-                            <p class="clinic-search-credit">
-                                Search data:
-                                <a href="https://www.openstreetmap.org/copyright" target="_blank"
-                                    rel="noopener">OpenStreetMap contributors</a>
-                                · Photon
-                            </p>
-
-                            <button id="clinic-manual-toggle" class="text-button" type="button">
-                                My clinic isn’t listed
-                            </button>
-
                             <fieldset id="manual-clinic-fields" hidden disabled>
+                                <legend>Manual clinic details</legend>
                                 <label class="field-label" for="manual-clinic-name">
                                     Clinic name
                                 </label>
@@ -89,8 +119,8 @@
                                 <input id="manual-clinic-address" type="text" maxlength="255" required>
 
                                 <p class="registration-note">
-                                    These details will be reviewed before clinic access is approved.
-                                    Map coordinates can be added after approval.
+                                    Enter your clinic’s full address.
+                                    Map coordinates can be added in clinic settings.
                                 </p>
                             </fieldset>
 
@@ -103,16 +133,9 @@
                                 <div id="registration-map" aria-label="Selected clinic location"></div>
                             </details>
 
-                            <details class="existing-clinic-picker">
-                                <summary>Choose a clinic already registered with VetDental</summary>
-
-                                <label class="field-label" for="registration-clinic">
-                                    Registered clinic
-                                </label>
-                                <select id="registration-clinic">
-                                    <option value="">Loading clinics…</option>
-                                </select>
-                            </details>
+                            <select id="registration-clinic" hidden disabled>
+                                <option value=""></option>
+                            </select>
                         </div>
 
                         <label class="field-label" for="registration-password">
@@ -146,12 +169,12 @@
                         </div>
 
                         <p class="muted registration-note">
-                            Clinic membership requires approval.
-                            Selecting a clinic does not grant access.
+                            Already registered? Contact your clinic administrator
+                            to obtain a staff account.
                         </p>
 
                         <button id="registration-submit" class="primary" type="submit">
-                            Submit registration
+                            Register clinic
                         </button>
                     </fieldset>
                 </form>
@@ -164,8 +187,8 @@
             </section>
 
             <section id="registration-success" hidden>
-                <span class="badge">Pending approval</span>
-                <h1>Application submitted</h1>
+                <span class="badge">Registration complete</span>
+                <h1>Your clinic is ready</h1>
                 <p id="registration-success-message"></p>
             </section>
 

@@ -1,6 +1,9 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, Request, status
 from sqlalchemy.orm import Session
 
+from fastapi import HTTPException
+from app.schemas.auth import StaffLoginRequest
+
 from app.dependencies import get_current_user
 from app.models import User
 
@@ -203,4 +206,32 @@ def show_password_reset_page():
                 "form-action 'self'"
             ),
         },
+    )
+
+@router.post(
+    "/staff-login",
+    response_model=TokenResponse,
+)
+def staff_login(
+    data: StaffLoginRequest,
+    db: Session = Depends(get_db),
+):
+    user = authenticate_user(db, data)
+
+    if user.role != data.role:
+        raise HTTPException(
+            status_code=403,
+            detail=(
+                "This account does not match the selected staff role. "
+                "Select the correct login tab."
+            ),
+        )
+
+    return TokenResponse(
+        access_token=create_access_token(
+            user.user_id,
+            user.password_hash,
+        ),
+        expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        user=UserResponse.model_validate(user),
     )

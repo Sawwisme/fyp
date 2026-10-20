@@ -25,6 +25,12 @@ const createVet = document.getElementById('create-vet');
 const refreshVets = document.getElementById('refresh-vets');
 const vetPasswordToggle = document.getElementById('vet-password-toggle');
 
+const staffRole = document.getElementById('staff-role');
+const vetRegistrationField =
+    document.getElementById('vet-registration-field');
+const vetQualificationField =
+    document.getElementById('vet-qualification-field');
+
 let staffStarting = false;
 let vetListBusy = false;
 let vetCreating = false;
@@ -93,7 +99,7 @@ async function staffRequest(path, body) {
             throw new Error(
                 body === undefined
                     ? 'Cannot reach the server. Check that the backend is running.'
-                    : 'Could not confirm account creation. Refresh the veterinarian list before trying again.'
+                    : 'Could not confirm account creation. Refresh the staff list before trying again.'
             );
         }
 
@@ -117,22 +123,61 @@ async function loadVeterinarians() {
 
     vetListBusy = true;
     updateStaffButtons();
-    vetListMessage.textContent = 'Loading veterinarians…';
+    vetListMessage.textContent = 'Loading clinic staff…';
     vetTableBody.replaceChildren();
 
+    async function loadAll(path) {
+        const records = [];
+
+        for (let offset = 0; ; offset += 100) {
+            const page = await staffRequest(
+                `${path}?offset=${offset}&limit=100`
+            );
+
+            if (!Array.isArray(page)) {
+                throw new Error('Invalid staff list response.');
+            }
+
+            records.push(...page);
+
+            if (page.length < 100) break;
+        }
+
+        return records;
+    }
+
     try {
-        const vets = await staffRequest(
-            '/staff/veterinarians?offset=0&limit=100'
+        const [vets, administrators] = await Promise.all([
+            loadAll('/staff/veterinarians'),
+            loadAll('/staff/administrators')
+        ]);
+
+        const staff = [
+            ...administrators.map(record => ({
+                user: record.user,
+                role: 'Clinic Administrator',
+                registration: '—'
+            })),
+            ...vets.map(record => ({
+                user: record.user,
+                role: 'Veterinarian',
+                registration: record.registration_number
+            }))
+        ];
+
+        staff.sort((first, second) =>
+            first.user.full_name.localeCompare(second.user.full_name)
         );
 
-        for (const vet of vets) {
+        for (const person of staff) {
             const row = document.createElement('tr');
 
             for (const value of [
-                vet.user.full_name,
-                vet.user.email,
-                vet.registration_number,
-                vet.user.status
+                person.user.full_name,
+                person.user.email,
+                person.role,
+                person.registration,
+                person.user.status
             ]) {
                 const cell = document.createElement('td');
                 cell.textContent = value;
@@ -142,9 +187,8 @@ async function loadVeterinarians() {
             vetTableBody.appendChild(row);
         }
 
-        vetListMessage.textContent = vets.length
-            ? `Showing ${vets.length} most recent veterinarian account(s).`
-            : 'No veterinarian accounts yet. Click Add Veterinarian to create one.';
+        vetListMessage.textContent =
+            `${staff.length} staff account(s) in your clinic.`;
     } catch (error) {
         vetListMessage.textContent = error.message;
     } finally {
@@ -153,8 +197,24 @@ async function loadVeterinarians() {
     }
 }
 
+function updateStaffRoleFields() {
+    const isVet = staffRole.value === 'veterinarian';
+
+    vetRegistrationField.hidden = !isVet;
+    vetQualificationField.hidden = !isVet;
+
+    vetRegistration.disabled = !isVet;
+    vetRegistration.required = isVet;
+    vetQualification.disabled = !isVet;
+
+    vetRegistration.setCustomValidity('');
+}
+
+staffRole.addEventListener('change', updateStaffRoleFields);
+
 function resetVetForm() {
     vetForm.reset();
+    updateStaffRoleFields();
     vetPassword.type = 'password';
     vetPasswordToggle.setAttribute('aria-pressed', 'false');
     vetPasswordToggle.setAttribute('aria-label', 'Show initial password');
@@ -204,7 +264,13 @@ vetForm.addEventListener('submit', async event => {
 
     if (vetCreating || vetListBusy) return;
 
-    for (const input of [vetName, vetRegistration]) {
+    const isVet = staffRole.value === 'veterinarian';
+
+    const requiredInputs = isVet
+        ? [vetName, vetRegistration]
+        : [vetName];
+
+    for (const input of requiredInputs) {
         input.setCustomValidity(
             input.value.trim() ? '' : 'This field cannot be blank.'
         );
@@ -222,23 +288,29 @@ vetForm.addEventListener('submit', async event => {
         full_name: vetName.value.trim(),
         email: vetEmail.value.trim(),
         password: vetPassword.value,
-        registration_number: vetRegistration.value.trim(),
-        phone_number: vetPhone.value.trim() || null,
-        qualification: vetQualification.value.trim() || null
+        phone_number: vetPhone.value.trim() || null
     };
+
+    if (isVet) {
+        body.registration_number = vetRegistration.value.trim();
+        body.qualification = vetQualification.value.trim() || null;
+    }
+
+    const endpoint = isVet
+        ? '/staff/veterinarians'
+        : '/staff/administrators';
 
     vetCreating = true;
     updateStaffButtons();
     vetFormMessage.textContent = '';
 
     try {
-        await staffRequest('/staff/veterinarians', body);
-
+        await staffRequest(endpoint, body);
         resetVetForm();
         vetFormPanel.hidden = true;
 
         await loadVeterinarians();
-        window.alert('Veterinarian account created successfully.');
+        window.alert('Staff account created successfully.');
     } catch (error) {
         vetFormMessage.textContent = error.message;
     } finally {

@@ -315,3 +315,136 @@ body {
         gap: 0;
     }
 }
+
+#staff-role {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 44px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fafbf9;
+    color: var(--ink);
+    font: inherit;
+}
+
+.bulk-vet-picker {
+    margin-bottom: 20px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.bulk-vet-picker legend {
+    padding: 0 6px;
+    font-weight: 600;
+}
+
+#bulk-vet-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.bulk-vet-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.bulk-vet-option input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    flex-shrink: 0;
+    accent-color: var(--green);
+}
+
+#bulk-slot-duration,
+#schedule-duration,
+#schedule-vet {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 44px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fafbf9;
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+}
+
+#bulk-slot-duration:focus-visible,
+#schedule-duration:focus-visible,
+#schedule-vet:focus-visible {
+    outline: 3px solid #91c49e;
+    outline-offset: 2px;
+}
+
+#bulk-schedule-fields {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+}
+
+.bulk-vet-picker {
+    margin: 0 0 20px;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+}
+
+.bulk-vet-picker legend {
+    margin-bottom: 10px;
+    padding: 0;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#bulk-vet-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+}
+
+.bulk-vet-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fafbf9;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.bulk-vet-option:has(input:checked) {
+    border-color: var(--green);
+    background: #e7f2e9;
+}
+
+.bulk-vet-option:focus-within {
+    outline: 3px solid #91c49e;
+    outline-offset: 2px;
+}
+
+#bulk-vet-options:empty::before {
+    content: "No eligible veterinarians. Add an active veterinarian in User Management.";
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+section:has(#bulk-schedule-form) {
+    margin-bottom: 24px;
+}

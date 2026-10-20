@@ -1,0 +1,424 @@
+{
+  "state": "Selangor",
+  "state_code": "MY-10",
+  "downloaded_at": "2026-10-20T19:09:48.625363+00:00",
+  "source": "OpenStreetMap contributors",
+  "clinics": [
+    {
+      "osm_type": "node",
+      "osm_id": 12805953987,
+      "clinic_name": "Animed Veterinary Center",
+      "address": "11-G Jalan Desa Cahaya 11, Cheras, 56000",
+      "latitude": 3.045102,
+      "longitude": 101.742397
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 10813315002,
+      "clinic_name": "BRP Animal Clinic And Surgery",
+      "address": "53",
+      "latitude": 3.227151,
+      "longitude": 101.558866
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13769357762,
+      "clinic_name": "Catnest Veterinary Clinic - BTHO",
+      "address": "2A & 3A Jalan Suarasa 8/7, Cheras, 43200",
+      "latitude": 3.04707,
+      "longitude": 101.757791
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12119607989,
+      "clinic_name": "Catropolitan Veterinary Clinic",
+      "address": "33G Jalan Medan Bukit Indah 2, Ampang, 68000",
+      "latitude": 3.152093,
+      "longitude": 101.774965
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12269981400,
+      "clinic_name": "DrHawaVet Bangi",
+      "address": null,
+      "latitude": 2.963784,
+      "longitude": 101.763231
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1533842770,
+      "clinic_name": "Gasing Veterinary Hospital",
+      "address": "53&55, Petaling Jaya, 46000",
+      "latitude": 3.087243,
+      "longitude": 101.662928
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4754536239,
+      "clinic_name": "Happy Paws",
+      "address": "Kajang",
+      "latitude": 2.991297,
+      "longitude": 101.781494
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1110170822,
+      "clinic_name": "Institut Pengurusan Veterinar",
+      "address": null,
+      "latitude": 3.03658,
+      "longitude": 101.776002
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 8300690491,
+      "clinic_name": "iVet Medical Centre",
+      "address": "88 Jalan Pelabur A 23/A, Shah Alam, 40420",
+      "latitude": 3.047081,
+      "longitude": 101.527503
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1041898500,
+      "clinic_name": "Jabatan Perkhidmatan Veterinar Kuala Langat",
+      "address": null,
+      "latitude": 2.871449,
+      "longitude": 101.493868
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12270030312,
+      "clinic_name": "JHVH Veterinary Clinic",
+      "address": null,
+      "latitude": 2.964021,
+      "longitude": 101.764587
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 10725785640,
+      "clinic_name": "Kitty Kingdom",
+      "address": "47 Lorong Az Zaharah 10/B",
+      "latitude": 3.232693,
+      "longitude": 101.414622
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 10727153689,
+      "clinic_name": "Kitty’s Cottage",
+      "address": "7 Jalan PPAJ 2/8",
+      "latitude": 3.238958,
+      "longitude": 101.44657
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 7746220473,
+      "clinic_name": "Klinik Haiwan Dan Surgeri Dhillon",
+      "address": null,
+      "latitude": 3.109458,
+      "longitude": 101.625516
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12038509488,
+      "clinic_name": "Klinik Haiwan Dr Hawa Vet Ampang",
+      "address": "2 Jalan Avenue 1, One Ampang Avenue, 68000",
+      "latitude": 3.134978,
+      "longitude": 101.769626
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13159538567,
+      "clinic_name": "Klinik Haiwan Ikigai",
+      "address": "10 Jalan Presiden F U1/F",
+      "latitude": 3.094802,
+      "longitude": 101.58695
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4756642355,
+      "clinic_name": "Klinik Haiwan Mesra",
+      "address": "Jalan 7/7A, Bandar Baru Bangi, 43650",
+      "latitude": 2.968333,
+      "longitude": 101.774469
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13417543397,
+      "clinic_name": "Klinik Haiwan Pawsdoc.my",
+      "address": null,
+      "latitude": 3.114949,
+      "longitude": 101.760727
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 139214931,
+      "clinic_name": "Klinik Haiwan Ruby",
+      "address": "42 Jalan 6/31, Petaling Jaya, 46000",
+      "latitude": 3.088545,
+      "longitude": 101.653262
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4705755129,
+      "clinic_name": "Klinik Haiwan Siah",
+      "address": "Jalan Puchong, Puchong",
+      "latitude": 3.061866,
+      "longitude": 101.64611
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 880121726,
+      "clinic_name": "Klinik Haiwan Wee",
+      "address": null,
+      "latitude": 2.99753,
+      "longitude": 101.442282
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13286905569,
+      "clinic_name": "Klinik Veterinar dan Surgeri Aira",
+      "address": null,
+      "latitude": 3.241011,
+      "longitude": 101.706022
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12878460181,
+      "clinic_name": "Klinik Veterinar Dan Surgeri Olive Hill",
+      "address": null,
+      "latitude": 3.013615,
+      "longitude": 101.695736
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13377192650,
+      "clinic_name": "Klinik Veterinar dan Surgery CATSPACE",
+      "address": "Jalan Kebun Nenas 7A/KS 8",
+      "latitude": 2.959176,
+      "longitude": 101.51824
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12038495089,
+      "clinic_name": "Klinik Veterinar Goh",
+      "address": "66 Jalan Pandan Indah 4/3A, Pandan Indah, 55100",
+      "latitude": 3.131316,
+      "longitude": 101.754406
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4715487329,
+      "clinic_name": "Klinik Veterinar Kelana Jaya",
+      "address": "Petaling Jaya",
+      "latitude": 3.102813,
+      "longitude": 101.599824
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12243540206,
+      "clinic_name": "Klinik Veterinar Ziyad",
+      "address": null,
+      "latitude": 2.964218,
+      "longitude": 101.752781
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2900298452,
+      "clinic_name": "Klinik Veterinar Zul Erwan",
+      "address": "97G Jalan Nautika B U20/B, Sungai Buloh, 40160",
+      "latitude": 3.209264,
+      "longitude": 101.569424
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13954603161,
+      "clinic_name": "Kristy's Ark",
+      "address": null,
+      "latitude": 3.137833,
+      "longitude": 101.622736
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 792867259,
+      "clinic_name": "Makmal Kesihatan Awam Veterinar",
+      "address": null,
+      "latitude": 2.81431,
+      "longitude": 101.724825
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11147977730,
+      "clinic_name": "Nadia Veterinary Clinic",
+      "address": "84 Jalan Bidara 6/3",
+      "latitude": 3.20218,
+      "longitude": 101.487427
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11641378747,
+      "clinic_name": "Ohana Veterinary Clinic & Surgery (Taman Equine)",
+      "address": "B-2-G Jalan PP 25",
+      "latitude": 2.991581,
+      "longitude": 101.675861
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13925575210,
+      "clinic_name": "Pet Medical Centre",
+      "address": null,
+      "latitude": 2.992556,
+      "longitude": 101.616722
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12301256987,
+      "clinic_name": "Petaling District Veterinary Services Office",
+      "address": null,
+      "latitude": 3.1887,
+      "longitude": 101.589376
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13892948404,
+      "clinic_name": "Pets Health Veterinary Clinic and Surgery",
+      "address": "38-G PJU 1/45",
+      "latitude": 3.120762,
+      "longitude": 101.596413
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6602945744,
+      "clinic_name": "Philos Veterinary Clinic",
+      "address": null,
+      "latitude": 3.128228,
+      "longitude": 101.635976
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4736169123,
+      "clinic_name": "Right Angle Animal Clinic",
+      "address": "Petaling Jaya",
+      "latitude": 3.111264,
+      "longitude": 101.634336
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4755588013,
+      "clinic_name": "SAMC Animal Centre",
+      "address": "Jalan TKS 1, Taman Kajang Sentral, Kajang",
+      "latitude": 2.977366,
+      "longitude": 101.794212
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 454279759,
+      "clinic_name": "Starlight Veterinary Hospital",
+      "address": "30 Jalan Sulaiman 1",
+      "latitude": 3.150896,
+      "longitude": 101.749238
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11530248041,
+      "clinic_name": "Stella Vet Clinic",
+      "address": "R.G.17, Bell Avenue Jalan Sunsuria, Sepang, 43900",
+      "latitude": 2.828817,
+      "longitude": 101.705146
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12901622477,
+      "clinic_name": "Taqwa Vet Farm",
+      "address": null,
+      "latitude": 2.946983,
+      "longitude": 101.436876
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11942529081,
+      "clinic_name": "Temuvet",
+      "address": null,
+      "latitude": 3.185431,
+      "longitude": 101.525593
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12951211661,
+      "clinic_name": "Thundervet Animal Clinic",
+      "address": null,
+      "latitude": 3.334569,
+      "longitude": 101.518024
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12001774225,
+      "clinic_name": "Tompok Veterinary Clinic",
+      "address": null,
+      "latitude": 3.162685,
+      "longitude": 101.51342
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2621128074,
+      "clinic_name": "Unnamed veterinary clinic",
+      "address": null,
+      "latitude": 3.094473,
+      "longitude": 101.611531
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 10779432934,
+      "clinic_name": "Unnamed veterinary clinic",
+      "address": null,
+      "latitude": 3.232845,
+      "longitude": 101.451025
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11465285192,
+      "clinic_name": "Unnamed veterinary clinic",
+      "address": null,
+      "latitude": 3.346175,
+      "longitude": 101.245898
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 792868696,
+      "clinic_name": "Unnamed veterinary clinic",
+      "address": null,
+      "latitude": 2.814306,
+      "longitude": 101.724438
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 9941433972,
+      "clinic_name": "Vet For You",
+      "address": "19 Jalan Niaga Bestari 3",
+      "latitude": 3.234381,
+      "longitude": 101.42832
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 10859519180,
+      "clinic_name": "Vet For You",
+      "address": "9",
+      "latitude": 3.203831,
+      "longitude": 101.486419
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11949343486,
+      "clinic_name": "Vet For You",
+      "address": null,
+      "latitude": 3.161971,
+      "longitude": 101.513274
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 8412307067,
+      "clinic_name": "Vetology Veterinary Clinic and Surgery",
+      "address": "G-00-02, Pinnacle Kelana Jaya, Jalan SS 7/26, Petaling Jaya, 47301",
+      "latitude": 3.103852,
+      "longitude": 101.593619
+    }
+  ]
+}

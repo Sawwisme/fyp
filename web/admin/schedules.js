@@ -13,6 +13,15 @@
     const listMessage = document.getElementById('schedule-list-message');
     const list = document.getElementById('schedule-list');
 
+    const bulkForm = document.getElementById('bulk-schedule-form');
+    const bulkFields = document.getElementById('bulk-schedule-fields');
+    const bulkVetOptions = document.getElementById('bulk-vet-options');
+    const bulkStart = document.getElementById('bulk-start-date');
+    const bulkEnd = document.getElementById('bulk-end-date');
+    const bulkDuration = document.getElementById('bulk-slot-duration');
+    const bulkMessage = document.getElementById('bulk-schedule-message');
+    const generateButton = document.getElementById('generate-schedules');
+
     let busy = false;
 
     function logout() {
@@ -94,6 +103,8 @@
         fields.disabled = value;
         createButton.disabled = value || !vetSelect.value;
         refreshButton.disabled = value || !vetSelect.value;
+        bulkFields.disabled = value;
+        generateButton.disabled = value || !vetSelect.options.length;
 
         list.querySelectorAll('button').forEach(button => {
             button.disabled = value;
@@ -322,6 +333,68 @@
         window.location.reload();
     });
 
+    bulkForm.addEventListener('submit', async event => {
+        event.preventDefault();
+
+        if (busy || !bulkForm.reportValidity()) return;
+
+        bulkMessage.classList.remove('success');
+        bulkMessage.textContent = '';
+
+        const veterinarianIds = [
+            ...bulkVetOptions.querySelectorAll('input:checked')
+        ].map(input => Number(input.value));
+
+        if (
+            veterinarianIds.length === 0 ||
+            veterinarianIds.length > 20
+        ) {
+            bulkMessage.textContent =
+                'Select between 1 and 20 veterinarians.';
+            return;
+        }
+
+        const start = Date.parse(`${bulkStart.value}T00:00:00Z`);
+        const end = Date.parse(`${bulkEnd.value}T00:00:00Z`);
+        const days = (end - start) / 86400000;
+
+        if (!Number.isFinite(days) || days < 0 || days > 30) {
+            bulkMessage.textContent =
+                'Select a valid date range of at most 31 days.';
+            return;
+        }
+
+        const body = {
+            veterinarian_ids: veterinarianIds,
+            start_date: bulkStart.value,
+            end_date: bulkEnd.value,
+            slot_minutes: Number(bulkDuration.value)
+        };
+
+        setBusy(true);
+        generateButton.textContent = 'Generating…';
+
+        try {
+            const result = await request('/schedules/generate', body);
+
+            bulkMessage.classList.add('success');
+            bulkMessage.textContent =
+                `Created ${result.created_schedules} schedules with ` +
+                `${result.created_slots} slots. ` +
+                `${result.closed_days} closed day(s) skipped.`;
+
+            vetSelect.value = String(veterinarianIds[0]);
+            dateInput.value = body.start_date;
+
+            await renderSchedules();
+        } catch (error) {
+            bulkMessage.textContent = error.message;
+        } finally {
+            generateButton.textContent = 'Generate schedules';
+            setBusy(false);
+        }
+    });
+
     async function start() {
         setBusy(true);
 
@@ -358,6 +431,19 @@
                     option.textContent =
                         `${vet.user.full_name} (${vet.registration_number})`;
                     vetSelect.appendChild(option);
+                    const label = document.createElement('label');
+                    label.className = 'bulk-vet-option';
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.name = 'bulk-vet';
+                    checkbox.value = vet.veterinarian_id;
+
+                    const text = document.createElement('span');
+                    text.textContent = option.textContent;
+
+                    label.append(checkbox, text);
+                    bulkVetOptions.appendChild(label);
                 }
 
                 if (vets.length < 100) break;
@@ -369,6 +455,15 @@
                 month: '2-digit',
                 day: '2-digit'
             }).format(new Date());
+
+            const tomorrow = new Date(`${dateInput.value}T00:00:00Z`);
+            tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+            const tomorrowText = tomorrow.toISOString().slice(0, 10);
+
+            bulkStart.min = tomorrowText;
+            bulkEnd.min = tomorrowText;
+            bulkStart.value = tomorrowText;
+            bulkEnd.value = tomorrowText;
 
             document.getElementById('schedule-loading').hidden = true;
             document.getElementById('schedule-workspace').hidden = false;

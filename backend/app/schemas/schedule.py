@@ -68,3 +68,41 @@ class SlotStatusUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     status: Literal["available", "blocked"]
+
+class BulkScheduleCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    veterinarian_ids: list[int] = Field(
+        min_length=1,
+        max_length=20,
+    )
+    start_date: date
+    end_date: date
+    slot_minutes: int = Field(default=30, ge=5, le=120)
+
+    @field_validator("veterinarian_ids")
+    @classmethod
+    def validate_veterinarians(cls, values):
+        if any(value < 1 or value > 2147483647 for value in values):
+            raise ValueError("Invalid veterinarian ID")
+
+        if len(values) != len(set(values)):
+            raise ValueError("Do not select a veterinarian twice")
+
+        return sorted(values)
+
+    @model_validator(mode="after")
+    def validate_dates(self):
+        if self.end_date < self.start_date:
+            raise ValueError("End date must not precede start date")
+
+        if (self.end_date - self.start_date).days > 30:
+            raise ValueError("Generate at most 31 days at a time")
+
+        return self
+
+
+class BulkScheduleResponse(BaseModel):
+    created_schedules: int
+    created_slots: int
+    closed_days: int

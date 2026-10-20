@@ -1,0 +1,40 @@
+{
+  "state": "Kelantan",
+  "state_code": "MY-03",
+  "downloaded_at": "2026-10-20T19:05:12.775200+00:00",
+  "source": "OpenStreetMap contributors",
+  "clinics": [
+    {
+      "osm_type": "node",
+      "osm_id": 8931660426,
+      "clinic_name": "Klinik Veterinar UMK",
+      "address": null,
+      "latitude": 6.138392,
+      "longitude": 102.300326
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5724876621,
+      "clinic_name": "Pejabat Haiwan",
+      "address": null,
+      "latitude": 5.552282,
+      "longitude": 102.200419
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13516604931,
+      "clinic_name": "Pejabat Perkhidmatan Veterinar Jajahan Jeli",
+      "address": null,
+      "latitude": 5.69723,
+      "longitude": 101.841467
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 8971635015,
+      "clinic_name": "Pejabat Veterinar Jajahan Tumpat",
+      "address": null,
+      "latitude": 6.199582,
+      "longitude": 102.169702
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "state": "Melaka",
+  "state_code": "MY-04",
+  "downloaded_at": "2026-10-20T17:57:17.193896+00:00",
+  "source": "OpenStreetMap contributors",
+  "clinics": [
+    {
+      "osm_type": "node",
+      "osm_id": 8407988338,
+      "clinic_name": "Companion Veterinary Clinic",
+      "address": "203J (Ground) Jalan Kenanga 3/29A, Taman Kenanga Seksyen 3, 75200",
+      "latitude": 2.205423,
+      "longitude": 102.241987
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6290127444,
+      "clinic_name": "Dr. Jeyaseelan Arasoo Klinik Haiwan Melaka",
+      "address": "MT 74 Jalan Taman Sinn 4, Taman Sinn Ujong Pasir, 75050",
+      "latitude": 2.189553,
+      "longitude": 102.274239
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5544296821,
+      "clinic_name": "Grand Pet Salon",
+      "address": "8-1 Jalan KSB 12, 75200",
+      "latitude": 2.193513,
+      "longitude": 102.23623
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6324312743,
+      "clinic_name": "Jabatan Perkhidmatan Veterinar Negeri Melaka",
+      "address": "Jalan Ayer Keroh Lama, Ayer Keroh, 75450",
+      "latitude": 2.267266,
+      "longitude": 102.287763
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11114598778,
+      "clinic_name": "Kim Veterinary Clinic & Surgery",
+      "address": null,
+      "latitude": 2.249125,
+      "longitude": 102.223609
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4288722691,
+      "clinic_name": "Vally Animal Clinic (M) Sdn. Bhd.",
+      "address": "109 Jalan Laksamana Cheng Ho, Melaka, 75000",
+      "latitude": 2.195672,
+      "longitude": 102.259542
+    }
+  ]
+}

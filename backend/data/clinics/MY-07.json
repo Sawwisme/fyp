@@ -1,0 +1,32 @@
+{
+  "state": "Pulau Pinang",
+  "state_code": "MY-07",
+  "downloaded_at": "2026-10-20T16:40:39.277661+00:00",
+  "source": "OpenStreetMap contributors",
+  "clinics": [
+    {
+      "osm_type": "way",
+      "osm_id": 275876054,
+      "clinic_name": "Gills Veterinary Clinic",
+      "address": null,
+      "latitude": 5.436608,
+      "longitude": 100.30538
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 9111234357,
+      "clinic_name": "Island Vertinirary Clinic and Surgery",
+      "address": null,
+      "latitude": 5.395433,
+      "longitude": 100.314941
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6402727353,
+      "clinic_name": "Pet Wellness Veterinary Clinic",
+      "address": null,
+      "latitude": 5.423045,
+      "longitude": 100.396976
+    }
+  ]
+}

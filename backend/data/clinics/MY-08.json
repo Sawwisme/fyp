@@ -1,0 +1,88 @@
+{
+  "state": "Perak",
+  "state_code": "MY-08",
+  "downloaded_at": "2026-10-20T19:08:40.885466+00:00",
+  "source": "OpenStreetMap contributors",
+  "clinics": [
+    {
+      "osm_type": "node",
+      "osm_id": 6583629023,
+      "clinic_name": "Catmosphere Cat Centre",
+      "address": null,
+      "latitude": 4.332891,
+      "longitude": 101.155136
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4242211490,
+      "clinic_name": "Jabatan Perkhidmatan Veterinar Perak",
+      "address": null,
+      "latitude": 4.619134,
+      "longitude": 101.114352
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6559115563,
+      "clinic_name": "Klinik Haiwan dan Surgeri Tanjung Malim",
+      "address": null,
+      "latitude": 3.700866,
+      "longitude": 101.508877
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5365215842,
+      "clinic_name": "Klinik Haiwan Kampar",
+      "address": null,
+      "latitude": 4.332944,
+      "longitude": 101.155159
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6779492205,
+      "clinic_name": "Klinik Haiwan Taiping",
+      "address": null,
+      "latitude": 4.853054,
+      "longitude": 100.739165
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 727768733,
+      "clinic_name": "Pejabat Perkhidmatan Veterinar",
+      "address": null,
+      "latitude": 5.434678,
+      "longitude": 101.12988
+    },
+    {
+      "osm_type": "relation",
+      "osm_id": 19270802,
+      "clinic_name": "Pejabat Veterinar Daerah Kerian",
+      "address": null,
+      "latitude": 5.131569,
+      "longitude": 100.487879
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 962308922,
+      "clinic_name": "Pejabat Veterinar Daerah Larut & Matang",
+      "address": null,
+      "latitude": 4.852924,
+      "longitude": 100.730115
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13805950685,
+      "clinic_name": "Pejabat Veterinar Lenggong",
+      "address": "Lenggong, 33400",
+      "latitude": 5.110093,
+      "longitude": 100.965852
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12869685838,
+      "clinic_name": "Samudera Vet",
+      "address": "2393",
+      "latitude": 4.199334,
+      "longitude": 100.659089
+    }
+  ]
+}

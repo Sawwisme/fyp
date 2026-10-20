@@ -1,0 +1,128 @@
+{
+  "state": "W.P. Kuala Lumpur",
+  "state_code": "MY-14",
+  "downloaded_at": "2026-10-20T18:02:24.055524+00:00",
+  "source": "OpenStreetMap contributors",
+  "clinics": [
+    {
+      "osm_type": "node",
+      "osm_id": 6462439936,
+      "clinic_name": "Animal Medical Centre",
+      "address": null,
+      "latitude": 3.172644,
+      "longitude": 101.693466
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13097874606,
+      "clinic_name": "Bangsar Veterinary Clinic & Surgery",
+      "address": "94 Lorong Maarof",
+      "latitude": 3.13237,
+      "longitude": 101.673121
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1193057782,
+      "clinic_name": "Jabatan Perkhidmatan Veterinar Kuala Lumpur",
+      "address": null,
+      "latitude": 3.114712,
+      "longitude": 101.729184
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4898504723,
+      "clinic_name": "Klinik Haiwan",
+      "address": "79 Jalan Medan Setia 1",
+      "latitude": 3.150207,
+      "longitude": 101.654015
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4705755173,
+      "clinic_name": "Lee Veterinary Clinic",
+      "address": "Kuala Lumpur",
+      "latitude": 3.091032,
+      "longitude": 101.688198
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11084059046,
+      "clinic_name": "Leow Veterinary",
+      "address": null,
+      "latitude": 3.194277,
+      "longitude": 101.630501
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1120368975,
+      "clinic_name": "Mutiara Animal Clinic",
+      "address": "10 Jalan Mutiara Raya, Taman Mutiara Barat, 56000",
+      "latitude": 3.090498,
+      "longitude": 101.739882
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4666427342,
+      "clinic_name": "Poliklinik Haiwan",
+      "address": "Jalan Klang Lama, Kuala Lumpur",
+      "latitude": 3.105019,
+      "longitude": 101.677879
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13403758963,
+      "clinic_name": "Segar Veterinary Hospital",
+      "address": null,
+      "latitude": 3.088877,
+      "longitude": 101.743908
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13971770064,
+      "clinic_name": "Sixth Day Vetcare",
+      "address": null,
+      "latitude": 3.100586,
+      "longitude": 101.736931
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12620732726,
+      "clinic_name": "Small Animal And Exotics Hospital",
+      "address": "53 Jalan Maarof",
+      "latitude": 3.129153,
+      "longitude": 101.673819
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 8120949486,
+      "clinic_name": "Trusty Paws",
+      "address": "42A Jalan Rampai Niaga 4, Kuala Lumpur, 53300",
+      "latitude": 3.198827,
+      "longitude": 101.729238
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 8341884608,
+      "clinic_name": "Vet Partners",
+      "address": null,
+      "latitude": 3.131997,
+      "longitude": 101.670572
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13707439801,
+      "clinic_name": "Vetico",
+      "address": null,
+      "latitude": 3.179396,
+      "longitude": 101.68344
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11729279534,
+      "clinic_name": "Vets for Pets Animal Clinic",
+      "address": null,
+      "latitude": 3.09097,
+      "longitude": 101.679209
+    }
+  ]
+}

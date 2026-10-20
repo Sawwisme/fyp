@@ -1,0 +1,80 @@
+{
+  "state": "Johor",
+  "state_code": "MY-01",
+  "downloaded_at": "2026-10-20T17:54:43.209430+00:00",
+  "source": "OpenStreetMap contributors",
+  "clinics": [
+    {
+      "osm_type": "node",
+      "osm_id": 6251561990,
+      "clinic_name": "Eden Veterinary Clinic",
+      "address": null,
+      "latitude": 1.521434,
+      "longitude": 103.637025
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12450725189,
+      "clinic_name": "Jabatan Perkhidmatan Veterinar",
+      "address": null,
+      "latitude": 1.836508,
+      "longitude": 102.927971
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 7554130972,
+      "clinic_name": "Klinik Haiwan",
+      "address": null,
+      "latitude": 1.481749,
+      "longitude": 103.685504
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 10946619850,
+      "clinic_name": "Klinik Haiwan Vet Partners",
+      "address": null,
+      "latitude": 1.560976,
+      "longitude": 103.779945
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 7432913793,
+      "clinic_name": "Klinik Veterinar Dato' Onn",
+      "address": null,
+      "latitude": 1.557774,
+      "longitude": 103.738527
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 10933646162,
+      "clinic_name": "Klinik Veterinar Thats Animal",
+      "address": null,
+      "latitude": 1.553025,
+      "longitude": 103.784335
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12979349722,
+      "clinic_name": "MediCat",
+      "address": "40;42 Jalan Enau 11",
+      "latitude": 1.567759,
+      "longitude": 103.612316
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4161224389,
+      "clinic_name": "Pejabat Haiwan",
+      "address": null,
+      "latitude": 1.737468,
+      "longitude": 103.899385
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 7283906602,
+      "clinic_name": "Simpang Renggam Animal Clinic",
+      "address": "No 51 Jalan Setia 2, Simpang Renggam, 86200",
+      "latitude": 1.809209,
+      "longitude": 103.322766
+    }
+  ]
+}

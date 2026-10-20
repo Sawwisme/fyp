@@ -35,20 +35,31 @@
                     <div>
                         <h1>User Management</h1>
                         <p class="subtitle">
-                            Manage your clinic’s veterinarian accounts.
+                            Manage your clinic’s staff accounts.
                         </p>
                     </div>
 
                     <button id="open-vet-form" class="primary compact-button" type="button">
-                        Add Veterinarian
+                        Add Staff
                     </button>
                 </div>
 
                 <section id="vet-form-panel" class="panel" hidden aria-labelledby="vet-form-title">
-                    <h2 id="vet-form-title">Add Veterinarian</h2>
+                    <h2 id="vet-form-title">Add Staff</h2>
 
                     <form id="vet-form">
                         <fieldset id="vet-fields" class="staff-form-grid">
+                            <div>
+                                <label class="field-label" for="staff-role">
+                                    Account role
+                                </label>
+                                <select id="staff-role">
+                                    <option value="veterinarian">Veterinarian</option>
+                                    <option value="clinic_administrator">
+                                        Clinic Administrator
+                                    </option>
+                                </select>
+                            </div>
                             <div>
                                 <label class="field-label" for="vet-name">
                                     Full name
@@ -80,7 +91,7 @@
                                 </div>
                             </div>
 
-                            <div>
+                            <div id="vet-registration-field">
                                 <label class="field-label" for="vet-registration">
                                     Registration number
                                 </label>
@@ -94,7 +105,7 @@
                                 <input id="vet-phone" type="tel" maxlength="20">
                             </div>
 
-                            <div>
+                            <div id="vet-qualification-field">
                                 <label class="field-label" for="vet-qualification">
                                     Qualification (optional)
                                 </label>
@@ -136,6 +147,7 @@
                                 <tr>
                                     <th scope="col">Name</th>
                                     <th scope="col">Email</th>
+                                    <th scope="col">Role</th>
                                     <th scope="col">Registration number</th>
                                     <th scope="col">Status</th>
                                 </tr>
