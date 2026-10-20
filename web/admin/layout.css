@@ -186,3 +186,132 @@ body {
     padding: 6px 12px;
     font-size: 12px;
 }
+
+#clinic-hours-fields {
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+
+.clinic-period-row {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr auto;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.clinic-period-row select {
+    width: 100%;
+    min-width: 0;
+    padding: 13px 14px;
+    border: 1px solid #ccd6ce;
+    border-radius: 8px;
+    background: #fafbf9;
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+}
+
+.clinic-period-row select:focus-visible {
+    outline: 3px solid #91c49e;
+    outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+    .clinic-period-row {
+        grid-template-columns: 1fr 1fr;
+        padding-bottom: 16px;
+        margin-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+    }
+}
+
+.clinic-editor {
+    margin-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.clinic-editor>summary {
+    width: fit-content;
+    padding: 16px 0;
+    color: var(--green);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#clinic-settings-fields {
+    gap: 0 20px;
+}
+
+[data-clinic-field="address"],
+.clinic-map-editor {
+    grid-column: 1 / -1;
+}
+
+.clinic-map-editor {
+    margin-top: 20px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #f8faf8;
+}
+
+.clinic-map-editor>summary {
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.clinic-map-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.clinic-week-summary {
+    margin-top: 20px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.clinic-day-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 20px;
+    padding: 13px 16px;
+    background: white;
+    font-size: 14px;
+}
+
+.clinic-day-summary+.clinic-day-summary {
+    border-top: 1px solid var(--border);
+}
+
+.clinic-day-summary> :first-child {
+    font-weight: 600;
+}
+
+.clinic-day-summary> :last-child {
+    text-align: right;
+}
+
+.closed-day {
+    color: var(--muted);
+}
+
+.clinic-editor .staff-actions {
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+@media (max-width: 640px) {
+    .clinic-map-fields {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}

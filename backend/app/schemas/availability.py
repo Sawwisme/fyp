@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class VeterinarianSummary(BaseModel):
     veterinarian_id: int
+    clinic_id: int
     full_name: str
     clinic_name: str | None
     specialization: str | None
@@ -15,6 +16,7 @@ class AvailableSlotResponse(BaseModel):
     schedule_id: int
     veterinarian_id: int
     veterinarian_name: str
+    clinic_id: int
     clinic_name: str | None
     schedule_date: date
     start_time: time

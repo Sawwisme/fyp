@@ -11,6 +11,7 @@
 
     <script src="/web/admin/layout.js" defer></script>
     <script src="/web/admin/dashboard.js" defer></script>
+    <script src="/web/admin/clinic_settings.js" defer></script>
 </head>
 
 <body>
@@ -140,14 +141,82 @@
                         </dl>
                     </section>
 
-                    <section class="panel section-panel" aria-labelledby="security-title">
-                        <h2 id="security-title">Account information</h2>
+                    <section class="panel section-panel" aria-labelledby="clinic-settings-title">
+                        <div class="staff-heading">
+                            <h2 id="clinic-settings-title">Clinic information</h2>
+                            <button id="reload-clinic-settings" class="secondary compact-button" type="button">
+                                Reload settings
+                            </button>
+                        </div>
+
                         <dl class="details-grid">
                             <div class="full-width">
                                 <dt>Clinic name</dt>
                                 <dd id="account-clinic"></dd>
                             </div>
                         </dl>
+
+                        <dl id="clinic-contact-summary" class="details-grid"></dl>
+
+                        <details class="clinic-editor">
+                            <summary>Edit clinic information</summary>
+
+                            <form id="clinic-settings-form">
+                                <fieldset id="clinic-settings-fields" class="staff-form-grid" disabled></fieldset>
+
+                                <p class="muted">
+                                    Location is optional. Enter both latitude and longitude,
+                                    or leave both empty.
+                                </p>
+
+                                <p id="clinic-settings-message" class="message" role="status" aria-live="polite"></p>
+
+                                <div class="staff-actions">
+                                    <button id="save-clinic-settings" class="primary compact-button" type="submit"
+                                        disabled>
+                                        Save clinic information
+                                    </button>
+                                </div>
+                            </form>
+                        </details>
+                    </section>
+
+                    <section class="panel section-panel" aria-labelledby="clinic-hours-title">
+                        <h2 id="clinic-hours-title">Clinic working hours</h2>
+                        <p class="muted">
+                            Add opening periods for each weekday. A day without periods is
+                            closed. Add separate periods for a lunch break.
+                            All times use Malaysia time.
+                        </p>
+
+                        <div id="clinic-week-summary" class="clinic-week-summary"></div>
+
+                        <details class="clinic-editor">
+                            <summary>Edit weekly hours</summary>
+
+                            <form id="clinic-hours-form">
+                                <fieldset id="clinic-hours-fields" disabled>
+                                    <div id="clinic-hours-rows"></div>
+
+                                    <button id="add-clinic-period" class="secondary compact-button" type="button">
+                                        Add opening period
+                                    </button>
+                                </fieldset>
+
+                                <p id="clinic-hours-message" class="message" role="status" aria-live="polite"></p>
+
+                                <div class="staff-actions">
+                                    <button id="save-clinic-hours" class="primary compact-button" type="submit"
+                                        disabled>
+                                        Save weekly hours
+                                    </button>
+                                </div>
+                            </form>
+                        </details>
+                    </section>
+
+                    <section class="panel section-panel" aria-labelledby="security-title">
+                        <h2 id="security-title">Account information</h2>
 
                         <dl class="details-grid">
                             <div>

@@ -5,7 +5,9 @@ from app.schemas.user import UserResponse
 
 class AdminProfileResponse(BaseModel):
     clinic_administrator_id: int
+    clinic_id: int
     clinic_name: str
+    membership_status: str
     user: UserResponse
 
 

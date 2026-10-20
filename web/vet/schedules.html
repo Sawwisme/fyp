@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VetDental — My Schedule</title>
+
+    <link rel="stylesheet" href="/web/styles.css">
+    <link rel="stylesheet" href="/web/admin/dashboard.css">
+    <link rel="stylesheet" href="/web/admin/layout.css">
+
+    <script src="/web/vet/layout.js" defer></script>
+    <script src="/web/vet/schedules.js" defer></script>
+</head>
+
+<body>
+    <div id="vet-loading" class="loading">
+        <p id="vet-loading-message" role="status">
+            Loading your schedule…
+        </p>
+        <button id="vet-retry" class="secondary" type="button" hidden>
+            Try again
+        </button>
+        <a href="/web/">Back to staff login</a>
+    </div>
+
+    <div id="vet-workspace" class="workspace" hidden>
+        <aside id="shared-sidebar" class="sidebar"></aside>
+
+        <div class="content-area">
+            <header id="shared-topbar" class="topbar"></header>
+
+            <main class="main-content">
+                <div class="page-heading">
+                    <h1>My Schedule</h1>
+                    <p class="subtitle">
+                        View your working hours and manage slot availability.
+                        All times use Malaysia time.
+                    </p>
+                </div>
+
+                <section class="panel" aria-labelledby="my-slots-title">
+                    <div class="staff-heading">
+                        <h2 id="my-slots-title">Schedules and time slots</h2>
+
+                        <div>
+                            <label class="field-label" for="my-schedule-date">
+                                Date
+                            </label>
+                            <input id="my-schedule-date" type="date" required>
+                        </div>
+
+                        <button id="my-schedule-refresh" class="secondary compact-button" type="button">
+                            Refresh
+                        </button>
+                    </div>
+
+                    <p class="muted">
+                        You can block or reopen future slots that have no
+                        appointments. Contact your administrator to change
+                        working hours or cancel a whole schedule.
+                    </p>
+
+                    <p id="my-schedule-action" class="message" role="status" aria-live="polite"></p>
+
+                    <p id="my-schedule-message" role="status" aria-live="polite"></p>
+
+                    <div id="my-schedule-list"></div>
+                </section>
+            </main>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -29,6 +29,17 @@ class Veterinarian(Base):
     approval_status = Column(String(20), nullable=False)
     clinic_name = Column(String(150), nullable=True)
 
+    clinic_id = Column(
+        Integer,
+        ForeignKey("clinics.clinic_id"),
+        nullable=True,
+    )
+
+    clinic = relationship(
+        "Clinic",
+        back_populates="veterinarians",
+    )
+
     user = relationship("User", back_populates="veterinarian")
     
     schedules = relationship(

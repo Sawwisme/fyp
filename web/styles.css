@@ -507,3 +507,183 @@ dialog::backdrop {
         padding: 28px 24px;
     }
 }
+
+.registration-shell {
+    max-width: 540px;
+}
+
+#registration-fields {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+#registration-clinic {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid #ccd6ce;
+    border-radius: 8px;
+    background: #fafbf9;
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+}
+
+#registration-clinic:focus-visible {
+    outline: 3px solid #91c49e;
+    outline-offset: 2px;
+}
+
+.registration-note {
+    margin: 20px 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.registration-back {
+    margin: 24px 0 0;
+    text-align: center;
+    font-size: 14px;
+}
+
+.registration-back a {
+    color: var(--green);
+}
+
+.registration-shell {
+    max-width: 680px;
+}
+
+.registration-clinic-picker {
+    margin-top: 24px;
+}
+
+.registration-clinic-picker h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+#registration-map {
+    height: 300px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    z-index: 0;
+}
+
+.map-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.map-actions button {
+    padding: 10px;
+    font-size: 13px;
+}
+
+#clinic-map-results {
+    display: grid;
+    gap: 8px;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.clinic-search-result {
+    display: grid;
+    gap: 5px;
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    color: var(--ink);
+    text-align: left;
+}
+
+.clinic-search-result span {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.clinic-search-result.selected {
+    border-color: var(--green);
+    background: #e7f2e9;
+}
+
+.selected-clinic {
+    padding: 12px;
+    border-radius: 8px;
+    background: #edf4ee;
+    color: var(--green-dark);
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.existing-clinic-picker {
+    margin-top: 16px;
+    font-size: 13px;
+}
+
+.existing-clinic-picker summary {
+    cursor: pointer;
+    color: var(--green);
+}
+
+@media (max-width: 480px) {
+    .map-actions {
+        flex-direction: column;
+    }
+
+    #registration-map {
+        height: 250px;
+    }
+}
+
+.clinic-name-search {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+}
+
+.clinic-name-search input {
+    flex: 1;
+}
+
+.clinic-name-search button {
+    width: auto;
+    padding: 10px 18px;
+    flex-shrink: 0;
+}
+
+#manual-clinic-fields {
+    min-width: 0;
+    margin: 16px 0;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #f7faf7;
+}
+
+#clinic-map-preview {
+    margin-top: 16px;
+}
+
+#clinic-map-preview>summary {
+    margin-bottom: 12px;
+    color: var(--green);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.clinic-search-credit {
+    margin: 10px 0 16px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.clinic-search-credit a {
+    color: inherit;
+}

@@ -59,7 +59,8 @@ def create_veterinarian(
         specialization=data.specialization,
         years_experience=data.years_experience,
         approval_status="approved",
-        clinic_name=administrator.clinic_name,
+        clinic_id=administrator.clinic_id,
+        clinic_name=administrator.clinic.clinic_name,
     )
 
     try:
@@ -98,13 +99,16 @@ def list_veterinarians(
     offset: int,
     limit: int,
 ) -> list[Veterinarian]:
-    get_admin_record(db, current_user)
+    administrator = get_admin_record(db, current_user)
 
     statement = (
         select(Veterinarian)
         .join(Veterinarian.user)
         .options(joinedload(Veterinarian.user))
-        .where(User.role == "veterinarian")
+        .where(
+            User.role == "veterinarian",
+            Veterinarian.clinic_id == administrator.clinic_id,
+        )
         .order_by(Veterinarian.veterinarian_id.desc())
         .offset(offset)
         .limit(limit)

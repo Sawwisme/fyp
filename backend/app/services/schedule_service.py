@@ -4,10 +4,20 @@ from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
-from app.models import Appointment, Schedule, TimeSlot, User, Veterinarian
 from app.schemas.schedule import ScheduleCreate
 from app.services.admin_profile_service import get_admin_record
-from app.services.availability_service import CLINIC_TIMEZONE
+from app.clinic_time import CLINIC_TIMEZONE
+from app.services.clinic_hours_service import fits_working_hours
+
+from app.models import (
+    Appointment,
+    Clinic,
+    ClinicWorkingHour,
+    Schedule,
+    TimeSlot,
+    User,
+    Veterinarian,
+)
 
 
 def serialize_schedule(schedule: Schedule) -> dict:
@@ -30,15 +40,69 @@ def create_schedule(
     current_user: User,
     data: ScheduleCreate,
 ) -> dict:
-    get_admin_record(db, current_user)
+    administrator = get_admin_record(db, current_user)
 
     try:
+        # Lock the clinic before checking its working hours.
+        clinic = db.scalar(
+            select(Clinic)
+            .where(
+                Clinic.clinic_id == administrator.clinic_id,
+                Clinic.status == "active",
+            )
+            .execution_options(populate_existing=True)
+            .with_for_update()
+        )
+
+        if clinic is None:
+            raise HTTPException(
+                status_code=403,
+                detail="Your clinic is not active.",
+            )
+
+        periods = list(
+            db.scalars(
+                select(ClinicWorkingHour)
+                .where(
+                    ClinicWorkingHour.clinic_id == clinic.clinic_id,
+                    ClinicWorkingHour.weekday
+                    == data.schedule_date.weekday(),
+                )
+                .execution_options(populate_existing=True)
+                .with_for_update()
+            ).all()
+        )
+
+        if not periods:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "No clinic working hours are configured for this day. "
+                    "Set clinic hours before creating schedules."
+                ),
+            )
+
+        if not fits_working_hours(
+            periods,
+            data.schedule_date.weekday(),
+            data.start_time,
+            data.end_time,
+        ):
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "The schedule must fit within clinic working hours "
+                    "and cannot cross a clinic break."
+                ),
+            )
+        
         # Serialize schedule creation for this veterinarian.
         veterinarian = db.scalar(
             select(Veterinarian)
             .join(Veterinarian.user)
             .where(
                 Veterinarian.veterinarian_id == data.veterinarian_id,
+                Veterinarian.clinic_id == administrator.clinic_id,
                 Veterinarian.approval_status == "approved",
                 User.role == "veterinarian",
                 User.status == "active",
@@ -131,10 +195,15 @@ def list_schedules(
     offset: int,
     limit: int,
 ) -> list[dict]:
-    get_admin_record(db, current_user)
+    administrator = get_admin_record(db, current_user)
 
-    statement = select(Schedule).options(
-        selectinload(Schedule.time_slots)
+    statement = (
+        select(Schedule)
+        .join(Schedule.veterinarian)
+        .options(selectinload(Schedule.time_slots))
+        .where(
+            Veterinarian.clinic_id == administrator.clinic_id
+        )
     )
 
     if veterinarian_id is not None:
@@ -163,29 +232,85 @@ def list_schedules(
         for schedule in db.scalars(statement).all()
     ]
 
-def lock_schedule(db: Session, schedule_id: int) -> Schedule:
-    veterinarian_id = db.scalar(
-        select(Schedule.veterinarian_id).where(
-            Schedule.schedule_id == schedule_id
+def lock_schedule(
+    db: Session,
+    schedule_id: int,
+    current_user: User,
+) -> Schedule:
+    administrator = None
+
+    if current_user.role == "clinic_administrator":
+        administrator = get_admin_record(db, current_user)
+    elif (
+        current_user.role != "veterinarian"
+        or current_user.status != "active"
+    ):
+        raise HTTPException(
+            status_code=403,
+            detail="You cannot manage schedule availability.",
+        )
+
+    # Resolve only schedules visible to this account.
+    visible = (
+        select(Schedule.veterinarian_id)
+        .join(Schedule.veterinarian)
+        .join(Veterinarian.clinic)
+        .where(
+            Schedule.schedule_id == schedule_id,
+            Clinic.status == "active",
         )
     )
+
+    if administrator is not None:
+        visible = visible.where(
+            Veterinarian.clinic_id == administrator.clinic_id
+        )
+    else:
+        visible = visible.where(
+            Veterinarian.user_id == current_user.user_id,
+            Veterinarian.approval_status == "approved",
+        )
+
+    veterinarian_id = db.scalar(visible)
 
     if veterinarian_id is None:
         raise HTTPException(
             status_code=404,
-            detail="Schedule not found.",
+            detail="Schedule not found or unavailable to your account.",
         )
 
-    # Keep the same locking order as schedule creation.
-    db.scalar(
+    # Lock and reload the veterinarian before locking the schedule.
+    veterinarian = db.scalar(
         select(Veterinarian)
         .where(Veterinarian.veterinarian_id == veterinarian_id)
+        .execution_options(populate_existing=True)
         .with_for_update()
     )
 
+    if veterinarian is None:
+        raise HTTPException(status_code=404, detail="Veterinarian not found.")
+
+    if administrator is not None:
+        allowed = veterinarian.clinic_id == administrator.clinic_id
+    else:
+        allowed = (
+            veterinarian.user_id == current_user.user_id
+            and veterinarian.approval_status == "approved"
+            and veterinarian.clinic_id is not None
+        )
+
+    if not allowed:
+        raise HTTPException(
+            status_code=404,
+            detail="Schedule not found or unavailable to your account.",
+        )
+
     schedule = db.scalar(
         select(Schedule)
-        .where(Schedule.schedule_id == schedule_id)
+        .where(
+            Schedule.schedule_id == schedule_id,
+            Schedule.veterinarian_id == veterinarian_id,
+        )
         .execution_options(populate_existing=True)
         .with_for_update()
     )
@@ -228,7 +353,7 @@ def cancel_schedule(
     get_admin_record(db, current_user)
 
     try:
-        schedule = lock_schedule(db, schedule_id)
+        schedule = lock_schedule(db, schedule_id, current_user)
 
         if schedule.status == "cancelled":
             result = serialize_schedule(schedule)
@@ -297,8 +422,7 @@ def update_slot_status(
         )
 
     try:
-        schedule = lock_schedule(db, schedule_id)
-
+        schedule = lock_schedule(db, schedule_id, current_user)
         if current_user.role == "veterinarian":
             own_veterinarian_id = db.scalar(
                 select(Veterinarian.veterinarian_id)

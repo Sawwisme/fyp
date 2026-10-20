@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VetDental — Administrator Registration</title>
+    <link rel="stylesheet" href="/web/styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+    <script src="/web/admin_register.js" defer></script>
+    <script src="/web/clinic_map.js" defer></script>
+</head>
+
+<body>
+    <main class="login-shell registration-shell">
+        <div class="form-panel">
+            <a class="brand login-brand" href="/web/">
+                <span class="brand-icon" aria-hidden="true">✚</span>
+                VetDental
+            </a>
+
+            <section id="registration-section">
+                <span class="eyebrow">CLINIC ADMINISTRATOR</span>
+                <h1>Create an account</h1>
+                <p class="subtitle">
+                    Select your clinic and submit your administrator application.
+                </p>
+
+                <form id="admin-registration-form">
+                    <fieldset id="registration-fields" disabled>
+                        <label class="field-label" for="registration-name">
+                            Full name
+                        </label>
+                        <input id="registration-name" type="text" autocomplete="name" maxlength="150" required>
+
+                        <label class="field-label" for="registration-email">
+                            Email address
+                        </label>
+                        <input id="registration-email" type="email" autocomplete="email" maxlength="255" required>
+
+                        <label class="field-label" for="registration-phone">
+                            Phone number (optional)
+                        </label>
+                        <input id="registration-phone" type="tel" autocomplete="tel" maxlength="20">
+
+                        <div class="registration-clinic-picker">
+                            <h2>Your veterinary clinic</h2>
+
+                            <label class="field-label" for="clinic-name-query">
+                                Search clinic name
+                            </label>
+
+                            <div class="clinic-name-search">
+                                <input id="clinic-name-query" type="text" maxlength="150"
+                                    placeholder="Clinic name and town, e.g. Happy Vet Penang">
+                                <button id="search-clinic-name" class="secondary compact-button" type="button">
+                                    Search
+                                </button>
+                            </div>
+
+                            <p id="clinic-map-message" class="message" role="status" aria-live="polite"></p>
+
+                            <div id="clinic-map-results"></div>
+
+                            <p class="clinic-search-credit">
+                                Search data:
+                                <a href="https://www.openstreetmap.org/copyright" target="_blank"
+                                    rel="noopener">OpenStreetMap contributors</a>
+                                · Photon
+                            </p>
+
+                            <button id="clinic-manual-toggle" class="text-button" type="button">
+                                My clinic isn’t listed
+                            </button>
+
+                            <fieldset id="manual-clinic-fields" hidden disabled>
+                                <label class="field-label" for="manual-clinic-name">
+                                    Clinic name
+                                </label>
+                                <input id="manual-clinic-name" type="text" maxlength="150" required>
+
+                                <label class="field-label" for="manual-clinic-address">
+                                    Full clinic address
+                                </label>
+                                <input id="manual-clinic-address" type="text" maxlength="255" required>
+
+                                <p class="registration-note">
+                                    These details will be reviewed before clinic access is approved.
+                                    Map coordinates can be added after approval.
+                                </p>
+                            </fieldset>
+
+                            <p id="selected-map-clinic" class="selected-clinic" role="status" aria-live="polite">
+                                No clinic selected.
+                            </p>
+
+                            <details id="clinic-map-preview" hidden>
+                                <summary>Clinic location</summary>
+                                <div id="registration-map" aria-label="Selected clinic location"></div>
+                            </details>
+
+                            <details class="existing-clinic-picker">
+                                <summary>Choose a clinic already registered with VetDental</summary>
+
+                                <label class="field-label" for="registration-clinic">
+                                    Registered clinic
+                                </label>
+                                <select id="registration-clinic">
+                                    <option value="">Loading clinics…</option>
+                                </select>
+                            </details>
+                        </div>
+
+                        <label class="field-label" for="registration-password">
+                            Password
+                        </label>
+                        <div class="password-field">
+                            <input id="registration-password" type="password" autocomplete="new-password" minlength="8"
+                                maxlength="72" required>
+                            <button class="eye-button" type="button" data-registration-password="registration-password"
+                                aria-label="Show password" aria-pressed="false">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <label class="field-label" for="registration-confirm">
+                            Confirm password
+                        </label>
+                        <div class="password-field">
+                            <input id="registration-confirm" type="password" autocomplete="new-password" minlength="8"
+                                maxlength="72" required>
+                            <button class="eye-button" type="button" data-registration-password="registration-confirm"
+                                aria-label="Show confirmation password" aria-pressed="false">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <p class="muted registration-note">
+                            Clinic membership requires approval.
+                            Selecting a clinic does not grant access.
+                        </p>
+
+                        <button id="registration-submit" class="primary" type="submit">
+                            Submit registration
+                        </button>
+                    </fieldset>
+                </form>
+
+                <p id="registration-message" class="message" role="status" aria-live="polite"></p>
+
+                <button id="registration-retry" class="secondary" type="button" hidden>
+                    Reload clinics
+                </button>
+            </section>
+
+            <section id="registration-success" hidden>
+                <span class="badge">Pending approval</span>
+                <h1>Application submitted</h1>
+                <p id="registration-success-message"></p>
+            </section>
+
+            <p class="registration-back">
+                <a href="/web/">Back to staff login</a>
+            </p>
+        </div>
+    </main>
+</body>
+
+</html>

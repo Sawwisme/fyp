@@ -281,3 +281,16 @@ async function restoreSession() {
 }
 
 restoreSession();
+
+function updateRegistrationVisibility() {
+    const selectedRole =
+        document.querySelector('input[name="staff-role"]:checked')?.value;
+
+    document.getElementById('admin-registration-link').hidden =
+        selectedRole !== 'clinic_administrator';
+}
+
+roleSwitch.addEventListener('change', updateRegistrationVisibility);
+window.addEventListener('pageshow', updateRegistrationVisibility);
+
+updateRegistrationVisibility();

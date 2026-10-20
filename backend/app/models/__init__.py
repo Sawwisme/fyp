@@ -28,3 +28,5 @@ from app.models.payment import Payment
 from app.models.transaction import Transaction
 from app.models.refund import Refund
 from app.models.report import Report
+from app.models.clinic import Clinic
+from app.models.clinic_working_hour import ClinicWorkingHour

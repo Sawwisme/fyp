@@ -187,6 +187,8 @@ async function loadDashboard() {
         renderProfile(profile);
         showView();
 
+        window.dispatchEvent(new Event('admin-profile-ready'));
+
         loading.hidden = true;
         dashboard.hidden = false;
     } catch (error) {

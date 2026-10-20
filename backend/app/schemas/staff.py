@@ -64,6 +64,7 @@ class VeterinarianResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     veterinarian_id: int
+    clinic_id: int | None
     registration_number: str
     qualification: str | None
     specialization: str | None

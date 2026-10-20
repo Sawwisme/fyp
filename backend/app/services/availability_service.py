@@ -4,7 +4,14 @@ from fastapi import HTTPException, status
 from sqlalchemy import exists, select
 from sqlalchemy.orm import Session
 
-from app.models import Appointment, Schedule, TimeSlot, User, Veterinarian
+from app.models import (
+    Appointment,
+    Clinic,
+    Schedule,
+    TimeSlot,
+    User,
+    Veterinarian,
+)
 
 
 CLINIC_TIMEZONE = timezone(timedelta(hours=8))
@@ -15,14 +22,17 @@ def eligible_veterinarians():
         select(
             Veterinarian.veterinarian_id,
             User.full_name,
-            Veterinarian.clinic_name,
+            Clinic.clinic_id,
+            Clinic.clinic_name,
             Veterinarian.specialization,
         )
         .join(User, Veterinarian.user_id == User.user_id)
+        .join(Clinic, Veterinarian.clinic_id == Clinic.clinic_id)
         .where(
             User.role == "veterinarian",
             User.status == "active",
             Veterinarian.approval_status == "approved",
+            Clinic.status == "active",
         )
     )
 
@@ -80,7 +90,8 @@ def list_available_slots(
             Schedule.schedule_id,
             Veterinarian.veterinarian_id,
             User.full_name.label("veterinarian_name"),
-            Veterinarian.clinic_name,
+            Clinic.clinic_id,
+            Clinic.clinic_name,
             Schedule.schedule_date,
             TimeSlot.start_time,
             TimeSlot.end_time,
@@ -91,12 +102,12 @@ def list_available_slots(
             Schedule.veterinarian_id == Veterinarian.veterinarian_id,
         )
         .join(User, Veterinarian.user_id == User.user_id)
+        .join(Clinic, Veterinarian.clinic_id == Clinic.clinic_id)
         .where(
+            Clinic.status == "active",
             Veterinarian.veterinarian_id == veterinarian_id,
             Veterinarian.approval_status == "approved",
-            User.role == "veterininarian"
-            if False
-            else User.role == "veterinarian",
+            User.role == "veterinarian",
             User.status == "active",
             Schedule.schedule_date == appointment_date,
             Schedule.status == "active",
