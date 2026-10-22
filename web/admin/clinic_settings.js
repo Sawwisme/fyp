@@ -8,7 +8,8 @@ const clinicHoursForm = document.getElementById('clinic-hours-form');
 const clinicHoursFields = document.getElementById('clinic-hours-fields');
 const clinicHoursRows = document.getElementById('clinic-hours-rows');
 const clinicHoursMessage = document.getElementById('clinic-hours-message');
-const addClinicPeriod = document.getElementById('add-clinic-period');
+const copyClinicWeekdays =
+    document.getElementById('copy-clinic-weekdays');
 const saveClinicHours = document.getElementById('save-clinic-hours');
 
 const clinicFieldDefinitions = [
@@ -120,78 +121,190 @@ function fillClinicInformation(clinic) {
     }
 }
 
-function addOpeningPeriod(period) {
-    const row = document.createElement('div');
-    row.className = 'clinic-period-row';
+function createDayEditor(weekday, periods) {
+    const card = document.createElement('div');
+    card.className = 'weekly-day-card';
+    card.dataset.weekday = weekday;
 
-    const day = document.createElement('select');
-    day.className = 'period-day';
-    day.setAttribute('aria-label', 'Weekday');
+    const heading = document.createElement('label');
+    heading.className = 'weekly-day-heading';
 
-    weekdayNames.forEach((name, index) => {
-        const option = document.createElement('option');
-        option.value = index;
-        option.textContent = name;
-        day.appendChild(option);
+    const open = document.createElement('input');
+    open.type = 'checkbox';
+    open.className = 'day-open';
+    open.checked = periods.length > 0;
+    open.setAttribute(
+        'aria-label',
+        `${weekdayNames[weekday]} open`
+    );
+
+    const title = document.createElement('strong');
+    title.textContent = weekdayNames[weekday];
+
+    const state = document.createElement('span');
+
+    heading.append(open, title, state);
+
+    const editor = document.createElement('fieldset');
+    editor.className = 'weekly-day-periods';
+
+    const rows = document.createElement('div');
+    rows.className = 'day-period-rows';
+
+    function updateDay() {
+        state.textContent = open.checked ? 'Open' : 'Closed';
+        editor.hidden = !open.checked;
+        editor.disabled = !open.checked;
+    }
+
+    function addPeriod(period = {}) {
+        const row = document.createElement('div');
+        row.className = 'clinic-period-row';
+
+        function timeField(labelText, className, value) {
+            const wrapper = document.createElement('label');
+            wrapper.className = 'weekly-time-field';
+
+            const label = document.createElement('span');
+            label.textContent = labelText;
+
+            const input = document.createElement('input');
+            input.type = 'time';
+            input.step = '60';
+            input.required = true;
+            input.className = className;
+            input.value = value ? value.slice(0, 5) : '';
+
+            wrapper.append(label, input);
+            return wrapper;
+        }
+
+        const start = timeField(
+            'Opens',
+            'period-start',
+            period.start_time
+        );
+
+        const end = timeField(
+            'Closes',
+            'period-end',
+            period.end_time
+        );
+
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'secondary compact-button';
+        remove.textContent = 'Remove';
+        remove.setAttribute(
+            'aria-label',
+            `Remove ${weekdayNames[weekday]} opening period`
+        );
+
+        remove.addEventListener('click', () => {
+            row.remove();
+
+            if (!rows.children.length) {
+                open.checked = false;
+                updateDay();
+            }
+        });
+
+        row.append(start, end, remove);
+        rows.appendChild(row);
+    }
+
+    const add = document.createElement('button');
+    add.type = 'button';
+    add.className = 'secondary compact-button';
+    add.textContent = 'Add another opening period';
+
+    add.addEventListener('click', () => {
+        if (rows.children.length >= 12) {
+            settingsMessage(
+                clinicHoursMessage,
+                'A maximum of 12 periods per day is allowed.'
+            );
+            return;
+        }
+
+        addPeriod();
     });
 
-    day.value = period.weekday;
+    for (const period of periods) addPeriod(period);
 
-    const start = document.createElement('input');
-    start.type = 'time';
-    start.step = '60';
-    start.required = true;
-    start.className = 'period-start';
-    start.value = period.start_time.slice(0, 5);
-    start.setAttribute('aria-label', 'Opening time');
+    open.addEventListener('change', () => {
+        if (open.checked && !rows.children.length) {
+            addPeriod({
+                start_time: '09:00',
+                end_time: '17:00'
+            });
+        }
 
-    const end = document.createElement('input');
-    end.type = 'time';
-    end.step = '60';
-    end.required = true;
-    end.className = 'period-end';
-    end.value = period.end_time.slice(0, 5);
-    end.setAttribute('aria-label', 'Closing time');
+        updateDay();
+    });
 
-    const remove = document.createElement('button');
-    remove.type = 'button';
-    remove.className = 'secondary compact-button';
-    remove.textContent = 'Remove';
-    remove.addEventListener('click', () => row.remove());
+    editor.append(rows, add);
+    card.append(heading, editor);
+    updateDay();
 
-    row.append(day, start, end, remove);
-    clinicHoursRows.appendChild(row);
+    return card;
+}
+
+function readDayPeriods(card) {
+    if (!card.querySelector('.day-open').checked) return [];
+
+    return [...card.querySelectorAll('.clinic-period-row')].map(
+        row => ({
+            weekday: Number(card.dataset.weekday),
+            start_time: row.querySelector('.period-start').value,
+            end_time: row.querySelector('.period-end').value
+        })
+    );
 }
 
 function fillClinicHours(periods) {
     clinicHoursRows.replaceChildren();
 
-    for (const period of periods) {
-        addOpeningPeriod(period);
-    }
+    weekdayNames.forEach((name, weekday) => {
+        const dayPeriods = periods
+            .filter(period => period.weekday === weekday)
+            .sort((a, b) =>
+                a.start_time.localeCompare(b.start_time)
+            );
+
+        clinicHoursRows.appendChild(
+            createDayEditor(weekday, dayPeriods)
+        );
+    });
 
     const summary = document.getElementById('clinic-week-summary');
     summary.replaceChildren();
 
     weekdayNames.forEach((name, weekday) => {
         const row = document.createElement('div');
-        const dayLabel = document.createElement('span');
-        const hoursLabel = document.createElement('span');
-
         row.className = 'clinic-day-summary';
+
+        const dayLabel = document.createElement('span');
         dayLabel.textContent = name;
+
+        const hoursLabel = document.createElement('span');
 
         const dayPeriods = periods
             .filter(period => period.weekday === weekday)
-            .sort((a, b) => a.start_time.localeCompare(b.start_time));
+            .sort((a, b) =>
+                a.start_time.localeCompare(b.start_time)
+            );
 
         hoursLabel.textContent = dayPeriods.length
             ? dayPeriods.map(period =>
                 `${period.start_time.slice(0, 5)}–${period.end_time.slice(0, 5)}`
-            ).join('  /  ')
+            ).join(' / ')
             : 'Closed';
 
-        hoursLabel.classList.toggle('closed-day', !dayPeriods.length);
+        hoursLabel.classList.toggle(
+            'closed-day',
+            !dayPeriods.length
+        );
 
         row.append(dayLabel, hoursLabel);
         summary.appendChild(row);
@@ -232,21 +345,57 @@ reloadClinicSettings.addEventListener('click', () => {
     loadClinicSettings();
 });
 
-addClinicPeriod.addEventListener('click', () => {
-    if (clinicHoursRows.children.length >= 84) {
+copyClinicWeekdays.addEventListener('click', () => {
+    if (clinicSettingsBusy || !clinicSettingsLoaded) return;
+
+    const monday = clinicHoursRows.querySelector(
+        '[data-weekday="0"]'
+    );
+
+    const periods = readDayPeriods(monday).sort(
+        (a, b) => a.start_time.localeCompare(b.start_time)
+    );
+
+    if (
+        !periods.length ||
+        periods.some(period =>
+            !period.start_time ||
+            !period.end_time ||
+            period.end_time <= period.start_time
+        ) ||
+        periods.some((period, index) =>
+            index > 0 &&
+            periods[index - 1].end_time > period.start_time
+        )
+    ) {
         settingsMessage(
             clinicHoursMessage,
-            'A maximum of 84 opening periods is allowed.'
+            'Set valid, non-overlapping Monday hours first.'
         );
         return;
     }
 
-    // A draft only: it is not saved until Save weekly hours is clicked.
-    addOpeningPeriod({
-        weekday: 0,
-        start_time: '09:00',
-        end_time: '17:00'
-    });
+    for (let weekday = 1; weekday <= 4; weekday++) {
+        const existing = clinicHoursRows.querySelector(
+            `[data-weekday="${weekday}"]`
+        );
+
+        existing.replaceWith(
+            createDayEditor(
+                weekday,
+                periods.map(period => ({
+                    ...period,
+                    weekday
+                }))
+            )
+        );
+    }
+
+    settingsMessage(
+        clinicHoursMessage,
+        'Monday hours copied to Tuesday–Friday. Click Save weekly hours to apply.',
+        true
+    );
 });
 
 clinicSettingsForm.addEventListener('submit', async event => {
@@ -298,11 +447,11 @@ clinicHoursForm.addEventListener('submit', async event => {
 
     if (clinicSettingsBusy || !clinicSettingsLoaded) return;
 
-    const periods = Array.from(clinicHoursRows.children).map(row => ({
-        weekday: Number(row.querySelector('.period-day').value),
-        start_time: row.querySelector('.period-start').value,
-        end_time: row.querySelector('.period-end').value
-    }));
+    if (!clinicHoursForm.reportValidity()) return;
+
+    const periods = [
+        ...clinicHoursRows.querySelectorAll('.weekly-day-card')
+    ].flatMap(readDayPeriods);
 
     const ordered = [...periods].sort(
         (a, b) =>

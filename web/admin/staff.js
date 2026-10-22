@@ -22,7 +22,6 @@ const vetQualification = document.getElementById('vet-qualification');
 const openVetForm = document.getElementById('open-vet-form');
 const cancelVet = document.getElementById('cancel-vet');
 const createVet = document.getElementById('create-vet');
-const refreshVets = document.getElementById('refresh-vets');
 const vetPasswordToggle = document.getElementById('vet-password-toggle');
 
 const staffRole = document.getElementById('staff-role');
@@ -30,6 +29,14 @@ const vetRegistrationField =
     document.getElementById('vet-registration-field');
 const vetQualificationField =
     document.getElementById('vet-qualification-field');
+
+const staffSearch = document.getElementById('staff-search');
+const staffRoleFilter = document.getElementById('staff-role-filter');
+const staffTotal = document.getElementById('staff-total');
+const staffAdminTotal = document.getElementById('staff-admin-total');
+const staffVetTotal = document.getElementById('staff-vet-total');
+
+let staffRecords = [];
 
 let staffStarting = false;
 let vetListBusy = false;
@@ -111,11 +118,84 @@ async function staffRequest(path, body) {
 
 function updateStaffButtons() {
     openVetForm.disabled = vetListBusy || vetCreating;
-    refreshVets.disabled = vetListBusy || vetCreating;
     createVet.disabled = vetListBusy || vetCreating;
     cancelVet.disabled = vetCreating;
     vetFields.disabled = vetCreating;
     createVet.textContent = vetCreating ? 'Creating…' : 'Create account';
+    staffSearch.disabled = vetListBusy || vetCreating;
+    staffRoleFilter.disabled = vetListBusy || vetCreating;
+}
+
+function renderStaffList() {
+    const keywords = staffSearch.value
+        .trim()
+        .toLocaleLowerCase()
+        .split(/\s+/)
+        .filter(Boolean);
+
+    const selectedRole = staffRoleFilter.value;
+
+    const matches = staffRecords.filter(person => {
+        if (
+            selectedRole !== 'all' &&
+            person.user.role !== selectedRole
+        ) return false;
+
+        const searchable = [
+            person.user.full_name,
+            person.user.email,
+            person.registration
+        ].join(' ').toLocaleLowerCase();
+
+        return keywords.every(keyword =>
+            searchable.includes(keyword)
+        );
+    });
+
+    staffTotal.textContent = staffRecords.length;
+    staffAdminTotal.textContent = staffRecords.filter(
+        person => person.user.role === 'clinic_administrator'
+    ).length;
+    staffVetTotal.textContent = staffRecords.filter(
+        person => person.user.role === 'veterinarian'
+    ).length;
+
+    vetTableBody.replaceChildren();
+
+    for (const person of matches) {
+        const row = document.createElement('tr');
+
+        for (const value of [
+            person.user.full_name,
+            person.user.email,
+            person.role,
+            person.registration,
+            person.user.status
+        ]) {
+            const cell = document.createElement('td');
+            cell.textContent = value;
+            row.appendChild(cell);
+        }
+
+        vetTableBody.appendChild(row);
+    }
+
+    if (!matches.length) {
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+
+        cell.colSpan = 5;
+        cell.className = 'staff-empty';
+        cell.textContent = staffRecords.length
+            ? 'No staff match your search and role filter.'
+            : 'No staff accounts found.';
+
+        row.appendChild(cell);
+        vetTableBody.appendChild(row);
+    }
+
+    vetListMessage.textContent =
+        `Showing ${matches.length} of ${staffRecords.length} staff accounts.`;
 }
 
 async function loadVeterinarians() {
@@ -124,7 +204,6 @@ async function loadVeterinarians() {
     vetListBusy = true;
     updateStaffButtons();
     vetListMessage.textContent = 'Loading clinic staff…';
-    vetTableBody.replaceChildren();
 
     async function loadAll(path) {
         const records = [];
@@ -152,7 +231,7 @@ async function loadVeterinarians() {
             loadAll('/staff/administrators')
         ]);
 
-        const staff = [
+        staffRecords = [
             ...administrators.map(record => ({
                 user: record.user,
                 role: 'Clinic Administrator',
@@ -165,37 +244,22 @@ async function loadVeterinarians() {
             }))
         ];
 
-        staff.sort((first, second) =>
+        staffRecords.sort((first, second) =>
             first.user.full_name.localeCompare(second.user.full_name)
         );
 
-        for (const person of staff) {
-            const row = document.createElement('tr');
-
-            for (const value of [
-                person.user.full_name,
-                person.user.email,
-                person.role,
-                person.registration,
-                person.user.status
-            ]) {
-                const cell = document.createElement('td');
-                cell.textContent = value;
-                row.appendChild(cell);
-            }
-
-            vetTableBody.appendChild(row);
-        }
-
-        vetListMessage.textContent =
-            `${staff.length} staff account(s) in your clinic.`;
+        renderStaffList();
     } catch (error) {
-        vetListMessage.textContent = error.message;
+        vetListMessage.textContent =
+            `${error.message} The displayed list may be out of date. Reload the page to retry.`;
     } finally {
         vetListBusy = false;
         updateStaffButtons();
     }
 }
+
+staffSearch.addEventListener('input', renderStaffList);
+staffRoleFilter.addEventListener('change', renderStaffList);
 
 function updateStaffRoleFields() {
     const isVet = staffRole.value === 'veterinarian';
@@ -254,10 +318,6 @@ vetPasswordToggle.addEventListener('click', () => {
 for (const input of [vetName, vetRegistration, vetPassword]) {
     input.addEventListener('input', () => input.setCustomValidity(''));
 }
-
-refreshVets.addEventListener('click', () => {
-    if (!vetCreating) loadVeterinarians();
-});
 
 vetForm.addEventListener('submit', async event => {
     event.preventDefault();

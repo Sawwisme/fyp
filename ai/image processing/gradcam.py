@@ -4,6 +4,7 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
+
 # =========================================================
 # Configuration
 # =========================================================
@@ -16,13 +17,22 @@ MODEL_PATH = os.path.join(
     "dental_classifier.keras"
 )
 
+DENTAL_VALIDATOR_MODEL_PATH = os.path.join(
+    BASE_DIR,
+    "models",
+    "dental_image_validator.keras"
+)
+
 OUTPUT_DIR = os.path.join(
     BASE_DIR,
     "models",
     "gradcam_outputs"
 )
 
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+os.makedirs(
+    OUTPUT_DIR,
+    exist_ok=True
+)
 
 IMAGE_SIZE = (224, 224)
 
@@ -40,28 +50,254 @@ THRESHOLDS = {
     "calculus": 0.60
 }
 
+LAST_CONV_LAYER_NAME = "top_activation"
+
 
 # =========================================================
-# Load model
+# Image validation configuration
 # =========================================================
 
-print("Loading model...")
+ALLOWED_EXTENSIONS = {
+    ".jpg",
+    ".jpeg",
+    ".png"
+}
+
+MAX_FILE_SIZE_MB = 10
+
+MIN_WIDTH = 150
+MIN_HEIGHT = 150
+
+BLUR_THRESHOLD = 25.0
+
+MIN_BRIGHTNESS = 25
+MAX_BRIGHTNESS = 235
+
+DENTAL_CONTENT_THRESHOLD = 0.70
+
+
+# =========================================================
+# Load dental classifier
+# =========================================================
+
+print("Loading dental classifier...")
 
 model = tf.keras.models.load_model(
     MODEL_PATH,
     compile=False
 )
 
-print("Model loaded successfully.")
+print("Dental classifier loaded successfully.")
 
 
 # =========================================================
-# Load image
+# Load optional dental-image validator
 # =========================================================
 
-def load_image(image_path):
+dental_validator_model = None
 
-    image = tf.io.read_file(image_path)
+if os.path.exists(
+    DENTAL_VALIDATOR_MODEL_PATH
+):
+
+    print(
+        "Loading pet dental image validator..."
+    )
+
+    dental_validator_model = (
+        tf.keras.models.load_model(
+            DENTAL_VALIDATOR_MODEL_PATH,
+            compile=False
+        )
+    )
+
+    print(
+        "Pet dental image validator loaded successfully."
+    )
+
+else:
+
+    print(
+        "Pet dental image validator model not found."
+    )
+
+    print(
+        "Only technical image validation will be performed."
+    )
+
+
+# =========================================================
+# Validate file
+# =========================================================
+
+def validate_file(
+    image_path
+):
+
+    if not os.path.exists(
+        image_path
+    ):
+
+        return False, (
+            "Image file does not exist."
+        )
+
+    extension = os.path.splitext(
+        image_path
+    )[1].lower()
+
+    if extension not in (
+        ALLOWED_EXTENSIONS
+    ):
+
+        return False, (
+            "Unsupported image format. "
+            "Please upload JPG, JPEG or PNG."
+        )
+
+    file_size_mb = (
+        os.path.getsize(
+            image_path
+        )
+        / (1024 * 1024)
+    )
+
+    if (
+        file_size_mb
+        > MAX_FILE_SIZE_MB
+    ):
+
+        return False, (
+            f"Image file is too large. "
+            f"Maximum allowed size is "
+            f"{MAX_FILE_SIZE_MB} MB."
+        )
+
+    return True, (
+        "File validation passed."
+    )
+
+
+# =========================================================
+# Validate image quality
+# =========================================================
+
+def validate_image_quality(
+    image_path
+):
+
+    image = cv2.imread(
+        image_path
+    )
+
+    if image is None:
+
+        return False, (
+            "The uploaded file cannot be "
+            "decoded as a valid image."
+        )
+
+    height, width = (
+        image.shape[:2]
+    )
+
+    # -----------------------------------------------------
+    # Resolution
+    # -----------------------------------------------------
+
+    if (
+        width < MIN_WIDTH
+        or height < MIN_HEIGHT
+    ):
+
+        return False, (
+            f"Image resolution is too low. "
+            f"Minimum recommended resolution "
+            f"is {MIN_WIDTH}x{MIN_HEIGHT}."
+        )
+
+    gray = cv2.cvtColor(
+        image,
+        cv2.COLOR_BGR2GRAY
+    )
+
+    # -----------------------------------------------------
+    # Blur detection
+    # -----------------------------------------------------
+
+    blur_score = cv2.Laplacian(
+        gray,
+        cv2.CV_64F
+    ).var()
+
+    if (
+        blur_score
+        < BLUR_THRESHOLD
+    ):
+
+        return False, (
+            f"Image appears too blurry "
+            f"(blur score="
+            f"{blur_score:.2f}). "
+            f"Please retake the photo "
+            f"with better focus."
+        )
+
+    # -----------------------------------------------------
+    # Brightness detection
+    # -----------------------------------------------------
+
+    brightness = float(
+        np.mean(gray)
+    )
+
+    if (
+        brightness
+        < MIN_BRIGHTNESS
+    ):
+
+        return False, (
+            f"Image appears too dark "
+            f"(brightness="
+            f"{brightness:.2f}). "
+            f"Please capture the image "
+            f"with better lighting."
+        )
+
+    if (
+        brightness
+        > MAX_BRIGHTNESS
+    ):
+
+        return False, (
+            f"Image appears too bright "
+            f"(brightness="
+            f"{brightness:.2f}). "
+            f"Please avoid excessive lighting "
+            f"or flash."
+        )
+
+    quality_info = {
+        "width": width,
+        "height": height,
+        "blur_score": blur_score,
+        "brightness": brightness
+    }
+
+    return True, quality_info
+
+
+# =========================================================
+# Load image for model
+# =========================================================
+
+def load_image(
+    image_path
+):
+
+    image = tf.io.read_file(
+        image_path
+    )
 
     image = tf.image.decode_image(
         image,
@@ -69,7 +305,9 @@ def load_image(image_path):
         expand_animations=False
     )
 
-    original_image = image.numpy()
+    original_image = (
+        image.numpy()
+    )
 
     image = tf.image.resize(
         image,
@@ -81,33 +319,73 @@ def load_image(image_path):
         tf.float32
     )
 
+    # IMPORTANT:
+    # Keep image in 0-255 range.
+    #
+    # Your EfficientNet-B0 training pipeline
+    # used the Keras EfficientNet model,
+    # which already contains internal rescaling.
+
     input_image = tf.expand_dims(
         image,
         axis=0
     )
 
-    return original_image, input_image
+    return (
+        original_image,
+        input_image
+    )
 
 
 # =========================================================
-# Find last convolutional layer
+# Validate pet dental image content
 # =========================================================
 
-def find_last_conv_layer(base_model):
+def validate_pet_dental_content(
+    input_image
+):
 
-    for layer in reversed(base_model.layers):
+    if (
+        dental_validator_model
+        is None
+    ):
 
-        try:
-            output_shape = layer.output.shape
+        return None, (
+            "Dental content validation skipped "
+            "because the validator model "
+            "has not been trained yet."
+        )
 
-            if len(output_shape) == 4:
-                return layer.name
+    prediction = (
+        dental_validator_model.predict(
+            input_image,
+            verbose=0
+        )
+    )
 
-        except:
-            continue
+    score = float(
+        np.squeeze(
+            prediction
+        )
+    )
 
-    raise ValueError(
-        "No convolutional layer found."
+    if (
+        score
+        < DENTAL_CONTENT_THRESHOLD
+    ):
+
+        return False, (
+            f"The uploaded image does not "
+            f"appear to contain a suitable "
+            f"cat or dog dental region "
+            f"(dental confidence="
+            f"{score:.4f})."
+        )
+
+    return True, (
+        f"Pet dental image detected "
+        f"(confidence="
+        f"{score:.4f})."
     )
 
 
@@ -125,17 +403,10 @@ def generate_gradcam(
         "efficientnetb0"
     )
 
-    last_conv_layer_name = find_last_conv_layer(
-        base_model
-    )
-
-    print(
-        "Using last convolutional layer:",
-        last_conv_layer_name
-    )
-
-    last_conv_layer = base_model.get_layer(
-        last_conv_layer_name
+    last_conv_layer = (
+        base_model.get_layer(
+            LAST_CONV_LAYER_NAME
+        )
     )
 
     conv_model = tf.keras.Model(
@@ -161,7 +432,9 @@ def generate_gradcam(
             input_image
         )
 
-        tape.watch(conv_output)
+        tape.watch(
+            conv_output
+        )
 
         x = global_pool(
             conv_output
@@ -172,29 +445,44 @@ def generate_gradcam(
             training=False
         )
 
-        predictions = prediction_layer(
-            x
+        predictions = (
+            prediction_layer(
+                x
+            )
         )
 
-        class_score = predictions[
-            :,
-            class_index
-        ]
+        class_score = (
+            predictions[
+                :,
+                class_index
+            ]
+        )
 
     gradients = tape.gradient(
         class_score,
         conv_output
     )
 
-    pooled_gradients = tf.reduce_mean(
-        gradients,
-        axis=(0, 1, 2)
+    if gradients is None:
+
+        raise RuntimeError(
+            "Unable to calculate Grad-CAM gradients."
+        )
+
+    pooled_gradients = (
+        tf.reduce_mean(
+            gradients,
+            axis=(0, 1, 2)
+        )
     )
 
-    conv_output = conv_output[0]
+    conv_output = (
+        conv_output[0]
+    )
 
     heatmap = tf.reduce_sum(
-        conv_output * pooled_gradients,
+        conv_output
+        * pooled_gradients,
         axis=-1
     )
 
@@ -207,10 +495,18 @@ def generate_gradcam(
         heatmap
     )
 
-    if max_value > 0:
-        heatmap = heatmap / max_value
+    if (
+        max_value > 0
+    ):
 
-    return heatmap.numpy()
+        heatmap = (
+            heatmap
+            / max_value
+        )
+
+    return (
+        heatmap.numpy()
+    )
 
 
 # =========================================================
@@ -236,14 +532,18 @@ def overlay_heatmap(
         255 * heatmap
     )
 
-    heatmap_color = cv2.applyColorMap(
-        heatmap_uint8,
-        cv2.COLORMAP_JET
+    heatmap_color = (
+        cv2.applyColorMap(
+            heatmap_uint8,
+            cv2.COLORMAP_JET
+        )
     )
 
-    heatmap_color = cv2.cvtColor(
-        heatmap_color,
-        cv2.COLOR_BGR2RGB
+    heatmap_color = (
+        cv2.cvtColor(
+            heatmap_color,
+            cv2.COLOR_BGR2RGB
+        )
     )
 
     overlay = cv2.addWeighted(
@@ -258,24 +558,54 @@ def overlay_heatmap(
 
 
 # =========================================================
-# Save Grad-CAM result
+# Save combined Grad-CAM summary
 # =========================================================
 
-def save_gradcam_result(
+def save_gradcam_summary(
     original_image,
-    overlay,
-    condition,
-    confidence,
+    gradcam_items,
     image_name
 ):
 
-    plt.figure(
-        figsize=(10, 4)
+    total_images = (
+        1 + len(
+            gradcam_items
+        )
     )
 
+    # -----------------------------------------------------
+    # Dynamic layout
+    # -----------------------------------------------------
+
+    if total_images <= 2:
+
+        rows = 1
+        cols = 2
+
+    elif total_images <= 4:
+
+        rows = 2
+        cols = 2
+
+    else:
+
+        rows = 2
+        cols = 3
+
+    plt.figure(
+        figsize=(
+            6 * cols,
+            5 * rows
+        )
+    )
+
+    # -----------------------------------------------------
+    # Original image
+    # -----------------------------------------------------
+
     plt.subplot(
-        1,
-        2,
+        rows,
+        cols,
         1
     )
 
@@ -284,36 +614,64 @@ def save_gradcam_result(
     )
 
     plt.title(
-        "Original Image"
+        "Original Image",
+        fontsize=14
     )
 
     plt.axis(
         "off"
     )
 
-    plt.subplot(
-        1,
-        2,
-        2
-    )
+    # -----------------------------------------------------
+    # Grad-CAM panels
+    # -----------------------------------------------------
 
-    plt.imshow(
-        overlay
-    )
+    for index, item in enumerate(
+        gradcam_items,
+        start=2
+    ):
 
-    plt.title(
-        f"Grad-CAM: {condition}\n"
-        f"Confidence: {confidence:.4f}"
-    )
+        plt.subplot(
+            rows,
+            cols,
+            index
+        )
 
-    plt.axis(
-        "off"
-    )
+        plt.imshow(
+            item["overlay"]
+        )
+
+        condition = (
+            item["condition"]
+            .capitalize()
+        )
+
+        confidence = (
+            item["confidence"]
+        )
+
+        threshold = (
+            item["threshold"]
+        )
+
+        plt.title(
+            f"{condition}\n"
+            f"Confidence: "
+            f"{confidence:.2%} "
+            f"| Threshold: "
+            f"{threshold:.2f}",
+            fontsize=13
+        )
+
+        plt.axis(
+            "off"
+        )
 
     plt.tight_layout()
 
     output_filename = (
-        f"{image_name}_{condition}_gradcam.png"
+        f"{image_name}_"
+        f"gradcam_summary.png"
     )
 
     output_path = os.path.join(
@@ -328,7 +686,10 @@ def save_gradcam_result(
     )
 
     print(
-        "Saved:",
+        "\nCombined Grad-CAM saved:"
+    )
+
+    print(
         output_path
     )
 
@@ -336,27 +697,181 @@ def save_gradcam_result(
 
     plt.close()
 
+    return output_path
+
 
 # =========================================================
-# Automatic multi-label Grad-CAM
+# Automatic dental analysis
 # =========================================================
 
 def run_automatic_gradcam(
     image_path
 ):
 
-    original_image, input_image = load_image(
+    print(
+        "\n==================================="
+    )
+
+    print(
+        "Dental Image Analysis"
+    )
+
+    print(
+        "==================================="
+    )
+
+    # =====================================================
+    # STEP 1: File validation
+    # =====================================================
+
+    valid, message = (
+        validate_file(
+            image_path
+        )
+    )
+
+    if not valid:
+
+        print(
+            "\nFILE VALIDATION FAILED"
+        )
+
+        print(
+            message
+        )
+
+        return None
+
+    print(
+        "\nFile validation passed."
+    )
+
+    # =====================================================
+    # STEP 2: Image-quality validation
+    # =====================================================
+
+    valid, quality_info = (
+        validate_image_quality(
+            image_path
+        )
+    )
+
+    if not valid:
+
+        print(
+            "\nIMAGE QUALITY VALIDATION FAILED"
+        )
+
+        print(
+            quality_info
+        )
+
+        return None
+
+    print(
+        "\nImage quality validation passed."
+    )
+
+    print(
+        f"Resolution: "
+        f"{quality_info['width']}x"
+        f"{quality_info['height']}"
+    )
+
+    print(
+        f"Blur score: "
+        f"{quality_info['blur_score']:.2f}"
+    )
+
+    print(
+        f"Brightness: "
+        f"{quality_info['brightness']:.2f}"
+    )
+
+    # =====================================================
+    # STEP 3: Load image
+    # =====================================================
+
+    (
+        original_image,
+        input_image
+    ) = load_image(
         image_path
     )
+
+    # =====================================================
+    # STEP 4: Dental-content validation
+    # =====================================================
+
+    (
+        dental_valid,
+        dental_message
+    ) = (
+        validate_pet_dental_content(
+            input_image
+        )
+    )
+
+    if (
+        dental_valid is False
+    ):
+
+        print(
+            "\nDENTAL CONTENT VALIDATION FAILED"
+        )
+
+        print(
+            dental_message
+        )
+
+        return None
+
+    elif (
+        dental_valid is True
+    ):
+
+        print(
+            "\nDental content validation passed."
+        )
+
+        print(
+            dental_message
+        )
+
+    else:
+
+        print(
+            "\nDental content validator unavailable."
+        )
+
+        print(
+            dental_message
+        )
+
+    # =====================================================
+    # STEP 5: Condition prediction
+    # =====================================================
 
     predictions = model.predict(
         input_image,
         verbose=0
     )[0]
 
-    print("\nPredictions:")
+    print(
+        "\n==================================="
+    )
+
+    print(
+        "Condition Predictions"
+    )
+
+    print(
+        "==================================="
+    )
 
     positive_conditions = []
+
+    results = {}
 
     for i, label in enumerate(
         LABELS
@@ -366,94 +881,220 @@ def run_automatic_gradcam(
             predictions[i]
         )
 
-        threshold = THRESHOLDS[
-            label
-        ]
+        threshold = (
+            THRESHOLDS[
+                label
+            ]
+        )
+
+        is_positive = (
+            confidence
+            >= threshold
+        )
 
         status = (
             "POSITIVE"
-            if confidence >= threshold
+            if is_positive
             else "NEGATIVE"
         )
 
         print(
             f"{label:<12} "
             f"{confidence:.4f} "
-            f"(threshold={threshold:.2f}) "
+            f"(threshold="
+            f"{threshold:.2f}) "
             f"{status}"
         )
 
-        if confidence >= threshold:
+        results[label] = {
+            "confidence": confidence,
+            "threshold": threshold,
+            "positive": is_positive
+        }
+
+        if is_positive:
 
             positive_conditions.append(
                 (
                     label,
                     confidence,
+                    threshold,
                     i
                 )
             )
 
-    print("\nDetected positive conditions:")
+    # =====================================================
+    # STEP 6: Detected conditions
+    # =====================================================
+
+    print(
+        "\n==================================="
+    )
+
+    print(
+        "Detected Conditions"
+    )
+
+    print(
+        "==================================="
+    )
+
+    # -----------------------------------------------------
+    # No positive label fallback
+    # -----------------------------------------------------
 
     if len(
         positive_conditions
     ) == 0:
 
+        top_index = int(
+            np.argmax(
+                predictions
+            )
+        )
+
+        top_label = (
+            LABELS[
+                top_index
+            ]
+        )
+
+        top_confidence = float(
+            predictions[
+                top_index
+            ]
+        )
+
+        top_threshold = (
+            THRESHOLDS[
+                top_label
+            ]
+        )
+
         print(
-            "No condition exceeded its threshold."
+            "No condition exceeded "
+            "its classification threshold."
         )
-
-        return
-
-    for condition, confidence, class_index in positive_conditions:
 
         print(
-            f"- {condition}: "
-            f"{confidence:.4f}"
+            f"Highest model response: "
+            f"{top_label} "
+            f"({top_confidence:.4f})"
         )
-
-    image_name = os.path.splitext(
-        os.path.basename(
-            image_path
-        )
-    )[0]
-
-    # =====================================================
-    # Generate Grad-CAM for every positive condition
-    # =====================================================
-
-    for condition, confidence, class_index in positive_conditions:
 
         print(
-            f"\nGenerating Grad-CAM for: "
-            f"{condition}"
+            "Generating Grad-CAM for "
+            "the highest model response."
         )
 
-        heatmap = generate_gradcam(
-            model,
-            input_image,
-            class_index
+        positive_conditions.append(
+            (
+                top_label,
+                top_confidence,
+                top_threshold,
+                top_index
+            )
         )
 
-        overlay = overlay_heatmap(
-            original_image,
-            heatmap
-        )
+    else:
 
-        save_gradcam_result(
-            original_image,
-            overlay,
+        for (
             condition,
             confidence,
+            threshold,
+            _
+        ) in positive_conditions:
+
+            print(
+                f"- {condition}: "
+                f"{confidence:.4f}"
+            )
+
+    # =====================================================
+    # STEP 7: Generate Grad-CAM overlays
+    # =====================================================
+
+    image_name = (
+        os.path.splitext(
+            os.path.basename(
+                image_path
+            )
+        )[0]
+    )
+
+    gradcam_items = []
+
+    for (
+        condition,
+        confidence,
+        threshold,
+        class_index
+    ) in positive_conditions:
+
+        print(
+            f"\nGenerating Grad-CAM "
+            f"for: {condition}"
+        )
+
+        heatmap = (
+            generate_gradcam(
+                model,
+                input_image,
+                class_index
+            )
+        )
+
+        overlay = (
+            overlay_heatmap(
+                original_image,
+                heatmap
+            )
+        )
+
+        gradcam_items.append({
+            "condition": condition,
+            "confidence": confidence,
+            "threshold": threshold,
+            "overlay": overlay
+        })
+
+    # =====================================================
+    # STEP 8: Save one combined Grad-CAM summary
+    # =====================================================
+
+    summary_path = (
+        save_gradcam_summary(
+            original_image,
+            gradcam_items,
             image_name
         )
+    )
+
+    # =====================================================
+    # STEP 9: Return structured result
+    # =====================================================
+
+    return {
+        "image_path": image_path,
+        "quality": quality_info,
+        "predictions": results,
+        "gradcam_summary": summary_path
+    }
 
 
 # =========================================================
-# Main
+# Main local testing
 # =========================================================
 
 if __name__ == "__main__":
+
+    # -----------------------------------------------------
+    # LOCAL TESTING ONLY
+    #
+    # In the final Flutter + FastAPI system,
+    # this path will be replaced by the image
+    # uploaded by the Pet Owner.
+    # -----------------------------------------------------
 
     IMAGE_PATH = os.path.join(
         BASE_DIR,
@@ -462,6 +1103,35 @@ if __name__ == "__main__":
         "cat_0741.jpg"
     )
 
-    run_automatic_gradcam(
-        IMAGE_PATH
+    analysis_result = (
+        run_automatic_gradcam(
+            IMAGE_PATH
+        )
     )
+
+    if (
+        analysis_result
+        is not None
+    ):
+
+        print(
+            "\n==================================="
+        )
+
+        print(
+            "Analysis completed successfully."
+        )
+
+        print(
+            "==================================="
+        )
+
+        print(
+            "\nGrad-CAM summary:"
+        )
+
+        print(
+            analysis_result[
+                "gradcam_summary"
+            ]
+        )

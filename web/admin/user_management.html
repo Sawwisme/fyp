@@ -131,12 +131,42 @@
                     </form>
                 </section>
 
+                <div class="staff-summary">
+                    <div>
+                        <span>Total staff</span>
+                        <strong id="staff-total">—</strong>
+                    </div>
+                    <div>
+                        <span>Administrators</span>
+                        <strong id="staff-admin-total">—</strong>
+                    </div>
+                    <div>
+                        <span>Veterinarians</span>
+                        <strong id="staff-vet-total">—</strong>
+                    </div>
+                </div>
+
                 <section class="panel section-panel" aria-labelledby="vet-list-title">
-                    <div class="staff-heading">
-                        <h2 id="vet-list-title">Veterinarians</h2>
-                        <button id="refresh-vets" class="secondary compact-button" type="button">
-                            Refresh
-                        </button>
+                    <h2 id="vet-list-title">Clinic Staff</h2>
+
+                    <div class="staff-list-toolbar">
+                        <div>
+                            <label class="field-label" for="staff-search">
+                                Search staff
+                            </label>
+                            <input id="staff-search" type="search" placeholder="Name, email or registration number">
+                        </div>
+
+                        <div>
+                            <label class="field-label" for="staff-role-filter">
+                                Role
+                            </label>
+                            <select id="staff-role-filter">
+                                <option value="all">All staff</option>
+                                <option value="clinic_administrator">Administrators</option>
+                                <option value="veterinarian">Veterinarians</option>
+                            </select>
+                        </div>
                     </div>
 
                     <p id="vet-list-message" role="status" aria-live="polite"></p>

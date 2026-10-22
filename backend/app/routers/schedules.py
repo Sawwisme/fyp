@@ -13,7 +13,7 @@ from app.schemas.schedule import (
     BulkScheduleCreate,
     BulkScheduleResponse,
 )
-from app.services import schedule_service, bulk_schedule_service
+from app.services import schedule_service, bulk_schedule_service, clinic_schedule_overview_service
 
 router = APIRouter(
     prefix="/schedules",
@@ -135,4 +135,46 @@ def generate_schedules(
         db,
         current_user,
         data,
+    )
+
+@router.get("/overview")
+def get_clinic_overview(
+    schedule_date: date,
+    veterinarian_id: int | None = Query(
+        default=None,
+        ge=1,
+        le=2147483647,
+    ),
+    current_user: User = Depends(
+        require_roles("clinic_administrator")
+    ),
+    db: Session = Depends(get_db),
+):
+    return clinic_schedule_overview_service.get_overview(
+        db,
+        current_user,
+        schedule_date,
+        veterinarian_id,
+    )
+
+@router.get("/calendar")
+def get_clinic_calendar(
+    start_date: date,
+    end_date: date,
+    veterinarian_id: int | None = Query(
+        default=None,
+        ge=1,
+        le=2147483647,
+    ),
+    current_user: User = Depends(
+        require_roles("clinic_administrator")
+    ),
+    db: Session = Depends(get_db),
+):
+    return clinic_schedule_overview_service.get_calendar(
+        db,
+        current_user,
+        start_date,
+        end_date,
+        veterinarian_id,
     )

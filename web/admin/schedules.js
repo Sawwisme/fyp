@@ -22,6 +22,19 @@
     const bulkMessage = document.getElementById('bulk-schedule-message');
     const generateButton = document.getElementById('generate-schedules');
 
+    const autoForm = document.getElementById('auto-schedule-form');
+    const autoFields = document.getElementById('auto-schedule-fields');
+    const autoVetOptions = document.getElementById('auto-vet-options');
+    const autoEnabled = document.getElementById('auto-enabled');
+    const autoDuration = document.getElementById('auto-slot-duration');
+    const autoDays = document.getElementById('auto-days');
+    const autoMessage = document.getElementById('auto-schedule-message');
+    const autoSave = document.getElementById('save-auto-schedule');
+    const autoStatusMessage = document.getElementById('auto-status-message');
+    const autoStatusList = document.getElementById('auto-rule-status');
+
+    let autoStatusVersion = 0;
+
     let busy = false;
 
     function logout() {
@@ -82,6 +95,12 @@
                 );
             }
 
+            if (method !== 'GET') {
+                window.dispatchEvent(
+                    new Event('clinic-schedule-changed')
+                );
+            }
+
             return data;
         } catch (error) {
             if (error.name === 'AbortError' || error instanceof TypeError) {
@@ -105,11 +124,56 @@
         refreshButton.disabled = value || !vetSelect.value;
         bulkFields.disabled = value;
         generateButton.disabled = value || !vetSelect.options.length;
+        autoFields.disabled = value;
+        autoSave.disabled = value || !vetSelect.options.length;
+        document.getElementById('schedule-filter-fields').disabled = value;
+
+        document.getElementById('toggle-add-schedule').disabled =
+            value || !vetSelect.value;
 
         list.querySelectorAll('button').forEach(button => {
             button.disabled = value;
         });
     }
+
+    function finishScheduleAction(sourceForm, text, selectedDate) {
+        const dialog = sourceForm.closest('dialog');
+
+        if (dialog?.open) dialog.close();
+
+        if (selectedDate) {
+            document.getElementById('overview-date').value =
+                selectedDate;
+        }
+
+        let notice = document.getElementById('schedule-action-notice');
+
+        if (!notice) {
+            notice = document.createElement('p');
+            notice.id = 'schedule-action-notice';
+            notice.className = 'message success';
+            notice.setAttribute('role', 'status');
+
+            document.querySelector('.schedule-workspace-actions')
+                .after(notice);
+        }
+
+        notice.textContent = text;
+
+        window.dispatchEvent(
+            new Event('clinic-schedule-changed')
+        );
+    }
+
+    document.getElementById('toggle-add-schedule')
+        .addEventListener('click', () => {
+            if (busy) return;
+
+            form.hidden = !form.hidden;
+
+            document.getElementById('toggle-add-schedule')
+                .setAttribute('aria-expanded', String(!form.hidden));
+        });
 
     async function changeAvailability(path, body, method, question) {
         if (busy || !window.confirm(question)) return;
@@ -121,10 +185,19 @@
         try {
             await request(path, body, method);
 
-            message.classList.add('success');
-            message.textContent = 'Schedule availability updated successfully.';
+            if (method === 'POST' && path.endsWith('/cancel')) {
+                finishScheduleAction(
+                    form,
+                    'Schedule cancelled successfully.',
+                    dateInput.value
+                );
+            } else {
+                message.classList.add('success');
+                message.textContent =
+                    'Slot availability updated successfully.';
 
-            await renderSchedules();
+                await renderSchedules();
+            }
         } catch (error) {
             message.textContent = error.message;
         } finally {
@@ -273,6 +346,11 @@
 
         if (busy) return;
 
+        if (
+            !vetSelect.reportValidity() ||
+            !dateInput.reportValidity()
+        ) return;
+
         const minutes = value => {
             const [hour, minute] = value.split(':').map(Number);
             return hour * 60 + minute;
@@ -307,11 +385,11 @@
         try {
             const schedule = await request('/schedules', body);
 
-            message.classList.add('success');
-            message.textContent =
-                `Schedule created with ${schedule.time_slots.length} time slots.`;
-
-            await renderSchedules();
+            finishScheduleAction(
+                form,
+                `Schedule created with ${schedule.time_slots.length} slots.`,
+                body.schedule_date
+            );
         } catch (error) {
             message.textContent = error.message;
         } finally {
@@ -377,20 +455,157 @@
         try {
             const result = await request('/schedules/generate', body);
 
-            bulkMessage.classList.add('success');
-            bulkMessage.textContent =
+            finishScheduleAction(
+                bulkForm,
                 `Created ${result.created_schedules} schedules with ` +
                 `${result.created_slots} slots. ` +
-                `${result.closed_days} closed day(s) skipped.`;
-
-            vetSelect.value = String(veterinarianIds[0]);
-            dateInput.value = body.start_date;
-
-            await renderSchedules();
+                `${result.closed_days} closed day(s) skipped.`,
+                body.start_date
+            );
         } catch (error) {
             bulkMessage.textContent = error.message;
         } finally {
             generateButton.textContent = 'Generate schedules';
+            setBusy(false);
+        }
+    });
+
+    function renderAutomaticStatus(rules) {
+        const vetNames = new Map(
+            [...vetSelect.options].map(option => [
+                Number(option.value),
+                option.textContent
+            ])
+        );
+
+        autoStatusList.replaceChildren();
+        autoStatusMessage.textContent = rules.length
+            ? 'Status updates automatically while this page is open.'
+            : 'No automatic scheduling settings saved yet.';
+
+        for (const rule of rules) {
+            const item = document.createElement('li');
+
+            const title = document.createElement('strong');
+            title.textContent =
+                vetNames.get(rule.veterinarian_id) ||
+                `Veterinarian ${rule.veterinarian_id}`;
+
+            const settings = document.createElement('span');
+            settings.textContent =
+                `${rule.enabled ? 'Enabled' : 'Disabled'} · ` +
+                `${rule.slot_minutes}-minute slots · ` +
+                `${rule.days_ahead}-day booking window`;
+
+            const status = document.createElement('span');
+
+            if (!rule.enabled) {
+                status.textContent =
+                    'Future generation stopped. Existing schedules are kept.';
+            } else if (rule.last_error) {
+                status.textContent = rule.last_error;
+                status.className = 'message';
+            } else if (!rule.last_run_at) {
+                status.textContent =
+                    'Waiting for the next background check.';
+            } else {
+                const timestamp = /(?:Z|[+-]\d{2}:\d{2})$/i.test(
+                    rule.last_run_at
+                )
+                    ? rule.last_run_at
+                    : `${rule.last_run_at}Z`;
+
+                const lastRun = new Date(timestamp);
+
+                status.textContent =
+                    'Last successful check: ' +
+                    lastRun.toLocaleString('en-MY', {
+                        timeZone: 'Asia/Kuala_Lumpur'
+                    });
+            }
+
+            item.append(title, settings, status);
+            autoStatusList.appendChild(item);
+        }
+    }
+
+    async function loadAutomaticStatus() {
+        const version = ++autoStatusVersion;
+
+        try {
+            const rules = await request('/automatic-scheduling');
+
+            if (version !== autoStatusVersion) return;
+
+            if (!Array.isArray(rules)) {
+                throw new Error('Invalid automatic scheduling response.');
+            }
+
+            renderAutomaticStatus(rules);
+        } catch (error) {
+            if (version === autoStatusVersion) {
+                autoStatusMessage.textContent = error.message;
+            }
+        }
+    }
+
+    autoForm.addEventListener('submit', async event => {
+        event.preventDefault();
+
+        if (busy || !autoForm.reportValidity()) return;
+
+        autoMessage.classList.remove('success');
+        autoMessage.textContent = '';
+
+        const veterinarianIds = [
+            ...autoVetOptions.querySelectorAll('input:checked')
+        ].map(input => Number(input.value));
+
+        if (
+            veterinarianIds.length === 0 ||
+            veterinarianIds.length > 20
+        ) {
+            autoMessage.textContent =
+                'Select between 1 and 20 veterinarians.';
+            return;
+        }
+
+        const body = {
+            veterinarian_ids: veterinarianIds,
+            enabled: autoEnabled.value === 'true',
+            slot_minutes: Number(autoDuration.value),
+            days_ahead: Number(autoDays.value)
+        };
+
+        // Ignore an older status request while saving.
+        autoStatusVersion += 1;
+
+        setBusy(true);
+        autoSave.textContent = 'Saving…';
+
+        try {
+            const rules = await request(
+                '/automatic-scheduling',
+                body,
+                'PUT'
+            );
+
+            if (!Array.isArray(rules)) {
+                throw new Error('Invalid automatic scheduling response.');
+            }
+
+            renderAutomaticStatus(rules);
+
+            finishScheduleAction(
+                autoForm,
+                body.enabled
+                    ? 'Automatic scheduling saved. Generation will start on the next background check, usually within one minute.'
+                    : 'Automatic scheduling disabled for the selected vets. Existing schedules remain.'
+            );
+        } catch (error) {
+            autoMessage.textContent = error.message;
+        } finally {
+            autoSave.textContent = 'Save automatic scheduling';
             setBusy(false);
         }
     });
@@ -444,6 +659,19 @@
 
                     label.append(checkbox, text);
                     bulkVetOptions.appendChild(label);
+
+                    const autoLabel = document.createElement('label');
+                    autoLabel.className = 'bulk-vet-option';
+
+                    const autoCheckbox = document.createElement('input');
+                    autoCheckbox.type = 'checkbox';
+                    autoCheckbox.value = vet.veterinarian_id;
+
+                    const autoText = document.createElement('span');
+                    autoText.textContent = option.textContent;
+
+                    autoLabel.append(autoCheckbox, autoText);
+                    autoVetOptions.appendChild(autoLabel);
                 }
 
                 if (vets.length < 100) break;
@@ -474,6 +702,26 @@
             }
 
             await renderSchedules();
+
+            await loadAutomaticStatus();
+
+            window.clinicScheduleContext = {
+                request,
+                isBusy: () => busy,
+                refreshSchedules,
+                setBusy
+            };
+
+            window.dispatchEvent(
+                new Event('clinic-schedule-ready')
+            );
+
+            setInterval(() => {
+                if (!busy && !document.hidden) {
+                    loadAutomaticStatus();
+                }
+            }, 30000);
+
         } catch (error) {
             document.getElementById('schedule-loading-message').textContent =
                 error.message;

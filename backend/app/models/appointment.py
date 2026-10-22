@@ -43,6 +43,13 @@ class Appointment(Base):
     appointment_type = Column(String(30), nullable=False)
     appointment_date = Column(Date, nullable=False)
     status = Column(String(20), nullable=False)
+    appointment_source = Column(String(20), nullable=True)
+
+    created_by_user_id = Column(
+        Integer,
+        ForeignKey("users.user_id"),
+        nullable=True,
+    )
     created_at = Column(
         DateTime,
         nullable=False,

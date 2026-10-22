@@ -12,6 +12,9 @@
 
     <script src="/web/admin/layout.js" defer></script>
     <script src="/web/admin/schedules.js" defer></script>
+    <script src="/web/admin/schedule_overview.js" defer></script>
+    <script src="/web/admin/reception_appointments.js" defer></script>
+    <script src="/web/admin/schedule_calendar.js" defer></script>
 </head>
 
 <body>
@@ -39,6 +42,139 @@
                         All times use Malaysia time.
                     </p>
                 </div>
+
+                <div class="schedule-workspace-actions">
+                    <button class="secondary compact-button" type="button" data-schedule-editor="automatic"
+                        aria-expanded="false">
+                        Automatic Scheduling
+                    </button>
+
+                    <button class="secondary compact-button" type="button" data-schedule-editor="multiple"
+                        aria-expanded="false">
+                        Assign Multiple Vets
+                    </button>
+
+                    <button class="secondary compact-button" type="button" data-schedule-editor="individual"
+                        aria-expanded="false">
+                        Manage Vet Schedule
+                    </button>
+
+                    <button id="close-schedule-editor" class="secondary compact-button" type="button" hidden>
+                        Close editor
+                    </button>
+                </div>
+
+                <div class="staff-summary schedule-summary">
+                    <div>
+                        <span>Appointments</span>
+                        <strong id="overview-appointments">—</strong>
+                    </div>
+                    <div>
+                        <span>Available slots</span>
+                        <strong id="overview-available">—</strong>
+                    </div>
+                    <div>
+                        <span>Blocked slots</span>
+                        <strong id="overview-blocked">—</strong>
+                    </div>
+                </div>
+
+                <section class="panel section-panel">
+                    <div class="overview-heading">
+                        <h2>Clinic Schedule</h2>
+
+                        <div class="overview-filters">
+                            <div>
+                                <label class="field-label" for="overview-date">
+                                    Date
+                                </label>
+                                <input id="overview-date" type="date">
+                            </div>
+
+                            <div>
+                                <label class="field-label" for="overview-vet">
+                                    Veterinarian
+                                </label>
+                                <select id="overview-vet">
+                                    <option value="">All veterinarians</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p id="overview-message" class="muted" role="status" aria-live="polite"></p>
+
+                    <div id="overview-content"></div>
+                </section>
+
+                <section class="panel section-panel">
+                    <h2>Automatic scheduling</h2>
+
+                    <p class="muted">
+                        Automatically maintain future booking slots using clinic working
+                        hours. Existing schedules, blocked slots and cancellations are preserved.
+                    </p>
+
+                    <form id="auto-schedule-form">
+                        <fieldset id="auto-schedule-fields">
+                            <fieldset class="bulk-vet-picker">
+                                <legend>Apply settings to these veterinarians</legend>
+                                <div id="auto-vet-options"></div>
+                            </fieldset>
+
+                            <div class="staff-form-grid">
+                                <div>
+                                    <label class="field-label" for="auto-enabled">
+                                        Automatic scheduling
+                                    </label>
+                                    <select id="auto-enabled">
+                                        <option value="true">Enabled</option>
+                                        <option value="false">Disabled</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="field-label" for="auto-slot-duration">
+                                        Slot length
+                                    </label>
+                                    <select id="auto-slot-duration">
+                                        <option value="15">15 minutes</option>
+                                        <option value="30" selected>30 minutes</option>
+                                        <option value="60">60 minutes</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="field-label" for="auto-days">
+                                        Booking window
+                                    </label>
+                                    <select id="auto-days">
+                                        <option value="7">Next 7 days</option>
+                                        <option value="14">Next 14 days</option>
+                                        <option value="30" selected>Next 30 days</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <p class="muted">
+                            Settings apply only to selected veterinarians.
+                            Disabling automation keeps existing schedules.
+                        </p>
+
+                        <p id="auto-schedule-message" class="message" role="status" aria-live="polite"></p>
+
+                        <div class="staff-actions">
+                            <button id="save-auto-schedule" class="primary compact-button" type="submit">
+                                Save automatic scheduling
+                            </button>
+                        </div>
+                    </form>
+
+                    <h3>Current settings</h3>
+                    <p id="auto-status-message" role="status"></p>
+                    <ul id="auto-rule-status" class="auto-rule-status"></ul>
+                </section>
 
                 <section class="panel section-panel">
                     <h2>Generate schedules from clinic hours</h2>
@@ -101,23 +237,35 @@
                 </section>
 
                 <section class="panel" aria-labelledby="create-title">
-                    <h2 id="create-title">Create an individual schedule</h2>
-                    <form id="schedule-form">
+                    <h2 id="create-title">Manage Vet Schedule</h2>
+
+                    <fieldset id="schedule-filter-fields" class="staff-form-grid">
+                        <div>
+                            <label class="field-label" for="schedule-vet">
+                                Veterinarian
+                            </label>
+                            <select id="schedule-vet" required></select>
+                        </div>
+
+                        <div>
+                            <label class="field-label" for="schedule-date">
+                                Date
+                            </label>
+                            <input id="schedule-date" type="date" required>
+                        </div>
+                    </fieldset>
+
+                    <div class="staff-actions">
+                        <button id="toggle-add-schedule" class="secondary compact-button" type="button"
+                            aria-expanded="false">
+                            Add Schedule
+                        </button>
+                    </div>
+
+                    <p id="schedule-message" class="message" role="status" aria-live="polite"></p>
+
+                    <form id="schedule-form" hidden>
                         <fieldset id="schedule-fields" class="staff-form-grid">
-                            <div>
-                                <label class="field-label" for="schedule-vet">
-                                    Veterinarian
-                                </label>
-                                <select id="schedule-vet" required></select>
-                            </div>
-
-                            <div>
-                                <label class="field-label" for="schedule-date">
-                                    Date
-                                </label>
-                                <input id="schedule-date" type="date" required>
-                            </div>
-
                             <div>
                                 <label class="field-label" for="schedule-start">
                                     Start time
@@ -144,8 +292,6 @@
                                 </select>
                             </div>
                         </fieldset>
-
-                        <p id="schedule-message" class="message" role="status" aria-live="polite"></p>
 
                         <div class="staff-actions">
                             <button id="create-schedule" class="primary compact-button" type="submit">

@@ -1,6 +1,10 @@
 from fastapi import FastAPI
 from pathlib import Path
+import asyncio
+from contextlib import asynccontextmanager
+from threading import Event, Thread
 
+from app.automatic_scheduling_worker import run_worker
 from fastapi.staticfiles import StaticFiles
 
 from app.routers.auth import router as auth_router
@@ -14,11 +18,42 @@ from app.routers.schedules import router as schedules_router
 from app.routers.clinics import router as clinics_router
 from app.routers.admin_registration import router as admin_registration_router
 from app.routers.clinic_discovery import router as clinic_discovery_router
+from app.routers.automatic_scheduling import (
+    router as automatic_scheduling_router,
+)
+from app.routers.clinic_customers import (
+    router as clinic_customers_router,
+)
+
+from app.routers.clinic_appointments import (
+    router as clinic_appointments_router,
+)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    stop_event = Event()
+
+    worker = Thread(
+        target=run_worker,
+        args=(stop_event,),
+        name="automatic-scheduling",
+        daemon=True,
+    )
+
+    worker.start()
+
+    try:
+        yield
+    finally:
+        stop_event.set()
+        await asyncio.to_thread(worker.join)
 
 app = FastAPI(
     title="Veterinary Dental Care System API",
     version="1.0.0",
+    lifespan=lifespan,
 )
+
 
 app.include_router(auth_router)
 app.include_router(pets_router)
@@ -31,6 +66,9 @@ app.include_router(schedules_router)
 app.include_router(clinics_router)
 app.include_router(admin_registration_router)
 app.include_router(clinic_discovery_router)
+app.include_router(automatic_scheduling_router)
+app.include_router(clinic_customers_router)
+app.include_router(clinic_appointments_router)
 
 WEB_DIR = Path(__file__).resolve().parents[2] / "web"
 
