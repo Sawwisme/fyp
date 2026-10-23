@@ -108,9 +108,11 @@ function buildVetLayout() {
                 My Schedule
             </a>
 
-            <button class="nav-item" type="button" disabled>
-                Appointments <small>Coming soon</small>
-            </button>
+            <a class="nav-item" href="/web/vet/appointments.html"
+            data-vet-page="appointments">
+                Appointments
+            </a>
+
             <button class="nav-item" type="button" disabled>
                 AI Assessments <small>Coming soon</small>
             </button>
@@ -147,7 +149,9 @@ function buildVetLayout() {
             ? 'profile'
             : window.location.pathname.endsWith('/schedules.html')
                 ? 'schedules'
-                : 'dashboard';
+                : window.location.pathname.endsWith('/appointments.html')
+                    ? 'appointments'
+                    : 'dashboard';
 
     document.querySelectorAll('[data-vet-page]').forEach(link => {
         const active = link.dataset.vetPage === currentVetPage;

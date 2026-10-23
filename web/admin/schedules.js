@@ -208,6 +208,8 @@
     async function renderSchedules() {
         list.replaceChildren();
 
+        listMessage.classList.remove('schedule-empty');
+
         if (!vetSelect.value || !dateInput.value) {
             listMessage.textContent = 'Select a veterinarian and date.';
             return;
@@ -224,9 +226,14 @@
 
             const schedules = await request(`/schedules?${query}`);
 
+            listMessage.classList.toggle(
+                'schedule-empty',
+                schedules.length === 0
+            );
+
             listMessage.textContent = schedules.length
-                ? `${schedules.length} schedule(s) found. Expand one to view its slots.`
-                : 'No schedules for this veterinarian on the selected date.';
+                ? 'Select a working period to manage its slots.'
+                : 'No working hours scheduled for this date. Choose another date or use Add Schedule.';
 
             for (const schedule of schedules) {
                 const details = document.createElement('details');
@@ -235,7 +242,7 @@
                 const summary = document.createElement('summary');
                 summary.textContent =
                     `${schedule.start_time.slice(0, 5)}–${schedule.end_time.slice(0, 5)}`
-                    + ` · ${schedule.time_slots.length} slots · ${schedule.status}`;
+                    + ` · ${schedule.time_slots.length} total slots · Schedule ${schedule.status}`;
 
                 details.appendChild(summary);
 

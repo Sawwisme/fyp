@@ -41,32 +41,70 @@
                 </div>
 
                 <section class="panel" aria-labelledby="my-slots-title">
-                    <div class="staff-heading">
-                        <h2 id="my-slots-title">Schedules and time slots</h2>
-
-                        <div>
-                            <label class="field-label" for="my-schedule-date">
-                                Date
-                            </label>
-                            <input id="my-schedule-date" type="date" required>
-                        </div>
-
-                        <button id="my-schedule-refresh" class="secondary compact-button" type="button">
-                            Refresh
-                        </button>
-                    </div>
+                    <h2 id="my-slots-title">My working schedule</h2>
 
                     <p class="muted">
-                        You can block or reopen future slots that have no
-                        appointments. Contact your administrator to change
-                        working hours or cancel a whole schedule.
+                        Select a date to view your slots and appointments.
+                        All times use Malaysia time.
                     </p>
 
                     <p id="my-schedule-action" class="message" role="status" aria-live="polite"></p>
 
+                    <div id="vet-calendar-view">
+                        <div class="calendar-navigation">
+                            <h3 id="vet-calendar-month"></h3>
+
+                            <div>
+                                <button id="vet-month-previous" type="button" class="secondary compact-button"
+                                    aria-label="Previous month">‹</button>
+
+                                <button id="vet-calendar-today" type="button"
+                                    class="secondary compact-button">Today</button>
+
+                                <button id="vet-month-next" type="button" class="secondary compact-button"
+                                    aria-label="Next month">›</button>
+                            </div>
+                        </div>
+
+                        <div class="calendar-scroll">
+                            <div id="vet-calendar" class="clinic-calendar"></div>
+                        </div>
+                    </div>
+
+                    <div id="vet-day-view" hidden>
+                        <div class="vet-day-toolbar">
+                            <button id="vet-back-calendar" type="button" class="secondary compact-button">
+                                Back to calendar
+                            </button>
+
+                            <div class="vet-day-navigation">
+                                <button id="vet-day-previous" type="button" class="secondary compact-button"
+                                    aria-label="Previous day">‹</button>
+
+                                <input id="my-schedule-date" type="date" aria-label="Schedule date" required>
+
+                                <button id="vet-day-next" type="button" class="secondary compact-button"
+                                    aria-label="Next day">›</button>
+
+                                <button id="vet-day-today" type="button" class="secondary compact-button">Today</button>
+                            </div>
+                        </div>
+
+                        <h3 id="vet-day-title"></h3>
+
+                        <p class="muted">
+                            Block or reopen future slots without appointments.
+                            Select an appointment to view its details.
+                        </p>
+
+                        <div id="my-schedule-list" class="vet-timeline"></div>
+                    </div>
+
                     <p id="my-schedule-message" role="status" aria-live="polite"></p>
 
-                    <div id="my-schedule-list"></div>
+                    <button id="my-schedule-refresh" type="button" class="secondary compact-button" hidden>
+                        Try again
+                    </button>
                 </section>
             </main>
         </div>

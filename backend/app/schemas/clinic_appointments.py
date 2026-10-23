@@ -35,3 +35,8 @@ class ClinicAppointmentResponse(BaseModel):
     appointment_source: str
     appointment_date: date
     status: str
+
+class ClinicAppointmentReschedule(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    time_slot_id: int = Field(ge=1, le=2147483647)

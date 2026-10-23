@@ -223,3 +223,386 @@ def create_appointment(
     except Exception:
         db.rollback()
         raise
+
+def cancel_appointment(
+    db: Session,
+    current_user: User,
+    appointment_id: int,
+):
+    try:
+        administrator = get_admin_record(db, current_user)
+
+        # Use the same lock order as appointment creation.
+        clinic = db.scalar(
+            select(Clinic)
+            .where(
+                Clinic.clinic_id == administrator.clinic_id,
+                Clinic.status == "active",
+            )
+            .with_for_update()
+        )
+
+        if clinic is None:
+            raise HTTPException(
+                status_code=403,
+                detail="Your clinic is not active.",
+            )
+
+        location = db.execute(
+            select(
+                TimeSlot.schedule_id,
+                TimeSlot.time_slot_id,
+            )
+            .join(
+                Appointment,
+                Appointment.time_slot_id == TimeSlot.time_slot_id,
+            )
+            .join(
+                Schedule,
+                Schedule.schedule_id == TimeSlot.schedule_id,
+            )
+            .join(
+                Veterinarian,
+                Veterinarian.veterinarian_id
+                == Schedule.veterinarian_id,
+            )
+            .where(
+                Appointment.appointment_id == appointment_id,
+                Veterinarian.clinic_id == clinic.clinic_id,
+            )
+        ).first()
+
+        if location is None:
+            raise HTTPException(
+                status_code=404,
+                detail="Appointment not found in your clinic.",
+            )
+
+        schedule = lock_schedule(
+            db,
+            location.schedule_id,
+            current_user,
+        )
+
+        slot = db.scalar(
+            select(TimeSlot)
+            .where(
+                TimeSlot.time_slot_id == location.time_slot_id
+            )
+            .execution_options(populate_existing=True)
+            .with_for_update()
+        )
+
+        appointment = db.scalar(
+            select(Appointment)
+            .where(
+                Appointment.appointment_id == appointment_id,
+                Appointment.time_slot_id == slot.time_slot_id,
+            )
+            .execution_options(populate_existing=True)
+            .with_for_update()
+        )
+
+        if appointment is None:
+            raise HTTPException(
+                status_code=409,
+                detail="Appointment changed. Refresh and try again.",
+            )
+
+        if appointment.status == "cancelled":
+            return {"message": "Appointment is already cancelled."}
+
+        if appointment.status not in ("pending", "confirmed"):
+            raise HTTPException(
+                status_code=409,
+                detail="Only pending or confirmed appointments can be cancelled.",
+            )
+
+        start = datetime.combine(
+            schedule.schedule_date,
+            slot.start_time,
+            tzinfo=CLINIC_TIMEZONE,
+        )
+
+        if start <= datetime.now(CLINIC_TIMEZONE):
+            raise HTTPException(
+                status_code=409,
+                detail="An appointment that has started cannot be cancelled.",
+            )
+
+        appointment.status = "cancelled"
+        db.flush()
+
+        # Keep the slot unavailable if another appointment occupies it.
+        occupied = db.scalar(
+            select(Appointment.appointment_id)
+            .where(
+                Appointment.time_slot_id == slot.time_slot_id,
+                Appointment.status.notin_(["cancelled", "rejected"]),
+            )
+            .limit(1)
+            .with_for_update()
+        )
+
+        if (
+            occupied is None
+            and schedule.status == "active"
+            and slot.status == "booked"
+        ):
+            slot.status = "available"
+
+        db.commit()
+
+        return {"message": "Appointment cancelled successfully."}
+
+    except Exception:
+        db.rollback()
+        raise
+
+def reschedule_appointment(
+    db: Session,
+    current_user: User,
+    appointment_id: int,
+    new_slot_id: int,
+):
+    try:
+        administrator = get_admin_record(db, current_user)
+
+        clinic = db.scalar(
+            select(Clinic)
+            .where(
+                Clinic.clinic_id == administrator.clinic_id,
+                Clinic.status == "active",
+            )
+            .with_for_update()
+        )
+
+        if clinic is None:
+            raise HTTPException(403, "Your clinic is not active.")
+
+        # Resolve the current booking within this clinic.
+        current = db.execute(
+            select(
+                Appointment.time_slot_id,
+                TimeSlot.schedule_id,
+            )
+            .join(
+                TimeSlot,
+                TimeSlot.time_slot_id == Appointment.time_slot_id,
+            )
+            .join(
+                Schedule,
+                Schedule.schedule_id == TimeSlot.schedule_id,
+            )
+            .join(
+                Veterinarian,
+                Veterinarian.veterinarian_id
+                == Schedule.veterinarian_id,
+            )
+            .where(
+                Appointment.appointment_id == appointment_id,
+                Veterinarian.clinic_id == clinic.clinic_id,
+            )
+        ).first()
+
+        if current is None:
+            raise HTTPException(
+                404, "Appointment not found in your clinic."
+            )
+
+        if current.time_slot_id == new_slot_id:
+            raise HTTPException(
+                400, "Choose a different appointment slot."
+            )
+
+        target_schedule_id = db.scalar(
+            select(TimeSlot.schedule_id).where(
+                TimeSlot.time_slot_id == new_slot_id
+            )
+        )
+
+        if target_schedule_id is None:
+            raise HTTPException(404, "New slot not found.")
+
+        # Lock both schedules before changing either booking.
+        schedules = {}
+
+        for schedule_id in sorted({
+            current.schedule_id,
+            target_schedule_id,
+        }):
+            schedules[schedule_id] = lock_schedule(
+                db, schedule_id, current_user
+            )
+
+        slots = {
+            slot.time_slot_id: slot
+            for slot in db.scalars(
+                select(TimeSlot)
+                .where(
+                    TimeSlot.time_slot_id.in_([
+                        current.time_slot_id,
+                        new_slot_id,
+                    ])
+                )
+                .order_by(TimeSlot.time_slot_id)
+                .execution_options(populate_existing=True)
+                .with_for_update()
+            ).all()
+        }
+
+        old_slot = slots.get(current.time_slot_id)
+        new_slot = slots.get(new_slot_id)
+
+        if old_slot is None or new_slot is None:
+            raise HTTPException(
+                409, "A slot changed. Refresh and try again."
+            )
+
+        appointment = db.scalar(
+            select(Appointment)
+            .where(
+                Appointment.appointment_id == appointment_id
+            )
+            .execution_options(populate_existing=True)
+            .with_for_update()
+        )
+
+        if (
+            appointment is None
+            or appointment.time_slot_id != old_slot.time_slot_id
+        ):
+            raise HTTPException(
+                409, "Appointment changed. Refresh and try again."
+            )
+
+        if appointment.status not in ("pending", "confirmed"):
+            raise HTTPException(
+                409,
+                "Only pending or confirmed appointments can be rescheduled.",
+            )
+
+        old_schedule = schedules[current.schedule_id]
+        new_schedule = schedules[target_schedule_id]
+        now = datetime.now(CLINIC_TIMEZONE)
+
+        old_start = datetime.combine(
+            old_schedule.schedule_date,
+            old_slot.start_time,
+            tzinfo=CLINIC_TIMEZONE,
+        )
+        new_start = datetime.combine(
+            new_schedule.schedule_date,
+            new_slot.start_time,
+            tzinfo=CLINIC_TIMEZONE,
+        )
+
+        if old_start <= now:
+            raise HTTPException(
+                409,
+                "An appointment that has started cannot be rescheduled.",
+            )
+
+        if new_start <= now:
+            raise HTTPException(
+                400, "Choose a future appointment slot."
+            )
+
+        if (
+            new_schedule.status != "active"
+            or new_slot.status != "available"
+        ):
+            raise HTTPException(
+                409, "The new slot is no longer available."
+            )
+
+        eligible_vet = db.scalar(
+            select(Veterinarian.veterinarian_id)
+            .join(Veterinarian.user)
+            .where(
+                Veterinarian.veterinarian_id
+                == new_schedule.veterinarian_id,
+                Veterinarian.clinic_id == clinic.clinic_id,
+                Veterinarian.approval_status == "approved",
+                User.role == "veterinarian",
+                User.status == "active",
+            )
+            .with_for_update()
+        )
+
+        if eligible_vet is None:
+            raise HTTPException(
+                409, "The selected veterinarian is unavailable."
+            )
+
+        reject_occupied_slots(db, [new_slot.time_slot_id])
+
+        pet = db.scalar(
+            select(Pet)
+            .where(Pet.pet_id == appointment.pet_id)
+            .with_for_update()
+        )
+
+        if pet is None:
+            raise HTTPException(404, "Pet not found.")
+
+        overlapping = db.scalar(
+            select(Appointment.appointment_id)
+            .join(
+                TimeSlot,
+                TimeSlot.time_slot_id == Appointment.time_slot_id,
+            )
+            .join(
+                Schedule,
+                Schedule.schedule_id == TimeSlot.schedule_id,
+            )
+            .where(
+                Appointment.pet_id == appointment.pet_id,
+                Appointment.appointment_id != appointment_id,
+                Appointment.status.notin_(["cancelled", "rejected"]),
+                Schedule.schedule_date == new_schedule.schedule_date,
+                TimeSlot.start_time < new_slot.end_time,
+                TimeSlot.end_time > new_slot.start_time,
+            )
+            .limit(1)
+            .with_for_update()
+        )
+
+        if overlapping is not None:
+            raise HTTPException(
+                409,
+                "This pet already has an overlapping appointment.",
+            )
+
+        appointment.time_slot_id = new_slot.time_slot_id
+        appointment.veterinarian_id = new_schedule.veterinarian_id
+        appointment.appointment_date = new_schedule.schedule_date
+
+        new_slot.status = "booked"
+        db.flush()
+
+        # Release the previous slot only if nobody else occupies it.
+        occupied = db.scalar(
+            select(Appointment.appointment_id)
+            .where(
+                Appointment.time_slot_id == old_slot.time_slot_id,
+                Appointment.status.notin_(["cancelled", "rejected"]),
+            )
+            .limit(1)
+            .with_for_update()
+        )
+
+        if (
+            occupied is None
+            and old_schedule.status == "active"
+            and old_slot.status == "booked"
+        ):
+            old_slot.status = "available"
+
+        db.commit()
+
+        return {"message": "Appointment rescheduled successfully."}
+
+    except Exception:
+        db.rollback()
+        raise

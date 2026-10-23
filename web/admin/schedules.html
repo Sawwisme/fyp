@@ -15,6 +15,7 @@
     <script src="/web/admin/schedule_overview.js" defer></script>
     <script src="/web/admin/reception_appointments.js" defer></script>
     <script src="/web/admin/schedule_calendar.js" defer></script>
+    <script src="reschedule_appointments.js" defer></script>
 </head>
 
 <body>
@@ -255,13 +256,6 @@
                         </div>
                     </fieldset>
 
-                    <div class="staff-actions">
-                        <button id="toggle-add-schedule" class="secondary compact-button" type="button"
-                            aria-expanded="false">
-                            Add Schedule
-                        </button>
-                    </div>
-
                     <p id="schedule-message" class="message" role="status" aria-live="polite"></p>
 
                     <form id="schedule-form" hidden>
@@ -303,17 +297,17 @@
 
                 <section class="panel section-panel" aria-labelledby="schedule-list-title">
                     <div class="staff-heading">
-                        <div>
-                            <h2 id="schedule-list-title">Schedules and time slots</h2>
-                            <p class="muted">
-                                For the selected veterinarian and date.
-                            </p>
-                        </div>
+                        <h3 id="schedule-list-title">Scheduled hours</h3>
 
-                        <button id="refresh-schedules" class="secondary compact-button" type="button">
-                            Refresh
+                        <button id="toggle-add-schedule" class="secondary compact-button" type="button"
+                            aria-expanded="false">
+                            Add Schedule
                         </button>
                     </div>
+
+                    <button id="refresh-schedules" type="button" hidden>
+                        Refresh
+                    </button>
 
                     <p id="schedule-list-message" role="status" aria-live="polite"></p>
 

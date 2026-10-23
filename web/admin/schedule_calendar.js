@@ -88,6 +88,7 @@
                             <th>Type</th>
                             <th>Source</th>
                             <th>Status</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="appointment-overview-rows"></tbody>
@@ -337,6 +338,56 @@
         }
     }
 
+    let cancellingAppointment = false;
+
+    const actionMessage = document.createElement('p');
+    actionMessage.className = 'message';
+    actionMessage.setAttribute('role', 'status');
+    get('appointment-list-note').after(actionMessage);
+
+    async function cancelAppointment(item) {
+        const scheduleContext = window.clinicScheduleContext;
+
+        if (
+            !scheduleContext ||
+            scheduleContext.isBusy() ||
+            cancellingAppointment
+        ) {
+            return;
+        }
+
+        const confirmed = window.confirm(
+            `Cancel ${item.pet_name}'s appointment at ${item.time}?`
+        );
+
+        if (!confirmed) return;
+
+        cancellingAppointment = true;
+        scheduleContext.setBusy(true);
+        actionMessage.textContent = 'Cancelling appointment…';
+        actionMessage.classList.remove('error', 'success');
+        renderAppointments();
+
+        try {
+            const result = await scheduleContext.request(
+                `/clinic-appointments/${item.appointment_id}/cancel`,
+                undefined,
+                'POST'
+            );
+
+            item.status = 'cancelled';
+            actionMessage.textContent = result.message;
+            actionMessage.classList.add('success');
+        } catch (error) {
+            actionMessage.textContent = error.message;
+            actionMessage.classList.add('error');
+        } finally {
+            cancellingAppointment = false;
+            scheduleContext.setBusy(false);
+            renderAppointments();
+        }
+    }
+
     function renderAppointments() {
         const query = get('appointment-search').value
             .trim().toLocaleLowerCase();
@@ -373,6 +424,47 @@
                 row.appendChild(cell);
             }
 
+            const actions = document.createElement('td');
+
+            const canCancel =
+                ['pending', 'confirmed'].includes(item.status) &&
+                Date.parse(item.starts_at) > Date.now();
+
+            if (canCancel) {
+                actions.classList.add('appointment-row-actions');
+
+                const rescheduleButton = document.createElement('button');
+                rescheduleButton.type = 'button';
+                rescheduleButton.className = 'secondary compact-button';
+                rescheduleButton.textContent = 'Reschedule';
+                rescheduleButton.disabled = cancellingAppointment;
+
+                rescheduleButton.addEventListener('click', () => {
+                    window.openRescheduleAppointment(item);
+                });
+
+                actions.appendChild(rescheduleButton);
+
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'secondary compact-button';
+                button.textContent = 'Cancel';
+                button.disabled = cancellingAppointment;
+                button.setAttribute(
+                    'aria-label',
+                    `Cancel appointment for ${item.pet_name} at ${item.time}`
+                );
+
+                button.addEventListener('click', () => {
+                    cancelAppointment(item);
+                });
+
+                actions.appendChild(button);
+            } else {
+                actions.textContent = '—';
+            }
+
+            row.appendChild(actions);
             appointmentRows.appendChild(row);
         }
 
@@ -391,7 +483,11 @@
                         unique.set(appointment.appointment_id, {
                             ...appointment,
                             vet_name: vet.full_name,
-                            time: slot.start_time.slice(0, 5)
+                            veterinarian_id: vet.veterinarian_id,
+                            schedule_date: schedule.schedule_date,
+                            time: slot.start_time.slice(0, 5),
+                            starts_at:
+                                `${schedule.schedule_date}T${slot.start_time}+08:00`
                         });
                     }
                 }

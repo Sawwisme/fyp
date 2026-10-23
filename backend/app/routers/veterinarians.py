@@ -6,6 +6,11 @@ from datetime import date
 from fastapi import Query
 
 from app.schemas.schedule import ScheduleResponse
+from app.schemas.vet_appointments import (
+    VetAppointmentResponse,
+    VetCalendarEntry,
+)
+from app.services import vet_appointment_service
 
 from app.database import get_db
 from app.dependencies import require_roles
@@ -69,4 +74,44 @@ def get_my_schedules(
         schedule_date,
         offset,
         limit,
+    )
+
+@router.get(
+    "/me/appointments",
+    response_model=list[VetAppointmentResponse],
+)
+def get_my_appointments(
+    appointment_date: date,
+    offset: int = Query(default=0, ge=0),
+    limit: int = Query(default=20, ge=1, le=100),
+    current_user: User = Depends(
+        require_roles("veterinarian")
+    ),
+    db: Session = Depends(get_db),
+):
+    return vet_appointment_service.list_my_appointments(
+        db,
+        current_user,
+        appointment_date,
+        offset,
+        limit,
+    )
+
+@router.get(
+    "/me/calendar",
+    response_model=list[VetCalendarEntry],
+)
+def get_my_calendar(
+    start_date: date,
+    end_date: date,
+    current_user: User = Depends(
+        require_roles("veterinarian")
+    ),
+    db: Session = Depends(get_db),
+):
+    return vet_appointment_service.get_my_calendar(
+        db,
+        current_user,
+        start_date,
+        end_date,
     )

@@ -29,6 +29,10 @@ from app.routers.clinic_appointments import (
     router as clinic_appointments_router,
 )
 
+from app.routers.owner_appointments import (
+    router as owner_appointments_router,
+)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     stop_event = Event()
@@ -69,6 +73,7 @@ app.include_router(clinic_discovery_router)
 app.include_router(automatic_scheduling_router)
 app.include_router(clinic_customers_router)
 app.include_router(clinic_appointments_router)
+app.include_router(owner_appointments_router)
 
 WEB_DIR = Path(__file__).resolve().parents[2] / "web"
 

@@ -1054,3 +1054,226 @@ section:has(#schedule-form) {
     padding-top: 18px;
     border-top: 1px solid var(--border);
 }
+
+.schedule-editor-dialog:has(#schedule-filter-fields) {
+    width: min(720px, calc(100% - 32px));
+}
+
+#schedule-filter-fields {
+    gap: 16px;
+}
+
+#schedule-filter-fields .field-label {
+    margin-top: 0;
+}
+
+#schedule-filter-fields input,
+#schedule-filter-fields select {
+    min-height: 44px;
+    padding: 10px 12px;
+}
+
+.schedule-editor-dialog:has(#schedule-filter-fields) .schedule-dialog-header {
+    margin-bottom: 18px;
+}
+
+.schedule-editor-dialog:has(#schedule-filter-fields) .staff-heading {
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+#schedule-list-title {
+    margin: 0;
+    font-size: 16px;
+}
+
+#schedule-list-message {
+    margin: 10px 0;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+#schedule-list-message.schedule-empty {
+    padding: 24px 18px;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    background: #fafbf9;
+    text-align: center;
+    line-height: 1.7;
+}
+
+.schedule-editor-dialog:has(#schedule-filter-fields)>.staff-actions {
+    margin-top: 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.reschedule-dialog {
+    width: min(560px, calc(100% - 32px));
+}
+
+.reschedule-dialog .field-label {
+    display: block;
+    margin: 16px 0 8px;
+}
+
+.reschedule-dialog #reschedule-summary {
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: #edf4ee;
+    line-height: 1.6;
+}
+
+.appointment-row-actions {
+    white-space: nowrap;
+}
+
+.appointment-row-actions button+button {
+    margin-left: 8px;
+}
+
+.vet-calendar-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 8px;
+    width: 100%;
+    border-top: 0;
+    border-left: 0;
+    border-radius: 0;
+    color: var(--ink);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.vet-calendar-cell:hover {
+    background: #edf4ee;
+}
+
+.vet-calendar-cell:focus-visible {
+    outline: 3px solid var(--green);
+    outline-offset: -3px;
+}
+
+.vet-calendar-number {
+    font-weight: 700;
+}
+
+.vet-calendar-hours,
+.vet-calendar-count,
+.vet-calendar-empty {
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.vet-calendar-count {
+    color: var(--green);
+    font-weight: 600;
+}
+
+.vet-calendar-empty {
+    color: var(--muted);
+}
+
+.vet-day-toolbar,
+.vet-day-navigation {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.vet-day-toolbar {
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.vet-day-navigation input {
+    width: auto;
+    margin: 0;
+}
+
+.vet-timeline-row {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 18px;
+    margin-bottom: 12px;
+}
+
+.vet-timeline-time {
+    padding-top: 18px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.vet-timeline-card {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    min-height: 64px;
+    padding: 14px 18px;
+    border: 1px solid var(--border);
+    border-left: 4px solid #79a986;
+    border-radius: 8px;
+    background: #f5faf6;
+}
+
+.vet-timeline-card.is-blocked {
+    border-left-color: #8b9290;
+    background: #f1f3f2;
+}
+
+.vet-timeline-card.is-booked {
+    border-left-color: #3d7bc2;
+    background: #f0f6fd;
+}
+
+.vet-slot-status {
+    margin-right: auto;
+    text-transform: capitalize;
+}
+
+.vet-booking-link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #185b9d;
+    font: inherit;
+    font-weight: 600;
+    text-align: left;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.vet-appointment-dialog {
+    width: min(540px, calc(100% - 32px));
+}
+
+.vet-appointment-details {
+    display: grid;
+    grid-template-columns: 90px minmax(0, 1fr);
+    gap: 14px;
+}
+
+.vet-appointment-details dt {
+    color: var(--muted);
+}
+
+.vet-appointment-details dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+    .vet-timeline-row {
+        grid-template-columns: 80px minmax(0, 1fr);
+        gap: 10px;
+    }
+
+    .vet-timeline-card {
+        padding: 12px;
+    }
+}
