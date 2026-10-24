@@ -20,6 +20,11 @@
                     aria-controls="appointments-view" tabindex="-1">
                 Appointments
             </button>
+            <button id="emergency-tab" type="button"
+                    role="tab" aria-selected="false"
+                    aria-controls="emergency-view" tabindex="-1">
+                Emergency Requests
+            </button>
         </div>
 
         <div id="calendar-view" role="tabpanel"
@@ -95,6 +100,8 @@
                 </table>
             </div>
         </div>
+        <div id="emergency-view" role="tabpanel"
+     aria-labelledby="emergency-tab" hidden></div>
     `;
 
     oldContent.after(workspace);
@@ -103,7 +110,7 @@
     const grid = get('clinic-calendar');
     const calendarMessage = get('calendar-message');
     const appointmentRows = get('appointment-overview-rows');
-    const tabs = [get('calendar-tab'), get('appointments-tab')];
+    const tabs = [get('calendar-tab'), get('appointments-tab'), get('emergency-tab')];
 
     let context = null;
     let calendarVersion = 0;
@@ -124,6 +131,11 @@
 
         get('calendar-view').hidden = index !== 0;
         get('appointments-view').hidden = index !== 1;
+        get('emergency-view').hidden = index !== 2;
+
+        if (index === 2) {
+            window.dispatchEvent(new Event('clinic-emergency-open'));
+        }
     }
 
     tabs.forEach((tab, index) => {
@@ -135,7 +147,8 @@
             }
 
             event.preventDefault();
-            const next = index === 0 ? 1 : 0;
+            const direction = event.key === 'ArrowRight' ? 1 : -1;
+            const next = (index + direction + tabs.length) % tabs.length;
             switchTab(next);
             tabs[next].focus();
         });

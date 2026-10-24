@@ -106,6 +106,14 @@
             ['Status', item.status]
         ];
 
+        if (item.appointment_type === 'emergency') {
+            values.push(
+                ['Urgency', item.urgency_level || 'Unassessed'],
+                ['Reported reason',
+                    item.emergency_reason || 'No reason recorded.']
+            );
+        }
+
         for (const [name, value] of values) {
             const term = document.createElement('dt');
             const description = document.createElement('dd');
@@ -330,12 +338,22 @@
                 if (bookings.length) {
                     card.classList.add('is-booked');
 
+                    card.classList.toggle(
+                        'is-emergency',
+                        bookings.some(item => item.appointment_type === 'emergency')
+                    );
+
                     for (const appointment of bookings) {
                         const button = document.createElement('button');
                         button.type = 'button';
                         button.className = 'vet-booking-link';
+                        const emergencyLabel =
+                            appointment.appointment_type === 'emergency'
+                                ? 'Emergency · '
+                                : '';
+
                         button.textContent =
-                            `${appointment.pet_name} · ${appointment.status}`;
+                            `${emergencyLabel}${appointment.pet_name} · ${appointment.status}`;
                         button.addEventListener(
                             'click', () => showAppointment(appointment)
                         );

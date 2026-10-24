@@ -58,6 +58,27 @@
                 row.appendChild(cell);
             }
 
+            const emergencyCell = document.createElement('td');
+
+            if (item.appointment_type === 'emergency') {
+                const details = document.createElement('details');
+                const summary = document.createElement('summary');
+                const reason = document.createElement('p');
+
+                summary.textContent =
+                    `View details · ${item.urgency_level || 'Unassessed'}`;
+
+                reason.textContent =
+                    item.emergency_reason || 'No emergency reason recorded.';
+                reason.className = 'emergency-request-reason';
+
+                details.append(summary, reason);
+                emergencyCell.appendChild(details);
+            } else {
+                emergencyCell.textContent = '—';
+            }
+
+            row.appendChild(emergencyCell);
             rows.appendChild(row);
         }
 

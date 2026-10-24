@@ -21,3 +21,11 @@ class AvailableSlotResponse(BaseModel):
     schedule_date: date
     start_time: time
     end_time: time
+
+class ClinicSummary(BaseModel):
+    clinic_id: int
+    clinic_name: str
+    address: str | None
+    phone_number: str | None
+    latitude: float | None
+    longitude: float | None

@@ -9,6 +9,8 @@ import 'pet_detail.dart';
 import 'pets.dart';
 import 'pet_form.dart';
 import 'change_password.dart';
+import '../services/appointment_service.dart';
+import 'appointments.dart';
 
 class HomeScreen extends StatefulWidget {
   final Map<String, dynamic> user;
@@ -30,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   static const _green = Color(0xFF176B32);
 
   late final PetService _petService;
+  late final AppointmentService _appointmentService;
   late Map<String, dynamic> _user;
 
   int _selectedTab = 0;
@@ -45,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _user = Map<String, dynamic>.from(widget.user);
     _petService = PetService(widget.auth.api);
+    _appointmentService = AppointmentService(widget.auth.api);
     _loadPet();
   }
 
@@ -579,10 +583,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _currentPage() {
     switch (_selectedTab) {
       case 1:
-        return _comingSoon(
-          Icons.calendar_month,
-          'Book a veterinary visit',
-          'Appointment booking is coming soon.',
+        return AppointmentsPage(
+          service: _appointmentService,
+          petService: _petService,
         );
       case 2:
         return _comingSoon(

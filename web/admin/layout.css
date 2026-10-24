@@ -1277,3 +1277,54 @@ section:has(#schedule-form) {
         padding: 12px;
     }
 }
+
+.emergency-request-card {
+    margin-bottom: 16px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-left: 4px solid #c84736;
+    border-radius: 10px;
+    background: white;
+}
+
+.emergency-request-card h3 {
+    margin-top: 0;
+}
+
+.emergency-request-reason,
+#emergency-dialog-summary {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.emergency-dialog {
+    width: min(600px, calc(100% - 32px));
+}
+
+.emergency-dialog .field-label {
+    display: block;
+    margin: 16px 0 8px;
+}
+
+.emergency-dialog textarea {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font: inherit;
+    resize: vertical;
+}
+
+.vet-timeline-card.is-emergency {
+    border-left-color: #b3261e;
+    background: #fff4f2;
+}
+
+.vet-timeline-card.is-emergency .vet-booking-link {
+    color: #a5251e;
+}
+
+.vet-appointment-details dd {
+    white-space: pre-wrap;
+}

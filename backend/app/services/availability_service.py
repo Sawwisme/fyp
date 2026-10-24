@@ -41,17 +41,21 @@ def list_veterinarians(
     db: Session,
     offset: int,
     limit: int,
+    clinic_id: int | None = None,
 ):
+    query = eligible_veterinarians()
+
+    if clinic_id is not None:
+        query = query.where(Clinic.clinic_id == clinic_id)
+
     query = (
-        eligible_veterinarians()
+        query
         .order_by(User.full_name, Veterinarian.veterinarian_id)
         .offset(offset)
         .limit(limit)
     )
 
     return db.execute(query).mappings().all()
-
-
 def list_available_slots(
     db: Session,
     veterinarian_id: int,
@@ -132,3 +136,41 @@ def list_available_slots(
     )
 
     return db.execute(query).mappings().all()
+
+def list_clinics(
+    db: Session,
+    offset: int,
+    limit: int,
+):
+    eligible_vet = (
+        select(Veterinarian.veterinarian_id)
+        .join(User, User.user_id == Veterinarian.user_id)
+        .where(
+            Veterinarian.clinic_id == Clinic.clinic_id,
+            Veterinarian.approval_status == "approved",
+            User.role == "veterinarian",
+            User.status == "active",
+        )
+        .correlate(Clinic)
+        .exists()
+    )
+
+    statement = (
+        select(
+            Clinic.clinic_id,
+            Clinic.clinic_name,
+            Clinic.address,
+            Clinic.phone_number,
+            Clinic.latitude,
+            Clinic.longitude,
+        )
+        .where(
+            Clinic.status == "active",
+            eligible_vet,
+        )
+        .order_by(Clinic.clinic_name, Clinic.clinic_id)
+        .offset(offset)
+        .limit(limit)
+    )
+
+    return db.execute(statement).mappings().all()

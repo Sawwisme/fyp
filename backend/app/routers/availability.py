@@ -9,6 +9,7 @@ from app.models import User
 from app.schemas.availability import (
     AvailableSlotResponse,
     VeterinarianSummary,
+    ClinicSummary,
 )
 from app.services import availability_service
 
@@ -24,13 +25,20 @@ router = APIRouter(
     response_model=list[VeterinarianSummary],
 )
 def get_veterinarians(
+    clinic_id: int | None = Query(
+        default=None, ge=1, le=2147483647
+    ),
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
     current_user: User = Depends(require_roles("pet_owner")),
     db: Session = Depends(get_db),
 ):
-    return availability_service.list_veterinarians(db, offset, limit)
-
+    return availability_service.list_veterinarians(
+        db,
+        offset,
+        limit,
+        clinic_id,
+    )
 
 @router.get(
     "/veterinarians/{veterinarian_id}/slots",
@@ -52,6 +60,22 @@ def get_available_slots(
         db,
         veterinarian_id,
         appointment_date,
+        offset,
+        limit,
+    )
+
+@router.get(
+    "/clinics",
+    response_model=list[ClinicSummary],
+)
+def get_clinics(
+    offset: int = Query(default=0, ge=0),
+    limit: int = Query(default=20, ge=1, le=100),
+    current_user: User = Depends(require_roles("pet_owner")),
+    db: Session = Depends(get_db),
+):
+    return availability_service.list_clinics(
+        db,
         offset,
         limit,
     )

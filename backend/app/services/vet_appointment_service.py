@@ -40,6 +40,7 @@ def list_my_appointments(
             selectinload(Appointment.owner)
             .selectinload(PetOwner.user),
             selectinload(Appointment.time_slot),
+            selectinload(Appointment.emergency_request),
         )
         .order_by(
             TimeSlot.start_time,
@@ -66,6 +67,16 @@ def list_my_appointments(
             "appointment_type": record.appointment_type,
             "appointment_source": record.appointment_source,
             "status": record.status,
+            "emergency_reason": (
+                record.emergency_request.emergency_reason
+                if record.emergency_request is not None
+                else None
+            ),
+            "urgency_level": (
+                record.emergency_request.urgency_level
+                if record.emergency_request is not None
+                else None
+            ),
         }
         for record in records
     ]
