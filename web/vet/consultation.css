@@ -1,0 +1,76 @@
+#consultation-fields {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+#consultation-fields>.panel {
+    margin-bottom: 20px;
+}
+
+#consultation-form label {
+    display: block;
+    margin: 16px 0 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#consultation-form input,
+#consultation-form select,
+#consultation-form textarea {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 44px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fafbf9;
+    color: var(--ink);
+    font: inherit;
+}
+
+#consultation-form textarea {
+    resize: vertical;
+}
+
+.clinical-row {
+    margin-top: 16px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #fafcf9;
+}
+
+.clinical-row-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 16px;
+}
+
+.clinical-row .staff-actions {
+    margin-top: 16px;
+}
+
+#consultation-emergency {
+    padding: 14px;
+    border-left: 4px solid #b3261e;
+    border-radius: 6px;
+    background: #fff4f2;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+#consultation-state {
+    font-weight: 600;
+}
+
+#consultation-reload {
+    margin-bottom: 20px;
+}
+
+@media (max-width: 650px) {
+    .clinical-row-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VetDental — Consultation</title>
+
+    <link rel="stylesheet" href="/web/styles.css">
+    <link rel="stylesheet" href="/web/admin/dashboard.css">
+    <link rel="stylesheet" href="/web/admin/layout.css">
+    <link rel="stylesheet" href="/web/vet/consultation.css">
+
+    <script src="/web/vet/layout.js" defer></script>
+    <script src="/web/vet/consultation.js" defer></script>
+</head>
+
+<body>
+    <div id="vet-loading" class="loading">
+        <p id="vet-loading-message" role="status">
+            Loading your account…
+        </p>
+        <button id="vet-retry" class="secondary" type="button" hidden>
+            Try again
+        </button>
+        <a href="/web/">Back to staff login</a>
+    </div>
+
+    <div id="vet-workspace" class="workspace" hidden>
+        <aside id="shared-sidebar" class="sidebar"></aside>
+
+        <div class="content-area">
+            <header id="shared-topbar" class="topbar"></header>
+
+            <main class="main-content">
+                <div class="page-heading">
+                    <h1>Consultation</h1>
+                    <p class="subtitle">
+                        Record findings, treatments and prescriptions.
+                    </p>
+                    <a href="/web/vet/appointments.html">
+                        Back to appointments
+                    </a>
+                </div>
+
+                <section class="panel">
+                    <h2 id="consultation-patient">Patient information</h2>
+                    <p id="consultation-summary"></p>
+                    <p id="consultation-emergency" hidden></p>
+                    <p id="consultation-state"></p>
+                </section>
+
+                <p id="consultation-message" class="message" role="status" aria-live="polite"></p>
+
+                <button id="consultation-reload" type="button" class="secondary compact-button" hidden>
+                    Reload consultation
+                </button>
+
+                <form id="consultation-form">
+                    <fieldset id="consultation-fields" disabled>
+                        <section class="panel">
+                            <h2>Clinical information</h2>
+
+                            <label for="consultation-information">
+                                Presenting complaint and history
+                            </label>
+                            <textarea id="consultation-information" rows="4" maxlength="10000"></textarea>
+
+                            <label for="examination-findings">
+                                Examination findings
+                            </label>
+                            <textarea id="examination-findings" rows="4" maxlength="10000"></textarea>
+
+                            <label for="consultation-diagnosis">
+                                Diagnosis
+                            </label>
+                            <textarea id="consultation-diagnosis" rows="3" maxlength="10000"></textarea>
+
+                            <label for="consultation-notes">
+                                Additional notes
+                            </label>
+                            <textarea id="consultation-notes" rows="3" maxlength="10000"></textarea>
+                        </section>
+
+                        <section class="panel">
+                            <div class="staff-heading">
+                                <h2>Treatments</h2>
+                                <button id="add-treatment" type="button" class="secondary compact-button">
+                                    Add treatment
+                                </button>
+                            </div>
+
+                            <p class="muted">
+                                Record planned or performed procedures.
+                            </p>
+
+                            <div id="consultation-treatments"></div>
+                        </section>
+
+                        <section class="panel">
+                            <div class="staff-heading">
+                                <h2>Prescriptions</h2>
+                                <button id="add-prescription" type="button" class="secondary compact-button">
+                                    Add medication
+                                </button>
+                            </div>
+
+                            <p class="muted">
+                                Enter the medication and directions prescribed
+                                by the veterinarian.
+                            </p>
+
+                            <div id="consultation-prescriptions"></div>
+                        </section>
+
+                        <div class="staff-actions">
+                            <button id="save-consultation" type="submit" class="secondary compact-button">
+                                Save draft
+                            </button>
+                            <button id="complete-consultation" type="button" class="compact-button">
+                                Complete consultation
+                            </button>
+                        </div>
+                    </fieldset>
+                </form>
+            </main>
+        </div>
+    </div>
+</body>
+
+</html>

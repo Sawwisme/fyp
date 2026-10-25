@@ -72,6 +72,7 @@
                     <select id="appointment-status">
                         <option value="">All statuses</option>
                         <option value="confirmed">Confirmed</option>
+                        <option value="in_progress">In progress</option>
                         <option value="pending">Pending</option>
                         <option value="completed">Completed</option>
                         <option value="cancelled">Cancelled</option>

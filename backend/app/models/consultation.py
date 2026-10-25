@@ -81,7 +81,7 @@ class Consultation(Base):
     appointment = relationship(
     "Appointment",
     back_populates="consultation",
-)
+    )
     clinic = relationship("Clinic")
     pet = relationship("Pet")
     veterinarian = relationship("Veterinarian")

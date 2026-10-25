@@ -225,6 +225,10 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
   }
 
   bool _isUpcoming(Map<String, dynamic> item) {
+    if (item['status'] == 'in_progress') {
+      return true;
+    }
+
     if (!['pending', 'confirmed'].contains(item['status'])) {
       return false;
     }

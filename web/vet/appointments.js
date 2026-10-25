@@ -79,6 +79,18 @@
             }
 
             row.appendChild(emergencyCell);
+
+            const consultationCell = document.createElement('td');
+            const consultationButton =
+                window.createVetConsultationButton(item, message);
+
+            if (consultationButton) {
+                consultationCell.appendChild(consultationButton);
+            } else {
+                consultationCell.textContent = '—';
+            }
+
+            row.appendChild(consultationCell);
             rows.appendChild(row);
         }
 

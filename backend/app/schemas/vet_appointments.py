@@ -20,6 +20,9 @@ class VetAppointmentResponse(BaseModel):
     emergency_reason: str | None = None
     urgency_level: str | None = None
 
+    consultation_id: int | None = None
+    consultation_status: str | None = None
+
 class VetCalendarEntry(BaseModel):
     schedule_id: int
     schedule_date: date

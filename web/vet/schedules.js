@@ -81,6 +81,8 @@
                     aria-label="Close appointment details">×</button>
         </header>
         <dl class="vet-appointment-details"></dl>
+        <p id="vet-consultation-message" class="message" role="status"></p>
+        <div id="vet-consultation-actions" class="staff-actions"></div>
     `;
 
     document.body.appendChild(dialog);
@@ -120,6 +122,19 @@
             term.textContent = name;
             description.textContent = value;
             details.append(term, description);
+        }
+
+        const consultationMessage = get('vet-consultation-message');
+        const consultationActions = get('vet-consultation-actions');
+
+        consultationMessage.textContent = '';
+        consultationActions.replaceChildren();
+
+        const consultationButton =
+            window.createVetConsultationButton(item, consultationMessage);
+
+        if (consultationButton) {
+            consultationActions.appendChild(consultationButton);
         }
 
         dialog.showModal();
