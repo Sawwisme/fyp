@@ -24,6 +24,7 @@ class Prescription(Base):
     )
     medication_name = Column(String(150), nullable=False)
     dosage = Column(String(100), nullable=False)
+    administration_route = Column(String(50), nullable=True)
     frequency = Column(String(100), nullable=True)
     duration = Column(String(100), nullable=True)
     instructions = Column(Text, nullable=True)

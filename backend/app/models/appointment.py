@@ -66,3 +66,9 @@ class Appointment(Base):
         back_populates="appointment",
         uselist=False,
     )
+
+    consultation = relationship(
+        "Consultation",
+        back_populates="appointment",
+        uselist=False,
+    )

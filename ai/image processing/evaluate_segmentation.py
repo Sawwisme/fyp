@@ -14,14 +14,14 @@ BASE_DIR = os.path.dirname(
 
 TEST_IMAGE_DIR = os.path.join(
     BASE_DIR,
-    "segmentation split",
+    "segmentation grouped split",
     "test",
     "images"
 )
 
 TEST_MASK_DIR = os.path.join(
     BASE_DIR,
-    "segmentation split",
+    "segmentation grouped split",
     "test",
     "masks"
 )
@@ -29,7 +29,7 @@ TEST_MASK_DIR = os.path.join(
 MODEL_PATH = os.path.join(
     BASE_DIR,
     "models",
-    "dental_segmentation_unet.keras"
+    "dental_segmentation_unet_ce.keras"
 )
 
 IMAGE_SIZE = (256, 256)

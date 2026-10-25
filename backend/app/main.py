@@ -24,6 +24,7 @@ from app.routers.clinic_customers import router as clinic_customers_router
 from app.routers.clinic_appointments import router as clinic_appointments_router
 from app.routers.owner_appointments import router as owner_appointments_router
 from app.routers.emergency_requests import router as emergency_requests_router
+from app.routers.consultations import router as consultations_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -67,6 +68,7 @@ app.include_router(clinic_customers_router)
 app.include_router(clinic_appointments_router)
 app.include_router(owner_appointments_router)
 app.include_router(emergency_requests_router)
+app.include_router(consultations_router)
 
 WEB_DIR = Path(__file__).resolve().parents[2] / "web"
 
