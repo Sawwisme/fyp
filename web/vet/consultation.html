@@ -13,6 +13,7 @@
 
     <script src="/web/vet/layout.js" defer></script>
     <script src="/web/vet/consultation.js" defer></script>
+    <script src="/web/vet/consultation_history.js" defer></script>
 </head>
 
 <body>
@@ -46,6 +47,7 @@
                 <section class="panel">
                     <h2 id="consultation-patient">Patient information</h2>
                     <p id="consultation-summary"></p>
+                    <dl id="consultation-patient-details" class="consultation-patient-details"></dl>
                     <p id="consultation-emergency" hidden></p>
                     <p id="consultation-state"></p>
                 </section>
@@ -55,6 +57,68 @@
                 <button id="consultation-reload" type="button" class="secondary compact-button" hidden>
                     Reload consultation
                 </button>
+
+                <section id="consultation-return-visit" class="panel consultation-return-visit" hidden>
+                    <h2 id="return-visit-context-title"></h2>
+                    <div id="return-visit-context-details"></div>
+                </section>
+
+                <section class="panel consultation-appointment">
+                    <h2>Appointment Information</h2>
+                    <p class="muted">All appointment times use Malaysia time.</p>
+
+                    <dl id="consultation-appointment-details" class="consultation-patient-details"></dl>
+                </section>
+
+                <details class="panel patient-history-panel" id="patient-history-panel">
+                    <summary>Previous Consultations</summary>
+
+                    <p class="muted">
+                        Previous completed visits recorded at this clinic.
+                    </p>
+
+                    <p id="patient-history-message" role="status"></p>
+                    <div id="patient-history-records"></div>
+
+                    <div class="staff-actions">
+                        <button id="patient-history-retry" type="button" class="secondary compact-button" hidden>
+                            Try again
+                        </button>
+
+                        <button id="patient-history-more" type="button" class="secondary compact-button" hidden>
+                            Load more
+                        </button>
+                    </div>
+                </details>
+
+                <section class="panel consultation-ai">
+                    <h2>AI Dental Assessment</h2>
+                    <p class="muted">
+                        Review the AI findings alongside your clinical examination.
+                        Your final diagnosis is recorded separately below.
+                    </p>
+
+                    <div id="assessment-picker">
+                        <label for="consultation-assessment">
+                            Link an assessment for this patient
+                        </label>
+                        <select id="consultation-assessment" disabled>
+                            <option value="">No assessment linked</option>
+                        </select>
+                        <p class="muted">
+                            The selection is saved when you save the consultation.
+                        </p>
+                    </div>
+
+                    <p id="assessment-message" role="status"></p>
+                    <button id="assessment-retry" type="button" class="secondary compact-button" hidden>
+                        Retry loading assessments
+                    </button>
+
+                    <div id="assessment-result"></div>
+                </section>
+
+                <div id="consultation-readview" hidden></div>
 
                 <form id="consultation-form">
                     <fieldset id="consultation-fields" disabled>
@@ -113,6 +177,33 @@
                             <div id="consultation-prescriptions"></div>
                         </section>
 
+                        <section class="panel">
+                            <h2>Follow-up Care</h2>
+
+                            <label class="followup-toggle">
+                                <input id="followup-required" type="checkbox">
+                                <span>Follow-up required</span>
+                            </label>
+
+                            <div id="followup-fields" hidden>
+                                <label for="followup-date">Recommended review date</label>
+                                <input id="followup-date" type="date">
+
+                                <label for="followup-reason">Reason for review</label>
+                                <textarea id="followup-reason" rows="3" maxlength="5000"></textarea>
+
+                                <label for="followup-instructions">
+                                    Home-care instructions
+                                </label>
+                                <textarea id="followup-instructions" rows="4" maxlength="10000"></textarea>
+
+                                <p class="muted">
+                                    Completing this consultation creates a pending
+                                    follow-up task. This does not book an appointment.
+                                </p>
+                            </div>
+                        </section>
+
                         <div class="staff-actions">
                             <button id="save-consultation" type="submit" class="secondary compact-button">
                                 Save draft
@@ -123,6 +214,10 @@
                         </div>
                     </fieldset>
                 </form>
+                <section id="followup-readview" class="panel" hidden>
+                    <h2>Follow-up Care</h2>
+                    <div id="followup-readview-content"></div>
+                </section>
             </main>
         </div>
     </div>

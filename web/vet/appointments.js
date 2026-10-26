@@ -25,6 +25,29 @@
         return `${value('year')}-${value('month')}-${value('day')}`;
     }
 
+    function renderAppointmentCounts(items = null) {
+        const counts = items ? {
+            total: items.length,
+            confirmed: items.filter(
+                item => item.status === 'confirmed'
+            ).length,
+            progress: items.filter(
+                item => item.status === 'in_progress'
+            ).length,
+            completed: items.filter(
+                item => item.status === 'completed'
+            ).length
+        } : null;
+
+        for (const name of [
+            'total', 'confirmed', 'progress', 'completed'
+        ]) {
+            document.getElementById(
+                `appointment-count-${name}`
+            ).textContent = counts ? counts[name] : '—';
+        }
+    }
+
     function render() {
         const query = search.value.trim().toLocaleLowerCase();
 
@@ -35,6 +58,8 @@
             return text.includes(query)
                 && (!status.value || item.status === status.value);
         });
+
+        renderAppointmentCounts(matches);
 
         rows.replaceChildren();
 
@@ -103,6 +128,7 @@
         if (!ready) return;
 
         const currentVersion = ++version;
+        renderAppointmentCounts();
         records = [];
         rows.replaceChildren();
         retry.hidden = true;

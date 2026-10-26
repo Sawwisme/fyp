@@ -14,6 +14,10 @@
     let dirty = false;
     let needsReload = false;
     let rowCounter = 0;
+    let assessmentOptions = [];
+    let assessmentLoading = false;
+    let assessmentsLoaded = false;
+    let assessmentRequest = 0;
 
     // Validation is performed explicitly before each save.
     form.noValidate = true;
@@ -59,6 +63,8 @@
 
     function setBusy(value) {
         busy = value;
+
+        updateAssessmentControls();
 
         fields.disabled =
             value ||
@@ -200,21 +206,530 @@
         });
     }
 
+    function renderCompleted(data) {
+        const root = get('consultation-readview');
+        root.replaceChildren();
+
+        function section(title) {
+            const panel = document.createElement('section');
+            panel.className = 'panel consultation-report-panel';
+
+            const heading = document.createElement('h2');
+            heading.textContent = title;
+            panel.appendChild(heading);
+
+            return panel;
+        }
+
+        function detail(parent, labelText, value) {
+            const field = document.createElement('div');
+            field.className = 'consultation-report-field';
+
+            const label = document.createElement('h3');
+            label.textContent = labelText;
+
+            const content = document.createElement('p');
+            content.textContent = value || 'Not recorded';
+
+            field.append(label, content);
+            parent.appendChild(field);
+        }
+
+        const clinical = section('Clinical information');
+        const grid = document.createElement('div');
+        grid.className = 'consultation-report-grid';
+
+        detail(grid, 'Presenting complaint and history',
+            data.consultation_information);
+        detail(grid, 'Examination findings', data.examination_findings);
+        detail(grid, 'Diagnosis', data.diagnosis);
+        detail(grid, 'Additional notes', data.notes);
+
+        clinical.appendChild(grid);
+        root.appendChild(clinical);
+
+        const columns = document.createElement('div');
+        columns.className = 'consultation-report-columns';
+
+        const treatments = section('Treatments');
+
+        if (!data.treatments.length) {
+            detail(treatments, 'Treatment records', 'No treatments recorded.');
+        }
+
+        for (const item of data.treatments) {
+            const row = document.createElement('div');
+            row.className = 'consultation-record-row';
+
+            detail(row, item.treatment_name,
+                `${item.treatment_date} · ${item.status}`);
+
+            if (item.description) {
+                detail(row, 'Description', item.description);
+            }
+
+            treatments.appendChild(row);
+        }
+
+        const prescriptions = section('Prescriptions');
+
+        if (!data.prescriptions.length) {
+            detail(prescriptions, 'Medication records',
+                'No medications prescribed.');
+        }
+
+        for (const item of data.prescriptions) {
+            const row = document.createElement('div');
+            row.className = 'consultation-record-row';
+
+            detail(row, 'Medication', item.medication_name);
+
+            const medicationGrid = document.createElement('div');
+            medicationGrid.className = 'consultation-report-grid';
+
+            detail(medicationGrid, 'Dosage', item.dosage);
+            detail(medicationGrid, 'Route', item.administration_route);
+            detail(medicationGrid, 'Frequency', item.frequency);
+            detail(medicationGrid, 'Duration', item.duration);
+
+            row.appendChild(medicationGrid);
+
+            if (item.instructions) {
+                detail(row, 'Instructions', item.instructions);
+            }
+
+            prescriptions.appendChild(row);
+        }
+
+        columns.append(treatments, prescriptions);
+        root.appendChild(columns);
+    }
+
+    function renderPatient(patient) {
+        const root = get('consultation-patient-details');
+        root.replaceChildren();
+
+        let birthDate = 'Not recorded';
+
+        if (patient.date_of_birth) {
+            const [year, month, day] =
+                patient.date_of_birth.split('-');
+
+            birthDate = `${day}/${month}/${year}`;
+        }
+
+        const fields = [
+            ['Species', patient.species],
+            ['Breed', patient.breed],
+            ['Sex', patient.gender],
+            ['Date of birth', birthDate],
+            [
+                'Weight',
+                patient.weight == null
+                    ? null
+                    : `${patient.weight} kg`,
+            ],
+            [
+                'Existing dental condition',
+                patient.existing_dental_condition,
+            ],
+            ['Patient notes', patient.notes],
+        ];
+
+        for (const [label, value] of fields) {
+            const item = document.createElement('div');
+            const term = document.createElement('dt');
+            const description = document.createElement('dd');
+
+            term.textContent = label;
+            description.textContent = value || 'Not recorded';
+
+            item.append(term, description);
+            root.appendChild(item);
+        }
+    }
+
+    function updateAssessmentControls() {
+        get('consultation-assessment').disabled =
+            busy ||
+            assessmentLoading ||
+            !assessmentsLoaded ||
+            needsReload ||
+            !record ||
+            record.status !== 'draft';
+    }
+
+    function assessmentDate(value) {
+        if (!value) return 'Date not recorded';
+
+        const normalized = /(?:Z|[+-]\d{2}:\d{2})$/i.test(value)
+            ? value
+            : `${value}Z`;
+
+        const date = new Date(normalized);
+
+        return Number.isNaN(date.getTime())
+            ? 'Date not recorded'
+            : date.toLocaleString('en-MY', {
+                timeZone: 'Asia/Kuala_Lumpur',
+                dateStyle: 'medium',
+                timeStyle: 'short',
+            });
+    }
+
+    function showAssessment(assessment) {
+        const root = get('assessment-result');
+        root.replaceChildren();
+
+        if (!assessment) {
+            const empty = document.createElement('p');
+            empty.className = 'muted';
+            empty.textContent = 'No AI dental assessment linked.';
+            root.appendChild(empty);
+            return;
+        }
+
+        const heading = document.createElement('p');
+        heading.textContent =
+            `Assessment #${assessment.analysis_id} · ` +
+            assessmentDate(assessment.analysis_date);
+        root.appendChild(heading);
+
+        const list = document.createElement('ul');
+        list.className = 'assessment-predictions';
+
+        for (const prediction of assessment.predictions) {
+            const item = document.createElement('li');
+            const confidence = Number(prediction.confidence_score);
+
+            const result = !prediction.supported
+                ? 'Not supported by this model'
+                : prediction.predicted_positive
+                    ? 'Flagged by AI'
+                    : 'Not flagged by AI';
+
+            item.textContent =
+                `${prediction.condition_name}: ${result}` +
+                (
+                    prediction.supported &&
+                        Number.isFinite(confidence)
+                        ? ` · Score ${(confidence * 100).toFixed(1)}%`
+                        : ''
+                );
+
+            list.appendChild(item);
+        }
+
+        if (assessment.predictions.length) {
+            root.appendChild(list);
+        } else {
+            const empty = document.createElement('p');
+            empty.textContent = 'No prediction details recorded.';
+            root.appendChild(empty);
+        }
+
+        if (assessment.veterinarian_override) {
+            const review = document.createElement('p');
+            review.textContent =
+                `Recorded vet review: ` +
+                assessment.veterinarian_override;
+            root.appendChild(review);
+        }
+
+        if (assessment.override_notes) {
+            const notes = document.createElement('p');
+            notes.className = 'assessment-notes';
+            notes.textContent = assessment.override_notes;
+            root.appendChild(notes);
+        }
+    }
+
+    async function loadAssessments() {
+        if (!record || record.status !== 'draft') return;
+
+        const request = ++assessmentRequest;
+        const consultationRecord = record;
+        const select = get('consultation-assessment');
+        const status = get('assessment-message');
+
+        assessmentsLoaded = false;
+        assessmentLoading = true;
+        updateAssessmentControls();
+        get('assessment-retry').hidden = true;
+        status.textContent = 'Loading patient assessments…';
+
+        try {
+            const results = [];
+            let offset = 0;
+
+            while (true) {
+                const batch = await vetRequest(
+                    `/consultations/${consultationId}/ai-assessments` +
+                    `?offset=${offset}&limit=100`
+                );
+
+                if (
+                    request !== assessmentRequest ||
+                    record !== consultationRecord
+                ) return;
+
+                results.push(...batch);
+
+                if (batch.length < 100) break;
+                offset += batch.length;
+            }
+
+            const byId = new Map(
+                results.map(item => [item.analysis_id, item])
+            );
+
+            // Keep the linked result visible even if the list changes.
+            if (record.ai_assessment) {
+                byId.set(
+                    record.ai_assessment.analysis_id,
+                    record.ai_assessment
+                );
+            }
+
+            assessmentOptions = [...byId.values()];
+
+            assessmentsLoaded = true;
+
+            select.replaceChildren(
+                new Option('No assessment linked', '')
+            );
+
+            for (const item of assessmentOptions) {
+                select.add(new Option(
+                    `#${item.analysis_id} · ` +
+                    assessmentDate(item.analysis_date),
+                    String(item.analysis_id)
+                ));
+            }
+
+            select.value = record.ai_analysis_id == null
+                ? ''
+                : String(record.ai_analysis_id);
+
+            status.textContent = assessmentOptions.length
+                ? `${assessmentOptions.length} assessment(s) available.`
+                : 'No assessments recorded for this patient yet.';
+        } catch (error) {
+            if (request !== assessmentRequest) return;
+
+            status.textContent = error.message;
+            get('assessment-retry').hidden = false;
+        } finally {
+            if (request === assessmentRequest) {
+                assessmentLoading = false;
+                updateAssessmentControls();
+            }
+        }
+    }
+
+    get('consultation-assessment').addEventListener('change', () => {
+        if (
+            busy ||
+            needsReload ||
+            !record ||
+            record.status !== 'draft'
+        ) return;
+
+        const value = get('consultation-assessment').value;
+
+        record.ai_analysis_id = value ? Number(value) : null;
+        record.ai_assessment = assessmentOptions.find(
+            item => item.analysis_id === record.ai_analysis_id
+        ) || null;
+
+        showAssessment(record.ai_assessment);
+        dirty = true;
+    });
+
+    get('assessment-retry').addEventListener('click', () => {
+        if (!busy && !assessmentLoading) {
+            loadAssessments();
+        }
+    });
+
+    function renderAppointment(appointment) {
+        const root = get('consultation-appointment-details');
+        root.replaceChildren();
+
+        const readable = value => {
+            if (!value) return 'Not recorded';
+
+            return value
+                .replaceAll('_', ' ')
+                .replace(/\b\w/g, letter => letter.toUpperCase());
+        };
+
+        const [year, month, day] =
+            appointment.appointment_date.split('-');
+
+        const fields = [
+            ['Appointment', `#${appointment.appointment_id}`],
+            ['Date', `${day}/${month}/${year}`],
+            [
+                'Time',
+                `${appointment.start_time.slice(0, 5)}–` +
+                appointment.end_time.slice(0, 5),
+            ],
+            ['Type', readable(appointment.appointment_type)],
+            ['Veterinarian', appointment.veterinarian_name],
+            ['Status', readable(appointment.status)],
+            ['Booking source', readable(appointment.appointment_source)],
+        ];
+
+        for (const [label, value] of fields) {
+            const item = document.createElement('div');
+            const term = document.createElement('dt');
+            const description = document.createElement('dd');
+
+            term.textContent = label;
+            description.textContent = value || 'Not recorded';
+
+            item.append(term, description);
+            root.appendChild(item);
+        }
+    }
+
+    function renderFollowup(data) {
+        get('followup-required').checked =
+            Boolean(data.followup_required);
+
+        get('followup-fields').hidden = !data.followup_required;
+        get('followup-date').value =
+            data.followup_recommended_date || '';
+        get('followup-reason').value = data.followup_reason || '';
+        get('followup-instructions').value =
+            data.followup_instructions || '';
+
+        const completed = data.status === 'completed';
+        get('followup-readview').hidden = !completed;
+
+        const root = get('followup-readview-content');
+        root.replaceChildren();
+
+        if (!completed) return;
+
+        const entries = data.followup_required
+            ? [
+                [
+                    'Recommended review date',
+                    data.followup_recommended_date,
+                ],
+                ['Reason for review', data.followup_reason],
+                ['Home-care instructions', data.followup_instructions],
+            ]
+            : [['Follow-up', 'Not required']];
+
+        for (const [label, value] of entries) {
+            const paragraph = document.createElement('p');
+            const heading = document.createElement('strong');
+
+            heading.textContent = `${label}: `;
+            paragraph.append(
+                heading,
+                document.createTextNode(value || 'Not recorded')
+            );
+            root.appendChild(paragraph);
+        }
+
+        if (data.followup_required) {
+            const note = document.createElement('p');
+            note.className = 'muted';
+            note.textContent =
+                'A follow-up task was created when this consultation ' +
+                'was completed. Check Follow-up Care for its current status.';
+
+            root.appendChild(note);
+        }
+    }
+
+    get('followup-required').addEventListener('change', () => {
+        get('followup-fields').hidden =
+            !get('followup-required').checked;
+
+        dirty = true;
+    });
+
+    function renderReturnVisit(context) {
+        const panel = get('consultation-return-visit');
+        const root = get('return-visit-context-details');
+
+        panel.hidden = !context;
+        root.replaceChildren();
+
+        if (!context) return;
+
+        get('return-visit-context-title').textContent =
+            context.source_type === 'treatment'
+                ? 'Planned Treatment Visit'
+                : 'Follow-up Review Visit';
+
+        const entries = [
+            ['Purpose', context.title],
+            ['Reason', context.reason],
+            ['Original consultation', `#${context.original_consultation_id}`],
+        ];
+
+        if (context.care_instructions) {
+            entries.push([
+                'Previous care instructions',
+                context.care_instructions,
+            ]);
+        }
+
+        for (const [label, value] of entries) {
+            const paragraph = document.createElement('p');
+            const heading = document.createElement('strong');
+
+            heading.textContent = `${label}: `;
+            paragraph.append(
+                heading,
+                document.createTextNode(value || 'Not recorded')
+            );
+
+            root.appendChild(paragraph);
+        }
+    }
+
     function render(data) {
         record = data;
         needsReload = false;
 
+        ++assessmentRequest;
+        assessmentsLoaded = false;
+        assessmentLoading = false;
+
+        get('assessment-picker').hidden =
+            data.status === 'completed';
+
+        get('assessment-message').textContent = '';
+        get('assessment-retry').hidden = true;
+
+        showAssessment(data.ai_assessment);
+
+        if (data.status === 'draft') {
+            loadAssessments();
+        }
+
         get('consultation-patient').textContent = data.pet_name;
+
+        renderPatient(data.patient);
+        renderFollowup(data);
+        renderAppointment(data.appointment);
+        renderReturnVisit(data.return_visit);
 
         get('consultation-summary').textContent =
             `Owner: ${data.owner_name} · ` +
             `Appointment #${data.appointment_id}`;
 
         get('consultation-state').textContent =
-            `Status: ${data.status} · Version ${data.version}` +
-            (data.status === 'completed'
-                ? ' · Completed records are read-only.'
-                : '');
+            data.status === 'completed'
+                ? 'Completed · Read-only record'
+                : 'Draft · Save your changes before leaving.';
 
         const emergency = get('consultation-emergency');
         emergency.hidden = !data.emergency_reason;
@@ -241,6 +756,18 @@
 
         const completed = data.status === 'completed';
 
+        form.hidden = completed;
+        get('consultation-readview').hidden = !completed;
+
+        document.querySelector('.page-heading h1').textContent =
+            completed ? 'Consultation Record' : 'Consultation';
+
+        if (completed) {
+            renderCompleted(data);
+        } else {
+            get('consultation-readview').replaceChildren();
+        }
+
         for (const id of [
             'add-treatment',
             'add-prescription',
@@ -251,7 +778,7 @@
         }
 
         dirty = false;
-        reload.hidden = false;
+        reload.hidden = true;
     }
 
     async function loadConsultation() {
@@ -332,6 +859,27 @@
 
         if (!validate(complete)) return;
 
+        const followupRequired =
+            get('followup-required').checked;
+
+        if (complete && followupRequired) {
+            const date = get('followup-date');
+            const reason = get('followup-reason');
+
+            if (!date.value || date.value < today()) {
+                message.textContent =
+                    'Choose a follow-up date of today or later.';
+                date.focus();
+                return;
+            }
+
+            if (!reason.value.trim()) {
+                message.textContent = 'Enter the reason for follow-up.';
+                reason.focus();
+                return;
+            }
+        }
+
         if (
             complete &&
             !window.confirm(
@@ -343,9 +891,20 @@
 
         const body = {
             version: record.version,
+            ai_analysis_id: record.ai_analysis_id ?? null,
             complete,
             treatments: readRows('treatment'),
-            prescriptions: readRows('prescription')
+            prescriptions: readRows('prescription'),
+            followup_required: followupRequired,
+            followup_recommended_date: followupRequired
+                ? get('followup-date').value || null
+                : null,
+            followup_reason: followupRequired
+                ? get('followup-reason').value.trim() || null
+                : null,
+            followup_instructions: followupRequired
+                ? get('followup-instructions').value.trim() || null
+                : null,
         };
 
         for (const [name, id] of Object.entries(clinicalFields)) {

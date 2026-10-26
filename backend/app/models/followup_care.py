@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, Date
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -27,7 +27,10 @@ class FollowupCare(Base):
         ForeignKey("veterinarians.veterinarian_id"),
         nullable=False,
     )
-    followup_date = Column(DateTime, nullable=False)
+    followup_date = Column(DateTime, nullable=True)
+    recommended_date = Column(Date, nullable=True)
+    reason = Column(Text, nullable=True)
+    care_instructions = Column(Text, nullable=True)
     assessment_information = Column(Text, nullable=True)
     status = Column(String(20), nullable=False)
     notes = Column(Text, nullable=True)

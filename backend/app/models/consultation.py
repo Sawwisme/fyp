@@ -6,6 +6,8 @@ from sqlalchemy import (
     String,
     Text,
     text,
+    Boolean,
+    Date,
 )
 from sqlalchemy.orm import relationship
 
@@ -46,7 +48,30 @@ class Consultation(Base):
         nullable=False,
     )
 
-    consultation_date = Column(DateTime, nullable=False)
+    ai_analysis_id = Column(
+        Integer,
+        ForeignKey("ai_analysis_results.analysis_id"),
+        nullable=True,
+    )
+
+    ai_analysis = relationship("AIAnalysisResult")
+
+    consultation_date = Column(DateTime, nullable=False)\
+
+    followup_required = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=text("0"),
+    )
+
+    followup_recommended_date = Column(
+        Date,
+        nullable=True,
+    )
+
+    followup_reason = Column(Text, nullable=True)
+    followup_instructions = Column(Text, nullable=True)
 
     # Presenting complaint and consultation history.
     consultation_information = Column(Text, nullable=True)

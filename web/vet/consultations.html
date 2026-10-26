@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VetDental — Consultations</title>
+
+    <link rel="stylesheet" href="/web/styles.css">
+    <link rel="stylesheet" href="/web/admin/dashboard.css">
+    <link rel="stylesheet" href="/web/admin/layout.css">
+
+    <script src="/web/vet/layout.js" defer></script>
+    <script src="/web/vet/consultations.js" defer></script>
+</head>
+
+<body>
+    <div id="vet-loading" class="loading">
+        <p id="vet-loading-message" role="status">
+            Loading your account…
+        </p>
+        <button id="vet-retry" type="button" class="secondary" hidden>Try again</button>
+        <a href="/web/">Back to staff login</a>
+    </div>
+
+    <div id="vet-workspace" class="workspace" hidden>
+        <aside id="shared-sidebar" class="sidebar"></aside>
+
+        <div class="content-area">
+            <header id="shared-topbar" class="topbar"></header>
+
+            <main class="main-content">
+                <div class="page-heading">
+                    <h1>Consultations</h1>
+                    <p class="subtitle">
+                        Find your draft and completed consultation records.
+                    </p>
+                </div>
+
+                <div class="staff-summary" aria-label="Consultation counts">
+                    <div>
+                        <span>Total consultations</span>
+                        <strong id="consult-count-total">—</strong>
+                    </div>
+                    <div>
+                        <span>Draft</span>
+                        <strong id="consult-count-draft">—</strong>
+                    </div>
+                    <div>
+                        <span>Completed</span>
+                        <strong id="consult-count-completed">—</strong>
+                    </div>
+                </div>
+
+                <p class="muted">
+                    Counts follow the search and status filters across all pages.
+                </p>
+
+                <section class="panel">
+                    <div class="staff-list-toolbar">
+                        <div>
+                            <label class="field-label" for="consult-search">
+                                Search
+                            </label>
+                            <input id="consult-search" type="search" maxlength="100" placeholder="Pet or owner name">
+                        </div>
+
+                        <div>
+                            <label class="field-label" for="consult-status">
+                                Status
+                            </label>
+                            <select id="consult-status">
+                                <option value="">All statuses</option>
+                                <option value="draft">Draft</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <p id="consult-list-message" role="status" aria-live="polite"></p>
+
+                    <button id="consult-list-retry" type="button" class="secondary compact-button" hidden>
+                        Try again
+                    </button>
+
+                    <div class="table-scroll">
+                        <table class="staff-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Started</th>
+                                    <th scope="col">Pet</th>
+                                    <th scope="col">Owner</th>
+                                    <th scope="col">Diagnosis</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="consult-list-rows"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="staff-actions">
+                        <button id="consult-previous" type="button" class="secondary compact-button" disabled>
+                            Previous
+                        </button>
+                        <button id="consult-next" type="button" class="secondary compact-button" disabled>
+                            Next
+                        </button>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -74,3 +74,237 @@
         grid-template-columns: 1fr;
     }
 }
+
+.page-heading a {
+    display: inline-block;
+    margin-top: 10px;
+    color: var(--green);
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.page-heading a:hover {
+    text-decoration: underline;
+}
+
+.main-content>section.panel {
+    margin-bottom: 20px;
+}
+
+#consultation-summary {
+    margin: 8px 0;
+    color: var(--muted);
+}
+
+#consultation-state {
+    display: inline-block;
+    margin: 8px 0 0;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: #e7f2e9;
+    color: var(--green);
+    font-size: 13px;
+}
+
+#consultation-message:empty {
+    display: none;
+}
+
+.consultation-report-panel {
+    margin-bottom: 20px;
+}
+
+.consultation-report-grid,
+.consultation-report-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.consultation-report-grid {
+    margin-top: 16px;
+}
+
+.consultation-report-field {
+    min-width: 0;
+}
+
+.consultation-report-field h3 {
+    margin: 0 0 8px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.consultation-report-field p {
+    margin: 0;
+    color: var(--ink);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.consultation-record-row {
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fafcf9;
+}
+
+.consultation-record-row>.consultation-report-field+.consultation-report-field {
+    margin-top: 14px;
+}
+
+.consultation-record-row>.consultation-report-grid+.consultation-report-field {
+    margin-top: 16px;
+}
+
+@media (max-width: 900px) {
+    .consultation-report-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .consultation-report-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.consultation-patient-details {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px 24px;
+    margin: 20px 0 0;
+}
+
+.consultation-patient-details dt {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.consultation-patient-details dd {
+    margin: 0;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+    .consultation-patient-details {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .consultation-patient-details {
+        grid-template-columns: 1fr;
+    }
+}
+
+.consultation-ai {
+    margin-bottom: 20px;
+}
+
+.consultation-ai select {
+    width: 100%;
+    margin-top: 8px;
+}
+
+.assessment-predictions {
+    display: grid;
+    gap: 10px;
+    padding-left: 20px;
+    line-height: 1.6;
+}
+
+.assessment-notes {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.consultation-appointment {
+    margin-bottom: 20px;
+}
+
+.patient-history-panel {
+    margin-bottom: 20px;
+}
+
+.patient-history-panel summary {
+    cursor: pointer;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+.patient-history-visit {
+    margin-top: 12px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.patient-history-visit p {
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.patient-history-visit h3 {
+    margin: 20px 0 10px;
+    font-size: 15px;
+}
+
+.patient-history-item {
+    margin-top: 10px;
+    padding: 12px;
+    background: #f6f9f7;
+    border-radius: 8px;
+}
+
+#followup-date {
+    width: 100%;
+    max-width: 420px;
+}
+
+.followup-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.followup-toggle input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    flex: 0 0 auto;
+    accent-color: var(--green);
+}
+
+#followup-fields {
+    margin-top: 18px;
+}
+
+#followup-readview {
+    margin-top: 20px;
+}
+
+#followup-readview-content p {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    line-height: 1.7;
+}
+
+.consultation-return-visit {
+    margin-bottom: 20px;
+    border-left: 4px solid var(--green);
+}
+
+#return-visit-context-details p {
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}

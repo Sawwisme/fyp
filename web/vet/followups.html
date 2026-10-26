@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VetDental — Follow-up Care</title>
+
+    <link rel="stylesheet" href="/web/styles.css">
+    <link rel="stylesheet" href="/web/admin/dashboard.css">
+    <link rel="stylesheet" href="/web/admin/layout.css">
+
+    <script src="/web/vet/layout.js" defer></script>
+    <script src="/web/vet/return_visit_booking.js" defer></script>
+    <script src="/web/vet/followups.js" defer></script>
+</head>
+
+<body>
+    <div id="vet-loading" class="loading">
+        <p id="vet-loading-message" role="status">
+            Loading your account…
+        </p>
+        <button id="vet-retry" type="button" class="secondary" hidden>
+            Try again
+        </button>
+        <a href="/web/">Back to staff login</a>
+    </div>
+
+    <div id="vet-workspace" class="workspace" hidden>
+        <aside id="shared-sidebar" class="sidebar"></aside>
+
+        <div class="content-area">
+            <header id="shared-topbar" class="topbar"></header>
+
+            <main class="main-content">
+                <div class="page-heading">
+                    <h1>Follow-up Care</h1>
+                    <p class="subtitle">
+                        Review patient follow-up recommendations.
+                    </p>
+                </div>
+
+                <section class="panel">
+                    <div class="staff-list-toolbar">
+                        <div>
+                            <label for="followups-search">Search</label>
+                            <input id="followups-search" type="search" maxlength="100" placeholder="Pet or owner name">
+                        </div>
+
+                        <div>
+                            <label for="followups-status">Status</label>
+                            <select id="followups-status">
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <p class="muted">
+                        A recommended review date is not a booked appointment.
+                    </p>
+
+                    <p id="followups-message" role="status" aria-live="polite"></p>
+
+                    <button id="followups-retry" type="button" class="secondary compact-button" hidden>
+                        Try again
+                    </button>
+
+                    <div class="table-scroll">
+                        <table class="staff-table">
+                            <thead>
+                                <tr>
+                                    <th>Recommended Date</th>
+                                    <th>Pet</th>
+                                    <th>Owner</th>
+                                    <th>Status</th>
+                                    <th>Details</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="followups-rows"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="staff-actions">
+                        <button id="followups-previous" type="button" class="secondary compact-button" disabled>
+                            Previous
+                        </button>
+                        <button id="followups-next" type="button" class="secondary compact-button" disabled>
+                            Next
+                        </button>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+    <dialog id="followup-action-dialog" aria-labelledby="followup-action-title">
+        <form id="followup-action-form">
+            <div class="staff-heading">
+                <h2 id="followup-action-title">Record Review</h2>
+                <button id="followup-action-close" type="button" class="secondary compact-button"
+                    aria-label="Close dialog">×</button>
+            </div>
+
+            <p id="followup-action-patient"></p>
+
+            <fieldset id="followup-action-fields">
+                <div id="followup-review-fields">
+                    <p class="muted">
+                        Submit only after the review has taken place.
+                        The actual review time will be recorded now.
+                    </p>
+
+                    <label for="followup-review-findings">
+                        Review findings
+                    </label>
+                    <textarea id="followup-review-findings" rows="5" maxlength="10000"></textarea>
+
+                    <label for="followup-review-notes">Additional notes</label>
+                    <textarea id="followup-review-notes" rows="3" maxlength="5000"></textarea>
+                </div>
+
+                <div id="followup-cancel-fields" hidden>
+                    <label for="followup-cancel-reason">
+                        Cancellation reason
+                    </label>
+                    <textarea id="followup-cancel-reason" rows="4" maxlength="1000"></textarea>
+                </div>
+            </fieldset>
+
+            <p id="followup-action-message" role="status" aria-live="polite"></p>
+
+            <div class="staff-actions">
+                <button id="followup-action-dismiss" type="button" class="secondary compact-button">
+                    Close
+                </button>
+                <button id="followup-action-submit" type="submit" class="compact-button">
+                    Save Review
+                </button>
+            </div>
+        </form>
+    </dialog>
+</body>
+
+</html>

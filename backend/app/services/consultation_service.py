@@ -1,7 +1,7 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import case, func, or_, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.clinic_time import CLINIC_TIMEZONE
@@ -16,6 +16,11 @@ from app.models import (
     TimeSlot,
     Treatment,
     User,
+    AIAnalysisResult,
+    DentalImage,
+    Veterinarian,
+    FollowupCare,
+    TreatmentProgress,
 )
 from app.schemas.consultations import ConsultationSave
 from app.services.schedule_service import lock_schedule
@@ -43,6 +48,17 @@ def _details_statement(veterinarian):
             .selectinload(Appointment.emergency_request),
             selectinload(Consultation.treatments),
             selectinload(Consultation.prescriptions),
+            selectinload(Consultation.ai_analysis)
+            .selectinload(AIAnalysisResult.predictions),
+            selectinload(Consultation.appointment)
+            .selectinload(Appointment.time_slot),
+            selectinload(Consultation.veterinarian)
+            .selectinload(Veterinarian.user),
+            selectinload(Consultation.appointment)
+            .selectinload(Appointment.treatment_plan)
+            .selectinload(TreatmentProgress.treatment),
+            selectinload(Consultation.appointment)
+            .selectinload(Appointment.followup_task),
         )
         .execution_options(populate_existing=True)
     )
@@ -51,6 +67,35 @@ def _details_statement(veterinarian):
 def _serialize(record):
     owner = record.appointment.owner
     emergency = record.appointment.emergency_request
+
+    appointment = record.appointment
+    slot = appointment.time_slot
+
+    return_visit = None
+
+    if appointment.treatment_plan is not None:
+        treatment = appointment.treatment_plan.treatment
+
+        return_visit = {
+            "source_type": "treatment",
+            "source_id": treatment.treatment_id,
+            "original_consultation_id": treatment.consultation_id,
+            "title": treatment.treatment_name,
+            "reason": treatment.description,
+            "care_instructions": None,
+        }
+
+    elif appointment.followup_task is not None:
+        followup = appointment.followup_task
+
+        return_visit = {
+            "source_type": "followup",
+            "source_id": followup.followup_care_id,
+            "original_consultation_id": followup.consultation_id,
+            "title": "Follow-up review",
+            "reason": followup.reason,
+            "care_instructions": followup.care_instructions,
+        }
 
     return {
         "consultation_id": record.consultation_id,
@@ -87,6 +132,30 @@ def _serialize(record):
             record.prescriptions,
             key=lambda item: item.prescription_id,
         ),
+        "patient": record.pet,
+        "ai_analysis_id": record.ai_analysis_id,
+        "ai_assessment": record.ai_analysis,
+
+        "appointment": {
+            "appointment_id": appointment.appointment_id,
+            "appointment_date": appointment.appointment_date,
+            "start_time": slot.start_time,
+            "end_time": slot.end_time,
+            "appointment_type": appointment.appointment_type,
+            "appointment_source": appointment.appointment_source,
+            "status": appointment.status,
+            "veterinarian_name": (
+                record.veterinarian.user.full_name
+            ),
+        },
+
+        "followup_required": record.followup_required,
+        "followup_recommended_date": (
+            record.followup_recommended_date
+        ),
+        "followup_reason": record.followup_reason,
+        "followup_instructions": record.followup_instructions,
+        "return_visit": return_visit,
     }
 
 
@@ -330,6 +399,82 @@ def _sync_rows(
         if row_id not in retained:
             db.delete(row)
 
+def _initialize_treatment_progress(
+    db: Session,
+    record: Consultation,
+    current_user: User,
+    now: datetime,
+):
+    # Assign IDs to newly added treatments before querying them.
+    db.flush()
+
+    planned_treatments = db.scalars(
+        select(Treatment)
+        .where(
+            Treatment.consultation_id == record.consultation_id,
+            Treatment.status == "planned",
+        )
+        .with_for_update()
+    ).all()
+
+    for treatment in planned_treatments:
+        existing = db.get(
+            TreatmentProgress,
+            treatment.treatment_id,
+        )
+
+        if existing is None:
+            db.add(
+                TreatmentProgress(
+                    treatment_id=treatment.treatment_id,
+                    status="planned",
+                    updated_by_user_id=current_user.user_id,
+                    updated_at=now,
+                    version=1,
+                )
+            )
+
+def _complete_return_followup(
+    db: Session,
+    record: Consultation,
+    now: datetime,
+):
+    followup_id = record.appointment.followup_care_id
+
+    if followup_id is None:
+        return
+
+    followup = db.scalar(
+        select(FollowupCare)
+        .where(
+            FollowupCare.followup_care_id == followup_id,
+            FollowupCare.pet_id == record.pet_id,
+            FollowupCare.veterinarian_id == record.veterinarian_id,
+        )
+        .execution_options(populate_existing=True)
+        .with_for_update()
+    )
+
+    if followup is None:
+        raise HTTPException(
+            409,
+            "The linked follow-up does not match this visit.",
+        )
+
+    if followup.status != "pending":
+        raise HTTPException(
+            409,
+            "The linked follow-up is no longer pending. "
+            "Check its status before completing this consultation.",
+        )
+
+    followup.assessment_information = (
+        f"Examination findings:\n{record.examination_findings}\n\n"
+        f"Diagnosis:\n{record.diagnosis}"
+    )
+    followup.notes = record.notes
+    followup.followup_date = now
+    followup.status = "completed"
 
 def save_consultation(
     db: Session,
@@ -392,6 +537,74 @@ def save_consultation(
                 409, "The appointment is no longer in progress."
             )
 
+        if "ai_analysis_id" in data.model_fields_set:
+            if data.ai_analysis_id is not None:
+                assessment = db.scalar(
+                    select(AIAnalysisResult)
+                    .join(
+                        DentalImage,
+                        DentalImage.dental_image_id
+                        == AIAnalysisResult.dental_image_id,
+                    )
+                    .where(
+                        AIAnalysisResult.analysis_id
+                        == data.ai_analysis_id,
+                        DentalImage.pet_id == record.pet_id,
+                    )
+                    .with_for_update()
+                )
+
+                if assessment is None:
+                    raise HTTPException(
+                        400,
+                        "The selected AI assessment does not "
+                        "belong to this patient.",
+                    )
+
+            record.ai_analysis_id = data.ai_analysis_id
+
+        followup_fields = (
+            "followup_required",
+            "followup_recommended_date",
+            "followup_reason",
+            "followup_instructions",
+        )
+
+        # Preserve existing values if an older client omits them.
+        for field in followup_fields:
+            if field in data.model_fields_set:
+                setattr(record, field, getattr(data, field))
+
+        if not record.followup_required:
+            record.followup_recommended_date = None
+            record.followup_reason = None
+            record.followup_instructions = None
+
+        if data.complete and record.followup_required:
+            today = datetime.now(CLINIC_TIMEZONE).date()
+
+            if record.followup_recommended_date is None:
+                raise HTTPException(
+                    422,
+                    "Enter the recommended follow-up date.",
+                )
+
+            if record.followup_recommended_date < today:
+                raise HTTPException(
+                    422,
+                    "The recommended follow-up date "
+                    "cannot be in the past.",
+                )
+
+            if not (
+                record.followup_reason
+                and record.followup_reason.strip()
+            ):
+                raise HTTPException(
+                    422,
+                    "Enter the reason for follow-up.",
+                )
+
         record.consultation_information = data.consultation_information
         record.examination_findings = data.examination_findings
         record.diagnosis = data.diagnosis
@@ -426,6 +639,39 @@ def save_consultation(
             record.status = "completed"
             record.completed_at = now
             appointment.status = "completed"
+            
+            _complete_return_followup(
+                db,
+                record,
+                now,
+            )
+
+            _initialize_treatment_progress(
+                db,
+                record,
+                current_user,
+                now,
+            )
+
+            if record.followup_required:
+                db.add(
+                    FollowupCare(
+                        consultation_id=record.consultation_id,
+                        pet_id=record.pet_id,
+                        veterinarian_id=record.veterinarian_id,
+                        recommended_date=(
+                            record.followup_recommended_date
+                        ),
+                        reason=record.followup_reason,
+                        care_instructions=(
+                            record.followup_instructions
+                        ),
+                        followup_date=None,
+                        assessment_information=None,
+                        status="pending",
+                        notes=None,
+                    )
+                )
 
         db.commit()
 
@@ -436,3 +682,451 @@ def save_consultation(
     except Exception:
         db.rollback()
         raise
+
+def list_my_consultations(
+    db: Session,
+    current_user: User,
+    search: str | None,
+    consultation_status: str | None,
+    offset: int,
+    limit: int,
+    counts_only: bool = False,
+):
+    veterinarian = get_profile(db, current_user)
+
+    owner_name = func.coalesce(
+        User.full_name,
+        PetOwner.contact_name,
+        "Not recorded",
+    )
+
+    statement = (
+        select(
+            Consultation.consultation_id,
+            Consultation.appointment_id,
+            Consultation.consultation_date,
+            Pet.pet_name,
+            owner_name.label("owner_name"),
+            Consultation.diagnosis,
+            Consultation.status,
+        )
+        .join(Pet, Pet.pet_id == Consultation.pet_id)
+        .join(
+            Appointment,
+            Appointment.appointment_id == Consultation.appointment_id,
+        )
+        .join(
+            PetOwner,
+            PetOwner.pet_owner_id == Appointment.pet_owner_id,
+        )
+        .outerjoin(User, User.user_id == PetOwner.user_id)
+        .where(
+            Consultation.veterinarian_id
+            == veterinarian.veterinarian_id,
+            Consultation.clinic_id == veterinarian.clinic_id,
+        )
+    )
+
+    if consultation_status is not None:
+        statement = statement.where(
+            Consultation.status == consultation_status
+        )
+
+    if search and search.strip():
+            term = search.strip().lower()
+    
+            statement = statement.where(
+                or_(
+                    func.lower(Pet.pet_name).contains(
+                        term, autoescape=True
+                    ),
+                    func.lower(owner_name).contains(
+                        term, autoescape=True
+                    ),
+                )
+            )
+
+    if counts_only:
+        filtered = statement.subquery()
+
+        return db.execute(
+            select(
+                func.count().label("total"),
+                func.coalesce(
+                    func.sum(
+                        case(
+                            (filtered.c.status == "draft", 1),
+                            else_=0,
+                        )
+                    ),
+                    0,
+                ).label("draft"),
+                func.coalesce(
+                    func.sum(
+                        case(
+                            (filtered.c.effective_status == "completed", 1),
+                            else_=0,
+                        )
+                    ),
+                    0,
+                ).label("completed"),
+            )
+            .select_from(filtered)
+        ).mappings().one()
+
+
+    statement = (
+        statement
+        .order_by(
+            Consultation.consultation_date.desc(),
+            Consultation.consultation_id.desc(),
+        )
+        .offset(offset)
+        .limit(limit)
+    )
+
+    return db.execute(statement).mappings().all()
+
+    
+
+
+def list_my_clinical_history(
+    db: Session,
+    current_user: User,
+    record_type: str,
+    search: str | None,
+    consultation_status: str | None,
+    offset: int,
+    limit: int,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    counts_only: bool = False,
+):
+    veterinarian = get_profile(db, current_user)
+
+    models = {
+        "treatments": Treatment,
+        "prescriptions": Prescription,
+    }
+    model = models[record_type]
+
+    if record_type == "treatments":
+        name_column = Treatment.treatment_name
+        date_column = Treatment.treatment_date
+        id_column = Treatment.treatment_id
+    else:
+        name_column = Prescription.medication_name
+        date_column = Prescription.prescription_date
+        id_column = Prescription.prescription_id
+
+    owner_name = func.coalesce(
+        User.full_name,
+        PetOwner.contact_name,
+        "Not recorded",
+    )
+
+    statement = (
+        select(
+            model,
+            Pet.pet_name,
+            owner_name.label("owner_name"),
+            Consultation.status.label("consultation_status"),
+        )
+        .select_from(model)
+        .join(model.consultation)
+        .join(Consultation.pet)
+        .join(Consultation.appointment)
+        .join(Appointment.owner)
+        .outerjoin(PetOwner.user)
+        .where(
+            Consultation.veterinarian_id
+            == veterinarian.veterinarian_id,
+            Consultation.clinic_id == veterinarian.clinic_id,
+        )
+    )
+
+    if record_type == "treatments":
+        statement = (
+            statement
+            .outerjoin(
+                TreatmentProgress,
+                TreatmentProgress.treatment_id
+                == Treatment.treatment_id,
+            )
+            .add_columns(
+                func.coalesce(
+                    TreatmentProgress.status,
+                    Treatment.status,
+                ).label("effective_status"),
+                TreatmentProgress.version.label("progress_version"),
+            )
+        )
+
+    if record_type == "prescriptions":
+        statement = statement.where(
+            Prescription.veterinarian_id
+            == veterinarian.veterinarian_id
+        )
+
+    if consultation_status is not None:
+        statement = statement.where(
+            Consultation.status == consultation_status
+        )
+
+    if search and search.strip():
+        term = search.strip().lower()
+
+        statement = statement.where(
+            or_(
+                func.lower(Pet.pet_name).contains(
+                    term, autoescape=True
+                ),
+                func.lower(owner_name).contains(
+                    term, autoescape=True
+                ),
+                func.lower(name_column).contains(
+                    term, autoescape=True
+                ),
+            )
+        )
+
+    if date_from and date_to and date_from > date_to:
+        raise HTTPException(
+            422,
+            "Start date must be on or before end date.",
+        )
+
+    if date_from:
+        statement = statement.where(date_column >= date_from)
+
+    if date_to:
+        statement = statement.where(date_column <= date_to)
+
+    if counts_only:
+        today = datetime.now(CLINIC_TIMEZONE).date()
+        month_start = today.replace(day=1)
+
+        next_month = (
+            date(today.year + 1, 1, 1)
+            if today.month == 12
+            else date(today.year, today.month + 1, 1)
+        )
+
+        filtered = statement.subquery()
+        record_date = filtered.c[date_column.key]
+        consultation_status_column = (
+            filtered.c.consultation_status
+        )
+
+        planned_count = (
+            func.coalesce(
+                func.sum(
+                    case(
+                        (filtered.c.effective_status == "planned", 1),
+                        else_=0,
+                    )
+                ),
+                0,
+            )
+            if record_type == "treatments"
+            else 0
+        )
+
+        completed_count = (
+            func.coalesce(
+                func.sum(
+                    case(
+                        (filtered.c.effective_status == "completed", 1),
+                        else_=0,
+                    )
+                ),
+                0,
+            )
+            if record_type == "treatments"
+            else 0
+        )
+
+        return db.execute(
+            select(
+                func.count().label("total"),
+                func.coalesce(
+                    planned_count, 0
+                ).label("planned"),
+                func.coalesce(
+                    completed_count, 0
+                ).label("completed"),
+                func.coalesce(
+                    func.sum(
+                        case(
+                            (
+                                consultation_status_column == "draft",
+                                1,
+                            ),
+                            else_=0,
+                        )
+                    ),
+                    0,
+                ).label("draft"),
+                func.coalesce(
+                    func.sum(
+                        case(
+                            (
+                                consultation_status_column
+                                == "completed",
+                                1,
+                            ),
+                            else_=0,
+                        )
+                    ),
+                    0,
+                ).label("finalized"),
+                func.coalesce(
+                    func.sum(
+                        case(
+                            (
+                                (record_date >= month_start)
+                                & (record_date < next_month),
+                                1,
+                            ),
+                            else_=0,
+                        )
+                    ),
+                    0,
+                ).label("this_month"),
+            ).select_from(filtered)
+        ).mappings().one()
+
+    records = db.execute(
+        statement
+        .order_by(date_column.desc(), id_column.desc())
+        .offset(offset)
+        .limit(limit)
+    ).all()
+
+    result = []
+
+    for row in records:
+        record, pet_name, owner_name, consultation_status = row[:4]
+
+        item = {
+            column.name: getattr(record, column.name)
+            for column in model.__table__.columns
+        }
+
+        item.update({
+            "pet_name": pet_name,
+            "owner_name": owner_name,
+            "consultation_status": consultation_status,
+        })
+
+        if record_type == "treatments":
+            item["recorded_status"] = record.status
+            item["status"] = row[4]
+            item["progress_version"] = row[5]
+
+        result.append(item)
+
+    return result
+
+def list_consultation_assessments(
+    db: Session,
+    current_user: User,
+    consultation_id: int,
+    offset: int,
+    limit: int,
+):
+    # Checks that this consultation belongs to the current vet
+    # and their active clinic before accessing the patient's results.
+    consultation = get_consultation(
+        db, current_user, consultation_id
+    )
+
+    statement = (
+        select(AIAnalysisResult)
+        .join(
+            DentalImage,
+            DentalImage.dental_image_id
+            == AIAnalysisResult.dental_image_id,
+        )
+        .where(
+            DentalImage.pet_id == consultation["pet_id"],
+        )
+        .options(
+            selectinload(AIAnalysisResult.predictions),
+        )
+        .order_by(
+            AIAnalysisResult.analysis_date.desc(),
+            AIAnalysisResult.analysis_id.desc(),
+        )
+        .offset(offset)
+        .limit(limit)
+    )
+
+    return db.scalars(statement).all()
+
+def list_patient_consultation_history(
+    db: Session,
+    current_user: User,
+    consultation_id: int,
+    offset: int,
+    limit: int,
+):
+    # Authorize access through the vet's current consultation.
+    current = get_consultation(
+        db,
+        current_user,
+        consultation_id,
+    )
+
+    statement = (
+        select(Consultation)
+        .where(
+            Consultation.pet_id == current["pet_id"],
+            Consultation.clinic_id == current["clinic_id"],
+            Consultation.consultation_id != consultation_id,
+            Consultation.status == "completed",
+            Consultation.consultation_date
+            <= current["consultation_date"],
+        )
+        .options(
+            selectinload(Consultation.veterinarian)
+            .selectinload(Veterinarian.user),
+            selectinload(Consultation.treatments),
+            selectinload(Consultation.prescriptions),
+        )
+        .order_by(
+            Consultation.consultation_date.desc(),
+            Consultation.consultation_id.desc(),
+        )
+        .offset(offset)
+        .limit(limit)
+    )
+
+    records = db.scalars(statement).all()
+
+    return [
+        {
+            "consultation_id": item.consultation_id,
+            "consultation_date": item.consultation_date,
+            "veterinarian_name": (
+                item.veterinarian.user.full_name
+            ),
+            "consultation_information": (
+                item.consultation_information
+            ),
+            "examination_findings": item.examination_findings,
+            "diagnosis": item.diagnosis,
+            "notes": item.notes,
+            "treatments": sorted(
+                item.treatments,
+                key=lambda treatment: treatment.treatment_id,
+            ),
+            "prescriptions": sorted(
+                item.prescriptions,
+                key=lambda prescription: (
+                    prescription.prescription_id
+                ),
+            ),
+        }
+        for item in records
+    ]

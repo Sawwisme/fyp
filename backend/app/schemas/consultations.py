@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, time
 from typing import Literal
 
 from pydantic import (
@@ -72,6 +72,25 @@ class ConsultationSave(BaseModel):
     treatments: list[TreatmentInput] = Field(max_length=50)
     prescriptions: list[PrescriptionInput] = Field(max_length=50)
 
+    ai_analysis_id: int | None = Field(
+        default=None,
+        ge=1,
+        le=2147483647,
+    )
+
+    followup_required: bool = False
+    followup_recommended_date: date | None = None
+
+    followup_reason: str | None = Field(
+        default=None,
+        max_length=5000,
+    )
+
+    followup_instructions: str | None = Field(
+        default=None,
+        max_length=10000,
+    )
+
     complete: bool = False
 
     @model_validator(mode="after")
@@ -132,6 +151,54 @@ class PrescriptionResponse(BaseModel):
     instructions: str | None
     prescription_date: date
 
+class ConsultationPatient(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    species: str
+    breed: str | None
+    gender: str | None
+    date_of_birth: date | None
+    weight: float | None
+    existing_dental_condition: str | None
+    notes: str | None
+
+class AssessmentPrediction(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    condition_name: str
+    confidence_score: float
+    predicted_positive: bool
+    supported: bool
+
+
+class ConsultationAssessment(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    analysis_id: int
+    dental_image_id: int
+    analysis_date: datetime
+    model_version: str | None
+    veterinarian_override: str | None
+    override_notes: str | None
+    predictions: list[AssessmentPrediction]
+
+class ConsultationAppointment(BaseModel):
+    appointment_id: int
+    appointment_date: date
+    start_time: time
+    end_time: time
+    appointment_type: str
+    appointment_source: str | None
+    status: str
+    veterinarian_name: str
+
+class ConsultationReturnVisit(BaseModel):
+    source_type: Literal["treatment", "followup"]
+    source_id: int
+    original_consultation_id: int
+    title: str
+    reason: str | None
+    care_instructions: str | None
 
 class ConsultationResponse(BaseModel):
     consultation_id: int
@@ -142,6 +209,7 @@ class ConsultationResponse(BaseModel):
 
     pet_name: str
     owner_name: str
+    patient: ConsultationPatient
 
     consultation_date: datetime
     consultation_information: str | None
@@ -159,3 +227,63 @@ class ConsultationResponse(BaseModel):
 
     treatments: list[TreatmentResponse]
     prescriptions: list[PrescriptionResponse]
+
+    ai_analysis_id: int | None
+    ai_assessment: ConsultationAssessment | None
+
+    appointment: ConsultationAppointment
+    followup_required: bool
+    followup_recommended_date: date | None
+    followup_reason: str | None
+    followup_instructions: str | None
+
+    return_visit: ConsultationReturnVisit | None
+
+class ConsultationSummary(BaseModel):
+    consultation_id: int
+    appointment_id: int
+    consultation_date: datetime
+    pet_name: str
+    owner_name: str
+    diagnosis: str | None
+    status: str
+
+class TreatmentHistoryItem(TreatmentResponse):
+    consultation_id: int
+    consultation_status: str
+    pet_name: str
+    owner_name: str
+    recorded_status: str
+    progress_version: int | None
+
+
+class PrescriptionHistoryItem(PrescriptionResponse):
+    consultation_id: int
+    consultation_status: str
+    veterinarian_id: int
+    pet_name: str
+    owner_name: str
+
+class ConsultationCounts(BaseModel):
+    total: int
+    draft: int
+    completed: int
+
+class PatientConsultationHistory(BaseModel):
+    consultation_id: int
+    consultation_date: datetime
+    veterinarian_name: str
+    consultation_information: str | None
+    examination_findings: str | None
+    diagnosis: str | None
+    notes: str | None
+    treatments: list[TreatmentResponse]
+    prescriptions: list[PrescriptionResponse]
+
+class ClinicalHistoryCounts(BaseModel):
+    total: int
+    draft: int
+    finalized: int
+    planned: int
+    completed: int
+    this_month: int

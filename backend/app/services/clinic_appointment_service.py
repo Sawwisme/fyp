@@ -14,6 +14,10 @@ from app.models import (
     TimeSlot,
     User,
     Veterinarian,
+    Consultation,
+    FollowupCare,
+    Treatment,
+    TreatmentProgress,
 )
 from app.schemas.clinic_appointments import ClinicAppointmentCreate
 from app.services.admin_profile_service import get_admin_record
@@ -23,6 +27,133 @@ from app.services.schedule_service import (
     reject_occupied_slots,
 )
 
+from app.services.vet_profile_service import get_profile
+
+def _validate_return_visit(
+    db: Session,
+    clinic_id: int,
+    data: ClinicAppointmentCreate,
+):
+    if data.planned_treatment_id is not None:
+        source = db.execute(
+            select(
+                TreatmentProgress,
+                Consultation,
+                Appointment,
+            )
+            .join(
+                Treatment,
+                Treatment.treatment_id
+                == TreatmentProgress.treatment_id,
+            )
+            .join(
+                Consultation,
+                Consultation.consultation_id
+                == Treatment.consultation_id,
+            )
+            .join(
+                Appointment,
+                Appointment.appointment_id
+                == Consultation.appointment_id,
+            )
+            .where(
+                TreatmentProgress.treatment_id
+                == data.planned_treatment_id,
+                Treatment.status == "planned",
+                Consultation.clinic_id == clinic_id,
+                Consultation.status == "completed",
+            )
+            .execution_options(populate_existing=True)
+            .with_for_update()
+        ).first()
+
+        link_column = Appointment.planned_treatment_id
+        link_id = data.planned_treatment_id
+
+        if source is None:
+            raise HTTPException(404, "Treatment plan not found.")
+
+        task, consultation, original_appointment = source
+
+        if task.status not in ("planned", "in_progress"):
+            raise HTTPException(
+                409, "This treatment plan is no longer open."
+            )
+
+        expected_vet = consultation.veterinarian_id
+
+    elif data.followup_care_id is not None:
+        source = db.execute(
+            select(
+                FollowupCare,
+                Consultation,
+                Appointment,
+            )
+            .join(
+                Consultation,
+                Consultation.consultation_id
+                == FollowupCare.consultation_id,
+            )
+            .join(
+                Appointment,
+                Appointment.appointment_id
+                == Consultation.appointment_id,
+            )
+            .where(
+                FollowupCare.followup_care_id
+                == data.followup_care_id,
+                Consultation.clinic_id == clinic_id,
+                Consultation.status == "completed",
+            )
+            .execution_options(populate_existing=True)
+            .with_for_update()
+        ).first()
+
+        link_column = Appointment.followup_care_id
+        link_id = data.followup_care_id
+
+        if source is None:
+            raise HTTPException(404, "Follow-up task not found.")
+
+        task, consultation, original_appointment = source
+
+        if task.status != "pending":
+            raise HTTPException(
+                409, "This follow-up task is no longer pending."
+            )
+
+        expected_vet = task.veterinarian_id
+
+    else:
+        return None
+
+    if (
+        data.pet_id != consultation.pet_id
+        or data.pet_owner_id != original_appointment.pet_owner_id
+    ):
+        raise HTTPException(
+            400,
+            "The return visit must use the original patient and owner.",
+        )
+
+    existing = db.scalar(
+        select(Appointment.appointment_id)
+        .where(
+            link_column == link_id,
+            Appointment.status.notin_(["cancelled", "rejected"]),
+        )
+        .limit(1)
+        .with_for_update()
+    )
+
+    if existing is not None:
+        raise HTTPException(
+            409,
+            "This plan already has a linked appointment. "
+            "Manage that appointment before booking another.",
+        )
+
+    return expected_vet
 
 def create_appointment(
     db: Session,
@@ -30,12 +161,37 @@ def create_appointment(
     data: ClinicAppointmentCreate,
 ):
     try:
-        administrator = get_admin_record(db, current_user)
+        if current_user.role == "clinic_administrator":
+            profile = get_admin_record(db, current_user)
+
+        elif current_user.role == "veterinarian":
+            if (
+                data.planned_treatment_id is None
+                and data.followup_care_id is None
+            ):
+                raise HTTPException(
+                    403,
+                    "Veterinarians can book linked return visits only.",
+                )
+
+            if data.appointment_source != "reception":
+                raise HTTPException(
+                    400,
+                    "Return visits must use a future appointment slot.",
+                )
+
+            profile = get_profile(db, current_user)
+
+        else:
+            raise HTTPException(
+                403,
+                "You cannot create clinic appointments.",
+            )
 
         clinic = db.scalar(
             select(Clinic)
             .where(
-                Clinic.clinic_id == administrator.clinic_id,
+                Clinic.clinic_id == profile.clinic_id,
                 Clinic.status == "active",
             )
             .execution_options(populate_existing=True)
@@ -47,6 +203,12 @@ def create_appointment(
                 status_code=403,
                 detail="Your clinic is not active.",
             )
+
+        return_visit_vet_id = _validate_return_visit(
+            db,
+            clinic.clinic_id,
+            data,
+        )
 
         schedule_id = db.scalar(
             select(TimeSlot.schedule_id).where(
@@ -66,6 +228,16 @@ def create_appointment(
             schedule_id,
             current_user,
         )
+
+        if (
+            return_visit_vet_id is not None
+            and schedule.veterinarian_id != return_visit_vet_id
+        ):
+            raise HTTPException(
+                400,
+                "Select a slot belonging to the vet "
+                "responsible for this treatment or follow-up.",
+            )
 
         eligible_vet = db.scalar(
             select(Veterinarian.veterinarian_id)
@@ -210,6 +382,8 @@ def create_appointment(
             appointment_date=schedule.schedule_date,
             created_by_user_id=current_user.user_id,
             status="confirmed",
+            planned_treatment_id=data.planned_treatment_id,
+            followup_care_id=data.followup_care_id,
         )
 
         slot.status = "booked"
