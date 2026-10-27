@@ -40,6 +40,13 @@ class TreatmentProgress(Base):
     )
 
     started_at = Column(DateTime, nullable=True)
+    start_consultation_id = Column(
+        Integer,
+        ForeignKey("consultations.consultation_id"),
+        nullable=True,
+    )
+
+    start_notes = Column(Text, nullable=True)
     completed_at = Column(DateTime, nullable=True)
     cancelled_at = Column(DateTime, nullable=True)
 
@@ -66,4 +73,7 @@ class TreatmentProgress(Base):
         server_default=text("1"),
     )
 
-    treatment = relationship("Treatment")
+    treatment = relationship(
+        "Treatment",
+        back_populates="progress_record",
+    )

@@ -101,6 +101,12 @@ def get_treatment_history(
     limit: int = Query(default=20, ge=1, le=100),
     date_from: date | None = None,
     date_to: date | None = None,
+        treatment_status: Literal[
+        "planned",
+        "in_progress",
+        "completed",
+        "cancelled",
+    ] | None = None,
     current_user: User = Depends(require_roles("veterinarian")),
     db: Session = Depends(get_db),
 ):
@@ -114,6 +120,7 @@ def get_treatment_history(
         limit,
         date_from=date_from,
         date_to=date_to,
+        treatment_status=treatment_status,
     )
 
 @router.get(
@@ -218,6 +225,12 @@ def get_clinical_history_counts(
     ] | None = None,
     date_from: date | None = None,
     date_to: date | None = None,
+    treatment_status: Literal[
+        "planned",
+        "in_progress",
+        "completed",
+        "cancelled",
+    ] | None = None,
     current_user: User = Depends(
         require_roles("veterinarian")
     ),
@@ -234,4 +247,5 @@ def get_clinical_history_counts(
         date_from=date_from,
         date_to=date_to,
         counts_only=True,
+        treatment_status=treatment_status,
     )

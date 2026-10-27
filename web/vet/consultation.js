@@ -268,6 +268,18 @@
                 detail(row, 'Description', item.description);
             }
 
+            const progressDetails = document.createElement('details');
+            const progressSummary = document.createElement('summary');
+
+            progressSummary.textContent = 'View treatment progress';
+
+            progressDetails.append(
+                progressSummary,
+                createTreatmentDetails(item)
+            );
+
+            row.appendChild(progressDetails);
+
             treatments.appendChild(row);
         }
 
@@ -697,6 +709,7 @@
 
     function render(data) {
         record = data;
+        renderPrescriptionPrint(data);
         needsReload = false;
 
         ++assessmentRequest;

@@ -1,0 +1,250 @@
+#prescription-print-sheet {
+    display: none;
+}
+
+@media print {
+    body.printing-prescription> :not(#prescription-print-sheet) {
+        display: none !important;
+    }
+
+    body.printing-prescription {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        color: black !important;
+    }
+
+    body.printing-prescription #prescription-print-sheet {
+        display: block !important;
+        width: auto;
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        font: 11pt/1.5 Arial, sans-serif;
+        overflow-wrap: anywhere;
+    }
+
+    #prescription-print-sheet h1 {
+        margin: 0 0 6px;
+        font-size: 21pt;
+    }
+
+    #prescription-print-sheet h2 {
+        margin: 20px 0 14px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #333;
+        font-size: 17pt;
+    }
+
+    #prescription-print-sheet h3 {
+        margin: 0 0 10px;
+        font-size: 12pt;
+    }
+
+    #prescription-print-sheet p {
+        margin: 4px 0;
+        white-space: pre-wrap;
+    }
+
+    #prescription-print-sheet .rx-contact {
+        font-size: 10pt;
+    }
+
+    .rx-patient {
+        margin-bottom: 20px;
+    }
+
+    .rx-medication {
+        margin: 0 0 18px;
+        padding: 14px;
+        border: 1px solid #aaa;
+        break-inside: avoid;
+    }
+
+    .rx-footer {
+        margin-top: 24px;
+        padding-top: 12px;
+        border-top: 1px solid #aaa;
+        break-inside: avoid;
+    }
+}
+
+@page {
+    size: A4;
+    margin: 16mm;
+}
+
+@media screen {
+    #prescription-preview {
+        box-sizing: border-box;
+        width: min(860px, calc(100vw - 32px));
+        max-height: calc(100dvh - 48px);
+        margin: auto;
+        padding: 0;
+        overflow: hidden;
+        background: #fff;
+        color: #24332b;
+        border: 1px solid #dce5df;
+        border-radius: 16px;
+        box-shadow: 0 24px 80px rgb(0 0 0 / 28%);
+        font: inherit;
+    }
+
+    #prescription-preview[open] {
+        display: flex;
+        flex-direction: column;
+    }
+
+    #prescription-preview::backdrop {
+        background: rgb(15 25 19 / 65%);
+    }
+
+    .rx-preview-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 20px 24px;
+        border-bottom: 1px solid #e1e8e3;
+    }
+
+    .rx-preview-header h2 {
+        margin: 0 0 6px;
+        font-size: 20px;
+    }
+
+    .rx-preview-header p {
+        margin: 0;
+        color: #67756c;
+        font-size: 13px;
+    }
+
+    #rx-preview-close {
+        width: 32px;
+        height: 32px;
+        flex: 0 0 32px;
+        padding: 0;
+        background: transparent;
+        color: #67756c;
+        border: 0;
+        border-radius: 8px;
+        font-size: 24px;
+        cursor: pointer;
+    }
+
+    #rx-preview-close:hover {
+        background: #eef3ef;
+    }
+
+    .rx-preview-body {
+        min-height: 0;
+        padding: 24px;
+        overflow-y: auto;
+        background: #e9eeeb;
+    }
+
+    #prescription-preview-content {
+        box-sizing: border-box;
+        max-width: 720px;
+        margin: auto;
+        padding: 36px;
+        background: #fff;
+        color: #111;
+        border: 1px solid #dce2de;
+        box-shadow: 0 3px 12px rgb(0 0 0 / 7%);
+        font: 14px/1.6 Arial, sans-serif;
+        overflow-wrap: anywhere;
+    }
+
+    #prescription-preview-content h1 {
+        margin: 0 0 8px;
+        font-size: 24px;
+        line-height: 1.3;
+    }
+
+    #prescription-preview-content h2 {
+        margin: 22px 0 16px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #333;
+        font-size: 20px;
+    }
+
+    #prescription-preview-content h3 {
+        margin: 0 0 10px;
+        font-size: 16px;
+    }
+
+    #prescription-preview-content p {
+        margin: 5px 0;
+        white-space: pre-wrap;
+    }
+
+    #prescription-preview-content .rx-contact {
+        color: #555;
+        font-size: 12px;
+    }
+
+    #prescription-preview-content .rx-patient {
+        margin-bottom: 20px;
+    }
+
+    #prescription-preview-content .rx-medication {
+        margin-bottom: 16px;
+        padding: 16px;
+        border: 1px solid #d5ddd7;
+        border-radius: 6px;
+    }
+
+    #prescription-preview-content .rx-footer {
+        margin-top: 24px;
+        padding-top: 14px;
+        border-top: 1px solid #aaa;
+    }
+
+    .rx-preview-actions {
+        display: flex;
+        flex-shrink: 0;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 16px 24px;
+        border-top: 1px solid #e1e8e3;
+        background: #fff;
+    }
+
+    .rx-preview-actions button {
+        padding: 10px 16px;
+        border: 1px solid #ccd9cf;
+        border-radius: 8px;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    #rx-preview-cancel {
+        background: #fff;
+        color: #46564b;
+    }
+
+    #rx-preview-print {
+        background: var(--green, #176b35);
+        color: #fff;
+        border-color: transparent;
+    }
+
+    #prescription-preview button:focus-visible {
+        outline: 3px solid #a9d5b6;
+        outline-offset: 2px;
+    }
+
+    @media (max-width: 600px) {
+        .rx-preview-body {
+            padding: 12px;
+        }
+
+        #prescription-preview-content {
+            padding: 20px;
+        }
+    }
+}

@@ -7,6 +7,8 @@
     const message = get('treatment-progress-message');
     const consultation = get('treatment-completion-consultation');
     const reason = get('treatment-cancellation-reason');
+    const startConsultation = get('treatment-start-consultation');
+    const startNotes = get('treatment-start-notes');
 
     let selected = null;
     let targetStatus = '';
@@ -35,8 +37,16 @@
     }
 
     async function loadConsultations(item, request) {
+        const starting = targetStatus === 'in_progress';
+        const select = starting ? startConsultation : consultation;
+        const endpoint = starting
+            ? 'start-consultations'
+            : 'completion-consultations';
+
         loading = true;
         submit.disabled = true;
+        select.disabled = true;
+        select.replaceChildren(new Option('Loading consultations…', ''));
         message.textContent = 'Loading eligible consultations…';
 
         try {
@@ -46,7 +56,7 @@
             while (true) {
                 const batch = await vetRequest(
                     `/treatment-plans/${item.treatment_id}` +
-                    `/completion-consultations?offset=${offset}&limit=100`
+                    `/${endpoint}?offset=${offset}&limit=100`
                 );
 
                 if (request !== requestVersion || !dialog.open) return;
@@ -57,12 +67,12 @@
                 offset += batch.length;
             }
 
-            consultation.replaceChildren(
+            select.replaceChildren(
                 new Option('Select a consultation', '')
             );
 
             for (const option of options) {
-                consultation.add(new Option(
+                select.add(new Option(
                     `#${option.consultation_id} · ` +
                     dateLabel(option.consultation_date) +
                     (
@@ -74,14 +84,19 @@
                 ));
             }
 
+            select.disabled = options.length === 0;
+            submit.disabled = options.length === 0;
+
             message.textContent = options.length
                 ? ''
-                : 'No eligible consultations. Complete the later visit’s ' +
-                'consultation before recording treatment completion.';
-
-            submit.disabled = options.length === 0;
+                : starting
+                    ? 'No eligible consultations. Start the patient’s ' +
+                    'return-visit consultation from Appointments first.'
+                    : 'No eligible consultations. Complete the later visit’s ' +
+                    'consultation before recording treatment completion.';
         } catch (error) {
             if (request !== requestVersion) return;
+
             message.textContent =
                 `${error.message} Close and reopen this dialog to retry.`;
         } finally {
@@ -112,8 +127,13 @@
         get('treatment-progress-patient').textContent =
             `${item.pet_name} · ${item.treatment_name}`;
 
+        const starting = status === 'in_progress';
         const completing = status === 'completed';
         const cancelling = status === 'cancelled';
+
+        get('treatment-start-fields').hidden = !starting;
+        startConsultation.required = starting;
+        startNotes.required = starting;
 
         get('treatment-completion-fields').hidden = !completing;
         get('treatment-cancellation-fields').hidden = !cancelling;
@@ -133,7 +153,7 @@
 
         dialog.showModal();
 
-        if (completing) {
+        if (starting || completing) {
             loadConsultations(item, request);
         }
     }
@@ -170,6 +190,15 @@
         const cancellationReason = reason.value.trim();
 
         if (
+            targetStatus === 'in_progress' &&
+            (!startConsultation.value || !startNotes.value.trim())
+        ) {
+            message.textContent =
+                'Select the starting consultation and enter initial notes.';
+            return;
+        }
+
+        if (
             targetStatus === 'cancelled' &&
             cancellationReason.length < 5
         ) {
@@ -182,6 +211,14 @@
         const body = {
             version: selected.progress_version,
             status: targetStatus,
+            start_consultation_id:
+                targetStatus === 'in_progress'
+                    ? Number(startConsultation.value)
+                    : null,
+            start_notes:
+                targetStatus === 'in_progress'
+                    ? startNotes.value.trim()
+                    : null,
             completion_consultation_id:
                 targetStatus === 'completed'
                     ? Number(consultation.value)
@@ -243,20 +280,14 @@
             !['planned', 'in_progress'].includes(item.status)
         ) return root;
 
-        const booking = document.createElement('button');
-        booking.type = 'button';
-        booking.className = 'secondary compact-button';
-        booking.textContent = 'Book Appointment';
-
-        booking.addEventListener('click', () => {
-            openReturnVisitBooking(
+        root.appendChild(
+            createReturnVisitBookingControl(
                 'treatment',
                 item.treatment_id,
+                item.linked_visit,
                 onRefresh
-            );
-        });
-
-        root.appendChild(booking);
+            )
+        );
 
         const actions = item.status === 'planned'
             ? ['in_progress', 'completed', 'cancelled']

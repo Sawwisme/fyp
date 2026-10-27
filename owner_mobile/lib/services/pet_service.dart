@@ -57,4 +57,31 @@ class PetService {
 
     return data;
   }
+  
+  Future<List<Map<String, dynamic>>> getMedicalHistory(
+      int petId, {
+        int offset = 0,
+        int limit = 11,
+      }) async {
+    final query = Uri(
+      queryParameters: {
+        'pet_id': '$petId',
+        'offset': '$offset',
+        'limit': '$limit',
+      },
+    ).query;
+
+    final data = await api.get('/owner-medical-history?$query');
+
+    if (data is! List) {
+      throw const ApiException('Invalid medical history response.');
+    }
+
+    return data.map((item) {
+      if (item is! Map<String, dynamic>) {
+        throw const ApiException('Invalid medical record.');
+      }
+      return item;
+    }).toList();
+  }
 }

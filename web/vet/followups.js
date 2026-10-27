@@ -54,6 +54,10 @@
         detail(content, 'Review findings', item.assessment_information);
         detail(content, 'Notes', item.notes);
 
+        content.appendChild(
+            createLinkedVisitDetails(item.linked_visit, 'followup')
+        );
+
         details.append(summary, content);
         element.appendChild(details);
         return element;
@@ -252,20 +256,14 @@
                     const buttons = document.createElement('div');
                     buttons.className = 'followup-row-actions';
 
-                    const booking = document.createElement('button');
-                    booking.type = 'button';
-                    booking.className = 'secondary compact-button';
-                    booking.textContent = 'Book Appointment';
-
-                    booking.addEventListener('click', () => {
-                        openReturnVisitBooking(
+                    buttons.appendChild(
+                        createReturnVisitBookingControl(
                             'followup',
                             item.followup_care_id,
+                            item.linked_visit,
                             () => load(0)
-                        );
-                    });
-
-                    buttons.appendChild(booking);
+                        )
+                    );
 
                     for (const [mode, label] of [
                         ['review', 'Record Review'],

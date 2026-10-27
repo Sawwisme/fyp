@@ -2,6 +2,8 @@ from datetime import date, datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.schemas.linked_visit import LinkedVisitSummary
+
 
 class FollowupResponse(BaseModel):
     followup_care_id: int
@@ -17,6 +19,7 @@ class FollowupResponse(BaseModel):
     notes: str | None
     status: str
     overdue: bool
+    linked_visit: LinkedVisitSummary | None = None
 
 class FollowupReview(BaseModel):
     model_config = ConfigDict(

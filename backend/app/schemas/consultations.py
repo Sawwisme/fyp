@@ -9,6 +9,8 @@ from pydantic import (
 )
 
 from app.clinic_time import CLINIC_TIMEZONE
+from app.schemas.treatment_progress import TreatmentProgressResponse
+from app.schemas.linked_visit import LinkedVisitSummary
 
 
 class TreatmentInput(BaseModel):
@@ -137,6 +139,7 @@ class TreatmentResponse(BaseModel):
     description: str | None
     treatment_date: date
     status: str
+    progress_record: TreatmentProgressResponse | None = None
 
 
 class PrescriptionResponse(BaseModel):
@@ -200,6 +203,14 @@ class ConsultationReturnVisit(BaseModel):
     reason: str | None
     care_instructions: str | None
 
+class PrescriptionHeader(BaseModel):
+    clinic_name: str
+    clinic_address: str | None
+    clinic_phone: str | None
+    clinic_email: str | None
+    veterinarian_name: str
+    registration_number: str
+
 class ConsultationResponse(BaseModel):
     consultation_id: int
     appointment_id: int
@@ -238,6 +249,7 @@ class ConsultationResponse(BaseModel):
     followup_instructions: str | None
 
     return_visit: ConsultationReturnVisit | None
+    prescription_header: PrescriptionHeader
 
 class ConsultationSummary(BaseModel):
     consultation_id: int
@@ -255,6 +267,7 @@ class TreatmentHistoryItem(TreatmentResponse):
     owner_name: str
     recorded_status: str
     progress_version: int | None
+    linked_visit: LinkedVisitSummary | None = None
 
 
 class PrescriptionHistoryItem(PrescriptionResponse):
@@ -287,3 +300,4 @@ class ClinicalHistoryCounts(BaseModel):
     planned: int
     completed: int
     this_month: int
+    in_progress: int

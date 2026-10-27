@@ -22,3 +22,9 @@ class Treatment(Base):
         "Consultation",
         back_populates="treatments",
     )
+    
+    progress_record = relationship(
+        "TreatmentProgress",
+        back_populates="treatment",
+        uselist=False,
+    )

@@ -1750,3 +1750,106 @@ section:has(#schedule-form) {
     opacity: 0.55;
     cursor: not-allowed;
 }
+
+.treatment-progress-details {
+    display: grid;
+    gap: 12px;
+    margin: 14px 0 0;
+    min-width: 200px;
+    max-width: 440px;
+    font-size: 13px;
+}
+
+.treatment-progress-details dt {
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.treatment-progress-details dd {
+    margin: 0;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.treatment-progress-details a {
+    color: var(--green);
+}
+
+.consultation-record-row>details {
+    margin-top: 14px;
+}
+
+.consultation-record-row>details>summary {
+    color: var(--green);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.clinical-history-summary.show-treatment-progress {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+#history-progress-card[hidden],
+#history-treatment-filter[hidden] {
+    display: none;
+}
+
+#clinical-history-panel .staff-list-toolbar {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+@media (max-width: 1200px) {
+    .clinical-history-summary.show-treatment-progress {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 800px) {
+    .clinical-history-summary.show-treatment-progress {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 500px) {
+    .clinical-history-summary.show-treatment-progress {
+        grid-template-columns: 1fr;
+    }
+}
+
+.linked-visit-details {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.linked-visit-details p {
+    margin: 6px 0 10px;
+    overflow-wrap: anywhere;
+}
+
+.linked-visit-action {
+    display: inline-flex;
+    align-items: center;
+    margin: 4px 6px 4px 0;
+    padding: 6px 10px;
+    color: var(--green);
+    background: #f2f7f3;
+    border: 1px solid #d5e3d8;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.linked-visit-action:hover {
+    background: #e4efe7;
+}
+
+.linked-appointment-highlight>td {
+    background: #e7f3e9;
+}

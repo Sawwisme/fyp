@@ -10,8 +10,11 @@
     <link rel="stylesheet" href="/web/admin/dashboard.css">
     <link rel="stylesheet" href="/web/admin/layout.css">
     <link rel="stylesheet" href="/web/vet/consultation.css">
+    <link rel="stylesheet" href="/web/vet/prescription_print.css">
 
     <script src="/web/vet/layout.js" defer></script>
+    <script src="/web/vet/treatment_details.js" defer></script>
+    <script src="/web/vet/prescription_print.js" defer></script>
     <script src="/web/vet/consultation.js" defer></script>
     <script src="/web/vet/consultation_history.js" defer></script>
 </head>
@@ -42,6 +45,12 @@
                     <a href="/web/vet/appointments.html">
                         Back to appointments
                     </a>
+                </div>
+
+                <div class="staff-actions">
+                    <button id="print-prescription" type="button" class="secondary compact-button" hidden>
+                        Print Prescription
+                    </button>
                 </div>
 
                 <section class="panel">

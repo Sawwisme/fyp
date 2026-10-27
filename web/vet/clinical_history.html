@@ -11,7 +11,9 @@
     <link rel="stylesheet" href="/web/admin/layout.css">
 
     <script src="/web/vet/layout.js" defer></script>
+    <script src="/web/vet/treatment_details.js" defer></script>
     <script src="/web/vet/return_visit_booking.js" defer></script>
+    <script src="/web/vet/linked_visit.js" defer></script>
     <script src="/web/vet/treatment_progress.js" defer></script>
     <script src="/web/vet/clinical_history.js" defer></script>
 </head>
@@ -59,6 +61,10 @@
                         <p id="history-label-second">Planned Treatments</p>
                         <strong id="history-count-draft">—</strong>
                     </div>
+                    <div id="history-progress-card" class="panel">
+                        <p>In Progress Treatments</p>
+                        <strong id="history-count-progress">—</strong>
+                    </div>
                     <div class="panel">
                         <p id="history-label-third">Completed Treatments</p>
                         <strong id="history-count-finalized">—</strong>
@@ -89,6 +95,19 @@
                                 <option value="" selected>All statuses</option>
                                 <option value="draft">Draft</option>
                                 <option value="completed">Completed</option>
+                            </select>
+                        </div>
+
+                        <div id="history-treatment-filter">
+                            <label class="field-label" for="history-treatment-status">
+                                Treatment status
+                            </label>
+                            <select id="history-treatment-status">
+                                <option value="">All treatment statuses</option>
+                                <option value="planned">Planned</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
                             </select>
                         </div>
 
@@ -160,6 +179,23 @@
 
             <p id="treatment-progress-patient"></p>
             <p id="treatment-progress-explanation" class="muted"></p>
+
+            <div id="treatment-start-fields" hidden>
+                <label for="treatment-start-consultation">
+                    Starting consultation
+                </label>
+                <select id="treatment-start-consultation"></select>
+
+                <label for="treatment-start-notes">
+                    Initial treatment notes
+                </label>
+                <textarea id="treatment-start-notes" rows="4" maxlength="5000"
+                    placeholder="Record what was started and relevant observations."></textarea>
+
+                <p class="muted">
+                    The start date and time are recorded automatically when saved.
+                </p>
+            </div>
 
             <fieldset id="treatment-progress-fields">
                 <div id="treatment-completion-fields" hidden>

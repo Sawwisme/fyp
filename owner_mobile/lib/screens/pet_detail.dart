@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/api_client.dart';
 import '../services/pet_service.dart';
 import 'pet_form.dart';
+import 'medical_history.dart';
 
 
 class PetDetailScreen extends StatefulWidget {
@@ -122,6 +123,22 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                 pet['existing_dental_condition'],
               ),
               _detail('Notes', pet['notes']),
+              OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => MedicalHistoryScreen(
+                        petId: widget.petId,
+                        petName: pet['pet_name'] as String,
+                        service: widget.service,
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.medical_information_outlined),
+                label: const Text('Medical History'),
+              ),
+              const SizedBox(height: 12),
             const SizedBox(height: 16),
               FilledButton.icon(
                 onPressed: () => _editPet(pet),

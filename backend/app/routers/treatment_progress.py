@@ -57,3 +57,24 @@ def list_completion_consultations(
         offset,
         limit,
     )
+
+@router.get(
+    "/{treatment_id}/start-consultations",
+    response_model=list[CompletionConsultationOption],
+)
+def list_start_consultations(
+    treatment_id: int = Path(ge=1, le=2147483647),
+    offset: int = Query(default=0, ge=0),
+    limit: int = Query(default=20, ge=1, le=100),
+    current_user: User = Depends(
+        require_roles("veterinarian")
+    ),
+    db: Session = Depends(get_db),
+):
+    return treatment_progress_service.list_start_consultations(
+        db,
+        current_user,
+        treatment_id,
+        offset,
+        limit,
+    )

@@ -1,4 +1,5 @@
 (() => {
+    const visitParams = new URLSearchParams(location.search);
     const date = document.getElementById('vet-appointment-date');
     const search = document.getElementById('vet-appointment-search');
     const status = document.getElementById('vet-appointment-status');
@@ -65,6 +66,12 @@
 
         for (const item of matches) {
             const row = document.createElement('tr');
+
+            row.classList.toggle(
+                'linked-appointment-highlight',
+                String(item.appointment_id) ===
+                visitParams.get('appointment_id')
+            );
 
             const values = [
                 `${item.start_time.slice(0, 5)}–` +
@@ -194,7 +201,15 @@
         if (!profile) return;
 
         ready = true;
-        date.value = today();
+        const requestedDate = visitParams.get('date');
+
+        date.value = /^\d{4}-\d{2}-\d{2}$/.test(requestedDate || '')
+            ? requestedDate
+            : today();
+
+        if (!date.value || !date.validity.valid) {
+            date.value = today();
+        }
         loadAppointments();
 
         setInterval(() => {

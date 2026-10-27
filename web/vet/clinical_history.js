@@ -2,6 +2,7 @@
     const get = id => document.getElementById(id);
     const search = get('history-search');
     const status = get('history-status');
+    const treatmentStatus = get('history-treatment-status');
     const dateFrom = get('history-date-from');
     const dateTo = get('history-date-to');
     const rows = get('history-rows');
@@ -67,6 +68,14 @@
         }
 
         details.append(summary, content);
+
+        if (selectedType === 'treatments') {
+            details.appendChild(createTreatmentDetails(item));
+            details.appendChild(
+                createLinkedVisitDetails(item.linked_visit, 'treatment')
+            );
+        }
+
         result.appendChild(details);
 
         return result;
@@ -74,6 +83,12 @@
 
     function renderCounts(counts = null) {
         const treatment = type === 'treatments';
+
+        get('history-progress-card').hidden = !treatment;
+        get('history-treatment-filter').hidden = !treatment;
+
+        document.querySelector('.clinical-history-summary')
+            .classList.toggle('show-treatment-progress', treatment);
 
         get('history-label-total').textContent = treatment
             ? 'Total Treatments'
@@ -92,8 +107,8 @@
             : 'Prescriptions This Month';
 
         get('history-count-note').textContent = treatment
-            ? 'Counts follow the selected filters. Planned and completed ' +
-            'refer to treatment status.'
+            ? 'Counts follow the selected filters. Planned, In Progress and ' +
+            'Completed refer to current treatment status.'
             : 'Counts follow the selected filters. Draft and finalized ' +
             'refer to consultation status, not medication-course completion.';
 
@@ -106,6 +121,7 @@
                 ? counts?.completed
                 : counts?.finalized,
             'history-count-month': counts?.this_month,
+            'history-count-progress': counts?.in_progress,
         };
 
         for (const [id, value] of Object.entries(values)) {
@@ -160,6 +176,13 @@
 
         if (dateTo.value) {
             query.set('date_to', dateTo.value);
+        }
+
+        if (
+            selectedType === 'treatments' &&
+            treatmentStatus.value
+        ) {
+            query.set('treatment_status', treatmentStatus.value);
         }
 
         const countQuery = new URLSearchParams(query);
@@ -311,6 +334,11 @@
             load(0);
         });
     }
+
+    treatmentStatus.addEventListener('change', () => {
+        clearTimeout(timer);
+        load(0);
+    });
 
     previous.addEventListener('click', () => {
         if (!loading && page > 0) load(page - 1);

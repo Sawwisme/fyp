@@ -9,6 +9,7 @@ from app.models import (
     Treatment,
     TreatmentProgress,
     User,
+    Appointment,
 )
 from app.schemas.treatment_progress import (
     TreatmentProgressResponse,
@@ -16,6 +17,23 @@ from app.schemas.treatment_progress import (
 )
 from app.services.vet_profile_service import get_profile
 
+def _start_consultation_query(original, veterinarian):
+    return select(Consultation).where(
+        Consultation.consultation_id
+        != original.consultation_id,
+        Consultation.pet_id == original.pet_id,
+        Consultation.clinic_id == original.clinic_id,
+        Consultation.veterinarian_id
+        == veterinarian.veterinarian_id,
+        Consultation.status.in_(["draft", "completed"]),
+        Consultation.consultation_date
+        >= original.consultation_date,
+        Consultation.consultation_date
+        <= datetime.now(timezone.utc).replace(tzinfo=None),
+        Consultation.appointment.has(
+            Appointment.status.in_(["in_progress", "completed"])
+        ),
+    )
 
 def update_progress(
     db: Session,
@@ -90,6 +108,31 @@ def update_progress(
                 409,
                 "This treatment status change is not allowed.",
             )
+        
+        if data.status == "in_progress":
+            starting_consultation = db.scalar(
+                _start_consultation_query(
+                    original,
+                    veterinarian,
+                )
+                .where(
+                    Consultation.consultation_id
+                    == data.start_consultation_id,
+                )
+                .with_for_update()
+            )
+
+            if starting_consultation is None:
+                raise HTTPException(
+                    400,
+                    "Select an active or completed later "
+                    "consultation for this patient.",
+                )
+
+            progress.start_consultation_id = (
+                starting_consultation.consultation_id
+            )
+            progress.start_notes = data.start_notes
 
         if data.status == "completed":
             completion = db.scalar(
@@ -201,3 +244,61 @@ def list_completion_consultations(
         .offset(offset)
         .limit(limit)
     ).mappings().all()
+
+def list_start_consultations(
+    db: Session,
+    current_user: User,
+    treatment_id: int,
+    offset: int,
+    limit: int,
+):
+    veterinarian = get_profile(db, current_user)
+
+    original = db.scalar(
+        select(Consultation)
+        .join(
+            Treatment,
+            Treatment.consultation_id
+            == Consultation.consultation_id,
+        )
+        .join(
+            TreatmentProgress,
+            TreatmentProgress.treatment_id
+            == Treatment.treatment_id,
+        )
+        .where(
+            Treatment.treatment_id == treatment_id,
+            Treatment.status == "planned",
+            TreatmentProgress.status == "planned",
+            Consultation.status == "completed",
+            Consultation.clinic_id == veterinarian.clinic_id,
+            Consultation.veterinarian_id
+            == veterinarian.veterinarian_id,
+        )
+    )
+
+    if original is None:
+        raise HTTPException(
+            404,
+            "An unstarted treatment plan was not found "
+            "in your assigned records.",
+        )
+
+    records = db.scalars(
+        _start_consultation_query(original, veterinarian)
+        .order_by(
+            Consultation.consultation_date.desc(),
+            Consultation.consultation_id.desc(),
+        )
+        .offset(offset)
+        .limit(limit)
+    ).all()
+
+    return [
+        {
+            "consultation_id": item.consultation_id,
+            "consultation_date": item.consultation_date,
+            "diagnosis": item.diagnosis,
+        }
+        for item in records
+    ]

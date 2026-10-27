@@ -25,6 +25,7 @@ from app.models import (
 from app.schemas.consultations import ConsultationSave
 from app.services.schedule_service import lock_schedule
 from app.services.vet_profile_service import get_profile
+from app.services.return_visit_service import get_linked_visits
 
 
 def utc_now():
@@ -46,7 +47,8 @@ def _details_statement(veterinarian):
             .selectinload(PetOwner.user),
             selectinload(Consultation.appointment)
             .selectinload(Appointment.emergency_request),
-            selectinload(Consultation.treatments),
+            selectinload(Consultation.treatments)
+            .selectinload(Treatment.progress_record),
             selectinload(Consultation.prescriptions),
             selectinload(Consultation.ai_analysis)
             .selectinload(AIAnalysisResult.predictions),
@@ -59,6 +61,7 @@ def _details_statement(veterinarian):
             .selectinload(TreatmentProgress.treatment),
             selectinload(Consultation.appointment)
             .selectinload(Appointment.followup_task),
+            selectinload(Consultation.clinic),
         )
         .execution_options(populate_existing=True)
     )
@@ -156,6 +159,18 @@ def _serialize(record):
         "followup_reason": record.followup_reason,
         "followup_instructions": record.followup_instructions,
         "return_visit": return_visit,
+        "prescription_header": {
+            "clinic_name": record.clinic.clinic_name,
+            "clinic_address": record.clinic.address,
+            "clinic_phone": record.clinic.phone_number,
+            "clinic_email": record.clinic.email,
+            "veterinarian_name": (
+                record.veterinarian.user.full_name
+            ),
+            "registration_number": (
+                record.veterinarian.registration_number
+            ),
+        },
     }
 
 
@@ -764,7 +779,7 @@ def list_my_consultations(
                 func.coalesce(
                     func.sum(
                         case(
-                            (filtered.c.effective_status == "completed", 1),
+                            (filtered.c.status == "completed", 1),
                             else_=0,
                         )
                     ),
@@ -801,6 +816,7 @@ def list_my_clinical_history(
     date_from: date | None = None,
     date_to: date | None = None,
     counts_only: bool = False,
+    treatment_status: str | None = None,
 ):
     veterinarian = get_profile(db, current_user)
 
@@ -848,6 +864,7 @@ def list_my_clinical_history(
     if record_type == "treatments":
         statement = (
             statement
+            .options(selectinload(Treatment.progress_record))
             .outerjoin(
                 TreatmentProgress,
                 TreatmentProgress.treatment_id
@@ -866,6 +883,20 @@ def list_my_clinical_history(
         statement = statement.where(
             Prescription.veterinarian_id
             == veterinarian.veterinarian_id
+        )
+
+    if treatment_status is not None:
+        if record_type != "treatments":
+            raise HTTPException(
+                422,
+                "Treatment status applies to treatments only.",
+            )
+
+        statement = statement.where(
+            func.coalesce(
+                TreatmentProgress.status,
+                Treatment.status,
+            ) == treatment_status
         )
 
     if consultation_status is not None:
@@ -946,9 +977,30 @@ def list_my_clinical_history(
             else 0
         )
 
+        in_progress_count = (
+            func.coalesce(
+                func.sum(
+                    case(
+                        (
+                            filtered.c.effective_status
+                            == "in_progress",
+                            1,
+                        ),
+                        else_=0,
+                    )
+                ),
+                0,
+            )
+            if record_type == "treatments"
+            else 0
+        )
+
         return db.execute(
             select(
                 func.count().label("total"),
+                func.coalesce(
+                    in_progress_count, 0
+                ).label("in_progress"),
                 func.coalesce(
                     planned_count, 0
                 ).label("planned"),
@@ -1023,8 +1075,22 @@ def list_my_clinical_history(
             item["recorded_status"] = record.status
             item["status"] = row[4]
             item["progress_version"] = row[5]
+            item["progress_record"] = record.progress_record
 
         result.append(item)
+
+    if record_type == "treatments":
+        linked_visits = get_linked_visits(
+            db,
+            "treatment",
+            [item["treatment_id"] for item in result],
+            veterinarian,
+        )
+
+        for item in result:
+            item["linked_visit"] = linked_visits.get(
+                item["treatment_id"]
+            )
 
     return result
 

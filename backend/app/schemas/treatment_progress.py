@@ -18,6 +18,16 @@ class TreatmentProgressUpdate(BaseModel):
     version: int = Field(ge=1, le=2147483647)
 
     status: Literal["in_progress", "completed", "cancelled"]
+    start_consultation_id: int | None = Field(
+        default=None,
+        ge=1,
+        le=2147483647,
+    )
+
+    start_notes: str | None = Field(
+        default=None,
+        max_length=5000,
+    )
 
     completion_consultation_id: int | None = Field(
         default=None,
@@ -32,6 +42,25 @@ class TreatmentProgressUpdate(BaseModel):
 
     @model_validator(mode="after")
     def validate_action(self):
+        if self.status == "in_progress":
+            if self.start_consultation_id is None:
+                raise ValueError(
+                    "Select the consultation where treatment starts."
+                )
+
+            if not self.start_notes:
+                raise ValueError(
+                    "Enter the initial treatment notes."
+                )
+
+        elif (
+            self.start_consultation_id is not None
+            or self.start_notes is not None
+        ):
+            raise ValueError(
+                "Start details are only submitted "
+                "when starting treatment."
+            )
         if self.status == "completed":
             if self.completion_consultation_id is None:
                 raise ValueError(
@@ -75,6 +104,8 @@ class TreatmentProgressResponse(BaseModel):
     cancellation_reason: str | None
     updated_by_user_id: int | None
     updated_at: datetime | None
+    start_consultation_id: int | None
+    start_notes: str | None
 
 class CompletionConsultationOption(BaseModel):
     consultation_id: int

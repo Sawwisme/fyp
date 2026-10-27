@@ -16,6 +16,7 @@ from app.models import (
 )
 from app.services.vet_profile_service import get_profile
 from app.schemas.followups import FollowupReview, FollowupCancel
+from app.services.return_visit_service import get_linked_visits
 
 
 def list_my_followups(
@@ -93,7 +94,7 @@ def list_my_followups(
         .limit(limit)
     ).all()
 
-    return [
+    result = [
         {
             "followup_care_id": item.followup_care_id,
             "consultation_id": item.consultation_id,
@@ -115,6 +116,20 @@ def list_my_followups(
         }
         for item, pet_name, owner in records
     ]
+
+    linked_visits = get_linked_visits(
+        db,
+        "followup",
+        [item["followup_care_id"] for item in result],
+        veterinarian,
+    )
+
+    for item in result:
+        item["linked_visit"] = linked_visits.get(
+            item["followup_care_id"]
+        )
+
+    return result
 
 def _lock_pending_followup(
     db: Session,

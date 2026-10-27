@@ -9,6 +9,8 @@ from app.models import (
     PetOwner,
     Treatment,
     TreatmentProgress,
+    TimeSlot,
+    Veterinarian,
 )
 from app.services.vet_profile_service import get_profile
 
@@ -121,3 +123,66 @@ def get_booking_context(
         ),
         "existing_appointment_id": existing_id,
     }
+
+def get_linked_visits(
+    db: Session,
+    source_type: str,
+    source_ids: list[int],
+    veterinarian,
+):
+    if not source_ids:
+        return {}
+
+    link_column = {
+        "treatment": Appointment.planned_treatment_id,
+        "followup": Appointment.followup_care_id,
+    }[source_type]
+
+    records = db.execute(
+        select(
+            link_column.label("source_id"),
+            Appointment.appointment_id,
+            Appointment.appointment_date,
+            TimeSlot.start_time,
+            TimeSlot.end_time,
+            Appointment.status,
+            Consultation.consultation_id,
+            Consultation.status.label("consultation_status"),
+        )
+        .join(
+            TimeSlot,
+            TimeSlot.time_slot_id == Appointment.time_slot_id,
+        )
+        .join(
+            Veterinarian,
+            Veterinarian.veterinarian_id
+            == Appointment.veterinarian_id,
+        )
+        .outerjoin(
+            Consultation,
+            Consultation.appointment_id
+            == Appointment.appointment_id,
+        )
+        .where(
+            link_column.in_(source_ids),
+            Appointment.veterinarian_id
+            == veterinarian.veterinarian_id,
+            Veterinarian.clinic_id == veterinarian.clinic_id,
+        )
+        .order_by(
+            Appointment.status.in_(["cancelled", "rejected"]).asc(),
+            Appointment.appointment_id.desc(),
+        )
+    ).mappings().all()
+
+    result = {}
+
+    for row in records:
+        # Prefer an existing non-cancelled visit.
+        # Otherwise show the latest cancelled/rejected booking.
+        if row["source_id"] not in result:
+            item = dict(row)
+            source_id = item.pop("source_id")
+            result[source_id] = item
+
+    return result
