@@ -171,6 +171,11 @@ def _serialize(record):
                 record.veterinarian.registration_number
             ),
         },
+        "followup_photos_required": record.followup_photos_required,
+        "followup_photo_instructions": (
+            record.followup_photo_instructions
+        ),
+        "followup_visit_required": record.followup_visit_required,
     }
 
 
@@ -583,6 +588,9 @@ def save_consultation(
             "followup_recommended_date",
             "followup_reason",
             "followup_instructions",
+            "followup_photos_required",
+            "followup_photo_instructions",
+            "followup_visit_required",
         )
 
         # Preserve existing values if an older client omits them.
@@ -594,6 +602,26 @@ def save_consultation(
             record.followup_recommended_date = None
             record.followup_reason = None
             record.followup_instructions = None
+            record.followup_photos_required = False
+            record.followup_photo_instructions = None
+            record.followup_visit_required = False
+
+        if not record.followup_photos_required:
+            record.followup_photo_instructions = None
+
+        if (
+            data.complete
+            and record.followup_required
+            and record.followup_photos_required
+            and not (
+                record.followup_photo_instructions
+                and record.followup_photo_instructions.strip()
+            )
+        ):
+            raise HTTPException(
+                422,
+                "Describe the photos the owner needs to submit.",
+            )
 
         if data.complete and record.followup_required:
             today = datetime.now(CLINIC_TIMEZONE).date()
@@ -685,6 +713,15 @@ def save_consultation(
                         assessment_information=None,
                         status="pending",
                         notes=None,
+                        photos_required=(
+                            record.followup_photos_required
+                        ),
+                        photo_instructions=(
+                            record.followup_photo_instructions
+                        ),
+                        visit_required=(
+                            record.followup_visit_required
+                        ),
                     )
                 )
 

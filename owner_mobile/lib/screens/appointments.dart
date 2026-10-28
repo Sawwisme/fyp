@@ -7,6 +7,7 @@ import 'book_appointment.dart';
 import 'clinic_picker.dart';
 import 'emergency.dart';
 import 'reschedule_appointment.dart';
+import 'appointment_details.dart';
 
 class AppointmentsPage extends StatefulWidget {
   final AppointmentService service;
@@ -52,6 +53,7 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
 
     try {
       final page = await widget.service.getMyAppointments(
+        followupOnly: _filter == 'followup',
         offset: _appointments.length,
         limit: 20,
       );
@@ -280,6 +282,31 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
     }
   }
 
+  Future<void> _openAppointmentDetails(
+      Map<String, dynamic> item,
+      ) async {
+    if (_loading || _openingBooking) return;
+
+    setState(() => _openingBooking = true);
+
+    try {
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute(
+          builder: (_) => AppointmentDetailsScreen(
+            appointment: Map<String, dynamic>.from(item),
+            service: widget.service,
+          ),
+        ),
+      );
+
+      if (mounted) await _load(reset: true);
+    } finally {
+      if (mounted) {
+        setState(() => _openingBooking = false);
+      }
+    }
+  }
+
   Widget _appointmentCard(Map<String, dynamic> item) {
     final start = item['start_time'] as String;
     final end = item['end_time'] as String;
@@ -326,6 +353,30 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
               const SizedBox(height: 8),
               Text(item['clinic_address'] as String),
             ],
+
+            if (item['has_pending_followup'] == true) ...[
+              const SizedBox(height: 10),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Chip(
+                  avatar: Icon(Icons.assignment_late_outlined, size: 18),
+                  label: Text('Follow-up needed'),
+                ),
+              ),
+            ],
+
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: _loading || _openingBooking
+                  ? null
+                  : () => _openAppointmentDetails(item),
+              icon: const Icon(Icons.description_outlined),
+              label: Text(
+                item['has_pending_followup'] == true
+                    ? 'View follow-up'
+                    : 'View details',
+              ),
+            ),
 
             if (_canChangeAppointment(item)) ...[
               const SizedBox(height: 16),
@@ -417,11 +468,18 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
                 value: 'history',
                 child: Text('History'),
               ),
+              DropdownMenuItem(
+                value: 'followup',
+                child: Text('Follow-up needed'),
+              ),
             ],
-            onChanged: (value) {
-              if (value != null) {
-                setState(() => _filter = value);
-              }
+            onChanged: _loading || _openingBooking
+                ? null
+                : (value) {
+              if (value == null || value == _filter) return;
+
+              setState(() => _filter = value);
+              _load(reset: true);
             },
           ),
           const SizedBox(height: 16),
@@ -447,7 +505,9 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 24),
               child: Text(
-                _appointments.isEmpty
+                _filter == 'followup'
+                    ? 'No appointments require follow-up care.'
+                    : _appointments.isEmpty
                     ? 'No appointments yet. Select Book appointment to begin.'
                     : 'No matching appointments among the loaded records.',
                 textAlign: TextAlign.center,

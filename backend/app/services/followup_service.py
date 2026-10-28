@@ -108,6 +108,9 @@ def list_my_followups(
             "assessment_information": item.assessment_information,
             "notes": item.notes,
             "status": item.status,
+            "photos_required": item.photos_required,
+            "photo_instructions": item.photo_instructions,
+            "visit_required": item.visit_required,
             "overdue": bool(
                 item.status == "pending"
                 and item.recommended_date

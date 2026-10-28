@@ -11,6 +11,7 @@ import 'pet_form.dart';
 import 'change_password.dart';
 import '../services/appointment_service.dart';
 import 'appointments.dart';
+import 'medical_history.dart';
 
 class HomeScreen extends StatefulWidget {
   final Map<String, dynamic> user;
@@ -143,6 +144,121 @@ class _HomeScreenState extends State<HomeScreen> {
     } finally {
       if (mounted) {
         setState(() => _loggingOut = false);
+      }
+    }
+  }
+
+  bool _openingMedicalHistory = false;
+
+  Future<void> _openMedicalHistory() async {
+    if (_openingMedicalHistory || _loggingOut) return;
+
+    setState(() => _openingMedicalHistory = true);
+
+    try {
+      final pets = <Map<String, dynamic>>[];
+      var offset = 0;
+
+      while (true) {
+        final page = await _petService.getPets(
+          offset: offset,
+          limit: 100,
+        );
+
+        if (!mounted) return;
+
+        pets.addAll(page);
+        if (page.length < 100) break;
+
+        offset += page.length;
+      }
+
+      if (pets.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Register a pet to view medical history.'),
+          ),
+        );
+        return;
+      }
+
+      Map<String, dynamic>? selectedPet;
+
+      if (pets.length == 1) {
+        selectedPet = pets.first;
+      } else {
+        selectedPet =
+        await showModalBottomSheet<Map<String, dynamic>>(
+          context: context,
+          showDragHandle: true,
+          builder: (sheetContext) => SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    'Choose a pet',
+                    style: Theme.of(sheetContext).textTheme.titleLarge,
+                  ),
+                ),
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: pets.length,
+                    itemBuilder: (_, index) {
+                      final pet = pets[index];
+
+                      return ListTile(
+                        leading: const CircleAvatar(
+                          child: Icon(Icons.pets),
+                        ),
+                        title: Text(pet['pet_name'] as String),
+                        subtitle: Text(
+                          '${pet['species']} · Pet #${pet['pet_id']}',
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => Navigator.pop(sheetContext, pet),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
+      if (!mounted || selectedPet == null) return;
+
+      final pet = selectedPet;
+
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute(
+          builder: (_) => MedicalHistoryScreen(
+            petId: pet['pet_id'] as int,
+            petName: pet['pet_name'] as String,
+            service: _petService,
+          ),
+        ),
+      );
+    } on ApiException catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error.message)),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not open medical history. Try again.'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _openingMedicalHistory = false);
       }
     }
   }
@@ -291,6 +407,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 avatar: const Icon(Icons.pets, size: 18),
                 label: const Text('My pets'),
                 onPressed: _openPets,
+              ),
+              ActionChip(
+                avatar: _openingMedicalHistory
+                    ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+                    : const Icon(Icons.medical_information_outlined, size: 18),
+                label: const Text('Medical history'),
+                onPressed: _openingMedicalHistory || _loggingOut
+                    ? null
+                    : _openMedicalHistory,
               ),
               ActionChip(
                 avatar: const Icon(Icons.calendar_month, size: 18),

@@ -31,7 +31,18 @@ class FollowupImage(Base):
         server_default=text("CURRENT_TIMESTAMP"),
     )
 
+    submission_id = Column(
+        Integer,
+        ForeignKey("followup_submissions.submission_id"),
+        nullable=True,
+    )
+
     followup = relationship(
         "FollowupCare",
+        back_populates="images",
+    )
+
+    submission = relationship(
+        "FollowupSubmission",
         back_populates="images",
     )

@@ -206,6 +206,26 @@
                                 </label>
                                 <textarea id="followup-instructions" rows="4" maxlength="10000"></textarea>
 
+                                <div class="followup-requirements">
+                                    <label class="followup-toggle">
+                                        <input id="followup-photos-required" type="checkbox">
+                                        <span>Owner must submit photos</span>
+                                    </label>
+
+                                    <div id="followup-photo-fields" hidden>
+                                        <label for="followup-photo-instructions">
+                                            Photo requirements
+                                        </label>
+                                        <textarea id="followup-photo-instructions" rows="3" maxlength="5000"
+                                            placeholder="Describe which areas or views the owner should photograph."></textarea>
+                                    </div>
+
+                                    <label class="followup-toggle">
+                                        <input id="followup-visit-required" type="checkbox">
+                                        <span>In-clinic review required</span>
+                                    </label>
+                                </div>
+
                                 <p class="muted">
                                     Completing this consultation creates a pending
                                     follow-up task. This does not book an appointment.

@@ -636,6 +636,26 @@
             ]
             : [['Follow-up', 'Not required']];
 
+        if (data.followup_required) {
+            entries.push(
+                [
+                    'Owner photo submission required',
+                    data.followup_photos_required ? 'Yes' : 'No',
+                ],
+                [
+                    'In-clinic review required',
+                    data.followup_visit_required ? 'Yes' : 'No',
+                ]
+            );
+
+            if (data.followup_photos_required) {
+                entries.push([
+                    'Photo requirements',
+                    data.followup_photo_instructions,
+                ]);
+            }
+        }
+
         for (const [label, value] of entries) {
             const paragraph = document.createElement('p');
             const heading = document.createElement('strong');
@@ -767,6 +787,18 @@
             createRow('prescription', item, false);
         }
 
+        get('followup-photos-required').checked =
+            Boolean(data.followup_photos_required);
+
+        get('followup-photo-instructions').value =
+            data.followup_photo_instructions || '';
+
+        get('followup-photo-fields').hidden =
+            !data.followup_photos_required;
+
+        get('followup-visit-required').checked =
+            Boolean(data.followup_visit_required);
+
         const completed = data.status === 'completed';
 
         form.hidden = completed;
@@ -793,6 +825,13 @@
         dirty = false;
         reload.hidden = true;
     }
+
+    get('followup-photos-required').addEventListener('change', () => {
+        get('followup-photo-fields').hidden =
+            !get('followup-photos-required').checked;
+
+        markDirty();
+    });
 
     async function loadConsultation() {
         if (busy) return;
@@ -895,6 +934,18 @@
 
         if (
             complete &&
+            followupRequired &&
+            get('followup-photos-required').checked &&
+            !get('followup-photo-instructions').value.trim()
+        ) {
+            message.textContent =
+                'Describe the photos the owner needs to submit.';
+            get('followup-photo-instructions').focus();
+            return;
+        }
+
+        if (
+            complete &&
             !window.confirm(
                 'Complete this consultation? Review the clinical notes, ' +
                 'treatments and prescriptions first. ' +
@@ -918,6 +969,20 @@
             followup_instructions: followupRequired
                 ? get('followup-instructions').value.trim() || null
                 : null,
+
+            followup_photos_required:
+                followupRequired &&
+                get('followup-photos-required').checked,
+
+            followup_photo_instructions:
+                followupRequired &&
+                    get('followup-photos-required').checked
+                    ? get('followup-photo-instructions').value.trim() || null
+                    : null,
+
+            followup_visit_required:
+                followupRequired &&
+                get('followup-visit-required').checked,
         };
 
         for (const [name, id] of Object.entries(clinicalFields)) {

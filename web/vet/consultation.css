@@ -16,7 +16,7 @@
     font-weight: 600;
 }
 
-#consultation-form input,
+#consultation-form input:not([type="checkbox"]):not([type="radio"]),
 #consultation-form select,
 #consultation-form textarea {
     box-sizing: border-box;
@@ -269,19 +269,38 @@
     max-width: 420px;
 }
 
-.followup-toggle {
+#consultation-form label.followup-toggle {
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     gap: 10px;
+    width: fit-content;
+    margin: 12px 0;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
     cursor: pointer;
 }
 
-.followup-toggle input[type="checkbox"] {
+#consultation-form .followup-toggle input[type="checkbox"] {
+    appearance: auto;
+    display: inline-block;
+    flex: 0 0 18px;
+    box-sizing: border-box;
     width: 18px;
     height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    max-width: 18px;
+    max-height: 18px;
     margin: 0;
-    flex: 0 0 auto;
+    padding: 0;
     accent-color: var(--green);
+    cursor: pointer;
+}
+
+#consultation-form .followup-toggle span {
+    flex: 1;
 }
 
 #followup-fields {
@@ -307,4 +326,114 @@
     line-height: 1.6;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
+}
+
+.followup-requirements {
+    display: grid;
+    gap: 16px;
+    margin: 20px 0;
+    padding: 18px;
+    background: #f4f8f5;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+#followup-photo-fields[hidden] {
+    display: none;
+}
+
+#consultation-form .followup-requirements {
+    gap: 12px;
+    padding: 16px;
+    margin: 18px 0;
+}
+
+#consultation-form .followup-requirements .followup-toggle {
+    margin: 0;
+}
+
+#consultation-fields>.staff-actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+#consultation-fields>.staff-actions button {
+    box-sizing: border-box;
+    min-height: 42px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#complete-consultation {
+    background: var(--green);
+    color: white;
+    border: 1px solid var(--green);
+}
+
+#complete-consultation:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+#assessment-picker {
+    max-width: 620px;
+    margin-top: 18px;
+}
+
+#assessment-picker label {
+    display: block;
+    margin: 0 0 8px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.consultation-ai #consultation-assessment {
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    margin: 0;
+    padding: 11px 12px;
+    background: #fafbf9;
+    color: var(--ink);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font: inherit;
+    font-size: 14px;
+}
+
+.consultation-ai #consultation-assessment:focus-visible {
+    outline: 3px solid #b9ddc3;
+    outline-offset: 2px;
+    border-color: var(--green);
+}
+
+.consultation-ai #consultation-assessment:disabled {
+    background: #f1f4f2;
+    color: #748078;
+    cursor: not-allowed;
+}
+
+#assessment-picker>.muted {
+    margin: 8px 0 0;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+#assessment-message {
+    margin: 14px 0 0;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+#assessment-message:empty {
+    display: none;
 }

@@ -13,6 +13,8 @@ from app.models import (
     TimeSlot,
     User,
     Veterinarian,
+    Consultation,
+    FollowupCare,
 )
 from app.schemas.owner_appointments import OwnerAppointmentCreate
 from app.services.pet_service import get_owner_profile
@@ -210,8 +212,29 @@ def list_my_appointments(
     appointment_date: date | None,
     offset: int,
     limit: int,
+    followup_only: bool = False,
 ):
     owner = get_owner_profile(db, current_user)
+
+    # A pending task belonging to this appointment's completed consultation.
+    pending_followup = (
+        select(FollowupCare.followup_care_id)
+        .join(
+            Consultation,
+            Consultation.consultation_id
+            == FollowupCare.consultation_id,
+        )
+        .where(
+            Consultation.appointment_id
+            == Appointment.appointment_id,
+            Consultation.pet_id == Appointment.pet_id,
+            Consultation.status == "completed",
+            FollowupCare.pet_id == Appointment.pet_id,
+            FollowupCare.status == "pending",
+        )
+        .correlate(Appointment)
+        .exists()
+    )
 
     statement = (
         select(
@@ -228,6 +251,7 @@ def list_my_appointments(
             Clinic.address.label("clinic_address"),
             Appointment.appointment_type,
             Appointment.status,
+            pending_followup.label("has_pending_followup"),
         )
         .join(
             TimeSlot,
@@ -255,6 +279,9 @@ def list_my_appointments(
         statement = statement.where(
             Schedule.schedule_date == appointment_date
         )
+
+    if followup_only:
+        statement = statement.where(pending_followup)
 
     statement = (
         statement

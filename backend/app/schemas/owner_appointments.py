@@ -46,6 +46,7 @@ class OwnerAppointmentListItem(BaseModel):
 
     appointment_type: str
     status: str
+    has_pending_followup: bool = False
 
 class OwnerAppointmentReschedule(BaseModel):
     model_config = ConfigDict(extra="forbid")

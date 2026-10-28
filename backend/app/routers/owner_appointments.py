@@ -43,6 +43,7 @@ def create_appointment(
 )
 def get_my_appointments(
     appointment_date: date | None = None,
+    followup_only: bool = Query(default=False),
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
     current_user: User = Depends(
@@ -56,6 +57,7 @@ def get_my_appointments(
         appointment_date,
         offset,
         limit,
+        followup_only=followup_only,
     )
 
 @router.post("/{appointment_id}/cancel")

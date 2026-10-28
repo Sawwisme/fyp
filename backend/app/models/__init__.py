@@ -33,3 +33,4 @@ from app.models.clinic_working_hour import ClinicWorkingHour
 from app.models.automatic_schedule_rule import AutomaticScheduleRule
 from app.models.clinic_owner_link import ClinicOwnerLink
 from app.models.treatment_progress import TreatmentProgress
+from app.models.followup_submission import FollowupSubmission

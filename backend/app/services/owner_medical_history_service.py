@@ -19,6 +19,7 @@ def list_medical_history(
     pet_id: int,
     offset: int,
     limit: int,
+    appointment_id: int | None = None,
 ):
     owner = get_owner_profile(db, current_user)
 
@@ -45,6 +46,11 @@ def list_medical_history(
             Consultation.status == "completed",
             Pet.pet_owner_id == owner.pet_owner_id,
             Appointment.pet_owner_id == owner.pet_owner_id,
+            (
+                Consultation.appointment_id == appointment_id
+                if appointment_id is not None
+                else True
+            ),
         )
         .options(
             selectinload(Consultation.clinic),
@@ -110,3 +116,31 @@ def list_medical_history(
         })
 
     return result
+
+def get_appointment_record(
+    db: Session,
+    current_user: User,
+    appointment_id: int,
+):
+    owner = get_owner_profile(db, current_user)
+
+    appointment = db.scalar(
+        select(Appointment).where(
+            Appointment.appointment_id == appointment_id,
+            Appointment.pet_owner_id == owner.pet_owner_id,
+        )
+    )
+
+    if appointment is None:
+        raise HTTPException(404, "Appointment not found.")
+
+    records = list_medical_history(
+        db=db,
+        current_user=current_user,
+        pet_id=appointment.pet_id,
+        offset=0,
+        limit=1,
+        appointment_id=appointment_id,
+    )
+
+    return records[0] if records else None

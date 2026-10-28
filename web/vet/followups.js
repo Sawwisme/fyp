@@ -51,6 +51,21 @@
 
         detail(content, 'Reason', item.reason);
         detail(content, 'Home-care instructions', item.care_instructions);
+        detail(
+            content,
+            'Owner photos required',
+            item.photos_required ? 'Yes' : 'No'
+        );
+
+        if (item.photos_required) {
+            detail(content, 'Photo requirements', item.photo_instructions);
+        }
+
+        detail(
+            content,
+            'In-clinic review required',
+            item.visit_required ? 'Yes' : 'No'
+        );
         detail(content, 'Review findings', item.assessment_information);
         detail(content, 'Notes', item.notes);
 

@@ -108,12 +108,14 @@ class AppointmentService {
 
   Future<List<Map<String, dynamic>>> getMyAppointments({
     DateTime? date,
+    bool followupOnly = false,
     int offset = 0,
     int limit = 20,
   }) async {
     final query = Uri(
       queryParameters: {
         if (date != null) 'appointment_date': _dateOnly(date),
+        'followup_only': '$followupOnly',
         'offset': '$offset',
         'limit': '$limit',
       },
@@ -259,5 +261,21 @@ class AppointmentService {
 
       rethrow;
     }
+  }
+
+  Future<Map<String, dynamic>?> getAppointmentRecord(
+      int appointmentId,
+      ) async {
+    final data = await api.get(
+      '/owner-medical-history/appointments/$appointmentId',
+    );
+
+    if (data == null) return null;
+
+    if (data is! Map<String, dynamic>) {
+      throw const ApiException('Invalid medical record response.');
+    }
+
+    return data;
   }
 }

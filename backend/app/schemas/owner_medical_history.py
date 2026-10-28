@@ -23,6 +23,9 @@ class OwnerFollowup(BaseModel):
     reason: str | None
     care_instructions: str | None
     status: str
+    photos_required: bool
+    photo_instructions: str | None
+    visit_required: bool
 
 
 class OwnerMedicalRecord(BaseModel):

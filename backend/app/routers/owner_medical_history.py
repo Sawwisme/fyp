@@ -31,3 +31,20 @@ def list_medical_history(
         offset,
         limit,
     )
+
+@router.get(
+    "/appointments/{appointment_id}",
+    response_model=OwnerMedicalRecord | None,
+)
+def get_appointment_record(
+    appointment_id: int,
+    current_user: User = Depends(
+        require_roles("pet_owner")
+    ),
+    db: Session = Depends(get_db),
+):
+    return owner_medical_history_service.get_appointment_record(
+        db,
+        current_user,
+        appointment_id,
+    )

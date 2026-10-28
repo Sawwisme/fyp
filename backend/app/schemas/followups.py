@@ -20,6 +20,9 @@ class FollowupResponse(BaseModel):
     status: str
     overdue: bool
     linked_visit: LinkedVisitSummary | None = None
+    photos_required: bool
+    photo_instructions: str | None
+    visit_required: bool
 
 class FollowupReview(BaseModel):
     model_config = ConfigDict(

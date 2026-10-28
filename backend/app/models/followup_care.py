@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, Date
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, Date, Boolean, text
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -35,6 +35,22 @@ class FollowupCare(Base):
     status = Column(String(20), nullable=False)
     notes = Column(Text, nullable=True)
 
+    photos_required = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=text("0"),
+    )
+
+    photo_instructions = Column(Text, nullable=True)
+
+    visit_required = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=text("0"),
+    )
+
     consultation = relationship(
         "Consultation",
         back_populates="followups",
@@ -43,5 +59,10 @@ class FollowupCare(Base):
     veterinarian = relationship("Veterinarian")
     images = relationship(
         "FollowupImage",
+        back_populates="followup",
+    )
+
+    submissions = relationship(
+        "FollowupSubmission",
         back_populates="followup",
     )

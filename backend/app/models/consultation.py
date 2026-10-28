@@ -73,6 +73,22 @@ class Consultation(Base):
     followup_reason = Column(Text, nullable=True)
     followup_instructions = Column(Text, nullable=True)
 
+    followup_photos_required = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=text("0"),
+    )
+
+    followup_photo_instructions = Column(Text, nullable=True)
+
+    followup_visit_required = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=text("0"),
+    )
+
     # Presenting complaint and consultation history.
     consultation_information = Column(Text, nullable=True)
     examination_findings = Column(Text, nullable=True)

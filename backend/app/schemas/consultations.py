@@ -74,6 +74,15 @@ class ConsultationSave(BaseModel):
     treatments: list[TreatmentInput] = Field(max_length=50)
     prescriptions: list[PrescriptionInput] = Field(max_length=50)
 
+    followup_photos_required: bool = False
+
+    followup_photo_instructions: str | None = Field(
+        default=None,
+        max_length=5000,
+    )
+
+    followup_visit_required: bool = False
+
     ai_analysis_id: int | None = Field(
         default=None,
         ge=1,
@@ -250,6 +259,9 @@ class ConsultationResponse(BaseModel):
 
     return_visit: ConsultationReturnVisit | None
     prescription_header: PrescriptionHeader
+    followup_photos_required: bool
+    followup_photo_instructions: str | None
+    followup_visit_required: bool
 
 class ConsultationSummary(BaseModel):
     consultation_id: int
