@@ -1,6 +1,7 @@
 from datetime import datetime
+from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, computed_field
+from pydantic import BaseModel, ConfigDict, computed_field, Field
 
 
 class FollowupPhotoResponse(BaseModel):
@@ -27,3 +28,53 @@ class FollowupSubmissionResponse(BaseModel):
     veterinarian_comment: str | None
     reviewed_at: datetime | None
     images: list[FollowupPhotoResponse]
+    decision_outcome: str | None
+
+class FollowupSubmissionReview(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        str_strip_whitespace=True,
+    )
+
+    outcome: Literal[
+        "complete",
+        "request_update",
+        "in_clinic",
+    ]
+
+    veterinarian_comment: str = Field(
+        min_length=1,
+        max_length=5000,
+    )
+    expected_reviewed_at: datetime | None
+
+    correction_reason: str | None = Field(
+    default=None,
+    min_length=5,
+    max_length=1000,
+    )
+
+class OwnerFollowupSubmissionState(BaseModel):
+    followup_care_id: int
+    followup_status: str
+    can_submit: bool
+    submission_state: Literal[
+        "action_needed",
+        "awaiting_review",
+        "update_requested",
+        "reviewed",
+        "completed",
+        "cancelled",
+    ]
+
+from datetime import date
+from app.schemas.owner_medical_history import OwnerFollowup
+
+
+class OwnerFollowupListItem(OwnerFollowup):
+    consultation_id: int
+    appointment_id: int
+    appointment_date: date
+    pet_id: int
+    pet_name: str
+    clinic_name: str

@@ -9,10 +9,12 @@
     <link rel="stylesheet" href="/web/styles.css">
     <link rel="stylesheet" href="/web/admin/dashboard.css">
     <link rel="stylesheet" href="/web/admin/layout.css">
+    <link rel="stylesheet" href="/web/vet/followup_updates.css">
 
     <script src="/web/vet/layout.js" defer></script>
     <script src="/web/vet/return_visit_booking.js" defer></script>
     <script src="/web/vet/linked_visit.js" defer></script>
+    <script src="/web/vet/followup_updates.js" defer></script>
     <script src="/web/vet/followups.js" defer></script>
 </head>
 
@@ -99,7 +101,7 @@
     <dialog id="followup-action-dialog" aria-labelledby="followup-action-title">
         <form id="followup-action-form">
             <div class="staff-heading">
-                <h2 id="followup-action-title">Record Review</h2>
+                <h2 id="followup-action-title">Cancel follow-up</h2>
                 <button id="followup-action-close" type="button" class="secondary compact-button"
                     aria-label="Close dialog">×</button>
             </div>
@@ -107,22 +109,7 @@
             <p id="followup-action-patient"></p>
 
             <fieldset id="followup-action-fields">
-                <div id="followup-review-fields">
-                    <p class="muted">
-                        Submit only after the review has taken place.
-                        The actual review time will be recorded now.
-                    </p>
-
-                    <label for="followup-review-findings">
-                        Review findings
-                    </label>
-                    <textarea id="followup-review-findings" rows="5" maxlength="10000"></textarea>
-
-                    <label for="followup-review-notes">Additional notes</label>
-                    <textarea id="followup-review-notes" rows="3" maxlength="5000"></textarea>
-                </div>
-
-                <div id="followup-cancel-fields" hidden>
+                <div id="followup-cancel-fields">
                     <label for="followup-cancel-reason">
                         Cancellation reason
                     </label>
@@ -137,10 +124,66 @@
                     Close
                 </button>
                 <button id="followup-action-submit" type="submit" class="compact-button">
-                    Save Review
+                    Confirm cancellation
                 </button>
             </div>
         </form>
+    </dialog>
+
+    <dialog id="followup-updates-dialog" aria-labelledby="followup-updates-title">
+        <header class="updates-header">
+            <div>
+                <h2 id="followup-updates-title">Owner updates</h2>
+                <p id="followup-updates-patient" class="muted"></p>
+            </div>
+
+            <button id="followup-updates-close" type="button" aria-label="Close owner updates">
+                ×
+            </button>
+        </header>
+
+        <div class="updates-body">
+            <p class="muted">
+                Review the owner's update and choose the next step.
+                Selecting “No further follow-up needed” completes the task.
+            </p>
+
+            <p id="followup-updates-message" role="status" aria-live="polite"></p>
+
+            <button id="followup-updates-retry" type="button" class="secondary compact-button" hidden>
+                Try again
+            </button>
+
+            <div id="followup-updates-list"></div>
+        </div>
+
+        <footer class="updates-footer">
+            <button id="followup-updates-previous" type="button" class="secondary compact-button" disabled>
+                Previous
+            </button>
+
+            <span id="followup-updates-page"></span>
+
+            <button id="followup-updates-next" type="button" class="secondary compact-button" disabled>
+                Next
+            </button>
+        </footer>
+    </dialog>
+
+    <dialog id="followup-photo-dialog" aria-labelledby="followup-photo-title">
+        <header>
+            <h2 id="followup-photo-title">Follow-up photo</h2>
+
+            <button id="followup-photo-close" type="button" aria-label="Close photo">
+                ×
+            </button>
+        </header>
+
+        <div class="followup-photo-canvas">
+            <img id="followup-photo-large" alt="Enlarged owner-submitted follow-up photo">
+        </div>
+
+        <p>Click the image to switch between fitted and full-size views.</p>
     </dialog>
 </body>
 

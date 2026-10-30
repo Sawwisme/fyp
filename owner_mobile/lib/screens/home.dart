@@ -297,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _petSummary() {
     if (_loadingPets) {
       return _panel(
-        title: 'Your pet',
+        title: 'My pets',
         children: const [
           Center(child: CircularProgressIndicator()),
         ],
@@ -306,7 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (_petError != null) {
       return _panel(
-        title: 'Your pet',
+        title: 'My pets',
         children: [
           Text(_petError!),
           TextButton(
@@ -317,9 +317,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    final pet = _pet;
-
-    if (pet == null) {
+    if (_previewPets.isEmpty) {
       return _panel(
         title: 'Welcome to VetDental',
         children: [
@@ -328,7 +326,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 16),
           FilledButton.icon(
-            onPressed: _openPets,
+            onPressed: _registerPet,
             icon: const Icon(Icons.add),
             label: const Text('Add your first pet'),
           ),
@@ -337,33 +335,51 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return _panel(
-      title: pet['pet_name'] as String,
+      title: 'My pets',
       children: [
-        Row(
-          children: [
-            const CircleAvatar(
-              radius: 28,
-              backgroundColor: Color(0xFFE7F2E9),
-              child: Icon(Icons.pets, color: _green, size: 30),
+        for (final pet in _previewPets)
+          Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(
+                color: const Color(0xFFDCE6DE),
+              ),
+              borderRadius: BorderRadius.circular(14),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 6,
+              ),
+              leading: const CircleAvatar(
+                backgroundColor: Color(0xFFE7F2E9),
+                child: Icon(Icons.pets, color: _green),
+              ),
+              title: Text(
+                pet['pet_name'] as String,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              subtitle: Text(
                 '${pet['species']}'
-                    '${pet['breed'] == null ? '' : ' • ${pet['breed']}'}',
+                    '${pet['breed'] == null ? '' : ' · ${pet['breed']}'}',
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => _openPetProfile(
+                pet['pet_id'] as int,
               ),
             ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        OutlinedButton.icon(
-          onPressed: _openPetProfile,
-          icon: const Icon(Icons.pets_outlined),
-          label: const Text('View pet profile'),
-        ),
+          ),
         TextButton(
           onPressed: _openPets,
-          child: const Text('Manage all my pets'),
+          child: const Text('View all pets'),
+        ),
+        OutlinedButton.icon(
+          onPressed: _registerPet,
+          icon: const Icon(Icons.add),
+          label: const Text('Add pet'),
         ),
       ],
     );

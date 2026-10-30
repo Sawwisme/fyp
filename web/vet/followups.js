@@ -40,6 +40,24 @@
         parent.appendChild(paragraph);
     }
 
+    function statusCell(item) {
+        const td = document.createElement('td');
+        const badge = document.createElement('span');
+
+        const state = item.overdue ? 'overdue' : item.status;
+        badge.className = `followup-status followup-status-${state}`;
+
+        badge.textContent = {
+            overdue: 'Overdue',
+            pending: 'Pending',
+            completed: 'Completed',
+            cancelled: 'Cancelled',
+        }[state] || state;
+
+        td.appendChild(badge);
+        return td;
+    }
+
     function detailsCell(item) {
         const element = document.createElement('td');
         const details = document.createElement('details');
@@ -90,10 +108,15 @@
     let actionUncertain = false;
 
     function openAction(item, mode) {
-        if (actionBusy || loading || dialog.open) return;
+        if (
+            mode !== 'cancel' ||
+            actionBusy ||
+            loading ||
+            dialog.open
+        ) return;
 
         selectedFollowup = item;
-        actionMode = mode;
+        actionMode = 'cancel';
         actionUncertain = false;
 
         actionForm.reset();
@@ -101,27 +124,15 @@
         submitAction.disabled = false;
         actionMessage.textContent = '';
 
-        const reviewing = mode === 'review';
-
-        get('followup-action-title').textContent = reviewing
-            ? 'Record Review'
-            : 'Cancel Follow-up';
-
-        submitAction.textContent = reviewing
-            ? 'Save Review'
-            : 'Confirm Cancellation';
+        get('followup-action-title').textContent = 'Cancel follow-up';
+        submitAction.textContent = 'Confirm cancellation';
 
         get('followup-action-patient').textContent =
             `${item.pet_name} · Owner: ${item.owner_name}`;
 
-        get('followup-review-fields').hidden = !reviewing;
-        get('followup-cancel-fields').hidden = reviewing;
-
-        get('followup-review-findings').required = reviewing;
-
         const reason = get('followup-cancel-reason');
-        reason.required = !reviewing;
-        reason.minLength = reviewing ? 0 : 5;
+        reason.required = true;
+        reason.minLength = 5;
 
         dialog.showModal();
     }
@@ -156,29 +167,16 @@
             !selectedFollowup
         ) return;
 
-        const findings = get('followup-review-findings').value.trim();
-        const notes = get('followup-review-notes').value.trim();
         const reason = get('followup-cancel-reason').value.trim();
 
-        if (actionMode === 'review' && !findings) {
-            actionMessage.textContent = 'Enter the review findings.';
-            get('followup-review-findings').focus();
-            return;
-        }
-
-        if (actionMode === 'cancel' && reason.length < 5) {
+        if (reason.length < 5) {
             actionMessage.textContent =
                 'Enter a cancellation reason of at least 5 characters.';
             get('followup-cancel-reason').focus();
             return;
         }
 
-        const body = actionMode === 'review'
-            ? {
-                assessment_information: findings,
-                notes: notes || null,
-            }
-            : { reason };
+        const body = { reason };
 
         actionBusy = true;
         actionFields.disabled = true;
@@ -191,7 +189,7 @@
 
         try {
             await vetRequest(
-                `/followups/${selectedFollowup.followup_care_id}/${actionMode}`,
+                `/followups/${selectedFollowup.followup_care_id}/cancel`,
                 { method: 'POST', body }
             );
 
@@ -249,29 +247,83 @@
                     cell(dateLabel(item.recommended_date)),
                     cell(item.pet_name),
                     cell(item.owner_name),
-                    cell(
-                        item.overdue
-                            ? 'Pending — overdue'
-                            : item.status.charAt(0).toUpperCase() +
-                            item.status.slice(1)
-                    ),
+                    statusCell(item),
                     detailsCell(item)
                 );
 
                 const action = document.createElement('td');
-                const link = document.createElement('a');
+                const toolbar = document.createElement('div');
+                toolbar.className = 'followup-action-toolbar';
 
+                const updates = document.createElement('button');
+                updates.type = 'button';
+                updates.className = 'secondary compact-button';
+                updates.textContent = 'View updates';
+                updates.addEventListener('click', () => {
+                    openFollowupUpdates(item, () => load(page));
+                });
+
+                const menu = document.createElement('div');
+                menu.className = 'followup-more';
+
+                const summary = document.createElement('button');
+                summary.type = 'button';
+                summary.className = 'followup-more-trigger';
+                summary.textContent = 'More actions ⋯';
+                summary.setAttribute('aria-expanded', 'false');
+
+                const options = document.createElement('div');
+                options.className = 'followup-more-options';
+                options.setAttribute('popover', 'auto');
+
+                summary.addEventListener('click', () => {
+                    if (options.matches(':popover-open')) {
+                        options.hidePopover();
+                        return;
+                    }
+
+                    options.showPopover();
+
+                    const rect = summary.getBoundingClientRect();
+                    const width = options.offsetWidth;
+                    const height = options.offsetHeight;
+
+                    const left = Math.max(
+                        12,
+                        Math.min(rect.right - width, window.innerWidth - width - 12)
+                    );
+
+                    let top = rect.bottom + 6;
+
+                    if (top + height > window.innerHeight - 12) {
+                        top = Math.max(12, rect.top - height - 6);
+                    }
+
+                    options.style.left = `${left}px`;
+                    options.style.top = `${top}px`;
+                });
+
+                options.addEventListener('toggle', () => {
+                    summary.setAttribute(
+                        'aria-expanded',
+                        String(options.matches(':popover-open'))
+                    );
+                });
+
+                options.addEventListener('click', event => {
+                    if (event.target.closest('button, a')) {
+                        options.hidePopover();
+                    }
+                });
+
+                const link = document.createElement('a');
                 link.href =
                     `/web/vet/consultation.html?id=${item.consultation_id}`;
                 link.textContent = 'View original consultation';
-
-                action.appendChild(link);
+                options.appendChild(link);
 
                 if (item.status === 'pending') {
-                    const buttons = document.createElement('div');
-                    buttons.className = 'followup-row-actions';
-
-                    buttons.appendChild(
+                    options.appendChild(
                         createReturnVisitBookingControl(
                             'followup',
                             item.followup_care_id,
@@ -281,24 +333,27 @@
                     );
 
                     for (const [mode, label] of [
-                        ['review', 'Record Review'],
-                        ['cancel', 'Cancel Follow-up'],
+                        ['cancel', 'Cancel follow-up'],
                     ]) {
                         const button = document.createElement('button');
                         button.type = 'button';
-                        button.className = 'secondary compact-button';
                         button.textContent = label;
-                        button.addEventListener(
-                            'click',
-                            () => openAction(item, mode)
-                        );
+                        button.className = mode === 'cancel'
+                            ? 'followup-menu-danger'
+                            : '';
 
-                        buttons.appendChild(button);
+                        button.addEventListener('click', () => {
+                            options.hidePopover();
+                            openAction(item, mode);
+                        });
+
+                        options.appendChild(button);
                     }
-
-                    action.appendChild(buttons);
                 }
 
+                menu.append(summary, options);
+                toolbar.append(updates, menu);
+                action.appendChild(toolbar);
                 row.appendChild(action);
                 rows.appendChild(row);
             }
@@ -309,6 +364,9 @@
 
             previous.disabled = page === 0;
             next.disabled = data.length <= pageSize;
+            const showPagination = page > 0 || data.length > pageSize;
+            previous.hidden = !showPagination;
+            next.hidden = !showPagination;
         } catch (error) {
             if (request !== version) return;
 

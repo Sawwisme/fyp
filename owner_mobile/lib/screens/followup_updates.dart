@@ -33,15 +33,20 @@ class _FollowupUpdatesScreenState extends State<FollowupUpdatesScreen> {
   bool _blocked = false;
   String? _message;
   int _page = 0;
+  bool _canSubmit = false;
+  bool _checkingState = true;
+  String _submissionState = '';
+  String? _stateError;
+  int _stateVersion = 0;
 
   int get _followupId => widget.followup['followup_care_id'] as int;
-  bool get _pending => widget.followup['status'] == 'pending';
   bool get _photosRequired => widget.followup['photos_required'] == true;
 
   @override
   void initState() {
     super.initState();
     _history = _fetch(0);
+    _refreshSubmissionState();
   }
 
   @override
@@ -63,6 +68,8 @@ class _FollowupUpdatesScreenState extends State<FollowupUpdatesScreen> {
       _page = page;
       _history = _fetch(page);
     });
+
+    _refreshSubmissionState();
   }
 
   String _text(dynamic value) {
@@ -137,7 +144,13 @@ class _FollowupUpdatesScreenState extends State<FollowupUpdatesScreen> {
   }
 
   Future<void> _submit() async {
-    if (_submitting || _picking || _blocked || !_pending) return;
+    if (_submitting ||
+        _picking ||
+        _blocked ||
+        _checkingState ||
+        !_canSubmit) {
+      return;
+    }
 
     if (_photosRequired && _photos.isEmpty) {
       setState(() => _message = 'Your vet requires at least one photo.');
@@ -193,10 +206,69 @@ class _FollowupUpdatesScreenState extends State<FollowupUpdatesScreen> {
       });
     } finally {
       if (mounted) {
+        await _refreshSubmissionState();
+        }
+
+        if (mounted) {
         setState(() => _submitting = false);
+        }
       }
+  }
+
+Future<void> _refreshSubmissionState() async {
+  final request = ++_stateVersion;
+
+  setState(() {
+    _checkingState = true;
+    _canSubmit = false;
+    _stateError = null;
+  });
+
+  try {
+    final data = await widget.service.getSubmissionState(
+      _followupId,
+    );
+
+    if (!mounted || request != _stateVersion) return;
+
+    setState(() {
+      _canSubmit = data['can_submit'] as bool;
+      _submissionState = data['submission_state'] as String;
+    });
+  } catch (error) {
+    if (!mounted || request != _stateVersion) return;
+
+    setState(() {
+      _canSubmit = false;
+      _stateError = error is ApiException
+          ? error.message
+          : 'Could not check follow-up status.';
+    });
+  } finally {
+    if (mounted && request == _stateVersion) {
+      setState(() => _checkingState = false);
     }
   }
+}
+
+String get _submissionStatusMessage {
+  switch (_submissionState) {
+    case 'awaiting_review':
+      return 'Your update is awaiting vet review. '
+          'You can submit again if your vet requests another update.';
+    case 'reviewed':
+      return 'Your vet has reviewed your update. '
+          'No additional submission has been requested.';
+    case 'completed':
+      return 'This follow-up is completed. '
+          'Your updates and vet feedback remain available below.';
+    case 'cancelled':
+      return 'This follow-up is cancelled. '
+          'Previous updates remain available below.';
+    default:
+      return 'Please refresh to check the latest follow-up status.';
+  }
+}
 
   Widget _photo(int imageId) {
     final future = _photoRequests.putIfAbsent(
@@ -292,7 +364,8 @@ class _FollowupUpdatesScreenState extends State<FollowupUpdatesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final disabled = _submitting || _picking || _blocked;
+    final disabled =
+        _submitting || _picking || _blocked || _checkingState;
 
     return PopScope(
       canPop: !_submitting,
@@ -343,7 +416,7 @@ class _FollowupUpdatesScreenState extends State<FollowupUpdatesScreen> {
                 ),
               ),
             ),
-            if (_pending) ...[
+            if (_canSubmit && !_checkingState) ...[
               const SizedBox(height: 16),
               TextField(
                 controller: _comment,
@@ -408,10 +481,27 @@ class _FollowupUpdatesScreenState extends State<FollowupUpdatesScreen> {
                 child: Text(_submitting ? 'Submitting…' : 'Submit Update'),
               ),
             ] else
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Text(
-                  'This follow-up is closed. Previous updates remain available.',
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (_checkingState)
+                        const LinearProgressIndicator()
+                      else ...[
+                        Text(
+                          _stateError ?? _submissionStatusMessage,
+                          style: const TextStyle(height: 1.5),
+                        ),
+                        if (_stateError != null)
+                          TextButton(
+                            onPressed: _refreshSubmissionState,
+                            child: const Text('Retry'),
+                          ),
+                      ],
+                    ],
+                  ),
                 ),
               ),
             if (_message != null)

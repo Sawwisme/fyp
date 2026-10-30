@@ -7,10 +7,12 @@ from sqlalchemy import (
     String,
     Text,
     text,
+    select,
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, column_property
 
 from app.database import Base
+from app.models.followup_review_decision import FollowupReviewDecision
 
 
 class FollowupSubmission(Base):
@@ -66,6 +68,17 @@ class FollowupSubmission(Base):
     )
 
     reviewed_at = Column(DateTime, nullable=True)
+
+    decision_outcome = column_property(
+    select(FollowupReviewDecision.outcome)
+    .where(
+        FollowupReviewDecision.submission_id == submission_id
+    )
+    .order_by(FollowupReviewDecision.decision_id.desc())
+    .limit(1)
+    .correlate_except(FollowupReviewDecision)
+    .scalar_subquery()
+)
 
     followup = relationship(
         "FollowupCare",

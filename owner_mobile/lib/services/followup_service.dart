@@ -82,4 +82,47 @@ class FollowupService {
   Future<Uint8List> getPhoto(int imageId) {
     return api.getBytes('/followup-media/$imageId');
   }
+
+  Future<Map<String, dynamic>> getSubmissionState(
+      int followupId,
+      ) async {
+    final data = await api.get(
+      '/owner-followups/$followupId/submission-state',
+    );
+
+    if (data is! Map<String, dynamic> ||
+        data['can_submit'] is! bool ||
+        data['submission_state'] is! String) {
+      throw const ApiException('Invalid follow-up status response.');
+    }
+
+    return data;
+  }
+
+  Future<List<Map<String, dynamic>>> getFollowups({
+    String? status,
+    int offset = 0,
+    int limit = 11,
+  }) async {
+    final query = Uri(
+      queryParameters: {
+        if (status != null) 'task_status': status,
+        'offset': '$offset',
+        'limit': '$limit',
+      },
+    ).query;
+
+    final data = await api.get('/owner-followups?$query');
+
+    if (data is! List) {
+      throw const ApiException('Invalid follow-up list response.');
+    }
+
+    return data.map((item) {
+      if (item is! Map<String, dynamic>) {
+        throw const ApiException('Invalid follow-up record.');
+      }
+      return item;
+    }).toList();
+  }
 }

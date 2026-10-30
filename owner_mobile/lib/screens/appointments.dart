@@ -8,6 +8,8 @@ import 'clinic_picker.dart';
 import 'emergency.dart';
 import 'reschedule_appointment.dart';
 import 'appointment_details.dart';
+import '../services/followup_service.dart';
+import 'followup_care.dart';
 
 class AppointmentsPage extends StatefulWidget {
   final AppointmentService service;
@@ -99,6 +101,28 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
       if (!mounted) return;
 
       await _load(reset: true);
+    } finally {
+      if (mounted) {
+        setState(() => _openingBooking = false);
+      }
+    }
+  }
+
+  Future<void> _openFollowupCare() async {
+    if (_loading || _openingBooking) return;
+
+    setState(() => _openingBooking = true);
+
+    try {
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute(
+          builder: (_) => FollowupCareScreen(
+            service: FollowupService(widget.service.api),
+          ),
+        ),
+      );
+
+      if (mounted) await _load(reset: true);
     } finally {
       if (mounted) {
         setState(() => _openingBooking = false);
@@ -438,6 +462,14 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
                 : _startBooking,
             icon: const Icon(Icons.add),
             label: const Text('Book appointment'),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: _loading || _openingBooking
+                ? null
+                : _openFollowupCare,
+            icon: const Icon(Icons.assignment_outlined),
+            label: const Text('Follow-up Care'),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
