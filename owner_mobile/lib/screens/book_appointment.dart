@@ -9,12 +9,15 @@ class BookAppointmentScreen extends StatefulWidget {
   final Map<String, dynamic> clinic;
   final AppointmentService service;
   final PetService petService;
+  final Map<String, dynamic>? followupContext;
+
 
   const BookAppointmentScreen({
     super.key,
     required this.clinic,
     required this.service,
     required this.petService,
+    this.followupContext,
   });
 
   @override
@@ -97,6 +100,33 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
     });
 
     try {
+      final followup = widget.followupContext;
+
+      if (followup != null) {
+        setState(() {
+          _pets = [
+            {
+              'pet_id': followup['pet_id'],
+              'pet_name': followup['pet_name'],
+            },
+          ];
+
+          _vets = [
+            {
+              'veterinarian_id': followup['veterinarian_id'],
+              'full_name': followup['veterinarian_name'],
+            },
+          ];
+
+          _petId = followup['pet_id'] as int;
+          _vetId = followup['veterinarian_id'] as int;
+          _type = 'follow_up';
+        });
+
+        await _loadSlots();
+        return;
+      }
+
       final results = await Future.wait([
         _allPages(
               (offset) => widget.petService.getPets(
@@ -270,6 +300,8 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
         petId: _petId!,
         timeSlotId: _slotId!,
         appointmentType: _type,
+        followupCareId:
+        widget.followupContext?['followup_care_id'] as int?,
       );
 
       if (!mounted) return;
@@ -365,7 +397,9 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               child: Text(pet['pet_name'] as String),
             );
           }).toList(),
-          onChanged: _saving || _uncertainBooking
+          onChanged: widget.followupContext != null ||
+              _saving ||
+              _uncertainBooking
               ? null
               : (value) => setState(() => _petId = value),
         ),
@@ -388,7 +422,9 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               ),
             );
           }).toList(),
-          onChanged: _saving || _uncertainBooking
+          onChanged: widget.followupContext != null ||
+              _saving ||
+              _uncertainBooking
               ? null
               : (value) {
             setState(() => _vetId = value);
@@ -417,7 +453,9 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               child: Text('Follow-up'),
             ),
           ],
-          onChanged: _saving || _uncertainBooking
+          onChanged: widget.followupContext != null ||
+              _saving ||
+              _uncertainBooking
               ? null
               : (value) {
             if (value != null) setState(() => _type = value);

@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from fastapi import HTTPException, UploadFile
-from sqlalchemy import select
+from sqlalchemy import case, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.services.vet_profile_service import get_profile
@@ -149,6 +149,7 @@ def create_submission(
 
         # Validate every photo before writing any files.
         prepared = [prepare_photo(photo) for photo in files]
+        
 
         now = datetime.now(timezone.utc).replace(tzinfo=None)
 
@@ -386,14 +387,44 @@ def review_submission(
                     "A newer owner update exists. Review the latest update instead.",
                 )
 
-        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        booked_review_id = db.scalar(
+            select(Appointment.appointment_id)
+            .where(
+                Appointment.followup_care_id == followup_id,
+                Appointment.status.notin_(["cancelled", "rejected"]),
+            )
+            .limit(1)
+        )
 
-        if data.outcome == "complete":
-            if followup.visit_required:
+        if booked_review_id is not None:
+            locked_outcome = submission.decision_outcome or "in_clinic"
+
+            if (
+                data.outcome != locked_outcome
+                or data.visit_waiver_reason is not None
+            ):
                 raise HTTPException(
                     409,
-                    "An in-clinic review is required. Complete this "
-                    "follow-up through its review appointment.",
+                    "A review appointment is already booked. "
+                    "Only feedback can be updated; the outcome is locked.",
+                )
+
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+
+        if data.visit_waiver_reason is not None and (
+            data.outcome != "complete" or not followup.visit_required
+        ):
+            raise HTTPException(
+                422,
+                "A visit waiver applies only when completing a follow-up "
+                "that currently requires an in-clinic review.",
+            )
+
+        if data.outcome == "complete":
+            if followup.visit_required and not data.visit_waiver_reason:
+                raise HTTPException(
+                    422,
+                    "Explain why the in-clinic review is no longer needed.",
                 )
 
             linked_id = db.scalar(
@@ -434,6 +465,8 @@ def review_submission(
                 correction_reason=data.correction_reason,
                 submission_id=submission.submission_id,
                 veterinarian_id=veterinarian.veterinarian_id,
+                previous_visit_required=followup.visit_required,
+                visit_waiver_reason=data.visit_waiver_reason,
                 outcome=data.outcome,
                 veterinarian_comment=data.veterinarian_comment,
                 decided_at=now,
@@ -448,6 +481,7 @@ def review_submission(
 
         if data.outcome == "complete":
             submission.review_status = "reviewed"
+            followup.visit_required = False
             followup.status = "completed"
             followup.followup_date = now
             followup.assessment_information = data.veterinarian_comment
@@ -533,6 +567,9 @@ def get_owner_submission_state(
             state = "update_requested"
             can_submit = True
 
+        elif followup.visit_required:
+            state = "visit_required"
+
     return {
         "followup_care_id": followup.followup_care_id,
         "followup_status": followup.status,
@@ -549,6 +586,42 @@ def list_owner_followups(
 ):
     owner = get_owner_profile(db, current_user)
 
+    latest_status = (
+        select(FollowupSubmission.review_status)
+        .where(
+            FollowupSubmission.followup_care_id
+            == FollowupCare.followup_care_id
+        )
+        .order_by(
+            FollowupSubmission.submitted_at.desc(),
+            FollowupSubmission.submission_id.desc(),
+        )
+        .limit(1)
+        .correlate(FollowupCare)
+        .scalar_subquery()
+    )
+
+    awaiting_review = (
+        select(FollowupSubmission.submission_id)
+        .where(
+            FollowupSubmission.followup_care_id
+            == FollowupCare.followup_care_id,
+            FollowupSubmission.review_status == "submitted",
+        )
+        .correlate(FollowupCare)
+        .exists()
+    )
+
+    submission_state = case(
+        (FollowupCare.status == "completed", "completed"),
+        (FollowupCare.status == "cancelled", "cancelled"),
+        (awaiting_review, "awaiting_review"),
+        (latest_status.is_(None), "action_needed"),
+        (latest_status == "more_requested", "update_requested"),
+        (FollowupCare.visit_required.is_(True), "visit_required"),
+        else_="reviewed",
+    ).label("submission_state")
+
     statement = (
         select(
             FollowupCare,
@@ -556,6 +629,7 @@ def list_owner_followups(
             Appointment.appointment_date,
             Pet.pet_name,
             Clinic.clinic_name,
+            submission_state,
         )
         .join(
             Consultation,
@@ -615,6 +689,7 @@ def list_owner_followups(
             "photos_required": followup.photos_required,
             "photo_instructions": followup.photo_instructions,
             "visit_required": followup.visit_required,
+            "submission_state": progress_state,
         }
         for (
             followup,
@@ -622,5 +697,60 @@ def list_owner_followups(
             appointment_date,
             pet_name,
             clinic_name,
+            progress_state,
         ) in records
     ]
+
+def get_owner_booking_context(
+    db: Session,
+    current_user: User,
+    followup_id: int,
+):
+    owner = get_owner_profile(db, current_user)
+
+    followup = db.scalar(
+        owner_followup_query(
+            owner.pet_owner_id,
+            followup_id,
+        )
+    )
+
+    if followup is None:
+        raise HTTPException(404, "Follow-up not found.")
+
+    if followup.status != "pending":
+        raise HTTPException(
+            409,
+            "This follow-up is already closed.",
+        )
+
+    if not followup.visit_required:
+        raise HTTPException(
+            409,
+            "An in-clinic review has not been requested.",
+        )
+
+    existing_id = db.scalar(
+        select(Appointment.appointment_id)
+        .where(
+            Appointment.followup_care_id == followup_id,
+            Appointment.status.notin_(["cancelled", "rejected"]),
+        )
+        .order_by(Appointment.appointment_id.desc())
+        .limit(1)
+    )
+
+    consultation = followup.consultation
+    veterinarian = followup.veterinarian
+
+    return {
+        "followup_care_id": followup.followup_care_id,
+        "pet_id": followup.pet_id,
+        "pet_name": followup.pet.pet_name,
+        "clinic_id": consultation.clinic_id,
+        "clinic_name": consultation.clinic.clinic_name,
+        "veterinarian_id": followup.veterinarian_id,
+        "veterinarian_name": veterinarian.user.full_name,
+        "recommended_date": followup.recommended_date,
+        "existing_appointment_id": existing_id,
+    }

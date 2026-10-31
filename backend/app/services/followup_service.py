@@ -15,7 +15,7 @@ from app.models import (
     User,
 )
 from app.services.vet_profile_service import get_profile
-from app.schemas.followups import FollowupReview, FollowupCancel
+from app.schemas.followups import FollowupCancel
 from app.services.return_visit_service import get_linked_visits
 
 
@@ -196,44 +196,6 @@ def _reject_linked_appointment(
             "that appointment's consultation. To cancel the "
             "follow-up, cancel its linked appointment first.",
         )
-
-def record_review(
-    db: Session,
-    current_user: User,
-    followup_id: int,
-    data: FollowupReview,
-):
-    try:
-        record = _lock_pending_followup(
-            db, current_user, followup_id
-        )
-
-        _reject_linked_appointment(
-            db,
-            followup_id,
-        )
-
-        record.assessment_information = (
-            data.assessment_information
-        )
-        record.notes = data.notes
-        record.followup_date = datetime.now(
-            timezone.utc
-        ).replace(tzinfo=None)
-        record.status = "completed"
-
-        result = {
-            "followup_care_id": record.followup_care_id,
-            "status": record.status,
-            "followup_date": record.followup_date,
-        }
-
-        db.commit()
-        return result
-
-    except Exception:
-        db.rollback()
-        raise
 
 
 def cancel_followup(

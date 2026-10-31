@@ -6,12 +6,13 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.models import Appointment, PetOwner, Schedule, TimeSlot
 from app.services.vet_profile_service import get_profile
+from app.services.vet_absence_service import get_rearrangement_ids
 
 
 def list_my_appointments(
     db: Session,
     current_user,
-    appointment_date: date,
+    appointment_date: date | None,
     offset: int,
     limit: int,
 ):
@@ -33,7 +34,11 @@ def list_my_appointments(
             == veterinarian.veterinarian_id,
             Schedule.veterinarian_id
             == veterinarian.veterinarian_id,
-            Schedule.schedule_date == appointment_date,
+            (
+                Schedule.schedule_date == appointment_date
+                if appointment_date is not None
+                else True
+            ),
         )
         .options(
             selectinload(Appointment.pet),
@@ -44,6 +49,7 @@ def list_my_appointments(
             selectinload(Appointment.consultation),
         )
         .order_by(
+            Schedule.schedule_date.desc(),
             TimeSlot.start_time,
             Appointment.appointment_id,
         )
@@ -51,10 +57,15 @@ def list_my_appointments(
         .limit(limit)
     ).all()
 
+    rearrangement_ids = get_rearrangement_ids(
+    db,
+    [record.appointment_id for record in records],
+    )
+
     return [
         {
             "appointment_id": record.appointment_id,
-            "appointment_date": appointment_date,
+            "appointment_date": record.appointment_date,
             "start_time": record.time_slot.start_time,
             "end_time": record.time_slot.end_time,
             "pet_id": record.pet_id,
@@ -87,6 +98,9 @@ def list_my_appointments(
                 record.emergency_request.urgency_level
                 if record.emergency_request is not None
                 else None
+            ),
+            "needs_rearrangement": (
+                record.appointment_id in rearrangement_ids
             ),
         }
         for record in records
@@ -162,3 +176,27 @@ def get_my_calendar(
     ).mappings().all()
 
     return [dict(record) for record in records]
+
+def get_my_all_time_count(db: Session, current_user):
+    veterinarian = get_profile(db, current_user)
+
+    total = db.scalar(
+        select(func.count(Appointment.appointment_id))
+        .select_from(Appointment)
+        .join(
+            TimeSlot,
+            TimeSlot.time_slot_id == Appointment.time_slot_id,
+        )
+        .join(
+            Schedule,
+            Schedule.schedule_id == TimeSlot.schedule_id,
+        )
+        .where(
+            Appointment.veterinarian_id
+            == veterinarian.veterinarian_id,
+            Schedule.veterinarian_id
+            == veterinarian.veterinarian_id,
+        )
+    )
+
+    return {"total": int(total or 0)}

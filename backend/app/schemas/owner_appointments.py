@@ -16,6 +16,12 @@ class OwnerAppointmentCreate(BaseModel):
         "follow_up",
     ] = "dental_checkup"
 
+    followup_care_id: int | None = Field(
+    default=None,
+    ge=1,
+    le=2147483647,
+    )
+
 
 class OwnerAppointmentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -47,6 +53,7 @@ class OwnerAppointmentListItem(BaseModel):
     appointment_type: str
     status: str
     has_pending_followup: bool = False
+    needs_rearrangement: bool = False
 
 class OwnerAppointmentReschedule(BaseModel):
     model_config = ConfigDict(extra="forbid")

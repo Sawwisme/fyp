@@ -103,7 +103,6 @@
     const actionMessage = get('followup-action-message');
 
     let selectedFollowup = null;
-    let actionMode = 'review';
     let actionBusy = false;
     let actionUncertain = false;
 
@@ -116,7 +115,6 @@
         ) return;
 
         selectedFollowup = item;
-        actionMode = 'cancel';
         actionUncertain = false;
 
         actionForm.reset();
@@ -323,14 +321,6 @@
                 options.appendChild(link);
 
                 if (item.status === 'pending') {
-                    options.appendChild(
-                        createReturnVisitBookingControl(
-                            'followup',
-                            item.followup_care_id,
-                            item.linked_visit,
-                            () => load(0)
-                        )
-                    );
 
                     for (const [mode, label] of [
                         ['cancel', 'Cancel follow-up'],

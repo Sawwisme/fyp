@@ -14,6 +14,7 @@ from app.models import (
     Veterinarian,
 )
 from app.services.admin_profile_service import get_admin_record
+from app.services.vet_absence_service import get_rearrangement_ids
 
 
 def get_overview(
@@ -87,6 +88,11 @@ def get_overview(
         ).all()
     )
 
+    rearrangement_ids = get_rearrangement_ids(
+    db,
+    [appointment.appointment_id for appointment in appointments],
+    )
+
     appointments_by_slot = {}
 
     for appointment in appointments:
@@ -106,6 +112,9 @@ def get_overview(
             "appointment_type": appointment.appointment_type,
             "appointment_source": appointment.appointment_source,
             "status": appointment.status,
+            "needs_rearrangement": (
+                appointment.appointment_id in rearrangement_ids
+            ),
         }
 
         appointments_by_slot.setdefault(

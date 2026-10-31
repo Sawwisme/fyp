@@ -54,17 +54,24 @@ class FollowupSubmissionReview(BaseModel):
     max_length=1000,
     )
 
+    visit_waiver_reason: str | None = Field(
+    default=None,
+    min_length=10,
+    max_length=1000,
+    )
+
 class OwnerFollowupSubmissionState(BaseModel):
     followup_care_id: int
     followup_status: str
     can_submit: bool
     submission_state: Literal[
-        "action_needed",
-        "awaiting_review",
-        "update_requested",
-        "reviewed",
-        "completed",
-        "cancelled",
+    "action_needed",
+    "awaiting_review",
+    "update_requested",
+    "visit_required",
+    "reviewed",
+    "completed",
+    "cancelled",
     ]
 
 from datetime import date
@@ -78,3 +85,15 @@ class OwnerFollowupListItem(OwnerFollowup):
     pet_id: int
     pet_name: str
     clinic_name: str
+    submission_state: str
+
+class OwnerFollowupBookingContext(BaseModel):
+    followup_care_id: int
+    pet_id: int
+    pet_name: str
+    clinic_id: int
+    clinic_name: str
+    veterinarian_id: int
+    veterinarian_name: str
+    recommended_date: date | None
+    existing_appointment_id: int | None

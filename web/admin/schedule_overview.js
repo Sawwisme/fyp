@@ -285,7 +285,14 @@
                             `${appointment.pet_name} · ` +
                             `${appointment.owner_name} · ` +
                             `${appointment.appointment_type.replaceAll('_', ' ')} · ` +
-                            appointment.status;
+                            (appointment.needs_rearrangement
+                                ? 'Needs rearrangement'
+                                : appointment.status);
+
+                        if (appointment.needs_rearrangement) {
+                            description.style.color = '#b42318';
+                            description.style.fontWeight = '600';
+                        }
 
                         item.appendChild(description);
                     }

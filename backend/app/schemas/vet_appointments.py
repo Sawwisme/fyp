@@ -22,6 +22,7 @@ class VetAppointmentResponse(BaseModel):
 
     consultation_id: int | None = None
     consultation_status: str | None = None
+    needs_rearrangement: bool = False
 
 class VetCalendarEntry(BaseModel):
     schedule_id: int

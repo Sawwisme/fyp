@@ -125,4 +125,16 @@ class FollowupService {
       return item;
     }).toList();
   }
+
+  Future<Map<String, dynamic>> getBookingContext(int followupId) async {
+    final data = await api.get(
+      '/owner-followups/$followupId/booking-context',
+    );
+
+    if (data is! Map<String, dynamic>) {
+      throw const ApiException('Invalid follow-up booking response.');
+    }
+
+    return data;
+  }
 }

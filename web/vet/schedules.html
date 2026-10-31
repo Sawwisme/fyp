@@ -9,8 +9,10 @@
     <link rel="stylesheet" href="/web/styles.css">
     <link rel="stylesheet" href="/web/admin/dashboard.css">
     <link rel="stylesheet" href="/web/admin/layout.css">
+    <link rel="stylesheet" href="/web/vet/absences.css">
 
     <script src="/web/vet/layout.js" defer></script>
+    <script src="/web/vet/absences.js" defer></script>
     <script src="/web/vet/consultation_actions.js" defer></script>
     <script src="/web/vet/schedules.js" defer></script>
 </head>
@@ -40,6 +42,40 @@
                         All times use Malaysia time.
                     </p>
                 </div>
+
+                <section class="panel absence-panel">
+                    <div class="absence-heading">
+                        <div>
+                            <h2>Leave & unexpected absence</h2>
+                            <p class="muted">
+                                Report unavailable hours. Affected appointments will need rearrangement.
+                            </p>
+                        </div>
+
+                        <button id="absence-open" type="button" class="compact-button" disabled>
+                            Report absence
+                        </button>
+                    </div>
+
+                    <details id="absence-history">
+                        <summary>My absence reports</summary>
+                        <p id="absence-list-message" role="status"></p>
+                        <div id="absence-list"></div>
+
+                        <button id="absence-list-retry" type="button" class="secondary compact-button" hidden>
+                            Retry reports
+                        </button>
+
+                        <div class="absence-actions">
+                            <button id="absence-previous" type="button" class="secondary compact-button" disabled>
+                                Previous
+                            </button>
+                            <button id="absence-next" type="button" class="secondary compact-button" disabled>
+                                Next
+                            </button>
+                        </div>
+                    </details>
+                </section>
 
                 <section class="panel" aria-labelledby="my-slots-title">
                     <h2 id="my-slots-title">My working schedule</h2>
@@ -110,6 +146,47 @@
             </main>
         </div>
     </div>
+
+    <dialog id="absence-dialog" aria-labelledby="absence-title">
+        <form id="absence-form">
+            <div class="absence-heading">
+                <h2 id="absence-title">Report absence</h2>
+                <button id="absence-close" type="button" class="secondary compact-button"
+                    aria-label="Close absence form">×</button>
+            </div>
+
+            <p class="muted">
+                Times use Malaysia time. Affected bookings will need
+                rearrangement; this does not cancel them.
+            </p>
+
+            <fieldset id="absence-fields">
+                <label for="absence-date">Date</label>
+                <input id="absence-date" type="date" required>
+
+                <div class="absence-time-grid">
+                    <div>
+                        <label for="absence-start">From</label>
+                        <input id="absence-start" type="time" required>
+                    </div>
+                    <div>
+                        <label for="absence-end">Until</label>
+                        <input id="absence-end" type="time" required>
+                    </div>
+                </div>
+
+                <label for="absence-reason">Reason for clinic staff</label>
+                <textarea id="absence-reason" rows="3" minlength="5" maxlength="2000" required></textarea>
+            </fieldset>
+
+            <p id="absence-form-message" role="status"></p>
+
+            <div class="absence-actions">
+                <button id="absence-cancel" type="button" class="secondary compact-button">Cancel</button>
+                <button id="absence-submit" type="submit" class="compact-button">Report absence</button>
+            </div>
+        </form>
+    </dialog>
 </body>
 
 </html>

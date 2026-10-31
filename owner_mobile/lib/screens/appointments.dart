@@ -55,7 +55,6 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
 
     try {
       final page = await widget.service.getMyAppointments(
-        followupOnly: _filter == 'followup',
         offset: _appointments.length,
         limit: 20,
       );
@@ -352,15 +351,34 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Text(
-                  (item['status'] as String).replaceAll('_', ' '),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
+                Flexible(
+                  child: Text(
+                    item['needs_rearrangement'] == true
+                        ? 'Needs rearrangement'
+                        : (item['status'] as String).replaceAll('_', ' '),
+                    textAlign: TextAlign.end,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: item['needs_rearrangement'] == true
+                          ? const Color(0xFFB42318)
+                          : null,
+                    ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 10),
+            if (item['needs_rearrangement'] == true) ...[
+              const Text(
+                'Your vet is unavailable for this appointment. '
+                    'Please contact the clinic to arrange another suitable time.',
+                style: TextStyle(
+                  color: Color(0xFFB42318),
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
             Text(item['clinic_name'] as String),
             Text('Vet: ${item['veterinarian_name']}'),
             const SizedBox(height: 8),
@@ -500,10 +518,6 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
                 value: 'history',
                 child: Text('History'),
               ),
-              DropdownMenuItem(
-                value: 'followup',
-                child: Text('Follow-up needed'),
-              ),
             ],
             onChanged: _loading || _openingBooking
                 ? null
@@ -537,9 +551,7 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 24),
               child: Text(
-                _filter == 'followup'
-                    ? 'No appointments require follow-up care.'
-                    : _appointments.isEmpty
+                _appointments.isEmpty
                     ? 'No appointments yet. Select Book appointment to begin.'
                     : 'No matching appointments among the loaded records.',
                 textAlign: TextAlign.center,

@@ -453,3 +453,20 @@
         height: 280px;
     }
 }
+
+.followup-feedback-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+#followup-updates-dialog .followup-feedback-actions button {
+    min-height: 40px;
+    margin: 0;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+}

@@ -232,7 +232,9 @@ class _AppointmentDetailsScreenState
               ),
               _field(
                 'Status',
-                _text(appointment['status']).replaceAll('_', ' '),
+                appointment['needs_rearrangement'] == true
+                    ? 'Needs rearrangement — contact the clinic'
+                    : _text(appointment['status']).replaceAll('_', ' '),
               ),
             ]),
             FutureBuilder<Map<String, dynamic>?>(

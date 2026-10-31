@@ -19,7 +19,13 @@ from app.schemas.vet_profile import (
     VetProfileResponse,
     VetProfileUpdate,
 )
-from app.services import vet_profile_service
+from app.services import vet_profile_service, vet_absence_service
+
+from app.schemas.vet_absences import (
+    VetAbsenceCreate,
+    VetAbsenceCreated,
+    VetAbsenceResponse,
+)
 
 
 router = APIRouter(
@@ -81,7 +87,7 @@ def get_my_schedules(
     response_model=list[VetAppointmentResponse],
 )
 def get_my_appointments(
-    appointment_date: date,
+    appointment_date: date | None = None,
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
     current_user: User = Depends(
@@ -114,4 +120,56 @@ def get_my_calendar(
         current_user,
         start_date,
         end_date,
+    )
+
+@router.get(
+    "/me/appointments/summary",
+    response_model=dict[str, int],
+)
+def get_my_appointment_summary(
+    current_user: User = Depends(
+        require_roles("veterinarian")
+    ),
+    db: Session = Depends(get_db),
+):
+    return vet_appointment_service.get_my_all_time_count(
+        db,
+        current_user,
+    )
+
+@router.post(
+    "/me/absences",
+    response_model=VetAbsenceCreated,
+    status_code=201,
+)
+def report_my_absence(
+    data: VetAbsenceCreate,
+    current_user: User = Depends(
+        require_roles("veterinarian")
+    ),
+    db: Session = Depends(get_db),
+):
+    return vet_absence_service.create_absence(
+        db,
+        current_user,
+        data,
+    )
+
+@router.get(
+    "/me/absences",
+    response_model=list[VetAbsenceResponse],
+)
+def list_my_absences(
+    offset: int = Query(default=0, ge=0),
+    limit: int = Query(default=20, ge=1, le=100),
+    current_user: User = Depends(
+        require_roles("veterinarian")
+    ),
+    db: Session = Depends(get_db),
+):
+    return vet_absence_service.list_my_absences(
+        db,
+        current_user,
+        offset,
+        limit,
     )

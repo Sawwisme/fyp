@@ -4,6 +4,7 @@ from fastapi import HTTPException
 from sqlalchemy import case, func, or_, select
 from sqlalchemy.orm import Session, selectinload
 
+from app.services.vet_absence_service import reject_absent_slots
 from app.clinic_time import CLINIC_TIMEZONE
 from app.models import (
     Appointment,
@@ -338,6 +339,7 @@ def start_consultation(
             raise HTTPException(
                 409, "This appointment does not have an active booked slot."
             )
+        reject_absent_slots(db, [slot.time_slot_id])
 
         now = utc_now()
 

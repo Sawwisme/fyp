@@ -74,6 +74,7 @@
             );
 
             const values = [
+                item.appointment_date.split('-').reverse().join('/'),
                 `${item.start_time.slice(0, 5)}–` +
                 item.end_time.slice(0, 5),
                 item.pet_name,
@@ -81,7 +82,9 @@
                 item.appointment_type.replaceAll('_', ' '),
                 (item.appointment_source || 'Not recorded')
                     .replaceAll('_', ' '),
-                item.status
+                item.needs_rearrangement
+                    ? 'Needs rearrangement'
+                    : item.status
             ];
 
             for (const value of values) {
@@ -128,8 +131,46 @@
 
         message.textContent = records.length
             ? `Showing ${matches.length} of ${records.length} appointments.`
-            : 'No appointments assigned to you for this date.';
+            : date.value
+                ? 'No appointments assigned to you for this date.'
+                : 'No appointments assigned to you.';
     }
+
+    let totalLoading = false;
+
+    async function loadAllTimeCount() {
+        if (totalLoading) return;
+        totalLoading = true;
+
+        const total = document.getElementById('appointment-all-time-total');
+        const note = document.getElementById('appointment-all-time-message');
+        const retryTotal = document.getElementById('appointment-all-time-retry');
+
+        retryTotal.hidden = true;
+        total.textContent = '—';
+        note.textContent = 'Loading overall total…';
+
+        try {
+            const data = await vetRequest(
+                '/veterinarians/me/appointments/summary'
+            );
+
+            if (!Number.isInteger(data.total) || data.total < 0) {
+                throw new Error('Invalid appointment total.');
+            }
+
+            total.textContent = String(data.total);
+            note.textContent = '';
+        } catch (error) {
+            note.textContent = error.message;
+            retryTotal.hidden = false;
+        } finally {
+            totalLoading = false;
+        }
+    }
+
+    document.getElementById('appointment-all-time-retry')
+        .addEventListener('click', loadAllTimeCount);
 
     async function loadAppointments() {
         if (!ready) return;
@@ -140,7 +181,7 @@
         rows.replaceChildren();
         retry.hidden = true;
 
-        if (!date.value || !date.validity.valid) {
+        if (!date.validity.valid) {
             loading = false;
             message.textContent = 'Select a valid date.';
             return;
@@ -157,10 +198,13 @@
 
             while (true) {
                 const query = new URLSearchParams({
-                    appointment_date: selectedDate,
                     offset: String(offset),
                     limit: '100'
                 });
+
+                if (selectedDate) {
+                    query.set('appointment_date', selectedDate);
+                }
 
                 const page = await vetRequest(
                     `/veterinarians/me/appointments?${query}`
@@ -187,6 +231,17 @@
     }
 
     date.addEventListener('change', loadAppointments);
+    document.getElementById('appointment-today')
+        .addEventListener('click', () => {
+            date.value = today();
+            loadAppointments();
+        });
+
+    document.getElementById('appointment-clear-date')
+        .addEventListener('click', () => {
+            date.value = '';
+            loadAppointments();
+        });
     retry.addEventListener('click', loadAppointments);
 
     search.addEventListener('input', () => {
@@ -205,16 +260,19 @@
 
         date.value = /^\d{4}-\d{2}-\d{2}$/.test(requestedDate || '')
             ? requestedDate
-            : today();
+            : '';
 
-        if (!date.value || !date.validity.valid) {
-            date.value = today();
+        if (!date.validity.valid) {
+            date.value = '';
         }
+
         loadAppointments();
+        loadAllTimeCount();
 
         setInterval(() => {
             if (!document.hidden && !loading) {
                 loadAppointments();
+                loadAllTimeCount();
             }
         }, 60000);
     });

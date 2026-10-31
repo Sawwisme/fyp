@@ -1,7 +1,7 @@
 from datetime import date, datetime
 
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import and_, case, func, or_, select
 from sqlalchemy.orm import Session
 
 from app.clinic_time import CLINIC_TIMEZONE
@@ -19,7 +19,7 @@ from app.models import (
 from app.schemas.owner_appointments import OwnerAppointmentCreate
 from app.services.pet_service import get_owner_profile
 from app.services.schedule_service import reject_occupied_slots
-
+from app.services.vet_absence_service import reject_absent_slots, get_rearrangement_ids
 
 def create_appointment(
     db: Session,
@@ -66,6 +66,83 @@ def create_appointment(
             raise HTTPException(
                 409, "This clinic is unavailable for booking."
             )
+
+        if data.followup_care_id is not None:
+            if data.appointment_type != "follow_up":
+                raise HTTPException(
+                    422,
+                    "A linked follow-up booking must use follow_up type.",
+                )
+
+            followup = db.scalar(
+                select(FollowupCare)
+                .join(
+                    Consultation,
+                    Consultation.consultation_id
+                    == FollowupCare.consultation_id,
+                )
+                .join(
+                    Appointment,
+                    Appointment.appointment_id
+                    == Consultation.appointment_id,
+                )
+                .join(
+                    Pet,
+                    Pet.pet_id == FollowupCare.pet_id,
+                )
+                .where(
+                    FollowupCare.followup_care_id == data.followup_care_id,
+                    FollowupCare.pet_id == data.pet_id,
+                    FollowupCare.pet_id == Consultation.pet_id,
+                    Consultation.clinic_id == clinic.clinic_id,
+                    Consultation.status == "completed",
+                    Appointment.pet_owner_id == owner.pet_owner_id,
+                    Pet.pet_owner_id == owner.pet_owner_id,
+                )
+                .execution_options(populate_existing=True)
+                .with_for_update()
+            )
+
+            if followup is None:
+                raise HTTPException(
+                    404,
+                    "Follow-up not found for this pet and clinic.",
+                )
+
+            if followup.status != "pending":
+                raise HTTPException(
+                    409,
+                    "This follow-up is already closed.",
+                )
+
+            if not followup.visit_required:
+                raise HTTPException(
+                    409,
+                    "Your veterinarian has not requested an in-clinic review.",
+                )
+
+            if followup.veterinarian_id != location.veterinarian_id:
+                raise HTTPException(
+                    422,
+                    "Choose a slot with the veterinarian responsible "
+                    "for this follow-up.",
+                )
+
+            existing_booking = db.scalar(
+                select(Appointment.appointment_id)
+                .where(
+                    Appointment.followup_care_id == followup.followup_care_id,
+                    Appointment.status.notin_(["cancelled", "rejected"]),
+                )
+                .limit(1)
+            )
+
+            if existing_booking is not None:
+                raise HTTPException(
+                    409,
+                    "This follow-up already has a booked appointment. "
+                    "Open that appointment to manage it.",
+                )
 
         veterinarian = db.scalar(
             select(Veterinarian)
@@ -139,6 +216,7 @@ def create_appointment(
                 400, "Choose a future appointment slot."
             )
 
+        reject_absent_slots(db, [slot.time_slot_id])
         reject_occupied_slots(db, [slot.time_slot_id])
 
         pet = db.scalar(
@@ -193,6 +271,7 @@ def create_appointment(
             appointment_source="owner_app",
             created_by_user_id=current_user.user_id,
             status="confirmed",
+            followup_care_id=data.followup_care_id,
         )
 
         slot.status = "booked"
@@ -212,7 +291,6 @@ def list_my_appointments(
     appointment_date: date | None,
     offset: int,
     limit: int,
-    followup_only: bool = False,
 ):
     owner = get_owner_profile(db, current_user)
 
@@ -280,9 +358,6 @@ def list_my_appointments(
             Schedule.schedule_date == appointment_date
         )
 
-    if followup_only:
-        statement = statement.where(pending_followup)
-
     statement = (
         statement
         .order_by(
@@ -294,9 +369,21 @@ def list_my_appointments(
         .limit(limit)
     )
 
+    records = db.execute(statement).mappings().all()
+
+    rearrangement_ids = get_rearrangement_ids(
+        db,
+        [record["appointment_id"] for record in records],
+    )
+
     return [
-        dict(record)
-        for record in db.execute(statement).mappings().all()
+        {
+            **dict(record),
+            "needs_rearrangement": (
+                record["appointment_id"] in rearrangement_ids
+            ),
+        }
+        for record in records
     ]
 
 def _lock_owned_appointment(
@@ -539,6 +626,17 @@ def reschedule_my_appointment(
                 404, "Choose a slot at the same clinic."
             )
 
+        if (
+            appointment.followup_care_id is not None
+            and target.veterinarian_id != appointment.veterinarian_id
+        ):
+            raise HTTPException(
+                422,
+                "This follow-up must remain with its assigned veterinarian. "
+                "Choose another time with the same veterinarian, "
+                "or contact the clinic.",
+            )
+
         veterinarian = db.scalar(
             select(Veterinarian)
             .join(Veterinarian.user)
@@ -611,6 +709,7 @@ def reschedule_my_appointment(
                 400, "Choose a future appointment slot."
             )
 
+        reject_absent_slots(db, [new_slot.time_slot_id])
         reject_occupied_slots(db, [new_slot.time_slot_id])
 
         pet = db.scalar(

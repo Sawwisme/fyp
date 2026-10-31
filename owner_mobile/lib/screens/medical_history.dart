@@ -310,11 +310,6 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
                         'Reviewed',
                         _visitDate(followup['followup_date']),
                       ),
-                    if (followup['followup_date'] != null)
-                      _field(
-                        'Reviewed',
-                        _visitDate(followup['followup_date']),
-                      ),
 
                     const SizedBox(height: 8),
 

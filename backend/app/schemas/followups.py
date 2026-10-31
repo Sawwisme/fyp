@@ -24,21 +24,6 @@ class FollowupResponse(BaseModel):
     photo_instructions: str | None
     visit_required: bool
 
-class FollowupReview(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        str_strip_whitespace=True,
-    )
-
-    assessment_information: str = Field(
-        min_length=1,
-        max_length=10000,
-    )
-    notes: str | None = Field(
-        default=None,
-        max_length=5000,
-    )
-
 
 class FollowupCancel(BaseModel):
     model_config = ConfigDict(

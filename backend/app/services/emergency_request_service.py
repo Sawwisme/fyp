@@ -25,6 +25,8 @@ from app.services.schedule_service import (
     reject_occupied_slots,
 )
 
+from app.services.vet_absence_service import reject_absent_slots
+
 
 def create_request(
     db: Session,
@@ -332,7 +334,7 @@ def approve_request(
             raise HTTPException(
                 400, "Choose a slot that has not ended."
             )
-
+        reject_absent_slots(db, [slot.time_slot_id])
         reject_occupied_slots(db, [slot.time_slot_id])
 
         pet = db.scalar(

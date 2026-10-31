@@ -265,6 +265,9 @@ String get _submissionStatusMessage {
     case 'cancelled':
       return 'This follow-up is cancelled. '
           'Previous updates remain available below.';
+    case 'visit_required':
+      return 'Your vet requires an in-clinic review. '
+          'Check the feedback below and arrange your review appointment.';
     default:
       return 'Please refresh to check the latest follow-up status.';
   }

@@ -172,6 +172,13 @@
         const card = document.createElement('article');
         card.className = 'followup-update-card';
 
+        const linkedVisit = selected.linked_visit;
+
+        const hasActiveVisit = Boolean(
+            linkedVisit &&
+            !['cancelled', 'rejected'].includes(linkedVisit.status)
+        );
+
         paragraph(card, 'Submitted', timestamp(item.submitted_at));
         paragraph(
             card,
@@ -218,7 +225,9 @@
             const correct = document.createElement('button');
             correct.type = 'button';
             correct.className = 'secondary compact-button';
-            correct.textContent = 'Correct decision';
+            correct.textContent = hasActiveVisit
+                ? 'Update feedback'
+                : 'Correct decision';
 
             correct.addEventListener('click', () => {
                 if (saving || loading) return;
@@ -268,13 +277,27 @@
             outcome.required = true;
             outcome.add(new Option('Select an outcome', ''));
 
-            if (!selected.visit_required && !selected.linked_visit) {
-                outcome.add(
-                    new Option(
-                        'No further follow-up needed — complete',
-                        'complete'
-                    )
-                );
+            const completeOption = new Option(
+                hasActiveVisit
+                    ? 'Complete follow-up — resolve booked appointment first'
+                    : selected.visit_required
+                        ? 'Clinic visit no longer needed — complete follow-up'
+                        : 'No further follow-up needed — complete',
+                'complete'
+            );
+
+            completeOption.disabled = hasActiveVisit;
+            outcome.add(completeOption);
+
+            if (hasActiveVisit) {
+                const explanation = document.createElement('p');
+                explanation.className = 'muted';
+                explanation.textContent =
+                    `Review appointment #${linkedVisit.appointment_id} is linked. ` +
+                    'Complete its consultation, or cancel the booking through ' +
+                    'appointment management before withdrawing the visit requirement.';
+
+                fields.appendChild(explanation);
             }
 
             outcome.add(
@@ -291,6 +314,53 @@
                 )
             );
 
+            if (hasActiveVisit) {
+                outcome.value = item.decision_outcome || 'in_clinic';
+                outcome.disabled = true;
+                statusLabel.textContent = 'Saved outcome — locked';
+
+                paragraph(
+                    fields,
+                    'Appointment booked',
+                    'You may update feedback only. Manage the booked ' +
+                    'appointment through the appointment workflow.'
+                );
+            }
+
+            const waiverFields = document.createElement('div');
+            waiverFields.hidden = true;
+
+            const waiverId = `visit-waiver-${item.submission_id}`;
+
+            const waiverLabel = document.createElement('label');
+            waiverLabel.htmlFor = waiverId;
+            waiverLabel.textContent =
+                'Why is the in-clinic review no longer needed?';
+
+            const waiverReason = document.createElement('textarea');
+            waiverReason.id = waiverId;
+            waiverReason.rows = 3;
+            waiverReason.minLength = 10;
+            waiverReason.maxLength = 1000;
+            waiverReason.disabled = true;
+
+            waiverFields.append(waiverLabel, waiverReason);
+            fields.appendChild(waiverFields);
+
+            function updateWaiverFields() {
+                const withdrawingVisit =
+                    outcome.value === 'complete' &&
+                    selected.visit_required &&
+                    !hasActiveVisit;
+
+                waiverFields.hidden = !withdrawingVisit;
+                waiverReason.disabled = !withdrawingVisit;
+                waiverReason.required = Boolean(withdrawingVisit);
+            }
+
+            outcome.addEventListener('change', updateWaiverFields);
+            updateWaiverFields();
+
             let correctionReason = null;
 
             if (correctionMode) {
@@ -298,7 +368,9 @@
 
                 const reasonLabel = document.createElement('label');
                 reasonLabel.htmlFor = reasonId;
-                reasonLabel.textContent = 'Reason for correcting the decision';
+                reasonLabel.textContent = hasActiveVisit
+                    ? 'Reason for updating feedback'
+                    : 'Reason for correcting the decision';
 
                 correctionReason = document.createElement('textarea');
                 correctionReason.id = reasonId;
@@ -312,21 +384,31 @@
 
             const submit = document.createElement('button');
             submit.type = 'submit';
-            submit.textContent = correctionMode
-                ? 'Save corrected decision'
-                : 'Send feedback';
+            submit.textContent = hasActiveVisit
+                ? 'Save feedback'
+                : correctionMode
+                    ? 'Save corrected decision'
+                    : 'Send feedback';
 
             fields.append(
                 commentLabel, comment,
-                statusLabel, outcome, submit
+                statusLabel, outcome
             );
+
+            const actions = document.createElement('div');
+            actions.className = 'followup-feedback-actions';
+            actions.appendChild(submit);
+
+            fields.appendChild(actions);
             form.appendChild(fields);
 
             if (correctionMode) {
                 const cancelCorrection = document.createElement('button');
                 cancelCorrection.type = 'button';
                 cancelCorrection.className = 'secondary compact-button';
-                cancelCorrection.textContent = 'Cancel correction';
+                cancelCorrection.textContent = hasActiveVisit
+                    ? 'Cancel editing'
+                    : 'Cancel correction';
 
                 cancelCorrection.addEventListener('click', () => {
                     if (saving || loading) return;
@@ -336,7 +418,7 @@
                     );
                 });
 
-                fields.appendChild(cancelCorrection);
+                actions.appendChild(cancelCorrection);
             }
 
             form.addEventListener('submit', async event => {
@@ -350,6 +432,23 @@
                     message.textContent =
                         'Enter a correction reason of at least 5 characters.';
                     correctionReason.focus();
+                    return;
+                }
+
+                const withdrawingVisit =
+                    outcome.value === 'complete' &&
+                    selected.visit_required &&
+                    !hasActiveVisit;
+
+                const waiverText = withdrawingVisit
+                    ? waiverReason.value.trim()
+                    : null;
+
+                if (withdrawingVisit && (!waiverText || waiverText.length < 10)) {
+                    message.textContent =
+                        'Explain why the clinic review is no longer needed ' +
+                        '(at least 10 characters).';
+                    waiverReason.focus();
                     return;
                 }
 
@@ -373,6 +472,7 @@
                                 veterinarian_comment: comment.value.trim(),
                                 expected_reviewed_at: item.reviewed_at ?? null,
                                 correction_reason: correctionText,
+                                visit_waiver_reason: waiverText,
                             },
                         }
                     );

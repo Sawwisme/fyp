@@ -20,6 +20,10 @@
             Number.isInteger(item.consultation_id) &&
             item.consultation_id > 0;
 
+        if (!existing && item.needs_rearrangement) {
+            return null;
+        }
+
         if (
             !existing &&
             (

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/web/styles.css">
     <link rel="stylesheet" href="/web/admin/dashboard.css">
     <link rel="stylesheet" href="/web/admin/layout.css">
+    <link rel="stylesheet" href="/web/vet/appointments.css">
 
     <script src="/web/vet/layout.js" defer></script>
     <script src="/web/vet/consultation_actions.js" defer></script>
@@ -41,27 +42,46 @@
                     </p>
                 </div>
 
-                <div class="staff-summary appointment-summary" aria-label="Appointment counts">
-                    <div>
-                        <span>Total appointments</span>
-                        <strong id="appointment-count-total">—</strong>
+                <div class="vet-appointment-summary" aria-label="Appointment counts">
+                    <div class="appointment-stat appointment-stat-overall">
+                        <span>All-time total</span>
+                        <strong id="appointment-all-time-total">—</strong>
+                        <small>All dates · all statuses</small>
                     </div>
-                    <div>
+
+                    <div class="appointment-stat">
+                        <span>Selected date</span>
+                        <strong id="appointment-count-total">—</strong>
+                        <small>Matching appointments</small>
+                    </div>
+
+                    <div class="appointment-stat">
                         <span>Confirmed</span>
                         <strong id="appointment-count-confirmed">—</strong>
+                        <small>Selected date</small>
                     </div>
-                    <div>
+
+                    <div class="appointment-stat">
                         <span>In progress</span>
                         <strong id="appointment-count-progress">—</strong>
+                        <small>Selected date</small>
                     </div>
-                    <div>
+
+                    <div class="appointment-stat">
                         <span>Completed</span>
                         <strong id="appointment-count-completed">—</strong>
+                        <small>Selected date</small>
                     </div>
                 </div>
 
-                <p class="muted">
-                    Counts follow the selected date, search and status filters.
+                <p id="appointment-all-time-message" class="muted appointment-total-message" role="status"></p>
+
+                <button id="appointment-all-time-retry" type="button" class="secondary compact-button" hidden>
+                    Retry total
+                </button>
+
+                <p class="appointment-filter-note">
+                    Date counts follow the selected date, search and status filters.
                 </p>
 
                 <section class="panel" aria-labelledby="appointments-title">
@@ -72,7 +92,16 @@
                             <label class="field-label" for="vet-appointment-date">
                                 Date
                             </label>
-                            <input id="vet-appointment-date" type="date" required>
+                            <input id="vet-appointment-date" type="date">
+
+                            <div class="appointment-date-actions">
+                                <button id="appointment-today" type="button" class="secondary compact-button">
+                                    Today
+                                </button>
+                                <button id="appointment-clear-date" type="button" class="secondary compact-button">
+                                    All dates
+                                </button>
+                            </div>
                         </div>
 
                         <div>
@@ -108,6 +137,7 @@
                         <table class="staff-table">
                             <thead>
                                 <tr>
+                                    <th scope="col">Date</th>
                                     <th scope="col">Time</th>
                                     <th scope="col">Pet</th>
                                     <th scope="col">Owner</th>

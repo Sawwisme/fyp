@@ -8,6 +8,7 @@ from sqlalchemy import (
     String,
     Text,
     text,
+    Boolean,
 )
 
 from app.database import Base
@@ -51,6 +52,8 @@ class FollowupReviewDecision(Base):
 
     outcome = Column(String(30), nullable=False)
     veterinarian_comment = Column(Text, nullable=False)
+    previous_visit_required = Column(Boolean, nullable=True)
+    visit_waiver_reason = Column(Text, nullable=True)
 
     decided_at = Column(
         DateTime,

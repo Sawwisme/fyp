@@ -19,6 +19,7 @@ from app.schemas.followup_submissions import (
     FollowupSubmissionResponse,
     OwnerFollowupSubmissionState,
     OwnerFollowupListItem,
+    OwnerFollowupBookingContext,
 )
 
 
@@ -113,4 +114,21 @@ def list_followups(
         task_status,
         offset,
         limit,
+    )
+
+@router.get(
+    "/{followup_id}/booking-context",
+    response_model=OwnerFollowupBookingContext,
+)
+def get_booking_context(
+    followup_id: int = Path(ge=1, le=2147483647),
+    current_user: User = Depends(
+        require_roles("pet_owner")
+    ),
+    db: Session = Depends(get_db),
+):
+    return followup_submission_service.get_owner_booking_context(
+        db,
+        current_user,
+        followup_id,
     )

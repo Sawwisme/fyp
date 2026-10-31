@@ -525,6 +525,12 @@
         }
     });
 
+    window.addEventListener('vet-absence-reported', () => {
+        if (!busy && !loading) {
+            currentView === 'calendar' ? loadCalendar() : loadDay();
+        }
+    });
+
     vetReady.then(profile => {
         if (!profile) return;
 

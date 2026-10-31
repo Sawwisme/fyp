@@ -11,6 +11,7 @@ from app.models import (
     TimeSlot,
     User,
     Veterinarian,
+    VeterinarianAbsence,
 )
 
 
@@ -88,6 +89,21 @@ def list_available_slots(
         Appointment.status.notin_(["cancelled", "rejected"]),
     )
 
+    absent = (
+    select(VeterinarianAbsence.absence_id)
+    .where(
+        VeterinarianAbsence.veterinarian_id
+        == Schedule.veterinarian_id,
+        VeterinarianAbsence.absence_date
+        == Schedule.schedule_date,
+        VeterinarianAbsence.status == "active",
+        VeterinarianAbsence.start_time < TimeSlot.end_time,
+        VeterinarianAbsence.end_time > TimeSlot.start_time,
+    )
+    .correlate(Schedule, TimeSlot)
+    .exists()
+    )
+
     query = (
         select(
             TimeSlot.time_slot_id,
@@ -120,6 +136,7 @@ def list_available_slots(
             TimeSlot.start_time >= Schedule.start_time,
             TimeSlot.end_time <= Schedule.end_time,
             ~occupied,
+            ~absent,
         )
     )
 

@@ -72,6 +72,7 @@ class AppointmentService {
     required int petId,
     required int timeSlotId,
     required String appointmentType,
+    int? followupCareId,
   }) async {
     dynamic data;
 
@@ -82,6 +83,8 @@ class AppointmentService {
           'pet_id': petId,
           'time_slot_id': timeSlotId,
           'appointment_type': appointmentType,
+          if (followupCareId != null)
+            'followup_care_id': followupCareId,
         },
       );
     } on ApiException catch (error) {
@@ -108,14 +111,12 @@ class AppointmentService {
 
   Future<List<Map<String, dynamic>>> getMyAppointments({
     DateTime? date,
-    bool followupOnly = false,
     int offset = 0,
     int limit = 20,
   }) async {
     final query = Uri(
       queryParameters: {
         if (date != null) 'appointment_date': _dateOnly(date),
-        'followup_only': '$followupOnly',
         'offset': '$offset',
         'limit': '$limit',
       },

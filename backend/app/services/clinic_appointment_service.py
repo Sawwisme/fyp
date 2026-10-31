@@ -26,6 +26,7 @@ from app.services.schedule_service import (
     lock_schedule,
     reject_occupied_slots,
 )
+from app.services.vet_absence_service import reject_absent_slots
 
 from app.services.vet_profile_service import get_profile
 
@@ -312,6 +313,7 @@ def create_appointment(
 
         # A claimed slot cannot be booked again, even if its
         # status was accidentally left as available.
+        reject_absent_slots(db, [slot.time_slot_id])
         reject_occupied_slots(db, [slot.time_slot_id])
 
         owner = db.scalar(
@@ -708,7 +710,7 @@ def reschedule_appointment(
             raise HTTPException(
                 409, "The selected veterinarian is unavailable."
             )
-
+        reject_absent_slots(db, [new_slot.time_slot_id])
         reject_occupied_slots(db, [new_slot.time_slot_id])
 
         pet = db.scalar(

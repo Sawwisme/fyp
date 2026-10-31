@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../services/api_client.dart';
 import '../services/followup_service.dart';
 import 'followup_updates.dart';
+import '../services/appointment_service.dart';
+import '../services/pet_service.dart';
+import 'book_appointment.dart';
 
 class FollowupCareScreen extends StatefulWidget {
   final FollowupService service;
@@ -86,9 +89,76 @@ class _FollowupCareScreenState extends State<FollowupCareScreen> {
     }
   }
 
+  Future<void> _bookReview(Map<String, dynamic> item) async {
+    if (_opening) return;
+
+    setState(() => _opening = true);
+
+    try {
+      final booking = await widget.service.getBookingContext(
+        item['followup_care_id'] as int,
+      );
+
+      if (!mounted) return;
+
+      if (booking['existing_appointment_id'] != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Review appointment #${booking['existing_appointment_id']} '
+                  'is already booked. Open My Appointments to view it.',
+            ),
+          ),
+        );
+        return;
+      }
+
+      await Navigator.of(context).push<bool>(
+        MaterialPageRoute(
+          builder: (_) => BookAppointmentScreen(
+            clinic: {
+              'clinic_id': booking['clinic_id'],
+              'clinic_name': booking['clinic_name'],
+            },
+            service: AppointmentService(widget.service.api),
+            petService: PetService(widget.service.api),
+            followupContext: booking,
+          ),
+        ),
+      );
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              error is ApiException
+                  ? error.message
+                  : 'Could not open follow-up booking.',
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _opening = false);
+        await _refresh();
+      }
+    }
+  }
+
   Widget _card(Map<String, dynamic> item) {
     final status = item['status'] as String;
     final completed = status == 'completed';
+
+    final stageLabel = {
+      'action_needed': 'Awaiting your update',
+      'awaiting_review': 'Awaiting vet review',
+      'update_requested': 'Another update requested',
+      'visit_required': 'In-clinic review required',
+      'reviewed': 'Reviewed — awaiting vet decision',
+      'completed': 'Completed',
+      'cancelled': 'Cancelled',
+    }[item['submission_state']];
 
     return Card(
       color: Colors.white,
@@ -141,6 +211,19 @@ class _FollowupCareScreenState extends State<FollowupCareScreen> {
               ],
             ),
             const SizedBox(height: 10),
+
+            if (stageLabel != null) ...[
+              Text(
+                stageLabel,
+                style: const TextStyle(
+                  color: _green,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+
             Text(
               item['clinic_name'] as String,
               style: const TextStyle(fontWeight: FontWeight.w500),
@@ -163,6 +246,14 @@ class _FollowupCareScreenState extends State<FollowupCareScreen> {
               ),
             ],
             const SizedBox(height: 14),
+            if (status == 'pending' && item['visit_required'] == true) ...[
+              FilledButton.icon(
+                onPressed: _opening ? null : () => _bookReview(item),
+                icon: const Icon(Icons.calendar_month_outlined),
+                label: const Text('Book review appointment'),
+              ),
+              const SizedBox(height: 8),
+            ],
             OutlinedButton(
               onPressed: _opening ? null : () => _open(item),
               child: Text(
@@ -263,6 +354,7 @@ class _FollowupCareScreenState extends State<FollowupCareScreen> {
                           padding: EdgeInsets.all(24),
                           child: Text('No matching follow-up tasks.'),
                         ),
+
                       for (final item in visible) _card(item),
                       if (_page > 0 || data.length > _pageSize)
                         Row(
