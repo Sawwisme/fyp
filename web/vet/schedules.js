@@ -190,9 +190,10 @@
                 end_date: end
             });
 
-            const entries = await vetRequest(
-                `/veterinarians/me/calendar?${query}`
-            );
+            const [entries, absences] = await Promise.all([
+                vetRequest(`/veterinarians/me/calendar?${query}`),
+                vetRequest(`/veterinarians/me/absence-periods?${query}`)
+            ]);
 
             if (currentVersion !== version) return;
 
@@ -264,6 +265,23 @@
                     ));
                 }
 
+                const dayAbsences = absences.filter(
+                    absence => absence.absence_date === day
+                );
+
+                button.classList.toggle(
+                    'has-absence',
+                    dayAbsences.length > 0
+                );
+
+                for (const absence of dayAbsences) {
+                    button.appendChild(label(
+                        `Absent ${absence.start_time.slice(0, 5)}–` +
+                        absence.end_time.slice(0, 5),
+                        'vet-calendar-absence'
+                    ));
+                }
+
                 button.addEventListener('click', () => openDay(day));
                 grid.appendChild(button);
             }
@@ -296,16 +314,34 @@
         message.textContent = 'Loading timeline…';
 
         try {
-            const [schedules, appointments] = await Promise.all([
-                loadPages('/veterinarians/me/schedules', {
-                    schedule_date: selectedDate
-                }, currentVersion),
-                loadPages('/veterinarians/me/appointments', {
-                    appointment_date: selectedDate
-                }, currentVersion)
-            ]);
+            const [schedules, appointments, absences] =
+                await Promise.all([
+                    loadPages('/veterinarians/me/schedules', {
+                        schedule_date: selectedDate
+                    }, currentVersion),
+
+                    loadPages('/veterinarians/me/appointments', {
+                        appointment_date: selectedDate
+                    }, currentVersion),
+
+                    vetRequest(
+                        '/veterinarians/me/absence-periods?' +
+                        new URLSearchParams({
+                            start_date: selectedDate,
+                            end_date: selectedDate
+                        })
+                    )
+                ]);
 
             if (currentVersion !== version) return;
+
+            for (const absence of absences) {
+                list.appendChild(label(
+                    `Absence: ${absence.start_time.slice(0, 5)}–` +
+                    `${absence.end_time.slice(0, 5)} · ${absence.reason}`,
+                    'vet-day-absence'
+                ));
+            }
 
             const bySlot = new Map();
 
@@ -341,6 +377,19 @@
 
                 const card = document.createElement('div');
                 card.className = 'vet-timeline-card';
+
+                const absence = absences.find(period =>
+                    period.start_time < slot.end_time &&
+                    period.end_time > slot.start_time
+                );
+
+                if (absence) {
+                    card.classList.add('is-absence');
+                    card.appendChild(label(
+                        'Unavailable — absence',
+                        'vet-absence-label'
+                    ));
+                }
 
                 const bookings = bySlot.get(slot.time_slot_id) || [];
                 const start = Date.parse(
@@ -384,13 +433,16 @@
                     );
 
                     card.appendChild(label(
-                        slot.status === 'available' && end <= Date.now()
-                            ? 'Expired'
-                            : slot.status.replaceAll('_', ' '),
+                        absence
+                            ? 'Booking unavailable during absence'
+                            : slot.status === 'available' && end <= Date.now()
+                                ? 'Expired'
+                                : slot.status.replaceAll('_', ' '),
                         'vet-slot-status'
                     ));
 
                     if (
+                        !absence &&
                         start > Date.now() &&
                         ['available', 'blocked'].includes(slot.status)
                     ) {
@@ -526,7 +578,7 @@
     });
 
     window.addEventListener('vet-absence-reported', () => {
-        if (!busy && !loading) {
+        if (!busy) {
             currentView === 'calendar' ? loadCalendar() : loadDay();
         }
     });

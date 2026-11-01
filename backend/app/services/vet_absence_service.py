@@ -1,8 +1,7 @@
-from datetime import datetime, timezone
-
+from datetime import date, datetime, timezone
 from fastapi import HTTPException
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.clinic_time import CLINIC_TIMEZONE
 from app.models import (
@@ -14,9 +13,15 @@ from app.models import (
     User,
     Veterinarian,
     VeterinarianAbsence,
+    PetOwner,
 )
-from app.schemas.vet_absences import VetAbsenceCreate
+from app.schemas.vet_absences import (
+    VetAbsenceCreate,
+    RearrangementResolve,
+)
+from app.services.notification_service import notify_absence_reported
 from app.services.vet_profile_service import get_profile
+from app.services.admin_profile_service import get_admin_record
 
 
 def reject_vet_absence(
@@ -161,6 +166,13 @@ def create_absence(
                 )
             )
 
+        notify_absence_reported(
+            db,
+            absence,
+            current_user.full_name,
+            appointments,
+        )
+
         result = {
             "absence_id": absence.absence_id,
             "affected_appointments": len(appointments),
@@ -254,3 +266,405 @@ def list_my_absences(
         .offset(offset)
         .limit(limit)
     ).all()
+
+def list_clinic_rearrangements(
+    db: Session,
+    current_user: User,
+    pending_only: bool,
+    offset: int,
+    limit: int,
+):
+    administrator = get_admin_record(db, current_user)
+
+    statement = (
+        select(
+            AbsenceAffectedAppointment,
+            VeterinarianAbsence,
+            Appointment,
+            User.full_name.label("absent_vet_name"),
+            TimeSlot.start_time.label("original_start_time"),
+            TimeSlot.end_time.label("original_end_time"),
+        )
+        .select_from(AbsenceAffectedAppointment)
+        .join(
+            VeterinarianAbsence,
+            VeterinarianAbsence.absence_id
+            == AbsenceAffectedAppointment.absence_id,
+        )
+        .join(
+            Appointment,
+            Appointment.appointment_id
+            == AbsenceAffectedAppointment.appointment_id,
+        )
+        .join(
+            Veterinarian,
+            Veterinarian.veterinarian_id
+            == VeterinarianAbsence.veterinarian_id,
+        )
+        .join(
+            User,
+            User.user_id == Veterinarian.user_id,
+        )
+        .join(
+            TimeSlot,
+            TimeSlot.time_slot_id
+            == AbsenceAffectedAppointment.original_time_slot_id,
+        )
+        .options(
+            selectinload(Appointment.pet),
+            selectinload(Appointment.owner).selectinload(
+                PetOwner.user
+            ),
+            selectinload(Appointment.time_slot),
+            selectinload(Appointment.veterinarian).selectinload(
+                Veterinarian.user
+            ),
+        )
+        .where(
+            VeterinarianAbsence.clinic_id
+            == administrator.clinic_id,
+        )
+    )
+
+    if pending_only:
+        statement = statement.where(
+            AbsenceAffectedAppointment.resolution_status == "pending",
+        )
+
+    records = db.execute(
+        statement
+        .order_by(
+            VeterinarianAbsence.absence_date,
+            TimeSlot.start_time,
+            AbsenceAffectedAppointment.affected_id,
+        )
+        .offset(offset)
+        .limit(limit)
+    ).all()
+
+    result = []
+
+    for affected, absence, appointment, vet_name, start, end in records:
+        owner = appointment.owner
+        owner_user = owner.user
+        current_slot = appointment.time_slot
+
+        result.append({
+            "affected_id": affected.affected_id,
+            "absence_id": absence.absence_id,
+            "appointment_id": appointment.appointment_id,
+            "current_time_slot_id": appointment.time_slot_id,
+                        "current_veterinarian_id": appointment.veterinarian_id,
+            "current_vet_name": (
+                appointment.veterinarian.user.full_name
+                if appointment.veterinarian is not None
+                else vet_name
+            ),
+            "can_rearrange": (
+                appointment.status in ("pending", "confirmed")
+                and datetime.combine(
+                    appointment.appointment_date,
+                    current_slot.start_time,
+                    tzinfo=CLINIC_TIMEZONE,
+                ) > datetime.now(CLINIC_TIMEZONE)
+            ),
+            "pet_name": appointment.pet.pet_name,
+            "owner_name": (
+                owner_user.full_name
+                if owner_user is not None
+                else owner.contact_name
+            ),
+            "owner_phone": (
+                owner_user.phone_number
+                if owner_user is not None
+                else owner.contact_phone
+            ),
+            "absent_vet_name": vet_name,
+            "absence_reason": absence.reason,
+            "original_date": absence.absence_date,
+            "original_start_time": start,
+            "original_end_time": end,
+            "current_date": appointment.appointment_date,
+            "current_start_time": current_slot.start_time,
+            "current_end_time": current_slot.end_time,
+            "appointment_status": appointment.status,
+            "booking_changed": (
+                appointment.time_slot_id
+                != affected.original_time_slot_id
+            ),
+            "resolution_status": affected.resolution_status,
+            "resolution_note": affected.resolution_note,
+            "owner_agreement_note": affected.owner_agreement_note,
+            "resolved_at": affected.resolved_at,
+        })
+
+    return result
+
+def resolve_rearrangement(
+    db: Session,
+    current_user: User,
+    affected_id: int,
+    data: RearrangementResolve,
+):
+    try:
+        administrator = get_admin_record(db, current_user)
+
+        clinic = db.scalar(
+            select(Clinic)
+            .where(
+                Clinic.clinic_id == administrator.clinic_id,
+                Clinic.status == "active",
+            )
+            .with_for_update()
+        )
+
+        if clinic is None:
+            raise HTTPException(403, "Your clinic is unavailable.")
+
+        record = db.execute(
+            select(
+                AbsenceAffectedAppointment,
+                VeterinarianAbsence,
+            )
+            .join(
+                VeterinarianAbsence,
+                VeterinarianAbsence.absence_id
+                == AbsenceAffectedAppointment.absence_id,
+            )
+            .where(
+                AbsenceAffectedAppointment.affected_id == affected_id,
+                VeterinarianAbsence.clinic_id == clinic.clinic_id,
+            )
+            .execution_options(populate_existing=True)
+            .with_for_update()
+        ).first()
+
+        if record is None:
+            raise HTTPException(404, "Rearrangement record not found.")
+
+        affected, absence = record
+
+        if affected.resolution_status != "pending":
+            raise HTTPException(
+                409,
+                "This rearrangement has already been resolved.",
+            )
+
+        appointment = db.scalar(
+            select(Appointment)
+            .where(
+                Appointment.appointment_id
+                == affected.appointment_id
+            )
+            .execution_options(populate_existing=True)
+            .with_for_update()
+        )
+
+        if appointment is None:
+            raise HTTPException(404, "Appointment not found.")
+
+        if (
+            appointment.time_slot_id != data.expected_time_slot_id
+            or appointment.status
+            != data.expected_appointment_status
+        ):
+            raise HTTPException(
+                409,
+                "The appointment changed. Refresh before recording "
+                "its resolution.",
+            )
+
+        if appointment.status in ("cancelled", "rejected"):
+            resolution = "cancelled"
+
+        elif appointment.time_slot_id != affected.original_time_slot_id:
+            resolution = (
+                "reassigned"
+                if appointment.veterinarian_id
+                != absence.veterinarian_id
+                else "rescheduled"
+            )
+
+        elif absence.status == "cancelled":
+            resolution = "no_change"
+
+        else:
+            raise HTTPException(
+                409,
+                "Move or cancel the appointment first. "
+                "It is still assigned to the original affected slot.",
+            )
+
+        affected.resolution_status = resolution
+        affected.resolution_note = data.resolution_note
+        affected.owner_agreement_note = data.owner_agreement_note
+        affected.resolved_by_user_id = current_user.user_id
+        affected.resolved_at = datetime.now(
+            timezone.utc
+        ).replace(tzinfo=None)
+
+        result = {
+            "affected_id": affected.affected_id,
+            "resolution_status": resolution,
+            "message": "Rearrangement resolution recorded.",
+        }
+
+        db.commit()
+        return result
+
+    except Exception:
+        db.rollback()
+        raise
+
+def list_my_absence_periods(
+    db: Session,
+    current_user: User,
+    start_date: date,
+    end_date: date,
+):
+    veterinarian = get_profile(db, current_user)
+
+    if end_date < start_date or (end_date - start_date).days >= 42:
+        raise HTTPException(
+            422,
+            "Choose a date range of up to 42 days.",
+        )
+
+    return db.scalars(
+        select(VeterinarianAbsence)
+        .where(
+            VeterinarianAbsence.veterinarian_id
+            == veterinarian.veterinarian_id,
+            VeterinarianAbsence.clinic_id == veterinarian.clinic_id,
+            VeterinarianAbsence.status == "active",
+            VeterinarianAbsence.absence_date >= start_date,
+            VeterinarianAbsence.absence_date <= end_date,
+        )
+        .order_by(
+            VeterinarianAbsence.absence_date,
+            VeterinarianAbsence.start_time,
+        )
+    ).all()
+
+def withdraw_my_absence(
+    db: Session,
+    current_user: User,
+    absence_id: int,
+):
+    try:
+        profile = get_profile(db, current_user)
+
+        clinic = db.scalar(
+            select(Clinic)
+            .where(
+                Clinic.clinic_id == profile.clinic_id,
+                Clinic.status == "active",
+            )
+            .with_for_update()
+        )
+
+        if clinic is None:
+            raise HTTPException(403, "Your clinic is unavailable.")
+
+        veterinarian = db.scalar(
+            select(Veterinarian)
+            .where(
+                Veterinarian.veterinarian_id
+                == profile.veterinarian_id,
+                Veterinarian.clinic_id == clinic.clinic_id,
+                Veterinarian.approval_status == "approved",
+            )
+            .with_for_update()
+        )
+
+        if veterinarian is None:
+            raise HTTPException(403, "Veterinarian unavailable.")
+
+        absence = db.scalar(
+            select(VeterinarianAbsence)
+            .where(
+                VeterinarianAbsence.absence_id == absence_id,
+                VeterinarianAbsence.veterinarian_id
+                == veterinarian.veterinarian_id,
+                VeterinarianAbsence.clinic_id == clinic.clinic_id,
+            )
+            .execution_options(populate_existing=True)
+            .with_for_update()
+        )
+
+        if absence is None:
+            raise HTTPException(404, "Absence report not found.")
+
+        if absence.status != "active":
+            raise HTTPException(
+                409,
+                "This absence report has already been withdrawn.",
+            )
+
+        affected_records = db.scalars(
+            select(AbsenceAffectedAppointment)
+            .where(
+                AbsenceAffectedAppointment.absence_id == absence_id,
+                AbsenceAffectedAppointment.resolution_status
+                == "pending",
+            )
+            .order_by(AbsenceAffectedAppointment.affected_id)
+            .execution_options(populate_existing=True)
+            .with_for_update()
+        ).all()
+
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        unchanged_count = 0
+
+        for affected in affected_records:
+            appointment = db.scalar(
+                select(Appointment)
+                .where(
+                    Appointment.appointment_id
+                    == affected.appointment_id
+                )
+                .execution_options(populate_existing=True)
+                .with_for_update()
+            )
+
+            if appointment is None:
+                continue
+
+            # Preserve bookings already moved to another slot.
+            if (
+                appointment.time_slot_id
+                != affected.original_time_slot_id
+                or appointment.veterinarian_id
+                != veterinarian.veterinarian_id
+            ):
+                continue
+
+            # Existing cancellations still need their resolution record.
+            if appointment.status not in ("pending", "confirmed"):
+                continue
+
+            affected.resolution_status = "no_change"
+            affected.resolution_note = (
+                "Veterinarian withdrew the absence report. "
+                "The original appointment remains unchanged."
+            )
+            affected.resolved_by_user_id = current_user.user_id
+            affected.resolved_at = now
+            unchanged_count += 1
+
+        absence.status = "cancelled"
+        absence.cancelled_at = now
+
+        result = {
+            "absence_id": absence.absence_id,
+            "status": "cancelled",
+            "unchanged_appointments": unchanged_count,
+            "message": "Absence report withdrawn.",
+        }
+
+        db.commit()
+        return result
+
+    except Exception:
+        db.rollback()
+        raise

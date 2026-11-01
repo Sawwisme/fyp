@@ -1,4 +1,11 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, text
+from sqlalchemy import (
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    UniqueConstraint,
+    text,
+)
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -7,11 +14,32 @@ from app.database import Base
 class Cart(Base):
     __tablename__ = "carts"
 
+    __table_args__ = (
+        UniqueConstraint(
+            "pet_owner_id",
+            "clinic_id",
+            name="uq_cart_owner_clinic",
+        ),
+    )
+
     cart_id = Column(Integer, primary_key=True, autoincrement=True)
     pet_owner_id = Column(
         Integer,
         ForeignKey("pet_owners.pet_owner_id"),
         nullable=False,
+    )
+
+    clinic_id = Column(
+        Integer,
+        ForeignKey("clinics.clinic_id"),
+        nullable=True,
+    )
+
+    version = Column(
+        Integer,
+        nullable=False,
+        default=1,
+        server_default=text("1"),
     )
     created_at = Column(
         DateTime,
@@ -27,3 +55,4 @@ class Cart(Base):
 
     owner = relationship("PetOwner")
     items = relationship("CartItem", back_populates="cart")
+    clinic = relationship("Clinic")

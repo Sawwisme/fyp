@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Path, status
+from fastapi import APIRouter, Depends, Path, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -9,8 +9,8 @@ from app.schemas.clinic_appointments import (
     ClinicAppointmentResponse,
     ClinicAppointmentReschedule,
 )
-from app.services import clinic_appointment_service
-
+from app.services import clinic_appointment_service, vet_absence_service
+from app.schemas.vet_absences import RearrangementResolve
 
 router = APIRouter(
     prefix="/clinic-appointments",
@@ -64,4 +64,38 @@ def reschedule_appointment(
         current_user,
         appointment_id,
         data.time_slot_id,
+    )
+
+@router.get("/rearrangements")
+def list_rearrangements(
+    pending_only: bool = True,
+    offset: int = Query(default=0, ge=0),
+    limit: int = Query(default=20, ge=1, le=100),
+    current_user: User = Depends(
+        require_roles("clinic_administrator")
+    ),
+    db: Session = Depends(get_db),
+):
+    return vet_absence_service.list_clinic_rearrangements(
+        db,
+        current_user,
+        pending_only,
+        offset,
+        limit,
+    )
+
+@router.post("/rearrangements/{affected_id}/resolve")
+def resolve_rearrangement(
+    data: RearrangementResolve,
+    affected_id: int = Path(ge=1, le=2147483647),
+    current_user: User = Depends(
+        require_roles("clinic_administrator")
+    ),
+    db: Session = Depends(get_db),
+):
+    return vet_absence_service.resolve_rearrangement(
+        db,
+        current_user,
+        affected_id,
+        data,
     )

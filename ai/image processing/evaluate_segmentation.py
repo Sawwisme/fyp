@@ -29,7 +29,7 @@ TEST_MASK_DIR = os.path.join(
 MODEL_PATH = os.path.join(
     BASE_DIR,
     "models",
-    "dental_segmentation_unet_ce.keras"
+    "dental_segmentation_unet.keras"
 )
 
 IMAGE_SIZE = (256, 256)

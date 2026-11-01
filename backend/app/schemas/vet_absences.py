@@ -41,3 +41,20 @@ class VetAbsenceResponse(BaseModel):
     end_time: time
     reason: str
     status: str
+
+class RearrangementResolve(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        str_strip_whitespace=True,
+    )
+
+    expected_time_slot_id: int = Field(ge=1, le=2147483647)
+    expected_appointment_status: str = Field(
+        min_length=1,
+        max_length=20,
+    )
+    resolution_note: str = Field(min_length=5, max_length=2000)
+    owner_agreement_note: str = Field(
+        min_length=5,
+        max_length=2000,
+    )

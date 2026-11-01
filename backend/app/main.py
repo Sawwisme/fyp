@@ -31,6 +31,9 @@ from app.routers.return_visits import router as return_visits_router
 from app.routers.owner_medical_history import router as owner_medical_history_router
 from app.routers.owner_followups import router as owner_followups_router
 from app.routers.followup_media import router as followup_media_router
+from app.routers.notifications import router as notifications_router
+from app.routers.products import router as products_router
+from app.routers.shop import router as shop_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -81,6 +84,9 @@ app.include_router(return_visits_router)
 app.include_router(owner_medical_history_router)
 app.include_router(owner_followups_router)
 app.include_router(followup_media_router)
+app.include_router(notifications_router)
+app.include_router(products_router)
+app.include_router(shop_router)
 
 
 WEB_DIR = Path(__file__).resolve().parents[2] / "web"

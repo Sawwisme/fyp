@@ -12,6 +12,8 @@ import 'change_password.dart';
 import '../services/appointment_service.dart';
 import 'appointments.dart';
 import 'medical_history.dart';
+import '../services/shop_service.dart';
+import 'shop.dart';
 
 class HomeScreen extends StatefulWidget {
   final Map<String, dynamic> user;
@@ -34,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   late final PetService _petService;
   late final AppointmentService _appointmentService;
+  late final ShopService _shopService;
   late Map<String, dynamic> _user;
 
   int _selectedTab = 0;
@@ -50,6 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _user = Map<String, dynamic>.from(widget.user);
     _petService = PetService(widget.auth.api);
     _appointmentService = AppointmentService(widget.auth.api);
+    _shopService = ShopService(widget.auth.api);
     _loadPet();
   }
 
@@ -740,11 +744,7 @@ class _HomeScreenState extends State<HomeScreen> {
               'becomes available.',
         );
       case 3:
-        return _comingSoon(
-          Icons.shopping_bag_outlined,
-          'Dental care shop',
-          'Pet dental care products will be available here soon.',
-        );
+        return ShopScreen(service: _shopService);
       case 4:
         return _profilePage();
       default:

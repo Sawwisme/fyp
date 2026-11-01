@@ -36,3 +36,5 @@ from app.models.treatment_progress import TreatmentProgress
 from app.models.followup_submission import FollowupSubmission
 from app.models.followup_review_decision import FollowupReviewDecision
 from app.models.veterinarian_absence import VeterinarianAbsence, AbsenceAffectedAppointment
+from app.models.notification import Notification
+from app.models.product_stock_movement import ProductStockMovement

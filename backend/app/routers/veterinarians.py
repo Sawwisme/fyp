@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Path
 from sqlalchemy.orm import Session
 
 from datetime import date
@@ -172,4 +172,37 @@ def list_my_absences(
         current_user,
         offset,
         limit,
+    )
+
+@router.get(
+    "/me/absence-periods",
+    response_model=list[VetAbsenceResponse],
+)
+def get_my_absence_periods(
+    start_date: date,
+    end_date: date,
+    current_user: User = Depends(
+        require_roles("veterinarian")
+    ),
+    db: Session = Depends(get_db),
+):
+    return vet_absence_service.list_my_absence_periods(
+        db,
+        current_user,
+        start_date,
+        end_date,
+    )
+
+@router.post("/me/absences/{absence_id}/withdraw")
+def withdraw_my_absence(
+    absence_id: int = Path(ge=1, le=2147483647),
+    current_user: User = Depends(
+        require_roles("veterinarian")
+    ),
+    db: Session = Depends(get_db),
+):
+    return vet_absence_service.withdraw_my_absence(
+        db,
+        current_user,
+        absence_id,
     )

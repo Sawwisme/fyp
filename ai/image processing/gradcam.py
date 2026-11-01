@@ -508,6 +508,52 @@ def generate_gradcam(
         heatmap.numpy()
     )
 
+# =========================================================
+# Calculate Grad-CAM attention spread
+# =========================================================
+
+def calculate_gradcam_spread(
+    heatmap,
+    activation_threshold=0.5
+):
+    """
+    Calculate percentage of strongly activated
+    Grad-CAM pixels.
+
+    heatmap must be normalized to 0-1.
+    """
+
+    heatmap = np.asarray(
+        heatmap,
+        dtype=np.float32
+    )
+
+    heatmap = np.clip(
+        heatmap,
+        0.0,
+        1.0
+    )
+
+    active_pixels = np.sum(
+        heatmap >= activation_threshold
+    )
+
+    total_pixels = heatmap.size
+
+    if total_pixels == 0:
+        return 0.0
+
+    spread_percent = (
+        active_pixels
+        / total_pixels
+        * 100.0
+    )
+
+    return round(
+        float(spread_percent),
+        2
+    )
+
 
 # =========================================================
 # Overlay heatmap
@@ -654,12 +700,20 @@ def save_gradcam_summary(
             item["threshold"]
         )
 
+        spread = (
+    item[
+        "gradcam_spread_percent"
+    ]
+)
+
         plt.title(
             f"{condition}\n"
             f"Confidence: "
             f"{confidence:.2%} "
             f"| Threshold: "
-            f"{threshold:.2f}",
+            f"{threshold:.2f}\n"
+            f"Attention spread: "
+            f"{spread:.2f}%",
             fontsize=13
         )
 
@@ -1044,6 +1098,22 @@ def run_automatic_gradcam(
             )
         )
 
+# -----------------------------------------------------
+# Calculate Grad-CAM attention spread
+# -----------------------------------------------------
+
+        gradcam_spread_percent = (
+            calculate_gradcam_spread(
+                heatmap,
+                activation_threshold=0.5
+            )
+        )
+
+        print(
+            f"Grad-CAM attention spread: "
+            f"{gradcam_spread_percent:.2f}%"
+        )
+
         overlay = (
             overlay_heatmap(
                 original_image,
@@ -1055,6 +1125,8 @@ def run_automatic_gradcam(
             "condition": condition,
             "confidence": confidence,
             "threshold": threshold,
+            "gradcam_spread_percent":
+                gradcam_spread_percent,
             "overlay": overlay
         })
 
@@ -1075,10 +1147,20 @@ def run_automatic_gradcam(
     # =====================================================
 
     return {
-        "image_path": image_path,
-        "quality": quality_info,
-        "predictions": results,
-        "gradcam_summary": summary_path
+    "image_path": image_path,
+    "quality": quality_info,
+    "predictions": results,
+    "gradcam_items": [
+        {
+            "condition": item["condition"],
+            "confidence": item["confidence"],
+            "threshold": item["threshold"],
+            "gradcam_spread_percent":
+                item["gradcam_spread_percent"]
+        }
+        for item in gradcam_items
+    ],
+    "gradcam_summary": summary_path
     }
 
 

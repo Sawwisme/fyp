@@ -4,7 +4,8 @@
 
     const isSchedulePage =
         window.location.pathname.endsWith('/schedules.html');
-
+    const isProductPage =
+        window.location.pathname.endsWith('/products.html');
     const sidebar = document.getElementById('shared-sidebar');
     const topbar = document.getElementById('shared-topbar');
 
@@ -36,9 +37,10 @@
                 Appointment Schedule
             </a>
 
-            <button class="nav-item" type="button" disabled>
-                Products <small>Coming soon</small>
-            </button>
+            <a class="nav-item" href="/web/admin/products.html"
+            data-page="products">
+                Products
+            </a>
 
             <button class="nav-item" type="button" disabled>
                 Orders <small>Coming soon</small>
@@ -81,13 +83,15 @@
     `;
 
     function highlightNavigation() {
-        const activePage = isSchedulePage
-            ? 'schedules'
-            : isStaffPage
-                ? 'staff'
-                : window.location.hash === '#profile'
-                    ? 'profile'
-                    : 'dashboard';
+        const activePage = isProductPage
+            ? 'products'
+            : isSchedulePage
+                ? 'schedules'
+                : isStaffPage
+                    ? 'staff'
+                    : window.location.hash === '#profile'
+                        ? 'profile'
+                        : 'dashboard';
 
         sidebar.querySelectorAll('[data-page]').forEach(link => {
             const active = link.dataset.page === activePage;
@@ -104,4 +108,10 @@
 
     highlightNavigation();
     window.addEventListener('hashchange', highlightNavigation);
+})();
+
+(() => {
+    const script = document.createElement('script');
+    script.src = '/web/notifications.js';
+    document.head.appendChild(script);
 })();

@@ -38,6 +38,58 @@
         fields.disabled = saving || uncertain;
         get('absence-previous').disabled = loading || saving || page === 0;
         get('absence-next').disabled = loading || saving || !hasMore;
+
+        list.querySelectorAll('[data-withdraw-absence]')
+            .forEach(button => {
+                button.disabled = saving || loading;
+            });
+    }
+
+    async function withdrawAbsence(item) {
+        if (!ready || saving || loading) return;
+
+        const confirmed = window.confirm(
+            'Withdraw this absence report?\n\n' +
+            'Only continue if you are available for these hours. ' +
+            'Existing rescheduled or cancelled appointments will ' +
+            'not be restored automatically.'
+        );
+
+        if (!confirmed) return;
+
+        saving = true;
+        controls();
+        listMessage.textContent = 'Withdrawing absence…';
+
+        let result = null;
+        let failure = '';
+
+        try {
+            result = await vetRequest(
+                `/veterinarians/me/absences/${item.absence_id}/withdraw`,
+                { method: 'POST' }
+            );
+        } catch (error) {
+            failure = error.message;
+        } finally {
+            saving = false;
+            controls();
+        }
+
+        await loadReports(page);
+
+        if (result) {
+            listMessage.textContent =
+                'Absence withdrawn. Existing moved or cancelled ' +
+                'appointments remain unchanged.';
+        } else {
+            listMessage.textContent =
+                failure +
+                ' Check the refreshed report status before trying again.';
+        }
+
+        // Refresh the calendar even when the response was uncertain.
+        window.dispatchEvent(new Event('vet-absence-reported'));
     }
 
     async function loadReports(targetPage = 0) {
@@ -79,9 +131,30 @@
                 reason.textContent = item.reason;
 
                 const status = document.createElement('small');
-                status.textContent = `Report status: ${item.status}`;
+                status.textContent = item.status === 'cancelled'
+                    ? 'Report status: Withdrawn'
+                    : 'Report status: Active';
 
                 card.append(heading, reason, status);
+                if (item.status === 'active') {
+                    const actions = document.createElement('div');
+                    actions.className = 'absence-report-actions';
+
+                    const withdraw = document.createElement('button');
+                    withdraw.type = 'button';
+                    withdraw.className = 'secondary compact-button';
+                    withdraw.dataset.withdrawAbsence = '';
+                    withdraw.textContent = 'Withdraw absence';
+                    withdraw.disabled = saving || loading;
+
+                    withdraw.addEventListener(
+                        'click',
+                        () => withdrawAbsence(item)
+                    );
+
+                    actions.appendChild(withdraw);
+                    card.appendChild(actions);
+                }
                 list.appendChild(card);
             }
 

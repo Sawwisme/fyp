@@ -230,3 +230,9 @@ document.getElementById('vet-retry').addEventListener('click', () => {
 });
 
 const vetReady = initializeVetPage();
+
+(() => {
+    const script = document.createElement('script');
+    script.src = '/web/notifications.js';
+    document.head.appendChild(script);
+})();

@@ -7,6 +7,7 @@ from sqlalchemy import (
     String,
     Text,
     text,
+    Index,
 )
 from sqlalchemy.orm import relationship
 
@@ -16,7 +17,21 @@ from app.database import Base
 class Product(Base):
     __tablename__ = "products"
 
+    __table_args__ = (
+        Index(
+            "ix_product_clinic_status",
+            "clinic_id",
+            "status",
+            "product_id",
+        ),
+    )
+
     product_id = Column(Integer, primary_key=True, autoincrement=True)
+    clinic_id = Column(
+        Integer,
+        ForeignKey("clinics.clinic_id"),
+        nullable=True,
+    )
     category_id = Column(
         Integer,
         ForeignKey("product_categories.category_id"),
@@ -40,4 +55,12 @@ class Product(Base):
         server_onupdate=text("CURRENT_TIMESTAMP"),
     )
 
+    version = Column(
+        Integer,
+        nullable=False,
+        default=1,
+        server_default=text("1"),
+    )
+
     category = relationship("ProductCategory", back_populates="products")
+    clinic = relationship("Clinic")
