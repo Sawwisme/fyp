@@ -6,7 +6,13 @@ from app.dependencies import require_roles
 from app.models import User
 from app.schemas.products import ProductCategoryResponse
 from app.schemas.shop import ShopClinicResponse, ShopProductResponse
-from app.services import shop_service
+from app.services import shop_service, checkout_service
+
+from app.schemas.checkout import (
+    CheckoutQuoteRequest,
+    CheckoutQuoteResponse,
+    ShopSettingsResponse,
+)
 
 
 router = APIRouter(
@@ -81,4 +87,37 @@ def get_shop_product(
         db,
         current_user,
         product_id,
+    )
+
+@router.get(
+    "/clinics/{clinic_id}/settings",
+    response_model=ShopSettingsResponse,
+)
+def get_shop_settings(
+    clinic_id: int = Path(ge=1, le=2147483647),
+    current_user: User = Depends(require_roles("pet_owner")),
+    db: Session = Depends(get_db),
+):
+    return checkout_service.get_owner_shop_settings(
+        db,
+        current_user,
+        clinic_id,
+    )
+
+
+@router.post(
+    "/clinics/{clinic_id}/checkout-quote",
+    response_model=CheckoutQuoteResponse,
+)
+def get_checkout_quote(
+    data: CheckoutQuoteRequest,
+    clinic_id: int = Path(ge=1, le=2147483647),
+    current_user: User = Depends(require_roles("pet_owner")),
+    db: Session = Depends(get_db),
+):
+    return checkout_service.get_checkout_quote(
+        db,
+        current_user,
+        clinic_id,
+        data,
     )

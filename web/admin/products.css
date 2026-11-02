@@ -295,3 +295,100 @@
     width: 100%;
     font: inherit;
 }
+
+.product-heading-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+#shop-settings-dialog {
+    box-sizing: border-box;
+    width: min(560px, calc(100vw - 32px));
+    max-height: calc(100dvh - 40px);
+    overflow-y: auto;
+    padding: 24px;
+    border: 1px solid #dce5de;
+    border-radius: 16px;
+    background: #fff;
+    color: #24342a;
+}
+
+#shop-settings-dialog::backdrop {
+    background: rgb(18 35 27 / 55%);
+}
+
+#shop-settings-fields {
+    min-width: 0;
+    margin: 20px 0 0;
+    padding: 0;
+    border: 0;
+}
+
+.shop-setting-toggle {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid #dce5de;
+    border-radius: 10px;
+    background: #f8faf8;
+    cursor: pointer;
+}
+
+.shop-setting-toggle input[type="checkbox"] {
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    min-height: 0;
+    margin: 2px 0 0;
+    padding: 0;
+    accent-color: #176b32;
+}
+
+.shop-setting-toggle strong {
+    display: block;
+    font-size: 14px;
+}
+
+.shop-setting-toggle small,
+.shop-delivery-fee small {
+    display: block;
+    margin-top: 5px;
+    color: #69786e;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.shop-pickup-address {
+    margin: 10px 0 20px;
+    color: #69786e;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.shop-delivery-fee {
+    margin-top: 16px;
+}
+
+.shop-delivery-fee label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#shop-delivery-fee {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #cddbd1;
+    border-radius: 8px;
+    background: #f8faf8;
+    font: inherit;
+}
+
+#shop-delivery-fee:disabled {
+    opacity: .5;
+}

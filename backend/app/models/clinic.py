@@ -7,6 +7,7 @@ from sqlalchemy import (
     text,
     BigInteger,
     UniqueConstraint,
+    Boolean,
 )
 from sqlalchemy.orm import relationship
 
@@ -53,6 +54,34 @@ class Clinic(Base):
         nullable=True,
         server_default=text("CURRENT_TIMESTAMP"),
         server_onupdate=text("CURRENT_TIMESTAMP"),
+    )
+
+    shop_pickup_enabled = Column(
+        Boolean,
+        nullable=False,
+        default=True,
+        server_default=text("1"),
+    )
+
+    shop_delivery_enabled = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=text("0"),
+    )
+
+    shop_delivery_fee = Column(
+        Numeric(10, 2),
+        nullable=False,
+        default=0,
+        server_default=text("0.00"),
+    )
+
+    shop_version = Column(
+        Integer,
+        nullable=False,
+        default=1,
+        server_default=text("1"),
     )
 
     administrators = relationship(

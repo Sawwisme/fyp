@@ -972,5 +972,239 @@
         }
     });
 
+    const shopSettingsDialog = document.createElement('dialog');
+    shopSettingsDialog.id = 'shop-settings-dialog';
+    shopSettingsDialog.setAttribute(
+        'aria-labelledby',
+        'shop-settings-title'
+    );
+
+    shopSettingsDialog.innerHTML = `
+        <form id="shop-settings-form">
+            <header class="products-heading">
+                <h2 id="shop-settings-title">Shop Settings</h2>
+                <button id="shop-settings-close"
+                        class="dialog-close"
+                        type="button"
+                        aria-label="Close settings">×</button>
+            </header>
+
+            <p class="muted">
+                Choose how owners receive products from your clinic.
+            </p>
+
+            <fieldset id="shop-settings-fields">
+                <label class="shop-setting-toggle">
+                    <input id="shop-pickup" type="checkbox">
+                    <span>
+                        <strong>Clinic pickup</strong>
+                        <small>Owners collect their order at your clinic.</small>
+                    </span>
+                </label>
+
+                <p id="shop-pickup-address" class="shop-pickup-address"></p>
+
+                <label class="shop-setting-toggle">
+                    <input id="shop-delivery" type="checkbox">
+                    <span>
+                        <strong>Delivery</strong>
+                        <small>Your clinic arranges delivery to the owner.</small>
+                    </span>
+                </label>
+
+                <div class="shop-delivery-fee">
+                    <label for="shop-delivery-fee">Delivery fee (RM)</label>
+                    <input id="shop-delivery-fee"
+                           type="number"
+                           min="0"
+                           max="99999999.99"
+                           step="0.01">
+                    <small>
+                        A flat fee per delivery order. Enter 0 for free delivery.
+                    </small>
+                </div>
+            </fieldset>
+
+            <p id="shop-settings-message" role="status"></p>
+
+            <button id="shop-settings-retry"
+                    type="button"
+                    class="secondary compact-button"
+                    hidden>
+                Reload settings
+            </button>
+
+            <footer class="product-form-actions">
+                <button id="shop-settings-cancel"
+                        class="secondary compact-button"
+                        type="button">
+                    Cancel
+                </button>
+                <button id="shop-settings-save"
+                        class="product-primary"
+                        type="submit">
+                    Save settings
+                </button>
+            </footer>
+        </form>
+    `;
+
+    document.body.appendChild(shopSettingsDialog);
+
+    let shopSettingsData = null;
+    let shopSettingsLoading = false;
+    let shopSettingsUncertain = false;
+    let shopSettingsVersion = 0;
+
+    function shopSettingsControls() {
+        get('shop-settings-fields').disabled =
+            saving || shopSettingsLoading || !shopSettingsData ||
+            shopSettingsUncertain;
+
+        get('shop-settings-save').disabled =
+            saving || shopSettingsLoading || !shopSettingsData ||
+            shopSettingsUncertain;
+
+        get('shop-settings-close').disabled = saving;
+        get('shop-settings-cancel').disabled = saving;
+        get('shop-settings-retry').disabled =
+            saving || shopSettingsLoading;
+
+        get('shop-delivery-fee').disabled =
+            !get('shop-delivery').checked;
+
+        get('shop-delivery-fee').required =
+            get('shop-delivery').checked;
+    }
+
+    async function loadShopSettings() {
+        const currentVersion = ++shopSettingsVersion;
+        shopSettingsLoading = true;
+        shopSettingsData = null;
+
+        get('shop-settings-message').textContent = 'Loading settings…';
+        get('shop-settings-retry').hidden = true;
+        shopSettingsControls();
+
+        try {
+            const data = await request('/clinic-shop/settings');
+
+            if (currentVersion !== shopSettingsVersion) return;
+
+            shopSettingsData = data;
+            shopSettingsUncertain = false;
+
+            get('shop-pickup').checked = data.pickup_enabled;
+            get('shop-delivery').checked = data.delivery_enabled;
+            get('shop-delivery-fee').value = data.delivery_fee;
+
+            get('shop-pickup-address').textContent = data.pickup_address
+                ? `Pickup address: ${data.pickup_address}`
+                : 'Add your clinic address under Profile → Clinic information.';
+
+            get('shop-settings-message').textContent = '';
+        } catch (error) {
+            if (currentVersion !== shopSettingsVersion) return;
+
+            get('shop-settings-message').textContent = error.message;
+            get('shop-settings-retry').hidden = false;
+        } finally {
+            if (currentVersion === shopSettingsVersion) {
+                shopSettingsLoading = false;
+                shopSettingsControls();
+            }
+        }
+    }
+
+    get('shop-settings-open').addEventListener('click', () => {
+        if (saving || document.querySelector('dialog[open]')) return;
+
+        get('shop-settings-form').reset();
+        get('shop-pickup-address').textContent = '';
+        shopSettingsDialog.showModal();
+        loadShopSettings();
+    });
+
+    function closeShopSettings() {
+        if (!saving) shopSettingsDialog.close();
+    }
+
+    get('shop-settings-close').addEventListener(
+        'click', closeShopSettings
+    );
+    get('shop-settings-cancel').addEventListener(
+        'click', closeShopSettings
+    );
+    get('shop-settings-retry').addEventListener(
+        'click', loadShopSettings
+    );
+    get('shop-delivery').addEventListener(
+        'change', shopSettingsControls
+    );
+
+    shopSettingsDialog.addEventListener('cancel', event => {
+        if (saving) event.preventDefault();
+    });
+
+    shopSettingsDialog.addEventListener('close', () => {
+        shopSettingsVersion++;
+        shopSettingsData = null;
+        shopSettingsLoading = false;
+    });
+
+    get('shop-settings-form').addEventListener('submit', async event => {
+        event.preventDefault();
+
+        if (
+            saving ||
+            shopSettingsLoading ||
+            shopSettingsUncertain ||
+            !shopSettingsData ||
+            !get('shop-settings-form').reportValidity()
+        ) return;
+
+        const pickup = get('shop-pickup').checked;
+        const delivery = get('shop-delivery').checked;
+
+        if (!pickup && !delivery) {
+            get('shop-settings-message').textContent =
+                'Enable pickup, delivery, or both.';
+            return;
+        }
+
+        const body = {
+            expected_version: shopSettingsData.version,
+            pickup_enabled: pickup,
+            delivery_enabled: delivery,
+            delivery_fee: delivery
+                ? get('shop-delivery-fee').value
+                : shopSettingsData.delivery_fee
+        };
+
+        saving = true;
+        formControls();
+        shopSettingsControls();
+        get('shop-settings-message').textContent = 'Saving settings…';
+
+        try {
+            await request('/clinic-shop/settings', body, 'PUT');
+
+            shopSettingsDialog.close();
+            message.textContent = 'Shop settings saved.';
+        } catch (error) {
+            shopSettingsUncertain = Boolean(error.uncertain);
+
+            get('shop-settings-message').textContent =
+                error.message +
+                ' Reload settings before making another change.';
+
+            get('shop-settings-retry').hidden = false;
+        } finally {
+            saving = false;
+            formControls();
+            shopSettingsControls();
+        }
+    });
+
     initialize();
 })();

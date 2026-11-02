@@ -331,11 +331,50 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
   }
 
   Widget _appointmentCard(Map<String, dynamic> item) {
+    const green = Color(0xFF176B32);
+    const muted = Color(0xFF6B7770);
+
     final start = item['start_time'] as String;
     final end = item['end_time'] as String;
+    final status = item['status'] as String;
+    final rearrangement = item['needs_rearrangement'] == true;
+    final followup = item['has_pending_followup'] == true;
+    final busy = _loading || _openingBooking;
+
+    final statusLabels = {
+      'pending': 'Pending',
+      'confirmed': 'Confirmed',
+      'in_progress': 'In progress',
+      'completed': 'Completed',
+      'cancelled': 'Cancelled',
+      'rejected': 'Rejected',
+    };
+
+    final statusColor = rearrangement
+        ? const Color(0xFFB42318)
+        : ['confirmed', 'completed'].contains(status)
+        ? green
+        : status == 'pending'
+        ? const Color(0xFF946116)
+        : muted;
+
+    final statusBackground = rearrangement
+        ? const Color(0xFFFFEFED)
+        : ['confirmed', 'completed'].contains(status)
+        ? const Color(0xFFE8F3EB)
+        : status == 'pending'
+        ? const Color(0xFFFFF4DE)
+        : const Color(0xFFF0F2F1);
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      color: Colors.white,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 14),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: Color(0xFFDDE7DF)),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -347,101 +386,189 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
                 Expanded(
                   child: Text(
                     item['pet_name'] as String,
-                    style: Theme.of(context).textTheme.titleMedium,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
-                Flexible(
-                  child: Text(
-                    item['needs_rearrangement'] == true
-                        ? 'Needs rearrangement'
-                        : (item['status'] as String).replaceAll('_', ' '),
-                    textAlign: TextAlign.end,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: item['needs_rearrangement'] == true
-                          ? const Color(0xFFB42318)
-                          : null,
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: statusBackground,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        rearrangement
+                            ? 'Needs rearrangement'
+                            : statusLabels[status] ??
+                            status.replaceAll('_', ' '),
+                        style: TextStyle(
+                          color: statusColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 12),
+            Text(
+              item['clinic_name'] as String,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Vet: ${item['veterinarian_name']}',
+              style: const TextStyle(fontSize: 13, color: muted),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF3F7F4),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.calendar_today_outlined,
+                    size: 17,
+                    color: green,
+                  ),
+                  const SizedBox(width: 9),
+                  Expanded(
+                    child: Text(
+                      '${_dateLabel(item['appointment_date'] as String)}'
+                          ' · ${start.substring(0, 5)}–${end.substring(0, 5)}',
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(height: 10),
-            if (item['needs_rearrangement'] == true) ...[
+            Text(
+              (item['appointment_type'] as String).replaceAll('_', ' '),
+              style: const TextStyle(fontSize: 13, color: muted),
+            ),
+            if ((item['clinic_address'] as String?)?.trim().isNotEmpty ==
+                true) ...[
+              const SizedBox(height: 6),
+              Text(
+                item['clinic_address'] as String,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 12, color: muted),
+              ),
+            ],
+            if (rearrangement) ...[
+              const SizedBox(height: 12),
               const Text(
-                'Your vet is unavailable for this appointment. '
-                    'Please contact the clinic to arrange another suitable time.',
+                'Your vet is unavailable. Contact the clinic to '
+                    'arrange another suitable time.',
                 style: TextStyle(
                   color: Color(0xFFB42318),
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 10),
-            ],
-            Text(item['clinic_name'] as String),
-            Text('Vet: ${item['veterinarian_name']}'),
-            const SizedBox(height: 8),
-            Text(
-              '${_dateLabel(item['appointment_date'] as String)}'
-                  ' · ${start.substring(0, 5)}–${end.substring(0, 5)}',
-            ),
-            const SizedBox(height: 6),
-            Text(
-              (item['appointment_type'] as String)
-                  .replaceAll('_', ' '),
-            ),
-            if (item['clinic_address'] != null) ...[
-              const SizedBox(height: 8),
-              Text(item['clinic_address'] as String),
-            ],
-
-            if (item['has_pending_followup'] == true) ...[
-              const SizedBox(height: 10),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Chip(
-                  avatar: Icon(Icons.assignment_late_outlined, size: 18),
-                  label: Text('Follow-up needed'),
+                  fontSize: 13,
+                  height: 1.4,
                 ),
               ),
             ],
-
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: _loading || _openingBooking
-                  ? null
-                  : () => _openAppointmentDetails(item),
-              icon: const Icon(Icons.description_outlined),
-              label: Text(
-                item['has_pending_followup'] == true
-                    ? 'View follow-up'
-                    : 'View details',
-              ),
-            ),
-
-            if (_canChangeAppointment(item)) ...[
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
+            if (followup) ...[
+              const SizedBox(height: 10),
+              const Row(
                 children: [
-                  if (item['appointment_type'] != 'emergency')
-                    OutlinedButton(
-                      onPressed: _loading || _openingBooking
-                          ? null
-                          : () => _rescheduleAppointment(item),
-                      child: const Text('Reschedule'),
+                  Icon(
+                    Icons.assignment_outlined,
+                    size: 16,
+                    color: Color(0xFF946116),
+                  ),
+                  SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'Follow-up needed',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF946116),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  OutlinedButton(
-                    onPressed: _loading || _openingBooking
-                        ? null
-                        : () => _cancelAppointment(item),
-                    child: const Text('Cancel appointment'),
                   ),
                 ],
               ),
             ],
+            const SizedBox(height: 12),
+            const Divider(height: 1, color: Color(0xFFE8EDE9)),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                TextButton.icon(
+                  onPressed: busy
+                      ? null
+                      : () => _openAppointmentDetails(item),
+                  style: TextButton.styleFrom(
+                    foregroundColor: green,
+                    backgroundColor: const Color(0xFFEDF5EF),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 9,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  icon: const Icon(
+                    Icons.description_outlined,
+                    size: 18,
+                  ),
+                  label: Text(
+                    followup ? 'View follow-up' : 'View details',
+                  ),
+                ),
+                const Spacer(),
+                if (_canChangeAppointment(item))
+                  PopupMenuButton<String>(
+                    enabled: !busy,
+                    tooltip: 'Appointment actions',
+                    icon: const Icon(Icons.more_horiz, color: muted),
+                    onSelected: (value) async {
+                      if (value == 'reschedule') {
+                        await _rescheduleAppointment(item);
+                      } else if (value == 'cancel') {
+                        await _cancelAppointment(item);
+                      }
+                    },
+                    itemBuilder: (_) => [
+                      if (item['appointment_type'] != 'emergency')
+                        const PopupMenuItem(
+                          value: 'reschedule',
+                          child: Text('Reschedule'),
+                        ),
+                      const PopupMenuItem(
+                        value: 'cancel',
+                        child: Text(
+                          'Cancel appointment',
+                          style: TextStyle(color: Color(0xFFB42318)),
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
           ],
         ),
       ),
@@ -488,6 +615,14 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
                 : _openFollowupCare,
             icon: const Icon(Icons.assignment_outlined),
             label: const Text('Follow-up Care'),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(44),
+              foregroundColor: const Color(0xFF176B32),
+              side: const BorderSide(color: Color(0xFFCBDCCF)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
@@ -496,14 +631,39 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
                 : _openEmergencyRequests,
             icon: const Icon(Icons.emergency_outlined),
             label: const Text('Emergency requests'),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(44),
+              foregroundColor: const Color(0xFF176B32),
+              side: const BorderSide(color: Color(0xFFCBDCCF)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
           ),
           const SizedBox(height: 20),
 
           DropdownButtonFormField<String>(
             initialValue: _filter,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Show appointments',
-              border: OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 12,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(
+                  color: Color(0xFFCBDCCF),
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(
+                  color: Color(0xFFCBDCCF),
+                ),
+              ),
             ),
             items: const [
               DropdownMenuItem(

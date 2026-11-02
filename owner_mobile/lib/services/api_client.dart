@@ -59,6 +59,19 @@ class ApiClient {
     );
   }
 
+  Future<dynamic> put(
+      String path,
+      Map<String, dynamic> body, {
+        bool authenticated = true,
+      }) {
+    return _request(
+      'PUT',
+      path,
+      body: body,
+      authenticated: authenticated,
+    );
+  }
+
   Future<dynamic> _request(
     String method,
     String path, {
@@ -99,6 +112,10 @@ class ApiClient {
         case 'PATCH':
           response = await _client
               .patch(uri, headers: headers, body: jsonEncode(body))
+              .timeout(ApiConfig.timeout);
+        case 'PUT':
+          response = await _client
+              .put(uri, headers: headers, body: jsonEncode(body))
               .timeout(ApiConfig.timeout);
         default:
           throw ArgumentError('Unsupported request method');

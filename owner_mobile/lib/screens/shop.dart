@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../config/api_config.dart';
 import '../services/shop_service.dart';
+import '../services/cart_service.dart';
+import 'cart.dart';
+import 'add_to_cart_button.dart';
 
 class ShopScreen extends StatefulWidget {
   final ShopService service;
@@ -179,6 +182,13 @@ class _ShopScreenState extends State<ShopScreen> {
                         : 'No description provided.',
                     style: const TextStyle(height: 1.5),
                   ),
+                  const SizedBox(height: 24),
+                  AddToCartButton(
+                    service: CartService(widget.service.api),
+                    clinicId: product['clinic_id'] as int,
+                    productId: product['product_id'] as int,
+                    inStock: stock > 0,
+                  ),
                 ],
               ),
             ),
@@ -298,6 +308,22 @@ class _ShopScreenState extends State<ShopScreen> {
     );
   }
 
+  Future<void> _openCart() async {
+    final clinic = _clinic;
+    if (clinic == null) return;
+
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => CartScreen(
+          service: CartService(widget.service.api),
+          clinicId: clinic['clinic_id'] as int,
+        ),
+      ),
+    );
+
+    if (mounted) _load(_page);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -320,6 +346,13 @@ class _ShopScreenState extends State<ShopScreen> {
                       ),
                     ),
                   ),
+                  if (_clinic != null)
+                    IconButton(
+                      tooltip: 'View cart',
+                      onPressed: _openCart,
+                      icon: const Icon(Icons.shopping_cart_outlined),
+                    ),
+
                   if (_clinic != null)
                     TextButton(
                       onPressed: () => _selectClinic(null),

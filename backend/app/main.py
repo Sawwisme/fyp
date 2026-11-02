@@ -34,6 +34,8 @@ from app.routers.followup_media import router as followup_media_router
 from app.routers.notifications import router as notifications_router
 from app.routers.products import router as products_router
 from app.routers.shop import router as shop_router
+from app.routers.cart import router as cart_router
+from app.routers.checkout import router as checkout_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -87,6 +89,8 @@ app.include_router(followup_media_router)
 app.include_router(notifications_router)
 app.include_router(products_router)
 app.include_router(shop_router)
+app.include_router(cart_router)
+app.include_router(checkout_router)
 
 
 WEB_DIR = Path(__file__).resolve().parents[2] / "web"
