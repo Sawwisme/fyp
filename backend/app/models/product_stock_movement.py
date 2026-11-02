@@ -8,6 +8,8 @@ from sqlalchemy import (
     Index,
     Integer,
     String,
+    UniqueConstraint,
+    text,
 )
 
 from app.database import Base
@@ -37,6 +39,12 @@ class ProductStockMovement(Base):
             "created_at",
             "movement_id",
         ),
+        UniqueConstraint(
+            "product_id",
+            "reference_order_id",
+            "movement_type",
+            name="uq_stock_movement_order_type",
+        ),
     )
 
     movement_id = Column(
@@ -52,7 +60,7 @@ class ProductStockMovement(Base):
     created_by_user_id = Column(
         Integer,
         ForeignKey("users.user_id"),
-        nullable=False,
+        nullable=True,
     )
 
     quantity_change = Column(Integer, nullable=False)
@@ -64,4 +72,16 @@ class ProductStockMovement(Base):
         DateTime,
         nullable=False,
         default=stock_movement_utc_now,
+    )
+    movement_type = Column(
+        String(30),
+        nullable=False,
+        default="adjustment",
+        server_default=text("'adjustment'"),
+    )
+
+    reference_order_id = Column(
+        Integer,
+        ForeignKey("orders.order_id"),
+        nullable=True,
     )

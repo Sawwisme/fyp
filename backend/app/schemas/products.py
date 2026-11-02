@@ -93,7 +93,7 @@ class ProductStockMovementResponse(BaseModel):
 
     movement_id: int
     product_id: int
-    created_by_user_id: int
+    created_by_user_id: int | None
     quantity_change: int
     quantity_before: int
     quantity_after: int

@@ -51,16 +51,7 @@ def create_reset_token(user: User) -> str:
     )
 
 
-def reset_password(
-    db: Session,
-    token: str,
-    new_password: str,
-) -> None:
-    invalid_token = HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        detail="The reset link is invalid or expired. Request a new one.",
-    )
-
+def decode_reset_token(token: str) -> dict:
     try:
         payload = jwt.decode(
             token,
@@ -70,15 +61,8 @@ def reset_password(
             audience=RESET_AUDIENCE,
             options={
                 "require": [
-                    "sub",
-                    "iat",
-                    "nbf",
-                    "exp",
-                    "jti",
-                    "iss",
-                    "aud",
-                    "purpose",
-                    "pwd_version",
+                    "sub", "iat", "nbf", "exp", "jti",
+                    "iss", "aud", "purpose", "pwd_version",
                 ],
             },
         )
@@ -90,40 +74,88 @@ def reset_password(
             or not isinstance(subject, str)
             or not subject.isascii()
             or not subject.isdigit()
+            or not 1 <= int(subject) <= 2147483647
         ):
             raise ValueError("Invalid reset token.")
 
-        user_id = int(subject)
+        return payload
 
-        if not 1 <= user_id <= 2147483647:
-            raise ValueError("Invalid user ID.")
     except (jwt.InvalidTokenError, ValueError) as exc:
-        raise invalid_token from exc
+        raise HTTPException(
+            400,
+            "The reset link is invalid or expired. Request a new one.",
+        ) from exc
+
+
+def validate_reset_link(
+    db: Session,
+    token: str,
+):
+    payload = decode_reset_token(token)
+
+    user = db.scalar(
+        select(User)
+        .where(User.user_id == int(payload["sub"]))
+        .execution_options(populate_existing=True)
+    )
+
+    if (
+        user is None
+        or user.status != "active"
+        or not token_version_matches(payload, user.password_hash)
+    ):
+        raise HTTPException(
+            400,
+            "The reset link is invalid or expired. Request a new one.",
+        )
+
+    remaining = int(
+        int(payload["exp"])
+        - datetime.now(timezone.utc).timestamp()
+    )
+
+    return {
+        "valid": True,
+        "expires_in": max(0, remaining),
+    }
+
+
+def reset_password(
+    db: Session,
+    token: str,
+    new_password: str,
+) -> None:
+    payload = decode_reset_token(token)
 
     try:
-        # Lock and reload the row so a used token cannot reset it again.
         user = db.scalar(
             select(User)
-            .where(User.user_id == user_id)
-            .with_for_update()
+            .where(User.user_id == int(payload["sub"]))
             .execution_options(populate_existing=True)
+            .with_for_update()
         )
 
         if (
             user is None
             or user.status != "active"
             or not token_version_matches(payload, user.password_hash)
+            or int(payload["exp"])
+            <= datetime.now(timezone.utc).timestamp()
         ):
-            raise invalid_token
+            raise HTTPException(
+                400,
+                "The reset link is invalid or expired. Request a new one.",
+            )
 
         if verify_password(new_password, user.password_hash):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Choose a different new password.",
+                400,
+                "Choose a different new password.",
             )
 
         user.password_hash = hash_password(new_password)
         db.commit()
+
     except Exception:
         db.rollback()
         raise

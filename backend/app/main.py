@@ -36,25 +36,43 @@ from app.routers.products import router as products_router
 from app.routers.shop import router as shop_router
 from app.routers.cart import router as cart_router
 from app.routers.checkout import router as checkout_router
+from app.routers.shop_orders import router as shop_orders_router
+from app.order_expiry_worker import run_worker as run_order_expiry_worker
+from app.automatic_scheduling_worker import run_worker
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     stop_event = Event()
 
-    worker = Thread(
-        target=run_worker,
-        args=(stop_event,),
-        name="automatic-scheduling",
-        daemon=True,
-    )
+    workers = [
+        Thread(
+            target=run_worker,
+            args=(stop_event,),
+            name="automatic-scheduling",
+            daemon=True,
+        ),
+        Thread(
+            target=run_order_expiry_worker,
+            args=(stop_event,),
+            name="shop-order-expiry",
+            daemon=True,
+        ),
+    ]
 
-    worker.start()
+    for worker in workers:
+        worker.start()
 
     try:
         yield
     finally:
         stop_event.set()
-        await asyncio.to_thread(worker.join)
+
+        await asyncio.gather(
+            *[
+                asyncio.to_thread(worker.join)
+                for worker in workers
+            ]
+        )
 
 app = FastAPI(
     title="Veterinary Dental Care System API",
@@ -91,6 +109,7 @@ app.include_router(products_router)
 app.include_router(shop_router)
 app.include_router(cart_router)
 app.include_router(checkout_router)
+app.include_router(shop_orders_router)
 
 
 WEB_DIR = Path(__file__).resolve().parents[2] / "web"

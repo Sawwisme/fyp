@@ -22,6 +22,8 @@ from app.schemas.auth import (
     TokenResponse,
     ForgotPasswordRequest, 
     ResetPasswordRequest,
+    ResetLinkValidationRequest,
+    ResetLinkValidationResponse,
 )
 
 from app.schemas.user import UserResponse
@@ -234,4 +236,21 @@ def staff_login(
         ),
         expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         user=UserResponse.model_validate(user),
+    )
+
+@router.post(
+    "/reset-password/validate",
+    response_model=ResetLinkValidationResponse,
+)
+def validate_password_reset_link(
+    data: ResetLinkValidationRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    client_ip = request.client.host if request.client else "unknown"
+    password_reset_service.check_reset_limits(client_ip)
+
+    return password_reset_service.validate_reset_link(
+        db,
+        data.token.get_secret_value(),
     )

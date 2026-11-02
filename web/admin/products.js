@@ -645,7 +645,12 @@
                     `${item.quantity_before} → ${item.quantity_after}`
                 );
                 cell(row, item.reason);
-                cell(row, `User #${item.created_by_user_id}`);
+                cell(
+                    row,
+                    item.created_by_user_id == null
+                        ? 'System'
+                        : `User #${item.created_by_user_id}`
+                );
 
                 get('stock-history-rows').appendChild(row);
             }

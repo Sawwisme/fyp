@@ -94,3 +94,13 @@ class ResetPasswordRequest(BaseModel):
 
 class StaffLoginRequest(LoginRequest):
     role: Literal["clinic_administrator", "veterinarian"]
+
+class ResetLinkValidationRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    token: SecretStr = Field(min_length=1, max_length=4096)
+
+
+class ResetLinkValidationResponse(BaseModel):
+    valid: bool
+    expires_in: int
