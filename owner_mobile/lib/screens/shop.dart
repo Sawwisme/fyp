@@ -5,6 +5,8 @@ import '../services/shop_service.dart';
 import '../services/cart_service.dart';
 import 'cart.dart';
 import 'add_to_cart_button.dart';
+import '../services/checkout_service.dart';
+import 'shop_orders.dart';
 
 class ShopScreen extends StatefulWidget {
   final ShopService service;
@@ -308,6 +310,18 @@ class _ShopScreenState extends State<ShopScreen> {
     );
   }
 
+  Future<void> _openOrders() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => ShopOrdersScreen(
+          service: CheckoutService(widget.service.api),
+        ),
+      ),
+    );
+
+    if (mounted) _load(_page);
+  }
+
   Future<void> _openCart() async {
     final clinic = _clinic;
     if (clinic == null) return;
@@ -366,6 +380,18 @@ class _ShopScreenState extends State<ShopScreen> {
                     ? 'Choose a clinic to browse its products.'
                     : 'Products sold by your selected clinic.',
                 style: TextStyle(color: Colors.grey.shade600),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: _openOrders,
+                icon: const Icon(Icons.receipt_long_outlined),
+                label: const Text('My Orders'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: _green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
               TextField(

@@ -38,3 +38,6 @@ from app.models.followup_review_decision import FollowupReviewDecision
 from app.models.veterinarian_absence import VeterinarianAbsence, AbsenceAffectedAppointment
 from app.models.notification import Notification
 from app.models.product_stock_movement import ProductStockMovement
+from app.models.order_status_history import OrderStatusHistory
+from app.models.stripe_webhook_event import StripeWebhookEvent
+from app.models.stripe_checkout_session import StripeCheckoutSession

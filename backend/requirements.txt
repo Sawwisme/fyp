@@ -9,3 +9,4 @@ bcrypt==5.0.0
 PyJWT==2.15.1
 python-multipart
 Pillow
+stripe

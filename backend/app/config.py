@@ -73,3 +73,14 @@ if reset_url.scheme != "https" and not local_http:
     raise RuntimeError(
         "RESET_PAGE_URL requires HTTPS, except for local development."
     )
+
+# Stripe sandbox configuration.
+STRIPE_SECRET_KEY = os.getenv(
+    "STRIPE_SECRET_KEY",
+    "",
+).strip()
+
+STRIPE_WEBHOOK_SECRET = os.getenv(
+    "STRIPE_WEBHOOK_SECRET",
+    "",
+).strip()

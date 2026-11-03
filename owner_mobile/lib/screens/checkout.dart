@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../services/api_client.dart';
 import '../services/checkout_service.dart';
+import 'dart:math';
+
+import 'shop_order_details.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final CheckoutService service;
@@ -30,6 +33,227 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   bool _loading = true;
   bool _quoting = false;
+
+  final _formKey = GlobalKey<FormState>();
+
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _noteController = TextEditingController();
+
+  Map<String, dynamic>? _pendingOrder;
+
+  bool _placing = false;
+  bool _uncertain = false;
+  String? _orderError;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
+    _noteController.dispose();
+    super.dispose();
+  }
+
+  String _newCheckoutKey() {
+    final random = Random.secure();
+    final bytes = List<int>.generate(16, (_) => random.nextInt(256));
+
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+    final hex = bytes
+        .map((value) => value.toRadixString(16).padLeft(2, '0'))
+        .join();
+
+    return '${hex.substring(0, 8)}-'
+        '${hex.substring(8, 12)}-'
+        '${hex.substring(12, 16)}-'
+        '${hex.substring(16, 20)}-'
+        '${hex.substring(20)}';
+  }
+
+  Future<void> _placeOrder() async {
+    if (_placing || _quoting || _loading || _quote == null) return;
+
+    if (_pendingOrder == null) {
+      if (!(_formKey.currentState?.validate() ?? false)) return;
+
+      FocusScope.of(context).unfocus();
+
+      _pendingOrder = {
+        'checkout_key': _newCheckoutKey(),
+        'expected_cart_version': _quote!['cart_version'],
+        'expected_settings_version': _quote!['settings_version'],
+        'expected_total_amount': _quote!['total_amount'].toString(),
+        'shipping_method': _method,
+        'recipient_name': _nameController.text.trim(),
+        'recipient_phone': _phoneController.text.trim(),
+        if (_method == 'delivery')
+          'delivery_address': _addressController.text.trim(),
+        'owner_note': _noteController.text.trim().isEmpty
+            ? null
+            : _noteController.text.trim(),
+      };
+    }
+
+    setState(() {
+      _placing = true;
+      _orderError = null;
+    });
+
+    try {
+      // Retrying keeps the original key and exact payload.
+      final order = await widget.service.createOrder(
+        clinicId: widget.clinicId,
+        payload: Map<String, dynamic>.from(_pendingOrder!),
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _placing = false;
+        _pendingOrder = null;
+        _uncertain = false;
+      });
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => ShopOrderDetailsScreen(
+            service: widget.service,
+            orderId: order['order_id'] as int,
+          ),
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+
+      final code = error is ApiException ? error.statusCode : null;
+
+      final uncertainResponse = code == null ||
+          code >= 500 ||
+          code < 300 ||
+          code == 408 ||
+          code == 429;
+
+      setState(() {
+        _placing = false;
+        _uncertain = _uncertain || uncertainResponse;
+
+        if (_uncertain) {
+          _orderError =
+          'The order could not be confirmed. Tap Retry order '
+              'to check or submit the same order safely.';
+        } else {
+          // A definite rejection allows editing and a fresh quote.
+          _pendingOrder = null;
+          _orderError = error.toString();
+          _quote = null;
+          _quoteError =
+          'Reload checkout and review the latest stock and total.';
+        }
+      });
+    }
+  }
+
+  Widget _recipientForm() {
+    final locked = _placing || _pendingOrder != null;
+
+    return _panel(
+      Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Contact details',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 14),
+            TextFormField(
+              controller: _nameController,
+              enabled: !locked,
+              maxLength: 150,
+              textCapitalization: TextCapitalization.words,
+              decoration: const InputDecoration(
+                labelText: 'Recipient name',
+                border: OutlineInputBorder(),
+                counterText: '',
+              ),
+              validator: (value) {
+                if ((value?.trim().length ?? 0) < 2) {
+                  return 'Enter the recipient’s name.';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 14),
+            TextFormField(
+              controller: _phoneController,
+              enabled: !locked,
+              maxLength: 20,
+              keyboardType: TextInputType.phone,
+              decoration: const InputDecoration(
+                labelText: 'Phone number',
+                hintText: 'e.g. +60123456789',
+                border: OutlineInputBorder(),
+                counterText: '',
+              ),
+              validator: (value) {
+                final phone = value?.trim() ?? '';
+                if (!RegExp(
+                  r'^\+?[0-9][0-9 ()-]{5,18}[0-9]$',
+                ).hasMatch(phone)) {
+                  return 'Enter a valid phone number.';
+                }
+                return null;
+              },
+            ),
+            if (_method == 'delivery') ...[
+              const SizedBox(height: 14),
+              TextFormField(
+                controller: _addressController,
+                enabled: !locked,
+                maxLength: 500,
+                minLines: 3,
+                maxLines: 5,
+                keyboardType: TextInputType.multiline,
+                decoration: const InputDecoration(
+                  labelText: 'Full delivery address',
+                  hintText: 'Street, city, postcode and state',
+                  alignLabelWithHint: true,
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if ((value?.trim().length ?? 0) < 10) {
+                    return 'Enter your full delivery address.';
+                  }
+                  return null;
+                },
+              ),
+            ],
+            const SizedBox(height: 14),
+            TextFormField(
+              controller: _noteController,
+              enabled: !locked,
+              maxLength: 500,
+              minLines: 2,
+              maxLines: 4,
+              decoration: const InputDecoration(
+                labelText: 'Order note (optional)',
+                alignLabelWithHint: true,
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -217,7 +441,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       child: Text('Delivery'),
                     ),
                 ],
-                onChanged: _quoting
+                onChanged: (_quoting || _placing || _pendingOrder != null)
                     ? null
                     : (value) {
                   if (value != null) _loadQuote(value);
@@ -304,16 +528,64 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ],
             ),
           ),
+        _recipientForm(),
+
+        if (_orderError != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: Text(
+              _orderError!,
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+
+        FilledButton(
+          onPressed: _placing ||
+              _quoting ||
+              _loading ||
+              _quote == null
+              ? null
+              : _placeOrder,
+          style: FilledButton.styleFrom(
+            backgroundColor: _green,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          child: Text(
+            _placing
+                ? 'Placing order…'
+                : _pendingOrder != null
+                ? 'Retry order'
+                : 'Place order',
+          ),
+        ),
+
+        const SizedBox(height: 10),
+
+        const Text(
+          'Your order will be pending payment. '
+              'Stock is reserved for 15 minutes.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.black54,
+            fontSize: 13,
+          ),
+        ),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F5),
-      appBar: AppBar(title: const Text('Checkout')),
-      body: _body(),
+    return PopScope(
+      canPop: !_placing,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F7F5),
+        appBar: AppBar(title: const Text('Checkout')),
+        body: _body(),
+      ),
     );
   }
 }

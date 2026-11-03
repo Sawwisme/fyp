@@ -39,6 +39,8 @@ from app.routers.checkout import router as checkout_router
 from app.routers.shop_orders import router as shop_orders_router
 from app.order_expiry_worker import run_worker as run_order_expiry_worker
 from app.automatic_scheduling_worker import run_worker
+from app.routers.clinic_orders import router as clinic_orders_router
+from app.routers.stripe_payment import router as stripe_payments_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -110,6 +112,8 @@ app.include_router(shop_router)
 app.include_router(cart_router)
 app.include_router(checkout_router)
 app.include_router(shop_orders_router)
+app.include_router(clinic_orders_router)
+app.include_router(stripe_payments_router)
 
 
 WEB_DIR = Path(__file__).resolve().parents[2] / "web"
