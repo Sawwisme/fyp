@@ -14,7 +14,9 @@ from app.models import (
     User,
 )
 from app.services.pet_service import get_owner_profile
-
+from app.services.stripe_reservation_service import (
+    close_checkout_before_stock_release,
+)
 
 def utc_now():
     return datetime.now(timezone.utc).replace(tzinfo=None)
@@ -97,6 +99,8 @@ def _release_stock(
             "Payment has been received. This order cannot be cancelled "
             "as an unpaid order.",
         )
+    
+    close_checkout_before_stock_release(db, order)
 
     items = db.scalars(
         select(OrderItem)

@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from stripe import StripeClient
+from stripe import RequestsClient, StripeClient
 
 from app import config
 
@@ -14,7 +14,11 @@ def get_stripe_client() -> StripeClient:
             detail="Stripe sandbox payments are not configured.",
         )
 
-    return StripeClient(key)
+    return StripeClient(
+        key,
+        http_client=RequestsClient(timeout=10),
+        max_network_retries=0,
+    )
 
 
 def get_webhook_secret() -> str:

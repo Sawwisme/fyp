@@ -84,3 +84,8 @@ STRIPE_WEBHOOK_SECRET = os.getenv(
     "STRIPE_WEBHOOK_SECRET",
     "",
 ).strip()
+
+STRIPE_RETURN_BASE_URL = os.getenv(
+    "STRIPE_RETURN_BASE_URL",
+    "http://127.0.0.1:8000",
+).strip().rstrip("/")
