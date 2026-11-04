@@ -262,3 +262,138 @@
     background: #fff4f4;
     color: #a32626;
 }
+
+.order-cash-cancel {
+    padding: 18px;
+    border: 1px solid #ead6d6;
+    border-radius: 12px;
+    background: white;
+}
+
+.order-cash-cancel summary {
+    color: #a32626;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.order-cash-cancel .order-fulfilment-form {
+    margin-top: 16px;
+}
+
+.order-fulfilment-form .order-cancel {
+    border: 1px solid #b52b2b;
+    background: white;
+    color: #b52b2b;
+}
+
+.order-refund-card {
+    padding: 18px;
+    margin-top: 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #fbfcfb;
+}
+
+.order-refund-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.order-refund-heading h4 {
+    margin: 0;
+    font-size: 15px;
+}
+
+.order-refund-heading strong {
+    flex-shrink: 0;
+    color: var(--green);
+}
+
+.order-refund-card .order-fulfilment-form {
+    margin-top: 18px;
+}
+
+.order-fulfilment-form select {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+}
+
+.order-refund-notice {
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border: 1px solid #cce1d1;
+    border-radius: 8px;
+    background: #edf6ef;
+    color: #176b32;
+    line-height: 1.5;
+}
+
+.order-refund-card button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.order-refund-stock {
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+}
+
+.order-refund-stock h4 {
+    margin: 0;
+}
+
+.refund-stock-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 140px;
+    gap: 18px;
+    align-items: center;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: white;
+}
+
+.refund-stock-row strong {
+    overflow-wrap: anywhere;
+}
+
+.refund-stock-row label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.refund-stock-row input {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 42px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: #fafbf9;
+    font: inherit;
+}
+
+.refund-stock-result {
+    padding-left: 20px;
+    line-height: 1.8;
+}
+
+@media (max-width: 560px) {
+    .refund-stock-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}

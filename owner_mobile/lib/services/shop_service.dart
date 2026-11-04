@@ -35,6 +35,7 @@ class ShopService {
   Future<List<Map<String, dynamic>>> getProducts({
     required int clinicId,
     String search = '',
+    int? categoryId,
     int offset = 0,
     int limit = 11,
   }) async {
@@ -42,10 +43,19 @@ class ShopService {
       'q': search,
       'offset': '$offset',
       'limit': '$limit',
+      if (categoryId != null) 'category_id': '$categoryId',
     }).query;
 
     return _readList(
       await api.get('/shop/clinics/$clinicId/products?$query'),
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getCategories(
+      int clinicId,
+      ) async {
+    return _readList(
+      await api.get('/shop/categories?clinic_id=$clinicId'),
     );
   }
 

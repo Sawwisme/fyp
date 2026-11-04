@@ -11,7 +11,10 @@ from app.schemas.clinic_orders import (
     ClinicOrderStatusUpdate,
 )
 from app.schemas.shop_orders import ShopOrderResponse
-from app.services import clinic_order_service
+from app.services import clinic_order_service, clinic_refund_service, stripe_refund_service, refund_stock_service
+
+from app.schemas.clinic_refunds import ClinicRefundReview, CashRefundConfirm, OnlineRefundProcess, RefundStockReview
+from app.schemas.shop_refunds import ShopRefundResponse
 
 
 router = APIRouter(
@@ -84,4 +87,106 @@ def update_status(
         current_user=current_user,
         order_id=order_id,
         data=data,
+    )
+
+@router.get(
+    "/{order_id}/refunds",
+    response_model=list[ShopRefundResponse],
+)
+def list_refunds(
+    order_id: int = Path(ge=1, le=2147483647),
+    current_user: User = Depends(
+        require_roles("clinic_administrator")
+    ),
+    db: Session = Depends(get_db),
+):
+    return clinic_refund_service.list_order_refunds(
+        db,
+        current_user,
+        order_id,
+    )
+
+
+@router.post(
+    "/{order_id}/refunds/{refund_id}/review",
+    response_model=ShopRefundResponse,
+)
+def review_refund(
+    data: ClinicRefundReview,
+    order_id: int = Path(ge=1, le=2147483647),
+    refund_id: int = Path(ge=1, le=2147483647),
+    current_user: User = Depends(
+        require_roles("clinic_administrator")
+    ),
+    db: Session = Depends(get_db),
+):
+    return clinic_refund_service.review_refund(
+        db,
+        current_user,
+        order_id,
+        refund_id,
+        data,
+    )
+
+@router.post(
+    "/{order_id}/refunds/{refund_id}/confirm-cash",
+    response_model=ShopRefundResponse,
+)
+def confirm_cash_refund(
+    data: CashRefundConfirm,
+    order_id: int = Path(ge=1, le=2147483647),
+    refund_id: int = Path(ge=1, le=2147483647),
+    current_user: User = Depends(
+        require_roles("clinic_administrator")
+    ),
+    db: Session = Depends(get_db),
+):
+    return clinic_refund_service.confirm_cash_refund(
+        db,
+        current_user,
+        order_id,
+        refund_id,
+        data,
+    )
+
+@router.post(
+    "/{order_id}/refunds/{refund_id}/process-online",
+    response_model=ShopRefundResponse,
+)
+def process_online_refund(
+    data: OnlineRefundProcess,
+    order_id: int = Path(ge=1, le=2147483647),
+    refund_id: int = Path(ge=1, le=2147483647),
+    current_user: User = Depends(
+        require_roles("clinic_administrator")
+    ),
+    db: Session = Depends(get_db),
+):
+    return stripe_refund_service.process_online_refund(
+        db,
+        current_user,
+        order_id,
+        refund_id,
+        data,
+    )
+
+@router.post(
+    "/{order_id}/refunds/{refund_id}/review-stock",
+    response_model=ShopRefundResponse,
+)
+def review_refund_stock(
+    data: RefundStockReview,
+    order_id: int = Path(ge=1, le=2147483647),
+    refund_id: int = Path(ge=1, le=2147483647),
+    current_user: User = Depends(
+        require_roles("clinic_administrator")
+    ),
+    db: Session = Depends(get_db),
+):
+    return refund_stock_service.review_refund_stock(
+        db,
+        current_user,
+        order_id,
+        refund_id,
+        data,
     )

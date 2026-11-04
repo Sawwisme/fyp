@@ -38,6 +38,8 @@ class ShopOrderCreate(BaseModel):
 
     shipping_method: Literal["pickup", "delivery"]
 
+    payment_method: Literal["cash", "online_banking"] = "online_banking"
+
     recipient_name: str = Field(
         min_length=2,
         max_length=150,
@@ -63,8 +65,12 @@ class ShopOrderCreate(BaseModel):
             if not self.delivery_address:
                 raise ValueError("Enter the delivery address.")
 
-        return self
+            if self.payment_method == "cash":
+                raise ValueError(
+                    "Cash payment is available for clinic pickup only."
+                )
 
+        return self
 
 class ShopOrderItemResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -82,6 +88,7 @@ class ShopOrderResponse(BaseModel):
     clinic_name: str
     order_status: str
     payment_status: str
+    payment_method: str
 
     shipping_method: str
     shipping_address: str

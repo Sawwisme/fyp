@@ -23,16 +23,21 @@ def list_categories(
     db: Session,
     current_user: User,
 ):
-    get_admin_record(db, current_user)
+    admin = get_admin_record(db, current_user)
 
     return db.scalars(
         select(ProductCategory)
+        .where(
+            or_(
+                ProductCategory.clinic_id.is_(None),
+                ProductCategory.clinic_id == admin.clinic_id,
+            )
+        )
         .order_by(
             ProductCategory.category_name,
             ProductCategory.category_id,
         )
     ).all()
-
 
 def list_clinic_products(
     db: Session,
@@ -110,10 +115,23 @@ def create_product(
         if clinic is None:
             raise HTTPException(403, "Your clinic is unavailable.")
 
-        category = db.get(ProductCategory, data.category_id)
+        category = db.scalar(
+            select(ProductCategory)
+            .where(
+                ProductCategory.category_id == data.category_id,
+                or_(
+                    ProductCategory.clinic_id.is_(None),
+                    ProductCategory.clinic_id == clinic.clinic_id,
+                ),
+            )
+        )
 
         if category is None:
-            raise HTTPException(422, "Select an existing category.")
+            raise HTTPException(
+                422,
+                "Select a shared category or one belonging "
+                "to your clinic.",
+            )
 
         product = Product(
             clinic_id=clinic.clinic_id,
@@ -247,10 +265,23 @@ def update_product(
                 "and reopen the product before editing.",
             )
 
-        category = db.get(ProductCategory, data.category_id)
+        category = db.scalar(
+            select(ProductCategory)
+            .where(
+                ProductCategory.category_id == data.category_id,
+                or_(
+                    ProductCategory.clinic_id.is_(None),
+                    ProductCategory.clinic_id == clinic.clinic_id,
+                ),
+            )
+        )
 
         if category is None:
-            raise HTTPException(422, "Select an existing category.")
+            raise HTTPException(
+                422,
+                "Select a shared category or one belonging "
+                "to your clinic.",
+            )
 
         product.category = category
         product.product_name = data.product_name

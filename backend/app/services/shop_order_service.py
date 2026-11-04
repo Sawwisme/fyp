@@ -21,10 +21,14 @@ from app.models import (
 )
 from app.schemas.shop_orders import ShopOrderCreate, ShopOrderResponse
 from app.services.pet_service import get_owner_profile
-
+from app.services.shop_notification_service import notify_shop_event
 
 def _fingerprint(clinic_id: int, data: ShopOrderCreate) -> str:
     payload = data.model_dump(mode="json")
+    # Preserve compatibility with existing online checkout retries.
+    if data.payment_method == "online_banking":
+        payload.pop("payment_method", None)
+
     payload["clinic_id"] = clinic_id
     payload["expected_total_amount"] = format(
         data.expected_total_amount, ".2f"
@@ -59,6 +63,11 @@ def build_order_response(db: Session, order: Order):
         clinic_id=order.clinic_id,
         clinic_name=order.clinic.clinic_name,
         order_status=order.order_status,
+        payment_method=(
+            payment.payment_method
+            if payment is not None
+            else "unavailable"
+        ),
         payment_status=(
             payment.payment_status if payment is not None else "unavailable"
         ),
@@ -269,9 +278,17 @@ def create_order(
             subtotal=subtotal,
             shipping_fee=shipping_fee,
             total_amount=total,
-            order_status="pending_payment",
+            order_status=(
+                "confirmed"
+                if data.payment_method == "cash"
+                else "pending_payment"
+            ),
             order_date=now,
-            payment_expires_at=now + timedelta(minutes=15),
+            payment_expires_at=(
+                None
+                if data.payment_method == "cash"
+                else now + timedelta(minutes=15)
+            ),
             version=1,
         )
 
@@ -314,7 +331,7 @@ def create_order(
         db.add(
             Payment(
                 order_id=order.order_id,
-                payment_method="online_banking",
+                payment_method=data.payment_method,
                 payment_status="pending",
                 amount=total,
             )
@@ -322,6 +339,21 @@ def create_order(
 
         cart.version += 1
         cart.updated_at = now
+
+        if data.payment_method == "cash":
+            notify_shop_event(
+                db,
+                order,
+                event_key=f"shop:order:{order.order_id}:created",
+                title="New cash pickup order",
+                message=(
+                    f"Order #{order.order_id} is confirmed "
+                    "for clinic pickup. Payment will be "
+                    "collected at pickup."
+                ),
+                include_owner=False,
+                include_admins=True,
+            )
 
         db.flush()
         result = build_order_response(db, order)

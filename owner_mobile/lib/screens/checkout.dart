@@ -28,6 +28,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Map<String, dynamic>? _quote;
 
   String? _method;
+  String _paymentMethod = 'online_banking';
   String? _error;
   String? _quoteError;
 
@@ -88,6 +89,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         'expected_settings_version': _quote!['settings_version'],
         'expected_total_amount': _quote!['total_amount'].toString(),
         'shipping_method': _method,
+        'payment_method': _paymentMethod,
         'recipient_name': _nameController.text.trim(),
         'recipient_phone': _phoneController.text.trim(),
         if (_method == 'delivery')
@@ -155,6 +157,67 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         }
       });
     }
+  }
+
+  Widget _paymentOptions() {
+    final locked = _placing ||
+        _quoting ||
+        _pendingOrder != null;
+
+    return _panel(
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Payment method',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 14),
+          DropdownButtonFormField<String>(
+            key: ValueKey('payment-$_method-$_paymentMethod'),
+            initialValue: _paymentMethod,
+            isExpanded: true,
+            decoration: const InputDecoration(
+              labelText: 'How would you like to pay?',
+              border: OutlineInputBorder(),
+            ),
+            items: [
+              const DropdownMenuItem(
+                value: 'online_banking',
+                child: Text('Online banking'),
+              ),
+              if (_method == 'pickup')
+                const DropdownMenuItem(
+                  value: 'cash',
+                  child: Text('Cash at clinic pickup'),
+                ),
+            ],
+            onChanged: locked
+                ? null
+                : (value) {
+              if (value == null) return;
+
+              setState(() => _paymentMethod = value);
+            },
+          ),
+          const SizedBox(height: 12),
+          Text(
+            _paymentMethod == 'cash'
+                ? 'Pay the clinic when collecting your order.'
+                : _method == 'delivery'
+                ? 'Delivery orders require online payment.'
+                : 'Pay online after placing your order.',
+            style: const TextStyle(
+              color: Colors.black54,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _recipientForm() {
@@ -308,6 +371,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Future<void> _loadQuote(String method) async {
     setState(() {
       _method = method;
+
+      if (method == 'delivery') {
+        _paymentMethod = 'online_banking';
+      }
+
       _quoting = true;
       _quote = null;
       _quoteError = null;
@@ -528,6 +596,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ],
             ),
           ),
+        _paymentOptions(),
         _recipientForm(),
 
         if (_orderError != null)
@@ -564,11 +633,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
         const SizedBox(height: 10),
 
-        const Text(
-          'Your order will be pending payment. '
-              'Stock is reserved for 15 minutes.',
+        Text(
+          _paymentMethod == 'cash'
+              ? 'Your pickup order will be confirmed. '
+              'Payment remains pending until the clinic receives cash.'
+              : 'Your order will be pending payment. '
+              'Complete online payment within 15 minutes.',
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.black54,
             fontSize: 13,
           ),

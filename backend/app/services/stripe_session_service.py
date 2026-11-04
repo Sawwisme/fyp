@@ -51,8 +51,11 @@ def resolve_remote_session(checkout: StripeCheckoutSession) -> dict:
 
         checkout.stripe_session_id = session_id
 
-        # The caller validates the response and commits the mapping.
-        return remote
+        # An idempotency retry can replay the original creation response.
+        # Retrieve the session again to obtain its current payment state.
+        return client.v1.checkout.sessions.retrieve(
+            session_id
+        ).to_dict()
 
     except StripeError:
         raise HTTPException(

@@ -10,8 +10,13 @@ from app.schemas.shop_orders import (
     ShopOrderCreate,
     ShopOrderResponse,
 )
-from app.services import shop_order_service
-from app.services import order_reservation_service
+
+from app.services import order_reservation_service, shop_order_service, shop_refund_service
+
+from app.schemas.shop_refunds import (
+    ShopRefundCreate,
+    ShopRefundResponse,
+)
 
 
 router = APIRouter(
@@ -97,6 +102,39 @@ def cancel_unpaid_order(
     db: Session = Depends(get_db),
 ):
     return order_reservation_service.cancel_my_unpaid_order(
+        db,
+        current_user,
+        order_id,
+    )
+
+@router.post(
+    "/orders/{order_id}/refunds",
+    response_model=ShopRefundResponse,
+)
+def request_refund(
+    data: ShopRefundCreate,
+    order_id: int = Path(ge=1, le=2147483647),
+    current_user: User = Depends(require_roles("pet_owner")),
+    db: Session = Depends(get_db),
+):
+    return shop_refund_service.request_my_refund(
+        db,
+        current_user,
+        order_id,
+        data,
+    )
+
+
+@router.get(
+    "/orders/{order_id}/refunds",
+    response_model=list[ShopRefundResponse],
+)
+def list_order_refunds(
+    order_id: int = Path(ge=1, le=2147483647),
+    current_user: User = Depends(require_roles("pet_owner")),
+    db: Session = Depends(get_db),
+):
+    return shop_refund_service.list_my_order_refunds(
         db,
         current_user,
         order_id,

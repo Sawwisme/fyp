@@ -44,11 +44,17 @@
                             Shop Settings
                         </button>
 
+                        <button id="category-add" class="secondary compact-button" type="button">
+                            Add Category
+                        </button>
+
                         <button id="product-add" class="product-primary" type="button">
                             Add Product
                         </button>
                     </div>
                 </div>
+
+                <p id="category-page-message" class="muted" role="status"></p>
 
                 <div class="staff-summary product-summary">
                     <div>
@@ -181,6 +187,50 @@
                 </button>
                 <button id="product-save" type="submit" class="product-primary">
                     Create product
+                </button>
+            </footer>
+        </form>
+    </dialog>
+
+    <dialog id="category-dialog" aria-labelledby="category-dialog-title">
+        <form id="category-form">
+            <header class="products-heading">
+                <h2 id="category-dialog-title">Add Category</h2>
+
+                <button id="category-close" type="button" class="dialog-close"
+                    aria-label="Close category form">×</button>
+            </header>
+
+            <p class="muted">
+                Create a category for your clinic.
+                Shared default categories remain available.
+            </p>
+
+            <fieldset id="category-fields" class="product-form-grid">
+                <div class="product-wide">
+                    <label for="category-name">Category name</label>
+                    <input id="category-name" required minlength="2" maxlength="100"
+                        placeholder="For example, Dental Supplements">
+                </div>
+
+                <div class="product-wide">
+                    <label for="category-description">
+                        Description (optional)
+                    </label>
+
+                    <textarea id="category-description" rows="3" maxlength="1000"></textarea>
+                </div>
+            </fieldset>
+
+            <p id="category-form-message" role="status"></p>
+
+            <footer class="product-form-actions">
+                <button id="category-cancel" type="button" class="secondary compact-button">
+                    Cancel
+                </button>
+
+                <button id="category-save" type="submit" class="product-primary">
+                    Save category
                 </button>
             </footer>
         </form>

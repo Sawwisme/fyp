@@ -434,6 +434,143 @@
     });
     get('logout-button').addEventListener('click', logout);
 
+    let savingCategory = false;
+    const categoryDialog = get('category-dialog');
+
+    async function loadCategories(selectedCategoryId = null) {
+        const categories = await request('/clinic-products/categories');
+
+        if (!Array.isArray(categories)) {
+            throw new Error('Unexpected category response.');
+        }
+
+        const filter = get('product-category-filter');
+        const productSelect = get('product-category');
+
+        const previousFilter = filter.value;
+        const previousSelection = selectedCategoryId === null
+            ? productSelect.value
+            : String(selectedCategoryId);
+
+        filter.replaceChildren(new Option('All categories', ''));
+        productSelect.replaceChildren(
+            new Option('Select a category', '')
+        );
+
+        for (const category of categories) {
+            const title = category.clinic_id === null
+                ? `${category.category_name} (Shared)`
+                : category.category_name;
+
+            filter.add(new Option(title, category.category_id));
+            productSelect.add(new Option(title, category.category_id));
+        }
+
+        filter.value = previousFilter;
+        if (filter.selectedIndex < 0) filter.value = '';
+
+        productSelect.value = previousSelection;
+        if (productSelect.selectedIndex < 0) {
+            productSelect.value = '';
+        }
+
+        return categories;
+    }
+
+    function categoryControls() {
+        get('category-fields').disabled = savingCategory;
+        get('category-save').disabled = savingCategory;
+        get('category-close').disabled = savingCategory;
+        get('category-cancel').disabled = savingCategory;
+        get('category-save').textContent = savingCategory
+            ? 'Saving…'
+            : 'Save category';
+    }
+
+    get('category-add').addEventListener('click', () => {
+        if (savingCategory || saving) return;
+
+        get('category-form').reset();
+        get('category-form-message').textContent = '';
+        get('category-page-message').textContent = '';
+
+        categoryDialog.showModal();
+        get('category-name').focus();
+    });
+
+    for (const id of ['category-close', 'category-cancel']) {
+        get(id).addEventListener('click', () => {
+            if (!savingCategory) categoryDialog.close();
+        });
+    }
+
+    categoryDialog.addEventListener('cancel', event => {
+        if (savingCategory) event.preventDefault();
+    });
+
+    get('category-form').addEventListener('submit', async event => {
+        event.preventDefault();
+
+        const form = get('category-form');
+        const feedback = get('category-form-message');
+
+        if (savingCategory || !form.reportValidity()) return;
+
+        const name = get('category-name').value
+            .trim()
+            .replace(/\s+/g, ' ');
+
+        if (name.length < 2) {
+            feedback.textContent =
+                'Enter a category name of at least 2 characters.';
+            return;
+        }
+
+        const payload = {
+            category_name: name,
+            description:
+                get('category-description').value.trim() || null
+        };
+
+        savingCategory = true;
+        categoryControls();
+        feedback.textContent = 'Saving category…';
+
+        let saved = false;
+
+        try {
+            const category = await request(
+                '/clinic-products/categories',
+                payload
+            );
+
+            if (!Number.isInteger(category.category_id)) {
+                throw new Error('Unexpected saved category response.');
+            }
+
+            saved = true;
+
+            await loadCategories(category.category_id);
+
+            categoryDialog.close();
+
+            get('category-page-message').textContent =
+                `“${category.category_name}” is ready to use. ` +
+                'Existing categories are reused instead of duplicated.';
+
+        } catch (error) {
+            feedback.textContent = saved
+                ? 'The category was saved, but the dropdowns could ' +
+                'not refresh. Reload the page to see it.'
+                : `${error.message} The result needs checking. ` +
+                'Retrying the same name reuses an existing category.';
+
+        } finally {
+            savingCategory = false;
+            categoryControls();
+        }
+    });
+
     async function initialize() {
         if (starting) return;
         starting = true;
@@ -445,20 +582,7 @@
             get('topbar-avatar').textContent =
                 Array.from(profile.user.full_name.trim())[0]?.toUpperCase() || 'A';
 
-            const categories = await request('/clinic-products/categories');
-
-            for (const category of categories) {
-                get('product-category-filter').add(
-                    new Option(category.category_name, category.category_id)
-                );
-                get('product-category').add(
-                    new Option(category.category_name, category.category_id)
-                );
-            }
-
-            if (!categories.length) {
-                throw new Error('Add the product categories in MySQL first.');
-            }
+            await loadCategories();
 
             get('products-loading').hidden = true;
             get('products-workspace').hidden = false;

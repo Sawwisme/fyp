@@ -43,7 +43,7 @@ class OrderStatusHistory(Base):
     changed_by_user_id = Column(
         Integer,
         ForeignKey("users.user_id"),
-        nullable=False,
+        nullable=True,
     )
 
     previous_status = Column(String(30), nullable=False)

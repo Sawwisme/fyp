@@ -21,8 +21,9 @@ from app.schemas.products import (
     ProductUpdate,
     ProductStockAdjustment,
     ProductStockMovementResponse,
+    ProductCategoryCreate,
 )
-from app.services import product_service, product_image_service
+from app.services import product_service, product_image_service, product_category_service
 
 
 router = APIRouter(
@@ -44,6 +45,23 @@ def list_categories(
     return product_service.list_categories(
         db,
         current_user,
+    )
+
+@router.post(
+    "/categories",
+    response_model=ProductCategoryResponse,
+)
+def create_category(
+    data: ProductCategoryCreate,
+    current_user: User = Depends(
+        require_roles("clinic_administrator")
+    ),
+    db: Session = Depends(get_db),
+):
+    return product_category_service.create_category(
+        db,
+        current_user,
+        data,
     )
 
 

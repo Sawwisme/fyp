@@ -1,5 +1,5 @@
 from decimal import Decimal
-
+from datetime import date
 from pydantic import BaseModel, ConfigDict
 
 from app.schemas.products import ProductCategoryResponse
@@ -12,6 +12,8 @@ class ShopClinicResponse(BaseModel):
     clinic_name: str
     address: str | None
     phone_number: str | None
+    completed_visit_count: int = 0
+    last_visit_date: date | None = None
 
 
 class ShopProductResponse(BaseModel):

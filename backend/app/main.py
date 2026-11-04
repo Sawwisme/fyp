@@ -41,6 +41,8 @@ from app.order_expiry_worker import run_worker as run_order_expiry_worker
 from app.automatic_scheduling_worker import run_worker
 from app.routers.clinic_orders import router as clinic_orders_router
 from app.routers.stripe_payment import router as stripe_payments_router
+from app.stripe_event_worker import run_worker as run_stripe_event_worker
+from app.stripe_refund_worker import run_worker as run_stripe_refund_worker
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -57,6 +59,18 @@ async def lifespan(app: FastAPI):
             target=run_order_expiry_worker,
             args=(stop_event,),
             name="shop-order-expiry",
+            daemon=True,
+        ),
+        Thread(
+            target=run_stripe_event_worker,
+            args=(stop_event,),
+            name="stripe-events",
+            daemon=True,
+        ),
+        Thread(
+            target=run_stripe_refund_worker,
+            args=(stop_event,),
+            name="stripe-refunds",
             daemon=True,
         ),
     ]

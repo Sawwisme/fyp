@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../services/checkout_service.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'shop_refunds.dart';
 
 class ShopOrderDetailsScreen extends StatefulWidget {
   final CheckoutService service;
@@ -18,18 +20,47 @@ class ShopOrderDetailsScreen extends StatefulWidget {
 }
 
 class _ShopOrderDetailsScreenState
-    extends State<ShopOrderDetailsScreen> {
+    extends State<ShopOrderDetailsScreen>
+    with WidgetsBindingObserver {
   static const _green = Color(0xFF176B32);
 
   Map<String, dynamic>? _order;
   String? _error;
   bool _loading = false;
   bool _cancelling = false;
+  bool _openingPayment = false;
+  bool _checkingPayment = false;
+  bool _awaitingPaymentReturn = false;
+  bool _refreshAfterOpening = false;
+
+  String? _paymentMessage;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _load();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed ||
+        !_awaitingPaymentReturn) {
+      return;
+    }
+
+    if (_openingPayment) {
+      _refreshAfterOpening = true;
+      return;
+    }
+
+    _refreshPaymentResult();
   }
 
   String _money(dynamic value) {
@@ -71,7 +102,25 @@ class _ShopOrderDetailsScreenState
     try {
       final order = await widget.service.getOrder(widget.orderId);
       if (!mounted) return;
-      setState(() => _order = order);
+      setState(() {
+        _order = order;
+
+        final acceptedStatuses = {
+          'paid',
+          'processing',
+          'ready_for_pickup',
+          'shipped',
+          'completed',
+        };
+
+        if (order['payment_status'] == 'paid' &&
+            acceptedStatuses.contains(order['order_status'])) {
+          _paymentMessage = 'Payment confirmed.';
+        } else if (order['order_status'] != 'pending_payment' &&
+            _paymentMessage != null) {
+          _paymentMessage = 'The order status has been updated.';
+        }
+      });
     } catch (error) {
       if (mounted) {
         setState(() => _error = error.toString());
@@ -81,8 +130,152 @@ class _ShopOrderDetailsScreenState
     }
   }
 
+  Future<void> _pay() async {
+    if (_openingPayment || _checkingPayment || _loading || _cancelling || _order?['payment_method'] != 'online_banking' || _order?['order_status'] != 'pending_payment' || _order?['payment_status'] != 'pending') {
+      return;
+    }
+
+    setState(() {
+      _openingPayment = true;
+      _paymentMessage = null;
+    });
+
+    try {
+      final checkout = await widget.service.openStripeCheckout(
+        widget.orderId,
+      );
+
+      if (!mounted) return;
+
+      final uri = Uri.tryParse(
+        checkout['checkout_url']?.toString() ?? '',
+      );
+
+      if (checkout['order_id'] != widget.orderId ||
+          uri == null ||
+          uri.scheme != 'https' ||
+          uri.host != 'checkout.stripe.com' ||
+          uri.userInfo.isNotEmpty) {
+        throw Exception('The server returned an invalid payment link.');
+      }
+
+      _awaitingPaymentReturn = true;
+
+      final opened = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+
+      if (!opened) {
+        throw Exception('Cannot open the payment page on this device.');
+      }
+
+      if (mounted) {
+        setState(() {
+          _paymentMessage =
+          'Complete payment in your browser, then return here. '
+              'Your order updates after payment is verified.';
+        });
+      }
+    } catch (error) {
+      _awaitingPaymentReturn = false;
+
+      if (mounted) {
+        setState(() {
+          _paymentMessage =
+          '$error\n'
+              'Refresh the order before trying again. '
+              'Pay now reuses the same saved payment request.';
+        });
+
+        await _load();
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _openingPayment = false);
+
+        if (_refreshAfterOpening) {
+          _refreshAfterOpening = false;
+          _refreshPaymentResult();
+        }
+      }
+    }
+  }
+
+  Future<void> _refreshPaymentResult() async {
+    if (!mounted || _checkingPayment) return;
+
+    _awaitingPaymentReturn = false;
+
+    setState(() {
+      _checkingPayment = true;
+      _paymentMessage = 'Checking payment confirmation…';
+    });
+
+    try {
+      // The webhook worker may need a few seconds to confirm payment.
+      for (var attempt = 0; attempt < 6; attempt++) {
+        if (!mounted) return;
+
+        if (WidgetsBinding.instance.lifecycleState !=
+            AppLifecycleState.resumed) {
+          _awaitingPaymentReturn = true;
+          return;
+        }
+
+        await _load();
+
+        if (!mounted) return;
+
+        if (_error != null ||
+            _order?['order_status'] != 'pending_payment' ||
+            _order?['payment_status'] == 'paid') {
+          break;
+        }
+
+        if (attempt < 5) {
+          await Future<void>.delayed(const Duration(seconds: 2));
+        }
+      }
+
+      if (!mounted) return;
+
+      final paidAndAccepted =
+          _order?['payment_status'] == 'paid' &&
+              {
+                'paid',
+                'processing',
+                'ready_for_pickup',
+                'shipped',
+                'completed',
+              }.contains(_order?['order_status']);
+
+      setState(() {
+        if (_error != null) {
+          _paymentMessage =
+          'Could not check payment confirmation. '
+              'Use Refresh order to try again.';
+        } else if (paidAndAccepted) {
+          _paymentMessage = 'Payment confirmed.';
+        } else if (_order?['order_status'] != 'pending_payment') {
+          _paymentMessage = 'The order status has been updated.';
+        } else {
+          _paymentMessage =
+          'Payment is not confirmed yet. '
+              'If you completed payment, refresh again shortly.';
+        }
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _checkingPayment = false);
+      }
+    }
+  }
+
   Future<void> _cancel() async {
-    if (_cancelling || _loading) return;
+    if (_cancelling || _loading || _openingPayment || _checkingPayment) {
+      return;
+    }
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -195,7 +388,11 @@ class _ShopOrderDetailsScreenState
 
     final order = _order!;
     final pending = order['order_status'] == 'pending_payment';
-    final busy = _loading || _cancelling;
+    final cash = order['payment_method'] == 'cash';
+
+    final canCancel = order['payment_status'] == 'pending' &&
+        (pending || (cash && order['order_status'] == 'confirmed'));
+    final busy = _loading || _cancelling || _openingPayment || _checkingPayment;
 
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -238,8 +435,29 @@ class _ShopOrderDetailsScreenState
             ),
           ),
           const SizedBox(height: 12),
+          Text(
+            'Payment method: '
+                '${cash ? 'Cash at clinic pickup' : 'Online banking'}',
+          ),
           Text('Payment: ${_label(order['payment_status'])}'),
           Text('Placed: ${_date(order['order_date'])}'),
+          if (cash &&
+              order['payment_status'] == 'pending' &&
+              {
+                'confirmed',
+                'processing',
+                'ready_for_pickup',
+              }.contains(order['order_status'])) ...[
+            const SizedBox(height: 12),
+            const Text(
+              'Pay the clinic when collecting your order. '
+                  'Staff will confirm payment after receiving your cash.',
+              style: TextStyle(
+                color: Colors.black54,
+                height: 1.5,
+              ),
+            ),
+          ],
           if (pending) ...[
             const SizedBox(height: 12),
             Text(
@@ -248,8 +466,8 @@ class _ShopOrderDetailsScreenState
             ),
             const SizedBox(height: 8),
             const Text(
-              'Unpaid orders expire automatically. '
-                  'Online banking will be available after payment integration.',
+              'Complete payment before the deadline. '
+                  'Return here afterward to check confirmation.',
               style: TextStyle(color: Colors.black54),
             ),
           ],
@@ -308,7 +526,72 @@ class _ShopOrderDetailsScreenState
           const Divider(),
           _amount('Total', order['total_amount'], total: true),
         ]),
-        if (pending)
+        if (_paymentMessage != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(
+              _paymentMessage!,
+              style: const TextStyle(
+                color: _green,
+                height: 1.5,
+              ),
+            ),
+          ),
+
+        if (!cash && pending && order['payment_status'] == 'pending') ...[
+          FilledButton.icon(
+            onPressed: busy || _error != null ? null : _pay,
+            icon: const Icon(Icons.account_balance_outlined),
+            label: Text(
+              _openingPayment
+                  ? 'Opening payment…'
+                  : _checkingPayment
+                  ? 'Checking payment…'
+                  : 'Pay now',
+            ),
+            style: FilledButton.styleFrom(
+              backgroundColor: _green,
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+
+        if ({
+          'paid',
+          'refunded',
+        }.contains(order['payment_status'])) ...[
+          OutlinedButton.icon(
+            onPressed: busy || _error != null
+                ? null
+                : () async {
+              await Navigator.of(context).push<void>(
+                MaterialPageRoute(
+                  builder: (_) => ShopRefundsScreen(
+                    service: widget.service,
+                    orderId: widget.orderId,
+                  ),
+                ),
+              );
+
+              if (mounted) {
+                await _load();
+              }
+            },
+            icon: const Icon(Icons.assignment_return_outlined),
+            label: const Text('Refunds'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: _green,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+
+        if (canCancel)
           OutlinedButton(
             onPressed: busy || _error != null ? null : _cancel,
             style: OutlinedButton.styleFrom(
@@ -316,7 +599,7 @@ class _ShopOrderDetailsScreenState
               padding: const EdgeInsets.symmetric(vertical: 14),
             ),
             child: Text(
-              _cancelling ? 'Cancelling…' : 'Cancel unpaid order',
+              _cancelling ? 'Cancelling…' : 'Cancel order',
             ),
           ),
       ],
@@ -326,7 +609,7 @@ class _ShopOrderDetailsScreenState
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: !_cancelling,
+      canPop: !_cancelling && !_openingPayment,
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F7F5),
         appBar: AppBar(
@@ -334,7 +617,9 @@ class _ShopOrderDetailsScreenState
           actions: [
             IconButton(
               tooltip: 'Refresh order',
-              onPressed: _loading || _cancelling ? null : _load,
+              onPressed: _loading || _cancelling || _openingPayment || _checkingPayment
+                  ? null
+                  : _load,
               icon: const Icon(Icons.refresh),
             ),
           ],

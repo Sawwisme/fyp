@@ -26,7 +26,13 @@ class ClinicOrderStatusUpdate(BaseModel):
         "ready_for_pickup",
         "shipped",
         "completed",
+        "cancelled",
     ]
+
+    cash_received: bool = Field(
+        default=False,
+        strict=True,
+    )
 
     notes: str | None = Field(
         default=None,

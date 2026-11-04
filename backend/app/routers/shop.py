@@ -36,16 +36,24 @@ def list_shop_clinics(
         db, current_user, q, offset, limit
     )
 
-
 @router.get(
     "/categories",
     response_model=list[ProductCategoryResponse],
 )
 def list_shop_categories(
+    clinic_id: int | None = Query(
+        default=None,
+        ge=1,
+        le=2147483647,
+    ),
     current_user: User = Depends(require_roles("pet_owner")),
     db: Session = Depends(get_db),
 ):
-    return shop_service.list_shop_categories(db, current_user)
+    return shop_service.list_shop_categories(
+        db,
+        current_user,
+        clinic_id,
+    )
 
 
 @router.get(

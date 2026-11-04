@@ -10,6 +10,7 @@ class ProductCategoryResponse(BaseModel):
 
     category_id: int
     category_name: str
+    clinic_id: int | None
 
 
 class ProductCreate(BaseModel):
@@ -99,3 +100,26 @@ class ProductStockMovementResponse(BaseModel):
     quantity_after: int
     reason: str
     created_at: datetime
+
+class ProductCategoryCreate(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        str_strip_whitespace=True,
+    )
+
+    category_name: str = Field(
+        min_length=2,
+        max_length=100,
+    )
+
+    description: str | None = Field(
+        default=None,
+        max_length=1000,
+    )
+
+    @field_validator("category_name", mode="before")
+    @classmethod
+    def normalize_category_name(cls, value):
+        if isinstance(value, str):
+            return " ".join(value.split())
+        return value

@@ -97,4 +97,45 @@ class CheckoutService {
       ),
     );
   }
+
+  Future<Map<String, dynamic>> openStripeCheckout(int orderId) async {
+    return _readMap(
+      await api.post(
+        '/shop/payments/stripe/orders/$orderId/checkout',
+        {},
+      ),
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getOrderRefunds(
+      int orderId,
+      ) async {
+    final data = await api.get(
+      '/shop/orders/$orderId/refunds',
+    );
+
+    if (data is! List) {
+      throw const ApiException('Invalid refund response.');
+    }
+
+    return data.map((item) {
+      if (item is! Map) {
+        throw const ApiException('Invalid refund record.');
+      }
+
+      return Map<String, dynamic>.from(item);
+    }).toList();
+  }
+
+  Future<Map<String, dynamic>> requestRefund({
+    required int orderId,
+    required String reason,
+  }) async {
+    return _readMap(
+      await api.post(
+        '/shop/orders/$orderId/refunds',
+        {'reason': reason},
+      ),
+    );
+  }
 }

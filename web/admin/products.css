@@ -392,3 +392,61 @@
 #shop-delivery-fee:disabled {
     opacity: .5;
 }
+
+#category-dialog {
+    box-sizing: border-box;
+    width: min(540px, calc(100vw - 32px));
+    max-height: 88vh;
+    padding: 24px;
+    overflow-y: auto;
+    border: 1px solid #dbe5dd;
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 24px 80px #10271940;
+}
+
+#category-dialog::backdrop {
+    background: #152b2066;
+}
+
+#category-dialog .products-heading {
+    margin-bottom: 12px;
+}
+
+#category-fields {
+    min-width: 0;
+    margin: 20px 0;
+    padding: 0;
+    border: 0;
+}
+
+#category-fields input,
+#category-fields textarea {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #dbe5dd;
+    border-radius: 8px;
+    background: #fafbf9;
+    color: #24332a;
+    font: inherit;
+}
+
+#category-fields textarea {
+    resize: vertical;
+}
+
+#category-form-message {
+    line-height: 1.5;
+}
+
+#category-dialog .product-form-actions {
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.product-heading-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}

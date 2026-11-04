@@ -29,6 +29,8 @@ class _ShopScreenState extends State<ShopScreen> {
   late Future<List<Map<String, dynamic>>> _future;
 
   Map<String, dynamic>? _clinic;
+  int? _categoryId;
+  Future<List<Map<String, dynamic>>>? _categoriesFuture;
   String _query = '';
   int _page = 0;
   bool _openingProduct = false;
@@ -57,6 +59,7 @@ class _ShopScreenState extends State<ShopScreen> {
     return widget.service.getProducts(
       clinicId: _clinic!['clinic_id'] as int,
       search: _query,
+      categoryId: _categoryId,
       offset: _page * _pageSize,
       limit: _pageSize + 1,
     );
@@ -74,6 +77,12 @@ class _ShopScreenState extends State<ShopScreen> {
 
     setState(() {
       _clinic = clinic;
+      _categoryId = null;
+      _categoriesFuture = clinic == null
+          ? null
+          : widget.service.getCategories(
+        clinic['clinic_id'] as int,
+      );
       _query = '';
       _page = 0;
       _future = _fetch();
@@ -208,7 +217,112 @@ class _ShopScreenState extends State<ShopScreen> {
     }
   }
 
+  void _selectCategory(int? categoryId) {
+    if (_categoryId == categoryId) return;
+
+    setState(() {
+      _categoryId = categoryId;
+      _page = 0;
+      _future = _fetch();
+    });
+  }
+
+  Widget _categoryChip(String title, int? categoryId) {
+    final selected = _categoryId == categoryId;
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: ChoiceChip(
+        label: Text(title),
+        selected: selected,
+        onSelected: (_) => _selectCategory(categoryId),
+        showCheckmark: false,
+        selectedColor: const Color(0xFFE1F0E5),
+        backgroundColor: Colors.white,
+        labelStyle: TextStyle(
+          color: selected ? _green : Colors.black87,
+          fontWeight: selected
+              ? FontWeight.w600
+              : FontWeight.normal,
+        ),
+        side: BorderSide(
+          color: selected
+              ? _green
+              : const Color(0xFFDDE7DF),
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
+
+  Widget _categoryFilter() {
+    if (_clinic == null) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+      child: FutureBuilder<List<Map<String, dynamic>>>(
+        key: ValueKey(_clinic!['clinic_id']),
+        future: _categoriesFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const LinearProgressIndicator();
+          }
+
+          if (snapshot.hasError) {
+            return Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'Categories unavailable. '
+                        'You can still browse all products.',
+                    style: TextStyle(color: Colors.black54),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _categoriesFuture =
+                          widget.service.getCategories(
+                            _clinic!['clinic_id'] as int,
+                          );
+                    });
+                  },
+                  child: const Text('Retry'),
+                ),
+              ],
+            );
+          }
+
+          final categories = snapshot.data ?? [];
+
+          return SizedBox(
+            height: 50,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                _categoryChip('All categories', null),
+                ...categories.map(
+                      (category) => _categoryChip(
+                    category['category_name'].toString(),
+                    category['category_id'] as int,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _clinicCard(Map<String, dynamic> clinic) {
+    final visits =
+        (clinic['completed_visit_count'] as num?)?.toInt() ?? 0;
+
+    final address = clinic['address']?.toString().trim() ?? '';
+
     return Card(
       color: Colors.white,
       elevation: 0,
@@ -221,21 +335,45 @@ class _ShopScreenState extends State<ShopScreen> {
         contentPadding: const EdgeInsets.all(16),
         leading: const CircleAvatar(
           backgroundColor: Color(0xFFE6F2E9),
-          child: Icon(Icons.local_hospital_outlined, color: _green),
+          child: Icon(
+            Icons.local_hospital_outlined,
+            color: _green,
+          ),
         ),
         title: Text(
           clinic['clinic_name'].toString(),
-          style: const TextStyle(fontWeight: FontWeight.w600),
-        ),
-        subtitle: Padding(
-          padding: const EdgeInsets.only(top: 6),
-          child: Text(
-            clinic['address']?.toString().isNotEmpty == true
-                ? clinic['address'].toString()
-                : 'Browse this clinic’s dental care products',
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
           ),
         ),
-        trailing: const Icon(Icons.chevron_right, color: _green),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (visits > 0) ...[
+                Text(
+                  '$visits completed '
+                      '${visits == 1 ? 'visit' : 'visits'}',
+                  style: const TextStyle(
+                    color: _green,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 6),
+              ],
+              Text(
+                address.isNotEmpty
+                    ? address
+                    : 'Browse this clinic’s dental care products',
+              ),
+            ],
+          ),
+        ),
+        trailing: const Icon(
+          Icons.chevron_right,
+          color: _green,
+        ),
         onTap: () => _selectClinic(clinic),
       ),
     );
@@ -377,7 +515,8 @@ class _ShopScreenState extends State<ShopScreen> {
               const SizedBox(height: 8),
               Text(
                 _clinic == null
-                    ? 'Choose a clinic to browse its products.'
+                    ? 'Choose a clinic to browse its products. '
+                    'Clinics you have visited appear first.'
                     : 'Products sold by your selected clinic.',
                 style: TextStyle(color: Colors.grey.shade600),
               ),
@@ -427,6 +566,9 @@ class _ShopScreenState extends State<ShopScreen> {
             ],
           ),
         ),
+
+        _categoryFilter(),
+
         Expanded(
           child: FutureBuilder<List<Map<String, dynamic>>>(
             future: _future,

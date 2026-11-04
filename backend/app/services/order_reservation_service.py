@@ -73,10 +73,15 @@ def _release_stock(
     status: str,
     actor_user_id: int | None,
 ):
-    if order.order_status != "pending_payment":
+    if order.order_status not in {
+        "pending_payment",
+        "confirmed",
+        "processing",
+        "ready_for_pickup",
+    }:
         raise HTTPException(
             409,
-            "Only an unpaid pending order can release reserved stock.",
+            "This order cannot release reserved stock.",
         )
 
     if order.stock_released_at is not None:
@@ -99,6 +104,23 @@ def _release_stock(
             "Payment has been received. This order cannot be cancelled "
             "as an unpaid order.",
         )
+
+    if not payments:
+        raise HTTPException(409, "Payment record unavailable.")
+
+    latest_payment = payments[-1]
+
+    if order.order_status != "pending_payment":
+        if (
+            order.shipping_method != "pickup"
+            or latest_payment.payment_method != "cash"
+            or latest_payment.payment_status != "pending"
+        ):
+            raise HTTPException(
+                409,
+                "Only an unpaid cash pickup order can be cancelled "
+                "during preparation.",
+            )
     
     close_checkout_before_stock_release(db, order)
 
@@ -242,6 +264,18 @@ def cancel_my_unpaid_order(
 
         if order is None:
             raise HTTPException(404, "Order not found.")
+
+        if order.order_status not in {
+            "pending_payment",
+            "confirmed",
+            "cancelled",
+            "expired",
+        }:
+            raise HTTPException(
+                409,
+                "Preparation has started. Contact the clinic "
+                "to cancel this order.",
+            )
 
         if order.order_status not in ("cancelled", "expired"):
             status = (
