@@ -43,6 +43,8 @@ from app.routers.clinic_orders import router as clinic_orders_router
 from app.routers.stripe_payment import router as stripe_payments_router
 from app.stripe_event_worker import run_worker as run_stripe_event_worker
 from app.stripe_refund_worker import run_worker as run_stripe_refund_worker
+from app.routers.consultation_billing import router as consultation_billing_router
+from app.routers.owner_billing import router as owner_billing_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -128,6 +130,8 @@ app.include_router(checkout_router)
 app.include_router(shop_orders_router)
 app.include_router(clinic_orders_router)
 app.include_router(stripe_payments_router)
+app.include_router(consultation_billing_router)
+app.include_router(owner_billing_router)
 
 
 WEB_DIR = Path(__file__).resolve().parents[2] / "web"

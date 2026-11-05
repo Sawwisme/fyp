@@ -175,6 +175,25 @@
             controls.appendChild(link);
         }
 
+        if (
+            item.resource_type === 'shop_order' &&
+            Number.isInteger(item.resource_id) &&
+            item.resource_id >= 1 &&
+            item.resource_id <= 2147483647 &&
+            window.location.pathname.startsWith('/web/admin/')
+        ) {
+            const link = document.createElement('a');
+
+            const query = new URLSearchParams({
+                order_id: String(item.resource_id)
+            });
+
+            link.href = `/web/admin/orders.html?${query}`;
+            link.textContent = 'View order';
+
+            controls.appendChild(link);
+        }
+
         if (!item.read_at) {
             const read = document.createElement('button');
             read.type = 'button';

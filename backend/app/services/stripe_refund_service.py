@@ -15,6 +15,7 @@ from app.services.clinic_refund_service import _get_clinic_order
 from app.services.shop_refund_service import build_refund_response
 from app.services.stripe_refund_gateway import resolve_stripe_refund
 from app.services.order_reservation_service import _lock_order
+from app.services.shop_notification_service import notify_refund_status
 
 
 def utc_now():
@@ -316,6 +317,13 @@ def process_online_refund(
             refund.failure_reason = None
 
         refund.version += 1
+
+        notify_refund_status(
+            db,
+            order,
+            refund,
+        )
+
         db.flush()
 
         result = build_refund_response(

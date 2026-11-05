@@ -14,6 +14,10 @@ import 'appointments.dart';
 import 'medical_history.dart';
 import '../services/shop_service.dart';
 import 'shop.dart';
+import '../services/notification_service.dart';
+import 'notification_bell.dart';
+import '../services/billing_service.dart';
+import 'bills.dart';
 
 class HomeScreen extends StatefulWidget {
   final Map<String, dynamic> user;
@@ -590,6 +594,35 @@ class _HomeScreenState extends State<HomeScreen> {
           _panel(
             title: 'Account',
             children: [
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const CircleAvatar(
+                  backgroundColor: Color(0xFFE7F2E9),
+                  child: Icon(
+                    Icons.receipt_long_outlined,
+                    color: _green,
+                  ),
+                ),
+                title: const Text('Bills & Receipts'),
+                subtitle: const Text(
+                  'Consultation bills for all your pets',
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: _loggingOut
+                    ? null
+                    : () {
+                  Navigator.of(context).push<void>(
+                    MaterialPageRoute(
+                      builder: (_) => BillsScreen(
+                        service: BillingService(
+                          widget.auth.api,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const Divider(),
               ExpansionTile(
                 tilePadding: EdgeInsets.zero,
                 shape: const Border(),
@@ -770,6 +803,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           actions: [
+            OwnerNotificationBell(
+              service: NotificationService(widget.auth.api),
+              enabled: !_loggingOut,
+            ),
             IconButton(
               onPressed: () => setState(() => _selectedTab = 4),
               icon: const Icon(Icons.account_circle_outlined),

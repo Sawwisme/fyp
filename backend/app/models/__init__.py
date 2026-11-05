@@ -41,3 +41,6 @@ from app.models.product_stock_movement import ProductStockMovement
 from app.models.order_status_history import OrderStatusHistory
 from app.models.stripe_webhook_event import StripeWebhookEvent
 from app.models.stripe_checkout_session import StripeCheckoutSession
+from app.models.consultation_bill import ConsultationBill
+from app.models.consultation_bill_item import ConsultationBillItem
+from app.models.billing_stripe_session import BillingStripeSession

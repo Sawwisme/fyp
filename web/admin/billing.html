@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VetDental — Consultation Billing</title>
+
+    <link rel="stylesheet" href="/web/styles.css">
+    <link rel="stylesheet" href="/web/admin/dashboard.css">
+    <link rel="stylesheet" href="/web/admin/layout.css">
+    <link rel="stylesheet" href="/web/admin/orders.css">
+    <link rel="stylesheet" href="/web/admin/billing.css">
+
+    <script src="/web/admin/layout.js" defer></script>
+    <script src="/web/admin/billing.js" defer></script>
+</head>
+
+<body>
+    <div class="workspace">
+        <aside id="shared-sidebar" class="sidebar"></aside>
+
+        <div class="content-area">
+            <header id="shared-topbar" class="topbar"></header>
+
+            <main class="main-content">
+                <h1>Consultation Billing</h1>
+                <p class="subtitle">
+                    Prepare itemized bills for completed consultations.
+                </p>
+
+                <section class="panel">
+                    <form id="billing-filters" class="billing-filters">
+                        <div>
+                            <label for="billing-search">Search</label>
+                            <input id="billing-search" type="search" maxlength="100" placeholder="Pet or owner name">
+                        </div>
+
+                        <div>
+                            <label for="billing-status">Bill status</label>
+                            <select id="billing-status">
+                                <option value="">All statuses</option>
+                                <option value="unbilled">Unbilled</option>
+                                <option value="draft">Draft</option>
+                                <option value="issued">Issued — awaiting payment</option>
+                                <option value="paid">Paid</option>
+                                <option value="void">Void</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="orders-primary">
+                            Search
+                        </button>
+                    </form>
+
+                    <p id="billing-message" role="status">
+                        Billing controls will load after setup.
+                    </p>
+
+                    <button id="billing-retry" type="button" class="secondary" hidden>
+                        Try again
+                    </button>
+
+                    <div class="orders-table-wrap">
+                        <table class="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Visit date</th>
+                                    <th>Pet</th>
+                                    <th>Owner</th>
+                                    <th>Consultation</th>
+                                    <th>Bill status</th>
+                                    <th>Total</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="billing-rows"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="orders-pagination">
+                        <button id="billing-previous" type="button" class="secondary" disabled>
+                            Previous
+                        </button>
+
+                        <span id="billing-page">Page 1</span>
+
+                        <button id="billing-next" type="button" class="secondary" disabled>
+                            Next
+                        </button>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <dialog id="billing-dialog" aria-labelledby="billing-dialog-title">
+        <form id="billing-form">
+            <header class="billing-dialog-header">
+                <div>
+                    <h2 id="billing-dialog-title">Consultation bill</h2>
+                    <p id="billing-context" class="muted"></p>
+                </div>
+
+                <button id="billing-close" type="button" aria-label="Close bill">×</button>
+            </header>
+
+            <div class="billing-dialog-body">
+                <p id="billing-state" class="muted"></p>
+
+                <fieldset id="billing-fields">
+                    <div id="billing-items"></div>
+
+                    <button id="billing-add-item" type="button" class="secondary">
+                        Add charge
+                    </button>
+                </fieldset>
+
+                <div class="billing-total">
+                    <span>Total</span>
+                    <strong id="billing-total">RM 0.00</strong>
+                </div>
+
+                <p class="muted">
+                    Draft totals are previews. Saved amounts are
+                    calculated and validated by the server.
+                </p>
+
+                <label id="billing-issue-confirmation" class="order-confirmation" hidden>
+                    <input id="billing-issue-confirm" type="checkbox">
+                    <span>
+                        I checked the saved charges. Issuing this bill
+                        makes its charges read-only.
+                    </span>
+                </label>
+
+                <section id="billing-payment-summary" class="billing-payment-card" hidden></section>
+
+                <section id="billing-cash-panel" class="billing-payment-card" hidden>
+                    <h3>Collect cash</h3>
+                    <p id="billing-cash-amount"></p>
+
+                    <fieldset id="billing-cash-fields">
+                        <label for="billing-cash-notes">
+                            Staff notes (optional)
+                        </label>
+
+                        <input id="billing-cash-notes" maxlength="500" placeholder="Payment collection notes">
+
+                        <label class="order-confirmation">
+                            <input id="billing-cash-confirm" type="checkbox">
+                            <span>
+                                I received the full amount shown above in cash.
+                            </span>
+                        </label>
+                    </fieldset>
+
+                    <button id="billing-collect-cash" type="button" class="orders-primary">
+                        Confirm cash received
+                    </button>
+                </section>
+
+                <p id="billing-form-message" role="status"></p>
+            </div>
+
+            <footer class="billing-dialog-footer">
+                <button id="billing-cancel" type="button" class="secondary">
+                    Close
+                </button>
+
+                <button id="billing-save" type="submit" class="secondary">
+                    Save draft
+                </button>
+
+                <button id="billing-issue" type="button" class="orders-primary" hidden>
+                    Issue bill
+                </button>
+            </footer>
+        </form>
+    </dialog>
+</body>
+
+</html>

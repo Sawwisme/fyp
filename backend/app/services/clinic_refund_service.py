@@ -9,6 +9,7 @@ from app.schemas.clinic_refunds import ClinicRefundReview, CashRefundConfirm
 from app.services.admin_profile_service import get_admin_record
 from app.services.order_reservation_service import _lock_order
 from app.services.shop_refund_service import build_refund_response
+from app.services.shop_notification_service import notify_refund_status
 
 
 def _get_clinic_order(db, current_user, order_id):
@@ -198,6 +199,12 @@ def review_refund(
 
         # Approval does not mean that money has been returned.
         refund.processed_at = None
+
+        notify_refund_status(
+            db,
+            order,
+            refund,
+        )
 
         db.flush()
         result = build_refund_response(
@@ -391,6 +398,13 @@ def confirm_cash_refund(
                 ),
                 created_at=now,
             )
+        )
+
+        notify_refund_status(
+            db,
+            order,
+            refund,
+            cash=True,
         )
 
         db.flush()

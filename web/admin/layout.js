@@ -10,6 +10,8 @@
     const topbar = document.getElementById('shared-topbar');
     const isOrderPage =
         window.location.pathname.endsWith('/orders.html');
+    const isBillingPage =
+        window.location.pathname.endsWith('/billing.html');
 
     sidebar.innerHTML = `
         <a class="brand" href="/web/admin/">
@@ -50,9 +52,11 @@
                 Orders
             </a>
 
-            <button class="nav-item" type="button" disabled>
-                Financial <small>Coming soon</small>
-            </button>
+            <a class="nav-item"
+            href="/web/admin/billing.html"
+            data-page="billing">
+                Consultation Billing
+            </a>
 
             <button class="nav-item" type="button" disabled>
                 Reports <small>Coming soon</small>
@@ -87,17 +91,19 @@
     `;
 
     function highlightNavigation() {
-        const activePage = isOrderPage
-            ? 'orders'
-            : isProductPage
-                ? 'products'
-                : isSchedulePage
-                    ? 'schedules'
-                    : isStaffPage
-                        ? 'staff'
-                        : window.location.hash === '#profile'
-                            ? 'profile'
-                            : 'dashboard';
+        const activePage = isBillingPage
+            ? 'billing'
+            : isOrderPage
+                ? 'orders'
+                : isProductPage
+                    ? 'products'
+                    : isSchedulePage
+                        ? 'schedules'
+                        : isStaffPage
+                            ? 'staff'
+                            : window.location.hash === '#profile'
+                                ? 'profile'
+                                : 'dashboard';
 
         sidebar.querySelectorAll('[data-page]').forEach(link => {
             const active = link.dataset.page === activePage;

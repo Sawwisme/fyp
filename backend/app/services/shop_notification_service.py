@@ -98,3 +98,71 @@ def notify_shop_event(
         )
 
     # No commit here. Notifications save with the order action.
+
+def notify_refund_status(
+    db: Session,
+    order,
+    refund,
+    *,
+    cash: bool = False,
+):
+    messages = {
+        "approved": (
+            "Your refund request was approved",
+            "The clinic approved your refund request. "
+            "The money has not been returned yet.",
+        ),
+        "rejected": (
+            "Your refund request was rejected",
+            "The clinic reviewed your request. "
+            "Open the order's Refunds screen to read its response.",
+        ),
+        "processing": (
+            "Your refund is processing",
+            "Your online refund is being processed. "
+            "Open the order to check its status.",
+        ),
+        "requires_action": (
+            "Your refund needs attention",
+            "Additional action is needed for your online refund. "
+            "Check your payment emails or contact the clinic.",
+        ),
+        "succeeded": (
+            "Your refund was completed",
+            (
+                "The clinic confirmed that your cash was returned."
+                if cash
+                else "Your online refund was verified as successful. "
+                     "It may take additional time to appear "
+                     "in your bank account."
+            ),
+        ),
+        "failed": (
+            "Your refund needs review",
+            "Your online refund could not be completed. "
+            "Please contact the clinic.",
+        ),
+    }
+
+    notification = messages.get(refund.status)
+
+    if notification is None:
+        return
+
+    title, description = notification
+
+    notify_shop_event(
+        db,
+        order,
+        event_key=(
+            f"shop:refund:{refund.refund_id}:"
+            f"{refund.status}"
+        ),
+        title=title,
+        message=f"Order #{order.order_id}: {description}",
+        include_owner=True,
+        include_admins=refund.status in {
+            "requires_action",
+            "failed",
+        },
+    )

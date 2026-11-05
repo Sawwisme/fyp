@@ -1,0 +1,46 @@
+import 'api_client.dart';
+
+class BillingService {
+  final ApiClient api;
+
+  BillingService(this.api);
+
+  Future<Map<String, dynamic>> getBills({
+    String? status,
+    int offset = 0,
+    int limit = 10,
+  }) async {
+    final parameters = {
+      'offset': '$offset',
+      'limit': '$limit',
+    };
+
+    if (status != null) {
+      parameters['bill_status'] = status;
+    }
+
+    final query = Uri(queryParameters: parameters).query;
+
+    final data = await api.get('/owner-billing/bills?$query');
+
+    if (data is! Map ||
+        data['items'] is! List ||
+        data['total'] is! int) {
+      throw const ApiException('Invalid bill-list response.');
+    }
+
+    return Map<String, dynamic>.from(data);
+  }
+
+  Future<Map<String, dynamic>> getBill(int billId) async {
+    final data = await api.get('/owner-billing/bills/$billId');
+
+    if (data is! Map ||
+        data['bill'] is! Map ||
+        data['payments'] is! List) {
+      throw const ApiException('Invalid bill response.');
+    }
+
+    return Map<String, dynamic>.from(data);
+  }
+}

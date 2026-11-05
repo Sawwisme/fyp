@@ -24,6 +24,8 @@ from app.services.stripe_reservation_service import (
 )
 from app.services.stripe_session_service import resolve_remote_session
 
+from app.services.shop_notification_service import notify_shop_event
+
 
 logger = logging.getLogger(__name__)
 
@@ -182,6 +184,20 @@ def record_paid(
             )
         )
 
+        
+        notify_shop_event(
+            db,
+            order,
+            event_key=f"shop:order:{order.order_id}:paid",
+            title="Order payment confirmed",
+            message=(
+                f"Online payment for order #{order.order_id} "
+                "was verified. The clinic can now prepare the order."
+            ),
+            include_owner=True,
+            include_admins=True,
+        )
+
         return True
 
     # A repeated event must not change a fulfilled order or deduct stock.
@@ -193,6 +209,20 @@ def record_paid(
         "completed",
     } and order.stock_released_at is None:
         return True
+
+    notify_shop_event(
+        db,
+        order,
+        event_key=f"shop:order:{order.order_id}:payment-review",
+        title="Order payment needs review",
+        message=(
+            f"Payment was received for closed order "
+            f"#{order.order_id}. Contact the clinic to "
+            "resolve the payment. Do not pay again."
+        ),
+        include_owner=True,
+        include_admins=True,
+    )
 
     # Preserve the financial record if money arrived for a closed order.
     # Do not reopen it or take stock from another order.

@@ -17,6 +17,7 @@ from app.services.pet_service import get_owner_profile
 from app.services.stripe_reservation_service import (
     close_checkout_before_stock_release,
 )
+from app.services.shop_notification_service import notify_shop_event
 
 def utc_now():
     return datetime.now(timezone.utc).replace(tzinfo=None)
@@ -216,6 +217,30 @@ def _release_stock(
     order.order_status = status
     order.stock_released_at = now
     order.version += 1
+
+    if status in {"cancelled", "expired"}:
+        expired = status == "expired"
+
+        notify_shop_event(
+            db,
+            order,
+            event_key=f"shop:order:{order.order_id}:{status}",
+            title=(
+                "Your order payment deadline expired"
+                if expired
+                else "Your order was cancelled"
+            ),
+            message=(
+                f"Unpaid order #{order.order_id} expired "
+                "after its payment deadline. Its reserved "
+                "stock was released."
+                if expired
+                else f"Unpaid order #{order.order_id} was cancelled. "
+                     "Its reserved stock was released."
+            ),
+            include_owner=True,
+            include_admins=not expired,
+        )
 
 
 def expire_unpaid_order(

@@ -1240,6 +1240,24 @@
             get('orders-workspace').hidden = false;
 
             await loadOrders(0);
+
+            const linkedOrder = new URLSearchParams(
+                window.location.search
+            ).get('order_id');
+
+            if (
+                linkedOrder &&
+                /^[1-9][0-9]{0,9}$/.test(linkedOrder)
+            ) {
+                const orderId = Number(linkedOrder);
+
+                if (
+                    Number.isSafeInteger(orderId) &&
+                    orderId <= 2147483647
+                ) {
+                    await openOrder(orderId);
+                }
+            }
         } catch (error) {
             get('orders-start-message').textContent = error.message;
             get('orders-start-retry').hidden = false;

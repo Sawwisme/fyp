@@ -3,11 +3,13 @@ from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException
 from stripe import StripeError
 
-from app.models import StripeCheckoutSession
+from app.models import BillingStripeSession, StripeCheckoutSession
 from app.services.stripe_gateway import get_stripe_client
 
 
-def resolve_remote_session(checkout: StripeCheckoutSession) -> dict:
+def resolve_remote_session(
+    checkout: StripeCheckoutSession | BillingStripeSession,
+) -> dict:
     client = get_stripe_client()
 
     try:

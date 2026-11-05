@@ -23,7 +23,7 @@ class Transaction(Base):
     user_id = Column(
         Integer,
         ForeignKey("users.user_id"),
-        nullable=False,
+        nullable=True,
     )
     order_id = Column(
         Integer,
