@@ -43,3 +43,19 @@ class OwnerBillDetail(BaseModel):
     clinic_phone: str | None
     pet_name: str
     payments: list[BillPaymentSummary]
+
+class BillCheckoutResponse(BaseModel):
+    consultation_bill_id: int
+    checkout_url: str
+    expires_at: datetime
+
+    @field_validator("expires_at")
+    @classmethod
+    def include_utc_offset(cls, value):
+        if value.tzinfo is None:
+            return value.replace(tzinfo=timezone.utc)
+        return value
+
+class BillOnlineCancelResponse(BaseModel):
+    consultation_bill_id: int
+    payment_attempt_closed: bool

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../services/billing_service.dart';
 
@@ -17,15 +18,188 @@ class BillDetailsScreen extends StatefulWidget {
       _BillDetailsScreenState();
 }
 
-class _BillDetailsScreenState extends State<BillDetailsScreen> {
+class _BillDetailsScreenState extends State<BillDetailsScreen>
+    with WidgetsBindingObserver {
   static const _green = Color(0xFF176B32);
 
   late Future<Map<String, dynamic>> _future;
+  bool _openingPayment = false;
+  bool _checkingPayment = false;
+  bool _awaitingPaymentReturn = false;
+  bool _refreshAfterOpening = false;
+  String? _paymentMessage;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _future = widget.service.getBill(widget.billId);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed ||
+        !_awaitingPaymentReturn) {
+      return;
+    }
+
+    if (_openingPayment) {
+      _refreshAfterOpening = true;
+      return;
+    }
+
+    _checkPaymentResult();
+  }
+
+  Future<void> _pay(Map<String, dynamic> data) async {
+    if (_openingPayment ||
+        _checkingPayment ||
+        (data['bill'] as Map)['status'] != 'issued') {
+      return;
+    }
+
+    setState(() {
+      _openingPayment = true;
+      _paymentMessage = null;
+    });
+
+    try {
+      final checkout = await widget.service.openCheckout(
+        widget.billId,
+      );
+
+      if (!mounted) return;
+
+      final uri = Uri.tryParse(
+        checkout['checkout_url']?.toString() ?? '',
+      );
+
+      if (checkout['consultation_bill_id'] != widget.billId ||
+          uri == null ||
+          uri.scheme != 'https' ||
+          uri.host != 'checkout.stripe.com' ||
+          uri.userInfo.isNotEmpty) {
+        throw Exception('The server returned an invalid payment link.');
+      }
+
+      _awaitingPaymentReturn = true;
+
+      final opened = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+
+      if (!opened) {
+        throw Exception('Cannot open the payment page.');
+      }
+
+      if (mounted) {
+        setState(() {
+          _paymentMessage =
+          'Complete payment in your browser, then return here. '
+              'Confirmation appears after payment is verified.';
+        });
+      }
+    } catch (error) {
+      _awaitingPaymentReturn = false;
+
+      if (mounted) {
+        setState(() {
+          _paymentMessage =
+          '$error\nRefresh this bill before trying again. '
+              'An existing pending payment will be reused.';
+          _future = widget.service.getBill(widget.billId);
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _openingPayment = false);
+
+        if (_refreshAfterOpening) {
+          _refreshAfterOpening = false;
+          _checkPaymentResult();
+        }
+      }
+    }
+  }
+
+  Future<void> _checkPaymentResult() async {
+    if (!mounted || _checkingPayment) return;
+
+    _awaitingPaymentReturn = false;
+
+    setState(() {
+      _checkingPayment = true;
+      _paymentMessage = 'Checking payment confirmation…';
+    });
+
+    try {
+      for (var attempt = 0; attempt < 7; attempt++) {
+        if (!mounted) return;
+
+        if (WidgetsBinding.instance.lifecycleState !=
+            AppLifecycleState.resumed) {
+          _awaitingPaymentReturn = true;
+          return;
+        }
+
+        final data = await widget.service.getBill(widget.billId);
+        if (!mounted) return;
+
+        final status = (data['bill'] as Map)['status'];
+
+        setState(() {
+          _future = Future.value(data);
+        });
+
+        if (status == 'paid') {
+          setState(() {
+            _paymentMessage = 'Payment confirmed.';
+          });
+          return;
+        }
+
+        if (status != 'issued') {
+          setState(() {
+            _paymentMessage = 'The bill status has been updated.';
+          });
+          return;
+        }
+
+        if (attempt < 6) {
+          await Future<void>.delayed(
+            const Duration(seconds: 3),
+          );
+        }
+      }
+
+      if (mounted) {
+        setState(() {
+          _paymentMessage =
+          'Payment is not confirmed yet. If you completed '
+              'payment, refresh again shortly. Do not pay again '
+              'while confirmation is pending.';
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _paymentMessage =
+          'Could not confirm payment. Refresh the bill '
+              'to check its saved status before trying again.';
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _checkingPayment = false);
+      }
+    }
   }
 
   void _reload() {
@@ -108,6 +282,30 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
     final phone = data['clinic_phone']?.toString().trim() ?? '';
     final zeroTotal =
         num.tryParse(bill['total_amount'].toString()) == 0;
+    final amount = num.tryParse(
+      bill['total_amount'].toString(),
+    );
+
+    final onlineEligible =
+        amount != null && amount >= 1 && amount <= 30000;
+
+    final pendingOnline = payments.any(
+          (payment) =>
+      payment['payment_status'] == 'pending' &&
+          payment['payment_method'] == 'online_banking',
+    );
+
+    final blockingPayment = payments.any(
+          (payment) =>
+      payment['payment_status'] == 'paid' ||
+          payment['payment_status'] == 'refunded' ||
+          (!{'failed', 'cancelled', 'expired'}.contains(
+            payment['payment_status'],
+          ) &&
+              payment['payment_method'] != 'online_banking'),
+    );
+
+    final busy = _openingPayment || _checkingPayment;
 
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -227,15 +425,59 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
             ],
           ),
         ]),
+        if (_paymentMessage != null)
+          _panel([
+            Text(
+              paid ? 'Payment confirmed.' : _paymentMessage!,
+              style: const TextStyle(
+                color: _green,
+                height: 1.5,
+              ),
+            ),
+          ]),
         if (bill['status'] == 'issued')
           _panel([
             _heading('Payment'),
             const SizedBox(height: 10),
-            const Text(
-              'Pay this bill at the clinic. Staff will confirm '
-                  'your payment after receiving the cash.',
-              style: TextStyle(height: 1.5),
+            Text(
+              pendingOnline
+                  ? 'An online payment attempt is pending. '
+                  'Resume it or refresh this bill to check '
+                  'whether payment was confirmed.'
+                  : 'Pay online through FPX, or pay cash at the clinic. '
+                  'Staff will confirm cash after receiving it.',
+              style: const TextStyle(height: 1.5),
             ),
+            if (onlineEligible && !blockingPayment) ...[
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: busy ? null : () => _pay(data),
+                  icon: const Icon(Icons.account_balance_outlined),
+                  label: Text(
+                    _openingPayment
+                        ? 'Opening payment…'
+                        : _checkingPayment
+                        ? 'Checking payment…'
+                        : pendingOnline
+                        ? 'Resume online payment'
+                        : 'Pay online',
+                  ),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: _green,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                  ),
+                ),
+              ),
+            ],
+            if (!onlineEligible) ...[
+              const SizedBox(height: 12),
+              const Text(
+                'Please contact the clinic to pay this amount.',
+                style: TextStyle(color: Colors.black54),
+              ),
+            ],
           ]),
         if (bill['status'] == 'void')
           _panel([
@@ -294,49 +536,54 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F5),
-      appBar: AppBar(
-        title: Text('Bill #${widget.billId}'),
-        actions: [
-          IconButton(
-            tooltip: 'Refresh bill',
-            onPressed: _reload,
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
-      ),
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: _future,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    final busy = _openingPayment || _checkingPayment;
 
-          if (snapshot.hasError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      snapshot.error.toString(),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 12),
-                    OutlinedButton(
-                      onPressed: _reload,
-                      child: const Text('Try again'),
-                    ),
-                  ],
+    return PopScope(
+      canPop: !_openingPayment,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F7F5),
+        appBar: AppBar(
+          title: Text('Bill #${widget.billId}'),
+          actions: [
+            IconButton(
+              tooltip: 'Refresh bill',
+              onPressed: busy ? null : _reload,
+              icon: const Icon(Icons.refresh),
+            ),
+          ],
+        ),
+        body: FutureBuilder<Map<String, dynamic>>(
+          future: _future,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        snapshot.error.toString(),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      OutlinedButton(
+                        onPressed: busy ? null : _reload,
+                        child: const Text('Try again'),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          }
+              );
+            }
 
-          return _content(snapshot.data!);
-        },
+            return _content(snapshot.data!);
+          },
+        ),
       ),
     );
   }

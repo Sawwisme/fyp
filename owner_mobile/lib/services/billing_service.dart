@@ -43,4 +43,17 @@ class BillingService {
 
     return Map<String, dynamic>.from(data);
   }
+
+  Future<Map<String, dynamic>> openCheckout(int billId) async {
+    final data = await api.post(
+      '/owner-billing/bills/$billId/checkout',
+      {},
+    );
+
+    if (data is! Map) {
+      throw const ApiException('Invalid payment response.');
+    }
+
+    return Map<String, dynamic>.from(data);
+  }
 }
