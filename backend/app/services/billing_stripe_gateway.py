@@ -42,7 +42,7 @@ def validate_bill_session(
         or payment.order_id is not None
         or payment.payment_purpose != "consultation_balance"
         or payment.payment_method != "online_banking"
-        or payment.amount != bill.total_amount
+        or payment.amount != bill.balance_amount
         or payment.amount <= 0
         or any(
             metadata.get(key) != value

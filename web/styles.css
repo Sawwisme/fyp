@@ -1,9 +1,9 @@
 :root {
-    --green: #176b32;
-    --green-dark: #105025;
-    --ink: #202b24;
-    --muted: #657168;
-    --border: #dce4dd;
+    --green: #2549c7;
+    --green-dark: #1d3ba4;
+    --ink: #192737;
+    --muted: #57697a;
+    --border: #d3dce5;
 }
 
 * {
@@ -20,7 +20,7 @@ body {
     display: grid;
     place-items: center;
     padding: 40px 24px;
-    background: #f3f5f3;
+    background: #eef1f5;
     color: var(--ink);
     font-family: "Segoe UI", system-ui, sans-serif;
 }
@@ -42,7 +42,7 @@ body {
     display: flex;
     flex-direction: column;
     padding: 44px;
-    background: linear-gradient(150deg, #e8f2e9, #f5f8f3);
+    background: linear-gradient(150deg, #e8edff, #e8edff);
     border-right: 1px solid var(--border);
 }
 
@@ -77,7 +77,7 @@ body {
 
 .brand-eyebrow {
     margin-bottom: 20px;
-    color: #477652;
+    color: #57697a;
     font-size: 11px;
     font-weight: 750;
     letter-spacing: 1.8px;
@@ -169,9 +169,9 @@ p {
     min-width: 0;
     margin: 28px 0;
     padding: 5px;
-    border: 1px solid #e7eae7;
+    border: 1px solid #d3dce5;
     border-radius: 10px;
-    background: #f2f4f2;
+    background: #f3f5fa;
 }
 
 .role-switch label {
@@ -205,7 +205,7 @@ p {
 }
 
 .role-switch input:focus-visible+span {
-    outline: 3px solid #91c49e;
+    outline: 3px solid #9aaff7;
 }
 
 .role-switch:disabled {
@@ -223,9 +223,9 @@ input {
     width: 100%;
     min-width: 0;
     padding: 13px 14px;
-    border: 1px solid #ccd6ce;
+    border: 1px solid #d3dce5;
     border-radius: 8px;
-    background: #fafbf9;
+    background: #f8faff;
     color: var(--ink);
     font: inherit;
     font-size: 14px;
@@ -233,15 +233,15 @@ input {
 
 input:focus-visible,
 button:focus-visible {
-    outline: 3px solid #91c49e;
+    outline: 3px solid #9aaff7;
     outline-offset: 2px;
 }
 
 .password-field {
     display: flex;
-    border: 1px solid #ccd6ce;
+    border: 1px solid #d3dce5;
     border-radius: 8px;
-    background: #fafbf9;
+    background: #f8faff;
 }
 
 .password-field input {
@@ -326,7 +326,7 @@ button:disabled {
     padding: 14px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: #f7f9f6;
+    background: #f8faff;
     color: var(--muted);
     font-size: 12px;
 }
@@ -488,7 +488,7 @@ dialog::backdrop {
 
 /* Focus the entire password field, including the eye button. */
 .password-field:focus-within {
-    outline: 3px solid #91c49e;
+    outline: 3px solid #9aaff7;
     outline-offset: 2px;
 }
 
@@ -522,16 +522,16 @@ dialog::backdrop {
 #registration-clinic {
     width: 100%;
     padding: 13px 14px;
-    border: 1px solid #ccd6ce;
+    border: 1px solid #d3dce5;
     border-radius: 8px;
-    background: #fafbf9;
+    background: #f8faff;
     color: var(--ink);
     font: inherit;
     font-size: 14px;
 }
 
 #registration-clinic:focus-visible {
-    outline: 3px solid #91c49e;
+    outline: 3px solid #9aaff7;
     outline-offset: 2px;
 }
 
@@ -602,13 +602,13 @@ dialog::backdrop {
 
 .clinic-search-result.selected {
     border-color: var(--green);
-    background: #e7f2e9;
+    background: #e8edff;
 }
 
 .selected-clinic {
     padding: 12px;
     border-radius: 8px;
-    background: #edf4ee;
+    background: #e8edff;
     color: var(--green-dark);
     font-size: 13px;
     overflow-wrap: anywhere;
@@ -656,7 +656,7 @@ dialog::backdrop {
     padding: 16px;
     border: 1px solid var(--border);
     border-radius: 10px;
-    background: #f7faf7;
+    background: #f8faff;
 }
 
 #clinic-map-preview {
@@ -685,9 +685,9 @@ dialog::backdrop {
 #clinic-entry-mode {
     width: 100%;
     padding: 13px 14px;
-    border: 1px solid #ccd6ce;
+    border: 1px solid #d3dce5;
     border-radius: 8px;
-    background: #fafbf9;
+    background: #f8faff;
     color: var(--ink);
     font: inherit;
     font-size: 14px;
@@ -706,7 +706,7 @@ dialog::backdrop {
 
 #clinic-state:focus-visible,
 #clinic-entry-mode:focus-visible {
-    outline: 3px solid #91c49e;
+    outline: 3px solid #9aaff7;
     outline-offset: 2px;
 }
 
@@ -754,7 +754,7 @@ dialog::backdrop {
 
 .clinic-option:hover,
 .clinic-option[aria-selected="true"] {
-    background: #e7f2e9;
+    background: #e8edff;
 }
 
 .clinic-option strong,

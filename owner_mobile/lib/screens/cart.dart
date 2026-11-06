@@ -19,7 +19,7 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  static const _green = Color(0xFF176B32);
+  static const _green = Color(0xFF2549C7);
 
   Map<String, dynamic>? _cart;
   String? _error;
@@ -304,7 +304,7 @@ class _CartScreenState extends State<CartScreen> {
     return PopScope(
       canPop: !_saving,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F7F5),
+        backgroundColor: const Color(0xFFEEF1F5),
         appBar: AppBar(title: const Text('My Cart')),
         body: _body(),
       ),

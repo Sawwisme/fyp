@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VetDental — My Appointments</title>
+
+    <link rel="stylesheet" href="/web/styles.css?v=cobalt-components-2">
+    <link rel="stylesheet" href="/web/admin/dashboard.css?v=cobalt-components-2">
+    <link rel="stylesheet" href="/web/admin/layout.css?v=cobalt-components-2">
+    <link rel="stylesheet" href="/web/vet/appointments.css?v=cobalt-components-2">
+
+    <script src="/web/vet/layout.js" defer></script>
+    <script src="/web/vet/consultation_actions.js" defer></script>
+    <script src="/web/vet/appointments.js" defer></script>
+    <link rel="stylesheet" href="/web/cobalt.css?v=cobalt-components-2">
+</head>
+
+<body>
+    <div id="vet-loading" class="loading">
+        <p id="vet-loading-message" role="status">
+            Loading your appointments…
+        </p>
+        <button id="vet-retry" class="secondary" type="button" hidden>
+            Try again
+        </button>
+        <a href="/web/">Back to staff login</a>
+    </div>
+
+    <div id="vet-workspace" class="workspace" hidden>
+        <aside id="shared-sidebar" class="sidebar"></aside>
+
+        <div class="content-area">
+            <header id="shared-topbar" class="topbar"></header>
+
+            <main class="main-content">
+                <div class="page-heading">
+                    <h1>My Appointments</h1>
+                    <p class="subtitle">
+                        View your assigned appointments.
+                        All times use Malaysia time.
+                    </p>
+                </div>
+
+                <div class="vet-appointment-summary" aria-label="Appointment counts">
+                    <div class="appointment-stat appointment-stat-overall">
+                        <span>All-time total</span>
+                        <strong id="appointment-all-time-total">—</strong>
+                        <small>All dates · all statuses</small>
+                    </div>
+
+                    <div class="appointment-stat">
+                        <span>Selected date</span>
+                        <strong id="appointment-count-total">—</strong>
+                        <small>Matching appointments</small>
+                    </div>
+
+                    <div class="appointment-stat">
+                        <span>Confirmed</span>
+                        <strong id="appointment-count-confirmed">—</strong>
+                        <small>Selected date</small>
+                    </div>
+
+                    <div class="appointment-stat">
+                        <span>In progress</span>
+                        <strong id="appointment-count-progress">—</strong>
+                        <small>Selected date</small>
+                    </div>
+
+                    <div class="appointment-stat">
+                        <span>Completed</span>
+                        <strong id="appointment-count-completed">—</strong>
+                        <small>Selected date</small>
+                    </div>
+                </div>
+
+                <p id="appointment-all-time-message" class="muted appointment-total-message" role="status"></p>
+
+                <button id="appointment-all-time-retry" type="button" class="secondary compact-button" hidden>
+                    Retry total
+                </button>
+
+                <p class="appointment-filter-note">
+                    Date counts follow the selected date, search and status filters.
+                </p>
+
+                <section class="panel" aria-labelledby="appointments-title">
+                    <h2 id="appointments-title">Appointments</h2>
+
+                    <div class="staff-list-toolbar">
+                        <div>
+                            <label class="field-label" for="vet-appointment-date">
+                                Date
+                            </label>
+                            <input id="vet-appointment-date" type="date">
+
+                            <div class="appointment-date-actions">
+                                <button id="appointment-today" type="button" class="secondary compact-button">
+                                    Today
+                                </button>
+                                <button id="appointment-clear-date" type="button" class="secondary compact-button">
+                                    All dates
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="field-label" for="vet-appointment-search">
+                                Search
+                            </label>
+                            <input id="vet-appointment-search" type="search" placeholder="Pet or owner name">
+                        </div>
+
+                        <div>
+                            <label class="field-label" for="vet-appointment-status">
+                                Status
+                            </label>
+                            <select id="vet-appointment-status">
+                                <option value="">All statuses</option>
+                                <option value="pending">Pending</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="in_progress">In progress</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <p id="vet-appointment-message" role="status" aria-live="polite"></p>
+
+                    <button id="vet-appointment-retry" type="button" class="secondary compact-button" hidden>
+                        Try again
+                    </button>
+
+                    <div class="table-scroll">
+                        <table class="staff-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Time</th>
+                                    <th scope="col">Pet</th>
+                                    <th scope="col">Owner</th>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">Source</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Emergency details</th>
+                                    <th scope="col">Consultation</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vet-appointment-rows"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+</body>
+
+</html>

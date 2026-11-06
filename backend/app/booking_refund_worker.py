@@ -5,6 +5,9 @@ from sqlalchemy import select
 
 from app.database import SessionLocal
 from app.models import Payment, Refund, Transaction
+from app.services.booking_excess_refund_service import (
+    process_booking_excess_refund,
+)
 from app.services.booking_refund_service import (
     process_booking_refund,
 )
@@ -12,11 +15,19 @@ from app.services.booking_refund_service import (
 
 logger = logging.getLogger(__name__)
 
+PROCESSORS = {
+    "booking_cancellation": process_booking_refund,
+    "booking_excess": process_booking_excess_refund,
+}
+
 
 def run_pass(stop_event, after_id):
     with SessionLocal() as db:
-        refund_ids = db.scalars(
-            select(Refund.refund_id)
+        requests = db.execute(
+            select(
+                Refund.refund_id,
+                Refund.refund_purpose,
+            )
             .join(
                 Transaction,
                 Transaction.transaction_id == Refund.transaction_id,
@@ -32,6 +43,7 @@ def run_pass(stop_event, after_id):
                     "processing",
                     "requires_action",
                 ]),
+                Refund.refund_purpose.in_(list(PROCESSORS)),
                 Transaction.transaction_type == "payment",
                 Transaction.order_id.is_(None),
                 Payment.order_id.is_(None),
@@ -43,19 +55,18 @@ def run_pass(stop_event, after_id):
             .limit(10)
         ).all()
 
-    if not refund_ids:
+    if not requests:
         return 0
 
-    for refund_id in refund_ids:
+    for refund_id, purpose in requests:
         if stop_event.is_set():
             return after_id
 
         try:
+            processor = PROCESSORS[purpose]
+
             with SessionLocal() as db:
-                result = process_booking_refund(
-                    db,
-                    refund_id,
-                )
+                result = processor(db, refund_id)
 
                 if result["refund_status"] == "failed":
                     logger.warning(

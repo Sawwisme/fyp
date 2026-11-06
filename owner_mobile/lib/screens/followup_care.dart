@@ -22,7 +22,7 @@ class FollowupCareScreen extends StatefulWidget {
 
 class _FollowupCareScreenState extends State<FollowupCareScreen> {
   static const _pageSize = 10;
-  static const _green = Color(0xFF176B32);
+  static const _green = Color(0xFF2549C7);
 
   late Future<List<Map<String, dynamic>>> _future;
   String _filter = 'pending';
@@ -167,7 +167,7 @@ class _FollowupCareScreenState extends State<FollowupCareScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFFDCE6DE)),
+        side: const BorderSide(color: Color(0xFFD3DCE5)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -271,10 +271,10 @@ class _FollowupCareScreenState extends State<FollowupCareScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F5),
+      backgroundColor: const Color(0xFFEEF1F5),
       appBar: AppBar(
         title: const Text('Follow-up Care'),
-        backgroundColor: const Color(0xFFF5F7F5),
+        backgroundColor: const Color(0xFFEEF1F5),
         foregroundColor: _green,
         surfaceTintColor: Colors.transparent,
       ),

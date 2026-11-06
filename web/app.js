@@ -149,7 +149,7 @@ togglePassword.addEventListener('click', () => {
         show ? 'Hide password' : 'Show password'
     );
     togglePassword.setAttribute('aria-pressed', String(show));
-    togglePassword.style.color = show ? '#176b32' : '';
+    togglePassword.style.color = show ? '#2549c7' : '';
 });
 
 form.addEventListener('submit', async event => {

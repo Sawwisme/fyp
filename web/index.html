@@ -5,12 +5,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>VetDental — Staff Login</title>
-    <link rel="stylesheet" href="/web/styles.css">
+    <link rel="stylesheet" href="/web/styles.css?v=cobalt-components-2">
     <script src="/web/app.js" defer></script>
+    <link rel="stylesheet" href="/web/cobalt.css?v=cobalt-components-2">
+    <link rel="stylesheet" href="/web/login-cobalt.css?v=cobalt-components-2">
+    <link rel="stylesheet" href="/web/auth-pages.css?v=2">
 </head>
 
-<body>
+<body class="login-page">
     <main class="login-shell">
+        <aside class="login-visual" aria-labelledby="login-visual-title">
+            <a class="login-visual-brand" href="/web/" aria-label="VetDental home">
+                <span class="login-visual-mark" aria-hidden="true">✚</span>
+                <span>VetDental</span>
+            </a>
+            <div class="login-visual-copy">
+                <span class="login-visual-eyebrow">THE CLINIC WORKSPACE</span>
+                <h2 id="login-visual-title">More care.<br><span>Less busywork.</span></h2>
+                <p>A clearer day for your team.<br>Better care for every pet.</p>
+                <div class="login-workflow" aria-label="Your connected care workflow">
+                    <div><span class="login-step" aria-hidden="true">01</span><span>Plan the day<small>Appointments &amp; schedules</small></span></div>
+                    <div><span class="login-step" aria-hidden="true">02</span><span>Focus on care<small>Consultations &amp; prescriptions</small></span></div>
+                    <div><span class="login-step" aria-hidden="true">03</span><span>Stay connected<small>Follow-up care &amp; owner updates</small></span></div>
+                </div>
+            </div>
+            <div class="login-visual-footer"><span class="login-footer-dot" aria-hidden="true"></span>One workspace. Every step of care.</div>
+        </aside>
+
         <div class="form-panel">
             <a class="brand login-brand" href="/web/">
                 <span class="brand-icon" aria-hidden="true">✚</span>
@@ -18,7 +39,7 @@
             </a>
             <section id="login-section">
                 <span class="eyebrow">WELCOME TO VETDENTAL</span>
-                <h1>Staff Login</h1>
+                <h1>Welcome back.</h1>
                 <p class="subtitle">
                     Sign in to access your clinic workspace.
                 </p>
@@ -78,7 +99,6 @@
                     <p>
                         Register your clinic to create its first administrator account.
                         Veterinarian accounts are created by your clinic administrator.
-                    </p>
                     </p>
                 </div>
             </section>

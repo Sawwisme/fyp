@@ -1,0 +1,51 @@
+@media screen {
+    .clinical-consultation-page #patient-history-panel { padding: 22px; background: #fff; border: 1px solid #d3dce5; border-radius: 12px; }
+    .clinical-consultation-page #patient-history-panel > summary { color: #192737; font-size: 16px; font-weight: 650; }
+    #patient-history-panel > .muted { font-size: 12px; color: #63738a; }
+    #patient-history-message { font-size: 12px; color: #63738a; }
+    #patient-history-records { position: relative; padding-left: 22px; }
+    #patient-history-records:not(:empty)::before { content: ''; position: absolute; top: 20px; bottom: 20px; left: 5px; width: 2px; background: #dfe6f3; }
+    #patient-history-records .history-visit-card { position: relative; margin-top: 14px; padding: 0; background: #fff; border: 1px solid #d8e1f0; border-radius: 11px; }
+    #patient-history-records .history-visit-summary { position: relative; display: grid; grid-template-columns: 160px minmax(0, 1fr) auto; align-items: center; gap: 20px; padding: 20px 44px 20px 20px; list-style: none; font-weight: 400; }
+    #patient-history-records .history-visit-summary::-webkit-details-marker { display: none; }
+    .history-visit-summary::before { content: ''; position: absolute; top: calc(50% - 5px); left: -22px; width: 10px; height: 10px; border: 3px solid #fff; border-radius: 50%; background: #2549c7; box-shadow: 0 0 0 2px #b8c8f5; box-sizing: border-box; }
+    .history-visit-summary::after { content: ''; position: absolute; right: 20px; width: 7px; height: 7px; border-right: 2px solid #63738a; border-bottom: 2px solid #63738a; transform: rotate(45deg); transition: transform 160ms ease; }
+    .history-visit-card[open] > .history-visit-summary::after { transform: rotate(225deg); }
+    .history-visit-summary:focus-visible { outline: 3px solid #9aaff7; outline-offset: 3px; border-radius: 10px; }
+    .history-visit-card[open] > .history-visit-summary { border-bottom: 1px solid #e2e8f3; background: #f8faff; border-radius: 11px 11px 0 0; }
+    .history-visit-date { padding: 12px; border-radius: 9px; background: #e8edff; color: #28418b; font-size: 12px; font-weight: 600; line-height: 1.6; }
+    .history-visit-overview { min-width: 0; }
+    .history-visit-diagnosis { display: block; color: #192737; font-size: 15px; font-weight: 650; line-height: 1.5; overflow-wrap: anywhere; }
+    .history-visit-vet { display: block; margin-top: 4px; color: #63738a; font-size: 12px; }
+    .history-visit-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .history-visit-chip { padding: 3px 8px; border-radius: 6px; background: #f0f3f9; color: #52647b; font-size: 11px; line-height: 1.5; }
+    .history-visit-reference { display: grid; gap: 7px; justify-items: end; }
+    .history-visit-id { color: #63738a; font-size: 12px; }
+    .history-visit-completed { padding: 4px 9px; border-radius: 20px; background: #e8f3eb; color: #176b32; font-size: 11px; font-weight: 550; }
+    .history-visit-body { padding: 22px; }
+    .history-visit-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    #patient-history-records .history-visit-fields > p { margin: 0; padding: 14px 16px; border-radius: 9px; background: #f5f7fc; color: #192737; font-size: 13px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .history-visit-fields > p > strong { display: block; margin-bottom: 6px; color: #63738a; font-size: 11px; font-weight: 550; }
+    .history-visit-collections { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin-top: 24px; }
+    .history-visit-collection { min-width: 0; }
+    #patient-history-records .history-visit-collection > h3 { margin: 0 0 12px; padding-bottom: 9px; border-bottom: 1px solid #dfe6f2; color: #2549c7; font-size: 13px; font-weight: 650; }
+    #patient-history-records .history-visit-item { padding: 16px; margin-top: 10px; border: 1px solid #e0e6f1; border-radius: 9px; background: #fff; }
+    .history-visit-item > h4 { margin: 0 0 10px; color: #192737; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+    #patient-history-records .history-visit-item > p { margin: 6px 0; color: #425570; font-size: 12px; line-height: 1.7; }
+    .history-visit-item > p > strong { color: #63738a; font-weight: 550; }
+    #patient-history-records .history-visit-empty { margin: 0; padding: 16px; background: #f7f9fd; color: #63738a; border-radius: 9px; font-size: 12px; }
+}
+@media screen and (max-width: 1050px) {
+    #patient-history-records .history-visit-summary { grid-template-columns: 130px minmax(0, 1fr); gap: 14px; }
+    .history-visit-reference { grid-column: 2; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+}
+@media screen and (max-width: 650px) {
+    #patient-history-records { padding-left: 18px; }
+    .history-visit-summary::before { left: -18px; }
+    #patient-history-records .history-visit-summary { grid-template-columns: minmax(0, 1fr); padding: 16px 38px 16px 16px; }
+    .history-visit-reference { grid-column: auto; }
+    .history-visit-date { width: fit-content; padding: 6px 10px; }
+    .history-visit-fields, .history-visit-collections { grid-template-columns: minmax(0, 1fr); }
+    .history-visit-body { padding: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .history-visit-summary::after { transition: none; } }

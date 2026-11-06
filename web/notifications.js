@@ -4,7 +4,7 @@
 
     const stylesheet = document.createElement('link');
     stylesheet.rel = 'stylesheet';
-    stylesheet.href = '/web/notifications.css';
+    stylesheet.href = '/web/notifications.css?v=cobalt-components-2';
     document.head.appendChild(stylesheet);
 
     const bell = document.createElement('button');

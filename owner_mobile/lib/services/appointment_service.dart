@@ -338,4 +338,31 @@ class AppointmentService {
 
     return Map<String, dynamic>.from(data);
   }
+
+  Future<Map<String, dynamic>?> getBookingRefund(
+      int appointmentId,
+      ) async {
+    final data = await api.get(
+      '/owner-appointments/$appointmentId/deposit-refund',
+    );
+
+    if (data == null) return null;
+
+    if (data is! Map ||
+        data['appointment_id'] != appointmentId ||
+        data['refund_id'] is! int ||
+        data['status'] is! String) {
+      throw const ApiException('Invalid deposit refund response.');
+    }
+
+    final amount = num.tryParse(
+      data['refund_amount']?.toString() ?? '',
+    );
+
+    if (amount == null || !amount.isFinite || amount <= 0) {
+      throw const ApiException('Invalid deposit refund amount.');
+    }
+
+    return Map<String, dynamic>.from(data);
+  }
 }

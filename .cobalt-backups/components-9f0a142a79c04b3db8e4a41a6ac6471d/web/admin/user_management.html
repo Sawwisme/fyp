@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VetDental — User Management</title>
+    <link rel="stylesheet" href="/web/styles.css">
+    <link rel="stylesheet" href="/web/admin/dashboard.css">
+    <link rel="stylesheet" href="/web/admin/layout.css">
+
+    <script src="/web/admin/layout.js" defer></script>
+    <script src="/web/admin/staff.js" defer></script>
+    <link rel="stylesheet" href="/web/cobalt.css?v=1">
+</head>
+
+<body>
+    <div id="staff-loading" class="loading">
+        <p id="staff-loading-message" role="status">
+            Loading your workspace…
+        </p>
+        <button id="staff-retry" class="secondary" type="button" hidden>
+            Try again
+        </button>
+        <a href="/web/">Back to staff login</a>
+    </div>
+
+    <div id="staff-workspace" class="workspace" hidden>
+        <aside id="shared-sidebar" class="sidebar"></aside>
+
+        <div class="content-area">
+            <header id="shared-topbar" class="topbar"></header>
+
+            <main class="main-content">
+                <div class="staff-heading">
+                    <div>
+                        <h1>User Management</h1>
+                        <p class="subtitle">
+                            Manage your clinic’s staff accounts.
+                        </p>
+                    </div>
+
+                    <button id="open-vet-form" class="primary compact-button" type="button">
+                        Add Staff
+                    </button>
+                </div>
+
+                <section id="vet-form-panel" class="panel" hidden aria-labelledby="vet-form-title">
+                    <h2 id="vet-form-title">Add Staff</h2>
+
+                    <form id="vet-form">
+                        <fieldset id="vet-fields" class="staff-form-grid">
+                            <div>
+                                <label class="field-label" for="staff-role">
+                                    Account role
+                                </label>
+                                <select id="staff-role">
+                                    <option value="veterinarian">Veterinarian</option>
+                                    <option value="clinic_administrator">
+                                        Clinic Administrator
+                                    </option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="field-label" for="vet-name">
+                                    Full name
+                                </label>
+                                <input id="vet-name" type="text" maxlength="150" required>
+                            </div>
+
+                            <div>
+                                <label class="field-label" for="vet-email">
+                                    Email address
+                                </label>
+                                <input id="vet-email" type="email" maxlength="255" required>
+                            </div>
+
+                            <div>
+                                <label class="field-label" for="vet-password">
+                                    Initial password
+                                </label>
+                                <div class="password-field">
+                                    <input id="vet-password" type="password" autocomplete="new-password" minlength="8"
+                                        maxlength="72" required>
+                                    <button id="vet-password-toggle" class="eye-button" type="button"
+                                        aria-label="Show initial password" aria-pressed="false">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+                                            <circle cx="12" cy="12" r="3" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="vet-registration-field">
+                                <label class="field-label" for="vet-registration">
+                                    Registration number
+                                </label>
+                                <input id="vet-registration" type="text" maxlength="50" required>
+                            </div>
+
+                            <div>
+                                <label class="field-label" for="vet-phone">
+                                    Phone number (optional)
+                                </label>
+                                <input id="vet-phone" type="tel" maxlength="20">
+                            </div>
+
+                            <div id="vet-qualification-field">
+                                <label class="field-label" for="vet-qualification">
+                                    Qualification (optional)
+                                </label>
+                                <input id="vet-qualification" type="text" maxlength="150">
+                            </div>
+                        </fieldset>
+
+                        <p class="muted">
+                            The account will be active and approved
+                            under your clinic.
+                        </p>
+
+                        <p id="vet-form-message" class="message" role="status" aria-live="polite"></p>
+
+                        <div class="staff-actions">
+                            <button id="cancel-vet" class="secondary compact-button" type="button">
+                                Cancel
+                            </button>
+                            <button id="create-vet" class="primary compact-button" type="submit">
+                                Create account
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <div class="staff-summary">
+                    <div>
+                        <span>Total staff</span>
+                        <strong id="staff-total">—</strong>
+                    </div>
+                    <div>
+                        <span>Administrators</span>
+                        <strong id="staff-admin-total">—</strong>
+                    </div>
+                    <div>
+                        <span>Veterinarians</span>
+                        <strong id="staff-vet-total">—</strong>
+                    </div>
+                </div>
+
+                <section class="panel section-panel" aria-labelledby="vet-list-title">
+                    <h2 id="vet-list-title">Clinic Staff</h2>
+
+                    <div class="staff-list-toolbar">
+                        <div>
+                            <label class="field-label" for="staff-search">
+                                Search staff
+                            </label>
+                            <input id="staff-search" type="search" placeholder="Name, email or registration number">
+                        </div>
+
+                        <div>
+                            <label class="field-label" for="staff-role-filter">
+                                Role
+                            </label>
+                            <select id="staff-role-filter">
+                                <option value="all">All staff</option>
+                                <option value="clinic_administrator">Administrators</option>
+                                <option value="veterinarian">Veterinarians</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <p id="vet-list-message" role="status" aria-live="polite"></p>
+
+                    <div class="table-scroll">
+                        <table class="staff-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Role</th>
+                                    <th scope="col">Registration number</th>
+                                    <th scope="col">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vet-table-body"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+</body>
+
+</html>

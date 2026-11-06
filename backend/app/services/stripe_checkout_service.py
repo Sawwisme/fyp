@@ -182,7 +182,7 @@ def create_or_reopen_checkout(
 
             payload = {
                 "mode": "payment",
-                "payment_method_types": ["fpx"],
+                "allowed_payment_method_types": ["fpx"],
                 "client_reference_id": str(order.order_id),
                 "customer_email": current_user.email,
                 "metadata": metadata,

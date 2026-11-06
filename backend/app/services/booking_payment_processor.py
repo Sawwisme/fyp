@@ -129,7 +129,10 @@ def record_verified_deposit(
             "The deposit transaction needs reconciliation.",
         )
 
-    if payment.payment_status == "refunded":
+    if payment.payment_status in {
+        "refunded",
+        "partially_refunded",
+    }:
         if transaction is None:
             raise HTTPException(
                 409,

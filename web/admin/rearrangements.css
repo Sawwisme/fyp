@@ -36,7 +36,7 @@
 
 .rearrangement-card {
     padding: 16px;
-    border: 1px solid #e0e7e2;
+    border: 1px solid #d3dce5;
     border-left: 3px solid #c47b20;
     border-radius: 10px;
     background: #fff;
@@ -76,9 +76,9 @@
     max-height: calc(100dvh - 40px);
     overflow-y: auto;
     padding: 24px;
-    border: 1px solid #dce5de;
+    border: 1px solid #d3dce5;
     border-radius: 16px;
-    color: #24342a;
+    color: #192737;
     background: #fff;
     box-shadow: 0 24px 70px #102c2333;
 }
@@ -115,9 +115,9 @@
     box-sizing: border-box;
     width: 100%;
     padding: 12px;
-    border: 1px solid #cddbd1;
+    border: 1px solid #d3dce5;
     border-radius: 8px;
-    background: #f8faf8;
+    background: #f8faff;
     font: inherit;
     resize: vertical;
 }
@@ -129,9 +129,9 @@
 
 #rearrangement-resolution-save {
     padding: 10px 16px;
-    border: 1px solid #176b32;
+    border: 1px solid #2549c7;
     border-radius: 8px;
-    background: #176b32;
+    background: #2549c7;
     color: #fff;
     font: inherit;
     font-weight: 600;

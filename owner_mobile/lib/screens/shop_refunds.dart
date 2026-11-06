@@ -18,7 +18,7 @@ class ShopRefundsScreen extends StatefulWidget {
 }
 
 class _ShopRefundsScreenState extends State<ShopRefundsScreen> {
-  static const _green = Color(0xFF176B32);
+  static const _green = Color(0xFF2549C7);
 
   Map<String, dynamic>? _order;
   List<Map<String, dynamic>> _refunds = [];
@@ -367,7 +367,7 @@ class _ShopRefundsScreenState extends State<ShopRefundsScreen> {
     return PopScope(
       canPop: !_sending,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F7F5),
+        backgroundColor: const Color(0xFFEEF1F5),
         appBar: AppBar(
           title: const Text('Refunds'),
           actions: [

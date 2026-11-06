@@ -16,7 +16,7 @@ class BillsScreen extends StatefulWidget {
 }
 
 class _BillsScreenState extends State<BillsScreen> {
-  static const _green = Color(0xFF176B32);
+  static const _green = Color(0xFF2549C7);
   static const _pageSize = 10;
 
   late Future<Map<String, dynamic>> _future;
@@ -212,7 +212,7 @@ class _BillsScreenState extends State<BillsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F5),
+      backgroundColor: const Color(0xFFEEF1F5),
       appBar: AppBar(
         title: const Text('Bills & Receipts'),
         actions: [

@@ -19,7 +19,7 @@ class ClinicPickerScreen extends StatefulWidget {
 }
 
 class _ClinicPickerScreenState extends State<ClinicPickerScreen> {
-  static const _green = Color(0xFF176B32);
+  static const _green = Color(0xFF2549C7);
 
   List<Map<String, dynamic>> _clinics = [];
   bool _loading = true;
@@ -289,7 +289,7 @@ class _ClinicPickerScreenState extends State<ClinicPickerScreen> {
 
               return ListTile(
                 leading: const CircleAvatar(
-                  backgroundColor: Color(0xFFE7F2E9),
+                  backgroundColor: Color(0xFFE8EDFF),
                   child: Icon(
                     Icons.local_hospital_outlined,
                     color: _green,

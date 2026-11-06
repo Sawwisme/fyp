@@ -11,15 +11,15 @@
     width: 40px;
     height: 40px;
     padding: 0;
-    border: 1px solid #e0e8e2;
+    border: 1px solid #d3dce5;
     border-radius: 10px;
     background: #fff;
-    color: #365242;
+    color: #57697a;
     cursor: pointer;
 }
 
 .notification-bell:hover {
-    background: #edf5ef;
+    background: #e8edff;
 }
 
 .notification-badge {
@@ -45,10 +45,10 @@
     max-height: calc(100dvh - 40px);
     overflow-y: auto;
     padding: 24px;
-    border: 1px solid #dce5de;
+    border: 1px solid #d3dce5;
     border-radius: 16px;
-    background: #f7faf8;
-    color: #24342a;
+    background: #f8faff;
+    color: #192737;
 }
 
 #staff-notification-dialog::backdrop {
@@ -72,15 +72,15 @@
 .notification-dialog-header p,
 .notification-message {
     font-size: 13px;
-    color: #65746a;
+    color: #57697a;
 }
 
 .notification-close {
     padding: 6px 12px;
     border: 0;
     border-radius: 8px;
-    background: #eaf1ec;
-    color: #365242;
+    background: #e8edff;
+    color: #57697a;
     font-size: 24px;
     cursor: pointer;
 }
@@ -92,13 +92,13 @@
 
 .notification-card {
     padding: 16px;
-    border: 1px solid #e0e7e2;
+    border: 1px solid #d3dce5;
     border-radius: 10px;
     background: #fff;
 }
 
 .notification-card.is-unread {
-    border-left: 3px solid #176b32;
+    border-left: 3px solid #2549c7;
 }
 
 .notification-card h3 {
@@ -113,7 +113,7 @@
 }
 
 .notification-card small {
-    color: #65746a;
+    color: #57697a;
 }
 
 .notification-card-actions {
@@ -130,10 +130,10 @@
 .notification-pagination button,
 .notification-card-actions button {
     padding: 8px 12px;
-    border: 1px solid #cbdccf;
+    border: 1px solid #d3dce5;
     border-radius: 8px;
     background: #fff;
-    color: #176b32;
+    color: #2549c7;
     font: inherit;
     cursor: pointer;
 }
@@ -145,5 +145,5 @@
 }
 
 .notification-card-actions a {
-    color: #176b32;
+    color: #2549c7;
 }

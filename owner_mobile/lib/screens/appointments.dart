@@ -376,7 +376,7 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
   }
 
   Widget _appointmentCard(Map<String, dynamic> item) {
-    const green = Color(0xFF176B32);
+    const green = Color(0xFF2549C7);
     const muted = Color(0xFF6B7770);
 
     final start = item['start_time'] as String;
@@ -731,7 +731,7 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
             label: const Text('Follow-up Care'),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(44),
-              foregroundColor: const Color(0xFF176B32),
+              foregroundColor: const Color(0xFF2549C7),
               side: const BorderSide(color: Color(0xFFCBDCCF)),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -747,7 +747,7 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
             label: const Text('Emergency requests'),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(44),
-              foregroundColor: const Color(0xFF176B32),
+              foregroundColor: const Color(0xFF2549C7),
               side: const BorderSide(color: Color(0xFFCBDCCF)),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),

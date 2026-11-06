@@ -51,6 +51,7 @@ def lock_refund_context(db, refund_id):
         )
         .where(
             Refund.refund_id == refund_id,
+            Refund.refund_purpose == "booking_cancellation",
             Payment.payment_purpose == "booking_deposit",
             Payment.order_id.is_(None),
             Transaction.order_id.is_(None),
@@ -252,6 +253,39 @@ def notify_refund_success(db, appointment, transaction, refund):
         )
     )
 
+def prepare_gateway_request(refund):
+    if refund.status == "approved":
+        if (
+            refund.gateway_requested_at is not None
+            or refund.gateway_refund_id is not None
+        ):
+            raise HTTPException(
+                409,
+                "The approved refund has conflicting gateway details.",
+            )
+
+        refund.gateway_idempotency_key = (
+            refund.gateway_idempotency_key
+            or str(uuid4())
+        )
+        refund.gateway_requested_at = utc_now()
+        refund.status = "processing"
+        refund.version += 1
+
+    elif refund.status not in {"processing", "requires_action"}:
+        raise HTTPException(
+            409,
+            "This refund is not approved for processing.",
+        )
+
+    if (
+        not refund.gateway_idempotency_key
+        or refund.gateway_requested_at is None
+    ):
+        raise HTTPException(
+            409,
+            "The saved refund request needs reconciliation.",
+        )
 
 def process_booking_refund(db, refund_id):
     try:
@@ -275,38 +309,7 @@ def process_booking_refund(db, refund_id):
             db.commit()
             return result
 
-        if refund.status == "approved":
-            if (
-                refund.gateway_requested_at is not None
-                or refund.gateway_refund_id is not None
-            ):
-                raise HTTPException(
-                    409,
-                    "The approved refund has conflicting gateway details.",
-                )
-
-            refund.gateway_idempotency_key = (
-                refund.gateway_idempotency_key
-                or str(uuid4())
-            )
-            refund.gateway_requested_at = utc_now()
-            refund.status = "processing"
-            refund.version += 1
-
-        elif refund.status not in {"processing", "requires_action"}:
-            raise HTTPException(
-                409,
-                "This booking refund is not approved for processing.",
-            )
-
-        if (
-            not refund.gateway_idempotency_key
-            or refund.gateway_requested_at is None
-        ):
-            raise HTTPException(
-                409,
-                "The saved refund request needs reconciliation.",
-            )
+        prepare_gateway_request(refund)
 
         # Commit the retry identity before sending a refund.
         db.commit()

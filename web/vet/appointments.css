@@ -11,7 +11,7 @@
     gap: 8px;
     min-width: 0;
     padding: 18px 20px;
-    border: 1px solid #dce6de;
+    border: 1px solid #d3dce5;
     border-radius: 12px;
     background: white;
 }
@@ -23,7 +23,7 @@
 }
 
 .appointment-stat>strong {
-    color: #24372a;
+    color: #192737;
     font-size: 30px;
     font-weight: 700;
     line-height: 1.2;
@@ -40,12 +40,12 @@
 }
 
 .appointment-stat-overall>strong {
-    color: #176b32;
+    color: #2549c7;
 }
 
 .appointment-filter-note {
     margin: 0 0 20px;
-    color: #728077;
+    color: #57697a;
     font-size: 12px;
 }
 

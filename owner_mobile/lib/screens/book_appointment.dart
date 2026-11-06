@@ -350,7 +350,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                             '${deposit.toStringAsFixed(2)}'
                             : 'No appointment deposit',
                         style: const TextStyle(
-                          color: Color(0xFF176B32),
+                          color: Color(0xFF2549C7),
                           fontWeight: FontWeight.bold,
                         ),
                       ),

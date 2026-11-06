@@ -1,0 +1,83 @@
+@media screen {
+    /* Page headings stay light; emphasis belongs to actions and record content. */
+    :is(.clinical-consultation-page, .clinical-list-page) .main-content > .page-heading,
+    .clinical-consultation-page .clinical-page-header .page-heading {
+        padding: 0 0 20px;
+        background: transparent;
+        border: 0;
+        border-bottom: 1px solid #d3dce5;
+        border-radius: 0;
+        color: #192737;
+    }
+    :is(.clinical-consultation-page, .clinical-list-page) .page-heading h1 { color: #192737; }
+    :is(.clinical-consultation-page, .clinical-list-page) .page-heading .subtitle { color: #57697a; }
+    .clinical-consultation-page .page-heading a { color: #2549c7; }
+    .clinical-page-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid #d3dce5; margin-bottom: 22px; padding-bottom: 18px; }
+    .clinical-consultation-page .clinical-page-header .page-heading { border: 0; margin: 0; padding: 0; }
+    .clinical-page-header > .staff-actions { margin: 0; }
+    #print-prescription { display: inline-flex; align-items: center; justify-content: center; width: auto; min-height: 44px; padding: 11px 18px; background: #2549c7; color: #fff; border: 1px solid #2549c7; border-radius: 9px; font-size: 13px; font-weight: 650; box-shadow: 0 4px 10px #2549c71c; }
+    #print-prescription:hover:not(:disabled) { background: #1d3ba4; color: #fff; }
+
+    #treatment-progress-dialog { width: min(640px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); overflow-y: auto; }
+    #treatment-progress-dialog label { display: block; margin: 18px 0 8px; font-size: 12px; color: #425570; font-weight: 650; }
+    #treatment-progress-dialog :is(select, textarea) { display: block; width: 100%; box-sizing: border-box; min-width: 0; padding: 12px 14px; border: 1px solid #d3dce5; border-radius: 9px; background: #fbfcff; color: #192737; font: inherit; font-size: 14px; line-height: 1.5; }
+    #treatment-progress-dialog select { min-height: 46px; }
+    #treatment-progress-dialog textarea { min-height: 120px; resize: vertical; }
+    #treatment-progress-dialog #treatment-progress-fields { min-width: 0; padding: 0; border: 0; margin: 0; }
+    #treatment-progress-dialog .staff-actions { padding-top: 18px; margin-top: 22px; border-top: 1px solid #d3dce5; }
+
+    #followup-readview { padding: 24px; border: 1px solid #d6dfef; }
+    #followup-readview > h2 { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+    #followup-readview > h2::before { content: ''; width: 5px; height: 22px; border-radius: 4px; background: #2549c7; }
+    #followup-readview-content { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    #followup-readview-content > p { margin: 0; padding: 16px 18px; background: #f3f6fd; border-radius: 10px; line-height: 1.65; overflow-wrap: anywhere; white-space: pre-wrap; }
+    #followup-readview-content > p strong { display: block; color: #63738a; font-size: 12px; margin-bottom: 6px; font-weight: 550; }
+    #followup-readview-content > p:nth-child(3),
+    #followup-readview-content > p:nth-child(6),
+    #followup-readview-content > p:only-child { grid-column: 1 / -1; }
+    #followup-readview-content > p.muted { grid-column: 1 / -1; padding: 12px 0 0; background: transparent; border-top: 1px solid #e1e7f1; border-radius: 0; font-size: 12px; }
+
+    .product-heading-actions > button,
+    #product-add, #category-add, #shop-settings-open {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: auto;
+        height: 42px;
+        min-height: 42px;
+        margin: 0;
+        padding: 0 16px;
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 8px;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 650;
+        line-height: 1.4;
+        white-space: nowrap;
+        box-sizing: border-box;
+    }
+    .product-heading-actions { align-items: center; gap: 10px; }
+
+    /* Desktop: hide the sidebar completely and recover its content width. */
+    #shared-sidebar { transition: transform .18s ease; }
+    body.shell-sidebar-closed .workspace { padding-left: 0; }
+    body.shell-sidebar-closed #shared-topbar { left: 0; }
+    body.shell-sidebar-closed #shared-sidebar { transform: translateX(-100%); visibility: hidden; }
+    .shell-title-group { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .shell-title-group > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #shell-sidebar-toggle, #shell-sidebar-close { display: inline-grid; place-items: center; flex: 0 0 40px; width: 40px; min-height: 40px; padding: 0; border: 1px solid #d3dce5; border-radius: 9px; background: #f3f6fb; color: #2549c7; font: inherit; font-size: 21px; cursor: pointer; }
+    #shell-sidebar-close { display: none; }
+    .shell-sidebar-backdrop { display: none; }
+}
+@media screen and (max-width: 760px) {
+    #shared-sidebar { position: fixed; inset: 0 auto 0 0; width: min(290px, 86vw); height: 100dvh; padding-top: 62px; z-index: 70; overflow-y: auto; }
+    #shared-sidebar .brand { margin-top: 0; }
+    #shared-sidebar #shell-sidebar-close { display: inline-grid; position: absolute; top: 12px; right: 14px; background: #2a3b52; color: #fff; border-color: #40516a; }
+    .workspace, body.shell-sidebar-closed .workspace { padding-left: 0; }
+    #shared-topbar, body.shell-sidebar-closed #shared-topbar { left: auto; }
+    .shell-sidebar-backdrop { display: block; position: fixed; inset: 0; z-index: 60; width: 100%; height: 100%; padding: 0; border: 0; border-radius: 0; background: #101b2e88; }
+    #followup-readview-content { grid-template-columns: minmax(0, 1fr); }
+    .shell-title-group > span { max-width: 130px; font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) { #shared-sidebar { transition: none; } }

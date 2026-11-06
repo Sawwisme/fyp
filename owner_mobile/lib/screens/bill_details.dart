@@ -20,7 +20,7 @@ class BillDetailsScreen extends StatefulWidget {
 
 class _BillDetailsScreenState extends State<BillDetailsScreen>
     with WidgetsBindingObserver {
-  static const _green = Color(0xFF176B32);
+  static const _green = Color(0xFF2549C7);
 
   late Future<Map<String, dynamic>> _future;
   bool _openingPayment = false;
@@ -364,6 +364,39 @@ class _BillDetailsScreenState extends State<BillDetailsScreen>
     );
   }
 
+  Widget _billAmountLine(
+      String title,
+      dynamic value, {
+        bool emphasis = false,
+      }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 7),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontWeight:
+                emphasis ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Text(
+            _money(value),
+            style: TextStyle(
+              color: emphasis ? _green : null,
+              fontWeight: FontWeight.bold,
+              fontSize: emphasis ? 20 : 15,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _content(Map<String, dynamic> data) {
     final bill = Map<String, dynamic>.from(data['bill'] as Map);
 
@@ -381,8 +414,16 @@ class _BillDetailsScreenState extends State<BillDetailsScreen>
     final zeroTotal =
         num.tryParse(bill['total_amount'].toString()) == 0;
     final amount = num.tryParse(
-      bill['total_amount'].toString(),
+      bill['balance_amount'].toString(),
     );
+
+    final depositApplied = num.tryParse(
+      bill['deposit_applied_amount']?.toString() ?? '',
+    ) ?? 0;
+
+    final excessRefund = num.tryParse(
+      bill['deposit_excess_refund_amount']?.toString() ?? '',
+    ) ?? 0;
 
     final onlineEligible =
         amount != null && amount >= 1 && amount <= 30000;
@@ -506,7 +547,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen>
             children: [
               const Expanded(
                 child: Text(
-                  'Total',
+                  'Total charges',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -524,6 +565,37 @@ class _BillDetailsScreenState extends State<BillDetailsScreen>
             ],
           ),
         ]),
+
+        _panel([
+          _heading('Deposit & balance'),
+          const SizedBox(height: 12),
+          _billAmountLine(
+            'Booking deposit received',
+            bill['deposit_paid_amount'],
+          ),
+          _billAmountLine(
+            'Deposit applied',
+            bill['deposit_applied_amount'],
+          ),
+          _billAmountLine(
+            'Balance after deposit',
+            bill['balance_amount'],
+          ),
+          const Divider(),
+          _billAmountLine(
+            'Amount still due',
+            bill['amount_due'],
+            emphasis: true,
+          ),
+          if (excessRefund > 0) ...[
+            const SizedBox(height: 10),
+            _billAmountLine(
+              'Excess deposit refund amount',
+              bill['deposit_excess_refund_amount'],
+            ),
+          ],
+        ]),
+
         if (_paymentMessage != null)
           _panel([
             Text(
@@ -610,9 +682,11 @@ class _BillDetailsScreenState extends State<BillDetailsScreen>
           const SizedBox(height: 12),
           if (payments.isEmpty)
             Text(
-              paid && zeroTotal
+              paid && depositApplied > 0
+                  ? 'This bill was settled using its booking deposit.'
+                  : paid && zeroTotal
                   ? 'No payment was required for this bill.'
-                  : 'No payment has been recorded yet.',
+                  : 'No balance payment has been recorded yet.',
             ),
           ...payments.map((payment) {
             final receipt =
@@ -660,7 +734,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen>
     return PopScope(
       canPop: !_openingPayment && !_cancellingPayment,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F7F5),
+        backgroundColor: const Color(0xFFEEF1F5),
         appBar: AppBar(
           title: Text('Bill #${widget.billId}'),
           actions: [

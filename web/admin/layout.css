@@ -32,7 +32,7 @@ body {
     height: 100vh;
     padding: 24px 16px;
     overflow-y: auto;
-    background: #f1f4f0;
+    background: #eef1f5;
     border-right: 1px solid var(--border);
 }
 
@@ -126,16 +126,16 @@ body {
     width: 100%;
     min-width: 0;
     padding: 13px 14px;
-    border: 1px solid #ccd6ce;
+    border: 1px solid #d3dce5;
     border-radius: 8px;
-    background: #fafbf9;
+    background: #f8faff;
     color: var(--ink);
     font: inherit;
     font-size: 14px;
 }
 
 #schedule-fields select:focus-visible {
-    outline: 3px solid #91c49e;
+    outline: 3px solid #9aaff7;
     outline-offset: 2px;
 }
 
@@ -144,7 +144,7 @@ body {
     padding: 16px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: #f8faf8;
+    background: #f8faff;
 }
 
 .schedule-entry summary {
@@ -206,16 +206,16 @@ body {
     width: 100%;
     min-width: 0;
     padding: 13px 14px;
-    border: 1px solid #ccd6ce;
+    border: 1px solid #d3dce5;
     border-radius: 8px;
-    background: #fafbf9;
+    background: #f8faff;
     color: var(--ink);
     font: inherit;
     font-size: 14px;
 }
 
 .clinic-period-row select:focus-visible {
-    outline: 3px solid #91c49e;
+    outline: 3px solid #9aaff7;
     outline-offset: 2px;
 }
 
@@ -256,7 +256,7 @@ body {
     padding: 14px 16px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: #f8faf8;
+    background: #f8faff;
 }
 
 .clinic-map-editor>summary {
@@ -323,7 +323,7 @@ body {
     padding: 12px 14px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: #fafbf9;
+    background: #f8faff;
     color: var(--ink);
     font: inherit;
 }
@@ -372,7 +372,7 @@ body {
     padding: 12px 14px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: #fafbf9;
+    background: #f8faff;
     color: var(--ink);
     font: inherit;
     font-size: 14px;
@@ -381,7 +381,7 @@ body {
 #bulk-slot-duration:focus-visible,
 #schedule-duration:focus-visible,
 #schedule-vet:focus-visible {
-    outline: 3px solid #91c49e;
+    outline: 3px solid #9aaff7;
     outline-offset: 2px;
 }
 
@@ -421,7 +421,7 @@ body {
     padding: 12px 14px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: #fafbf9;
+    background: #f8faff;
     color: var(--ink);
     font-size: 14px;
     font-weight: 400;
@@ -430,11 +430,11 @@ body {
 
 .bulk-vet-option:has(input:checked) {
     border-color: var(--green);
-    background: #e7f2e9;
+    background: #e8edff;
 }
 
 .bulk-vet-option:focus-within {
-    outline: 3px solid #91c49e;
+    outline: 3px solid #9aaff7;
     outline-offset: 2px;
 }
 
@@ -460,7 +460,7 @@ section:has(#bulk-schedule-form) {
     padding: 16px;
     border: 1px solid var(--border);
     border-radius: 10px;
-    background: #fafbf9;
+    background: #f8faff;
 }
 
 .staff-summary span {
@@ -490,7 +490,7 @@ section:has(#bulk-schedule-form) {
     padding: 12px 14px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: #fafbf9;
+    background: #f8faff;
     color: var(--ink);
     font: inherit;
     font-size: 14px;
@@ -540,7 +540,7 @@ section:has(#bulk-schedule-form) {
     padding: 12px 14px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: #fafbf9;
+    background: #f8faff;
     color: var(--ink);
     font: inherit;
     font-size: 14px;
@@ -586,7 +586,7 @@ section:has(#auto-schedule-form) {
     padding: 16px;
     border: 1px solid var(--border);
     border-radius: 10px;
-    background: #fafbf9;
+    background: #f8faff;
 }
 
 .weekly-day-heading {
@@ -664,7 +664,7 @@ section:has(#auto-schedule-form) {
 
 .schedule-workspace-actions [aria-expanded="true"] {
     border-color: var(--green);
-    background: #e7f2e9;
+    background: #e8edff;
 }
 
 .overview-vet-entry {
@@ -743,7 +743,7 @@ section:has(#schedule-form) {
     padding: 10px 12px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: #fafbf9;
+    background: #f8faff;
     color: var(--ink);
     font: inherit;
     font-size: 14px;
@@ -827,7 +827,7 @@ section:has(#schedule-form) {
     padding: 16px;
     border: 1px solid var(--border);
     border-radius: 10px;
-    background: #fafbf9;
+    background: #f8faff;
 }
 
 .reception-dialog input,
@@ -838,7 +838,7 @@ section:has(#schedule-form) {
     padding: 12px 14px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: #fafbf9;
+    background: #f8faff;
     color: var(--ink);
     font: inherit;
     font-size: 14px;
@@ -896,12 +896,12 @@ section:has(#schedule-form) {
 }
 
 .dialog-close:hover {
-    background: #edf4ee;
+    background: #e8edff;
     color: var(--ink);
 }
 
 .dialog-close:focus-visible {
-    outline: 3px solid #91c49e;
+    outline: 3px solid #9aaff7;
     outline-offset: 2px;
 }
 
@@ -976,7 +976,7 @@ section:has(#schedule-form) {
 
 .calendar-weekday {
     padding: 12px;
-    background: #f3f6f3;
+    background: #f3f5fa;
     text-align: center;
     font-size: 13px;
     font-weight: 600;
@@ -989,7 +989,7 @@ section:has(#schedule-form) {
 }
 
 .calendar-day.outside-month {
-    background: #f6f8f6;
+    background: #f3f5fa;
 }
 
 .calendar-day.selected-day {
@@ -1022,7 +1022,7 @@ section:has(#schedule-form) {
     border: 0;
     border-left: 3px solid var(--green);
     border-radius: 5px;
-    background: #e7f2e9;
+    background: #e8edff;
     color: var(--ink);
     font: inherit;
     text-align: left;
@@ -1039,7 +1039,7 @@ section:has(#schedule-form) {
 }
 
 .calendar-vet:hover {
-    background: #d8eadd;
+    background: #d8e1ff;
 }
 
 #schedule-filter-fields {
@@ -1097,7 +1097,7 @@ section:has(#schedule-form) {
     padding: 24px 18px;
     border: 1px dashed var(--border);
     border-radius: 8px;
-    background: #fafbf9;
+    background: #f8faff;
     text-align: center;
     line-height: 1.7;
 }
@@ -1120,7 +1120,7 @@ section:has(#schedule-form) {
 .reschedule-dialog #reschedule-summary {
     padding: 12px 14px;
     border-radius: 8px;
-    background: #edf4ee;
+    background: #e8edff;
     line-height: 1.6;
 }
 
@@ -1149,7 +1149,7 @@ section:has(#schedule-form) {
 }
 
 .vet-calendar-cell:hover {
-    background: #edf4ee;
+    background: #e8edff;
 }
 
 .vet-calendar-cell:focus-visible {
@@ -1218,7 +1218,7 @@ section:has(#schedule-form) {
     border: 1px solid var(--border);
     border-left: 4px solid #79a986;
     border-radius: 8px;
-    background: #f5faf6;
+    background: #f8faff;
 }
 
 .vet-timeline-card.is-blocked {
@@ -1402,8 +1402,8 @@ section:has(#schedule-form) {
     padding: 24px;
     overflow-y: auto;
     background: #fff;
-    color: var(--ink, #24332b);
-    border: 1px solid #dce5df;
+    color: var(--ink, #192737);
+    border: 1px solid #d3dce5;
     border-radius: 16px;
     box-shadow: 0 20px 60px rgb(20 40 28 / 18%);
     font: inherit;
@@ -1449,19 +1449,19 @@ section:has(#schedule-form) {
     border: 0;
     border-radius: 8px;
     background: transparent;
-    color: #67756c;
+    color: #57697a;
     font-size: 24px;
     line-height: 1;
 }
 
 #treatment-progress-dialog #treatment-progress-close:hover {
-    background: #f0f4f1;
+    background: #f3f5fa;
 }
 
 #treatment-progress-patient {
     margin: 0 0 14px;
     padding: 12px 14px;
-    background: #f2f7f3;
+    background: #e8edff;
     border-radius: 10px;
     font-size: 14px;
     font-weight: 600;
@@ -1470,7 +1470,7 @@ section:has(#schedule-form) {
 
 #treatment-progress-explanation {
     margin: 0 0 18px;
-    color: #67756c;
+    color: #57697a;
     font-size: 14px;
     line-height: 1.6;
 }
@@ -1495,9 +1495,9 @@ section:has(#schedule-form) {
     width: 100%;
     margin: 0 0 16px;
     padding: 11px 12px;
-    background: #fafcfb;
+    background: #f8faff;
     color: inherit;
-    border: 1px solid #ccd9cf;
+    border: 1px solid #d3dce5;
     border-radius: 8px;
     font: inherit;
     font-size: 14px;
@@ -1523,14 +1523,14 @@ section:has(#schedule-form) {
     gap: 10px;
     margin: 20px 0 0;
     padding-top: 16px;
-    border-top: 1px solid #e6ece8;
+    border-top: 1px solid #d3dce5;
 }
 
 #treatment-progress-dialog .staff-actions button {
     min-height: 40px;
     margin: 0;
     padding: 9px 16px;
-    border: 1px solid #ccd9cf;
+    border: 1px solid #d3dce5;
     border-radius: 8px;
     font-size: 14px;
     font-weight: 600;
@@ -1538,11 +1538,11 @@ section:has(#schedule-form) {
 
 #treatment-progress-dismiss {
     background: #fff;
-    color: #46564b;
+    color: #57697a;
 }
 
 #treatment-progress-dialog #treatment-progress-submit {
-    background: var(--green, #176b35);
+    background: var(--green, #2549c7);
     color: #fff;
     border-color: transparent;
 }
@@ -1559,7 +1559,7 @@ section:has(#schedule-form) {
 #treatment-progress-dialog button:focus-visible,
 #treatment-progress-dialog select:focus-visible,
 #treatment-progress-dialog textarea:focus-visible {
-    outline: 3px solid #a9d5b6;
+    outline: 3px solid #9aaff7;
     outline-offset: 2px;
 }
 
@@ -1579,7 +1579,7 @@ section:has(#schedule-form) {
 }
 
 #clinical-history-panel td>a {
-    color: var(--green, #176b35);
+    color: var(--green, #2549c7);
     font-size: 13px;
     font-weight: 600;
     text-decoration: none;
@@ -1597,8 +1597,8 @@ section:has(#schedule-form) {
     margin: auto;
     padding: 24px;
     background: white;
-    color: var(--ink, #24332b);
-    border: 1px solid #dce5df;
+    color: var(--ink, #192737);
+    border: 1px solid #d3dce5;
     border-radius: 16px;
     box-shadow: 0 20px 60px rgb(20 40 28 / 18%);
     font: inherit;
@@ -1635,7 +1635,7 @@ section:has(#schedule-form) {
     height: 32px;
     padding: 0;
     background: transparent;
-    color: #67756c;
+    color: #57697a;
     border: 0;
     border-radius: 8px;
     font-size: 24px !important;
@@ -1661,8 +1661,8 @@ section:has(#schedule-form) {
     width: 100%;
     margin: 0 0 16px;
     padding: 11px 12px;
-    background: #fafcfb;
-    border: 1px solid #ccd9cf;
+    background: #f8faff;
+    border: 1px solid #d3dce5;
     border-radius: 8px;
     font: inherit;
 }
@@ -1676,12 +1676,12 @@ section:has(#schedule-form) {
 .return-visit-footer {
     justify-content: flex-end;
     padding-top: 16px;
-    border-top: 1px solid #e6ece8;
+    border-top: 1px solid #d3dce5;
 }
 
 .return-visit-footer button {
     padding: 10px 16px;
-    border: 1px solid #ccd9cf;
+    border: 1px solid #d3dce5;
     border-radius: 8px;
     font-size: 14px;
     font-weight: 600;
@@ -1689,11 +1689,11 @@ section:has(#schedule-form) {
 
 #return-visit-dismiss {
     background: white;
-    color: #46564b;
+    color: #57697a;
 }
 
 #return-visit-submit {
-    background: var(--green, #176b35);
+    background: var(--green, #2549c7);
     color: white;
     border-color: transparent;
 }
@@ -1790,8 +1790,8 @@ section:has(#schedule-form) {
     margin: 4px 6px 4px 0;
     padding: 6px 10px;
     color: var(--green);
-    background: #f2f7f3;
-    border: 1px solid #d5e3d8;
+    background: #e8edff;
+    border: 1px solid #d3dce5;
     border-radius: 7px;
     font-size: 12px;
     font-weight: 600;
@@ -1799,9 +1799,9 @@ section:has(#schedule-form) {
 }
 
 .linked-visit-action:hover {
-    background: #e4efe7;
+    background: #e8edff;
 }
 
 .linked-appointment-highlight>td {
-    background: #e7f3e9;
+    background: #e8edff;
 }

@@ -123,7 +123,8 @@ def queue_booking_deposit_refund(
         existing = refunds[0]
 
         if (
-            existing.refund_amount != payment.amount
+            existing.refund_purpose != "booking_cancellation"
+            or existing.refund_amount != payment.amount
             or existing.status not in {
                 "approved",
                 "processing",
@@ -189,6 +190,7 @@ def queue_booking_deposit_refund(
         requested_at=now,
         gateway_idempotency_key=str(uuid4()),
         gateway_requested_at=None,
+        refund_purpose="booking_cancellation",
     )
 
     db.add(refund)

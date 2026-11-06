@@ -125,6 +125,10 @@ class OwnerBookingRefundResponse(BaseModel):
     refund_amount: Decimal
     requested_at: datetime
     processed_at: datetime | None
+    refund_purpose: Literal[
+        "booking_cancellation",
+        "booking_excess",
+    ]
 
     @field_validator("requested_at", "processed_at")
     @classmethod

@@ -17,9 +17,12 @@ from app.services.pet_service import get_owner_profile
 from app.services.stripe_checkout_service import get_return_url
 from app.services.stripe_gateway import get_stripe_client
 from app.services.stripe_session_service import resolve_remote_session
+from app.services.bill_deposit_validation import (
+    validate_bill_deposit,
+)
 
 
-def ensure_payable(clinic, bill, appointment):
+def ensure_payable(db, clinic, bill, appointment):
     if clinic.status != "active":
         raise HTTPException(
             409,
@@ -37,7 +40,13 @@ def ensure_payable(clinic, bill, appointment):
             "This bill is not awaiting payment. Refresh its details.",
         )
 
-    cents = int(bill.total_amount * 100)
+    validate_bill_deposit(
+        db,
+        bill,
+        appointment,
+    )
+
+    cents = int(bill.balance_amount * 100)
 
     if not 100 <= cents <= 3000000:
         raise HTTPException(
@@ -156,7 +165,7 @@ def create_or_reopen_checkout(db, current_user, bill_id):
         )
 
         amount_cents = ensure_payable(
-            clinic, bill, appointment
+            db, clinic, bill, appointment
         )
 
         payment, checkout = find_pending_attempt(
@@ -171,7 +180,7 @@ def create_or_reopen_checkout(db, current_user, bill_id):
                 payment_purpose="consultation_balance",
                 payment_method="online_banking",
                 payment_status="pending",
-                amount=bill.total_amount,
+                amount=bill.balance_amount,
             )
 
             db.add(payment)
@@ -195,7 +204,7 @@ def create_or_reopen_checkout(db, current_user, bill_id):
 
             checkout.request_payload = {
                 "mode": "payment",
-                "payment_method_types": ["fpx"],
+                "allowed_payment_method_types": ["fpx"],
                 "client_reference_id": (
                     f"bill:{bill.consultation_bill_id}"
                 ),
@@ -225,7 +234,7 @@ def create_or_reopen_checkout(db, current_user, bill_id):
             db.flush()
 
         if (
-            payment.amount != bill.total_amount
+            payment.amount != bill.balance_amount
             or checkout.amount_cents != amount_cents
             or checkout.currency != "myr"
         ):
@@ -252,7 +261,7 @@ def create_or_reopen_checkout(db, current_user, bill_id):
             )
         )
 
-        ensure_payable(clinic, bill, appointment)
+        ensure_payable(db, clinic, bill, appointment)
 
         checkout = next(
             (

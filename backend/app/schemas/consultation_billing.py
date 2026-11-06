@@ -78,6 +78,11 @@ class BillResponse(BaseModel):
     pet_owner_id: int
     status: str
     total_amount: Decimal
+    deposit_paid_amount: Decimal
+    deposit_applied_amount: Decimal
+    deposit_excess_refund_amount: Decimal
+    balance_amount: Decimal
+    amount_due: Decimal
     version: int
     created_at: datetime
     updated_at: datetime

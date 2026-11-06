@@ -36,7 +36,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  static const _green = Color(0xFF176B32);
+  static const _green = Color(0xFF2549C7);
 
   late final PetService _petService;
   late final AppointmentService _appointmentService;
@@ -351,7 +351,7 @@ class _HomeScreenState extends State<HomeScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               border: Border.all(
-                color: const Color(0xFFDCE6DE),
+                color: const Color(0xFFD3DCE5),
               ),
               borderRadius: BorderRadius.circular(14),
             ),
@@ -361,7 +361,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 vertical: 6,
               ),
               leading: const CircleAvatar(
-                backgroundColor: Color(0xFFE7F2E9),
+                backgroundColor: Color(0xFFE8EDFF),
                 child: Icon(Icons.pets, color: _green),
               ),
               title: Text(
@@ -545,7 +545,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const Center(
             child: CircleAvatar(
               radius: 36,
-              backgroundColor: Color(0xFFE7F2E9),
+              backgroundColor: Color(0xFFE8EDFF),
               child: Icon(
                 Icons.person_outline,
                 size: 40,
@@ -597,7 +597,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const CircleAvatar(
-                  backgroundColor: Color(0xFFE7F2E9),
+                  backgroundColor: Color(0xFFE8EDFF),
                   child: Icon(
                     Icons.receipt_long_outlined,
                     color: _green,
@@ -637,7 +637,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   setState(() => _personalInfoExpanded = expanded);
                 },
                 leading: const CircleAvatar(
-                  backgroundColor: Color(0xFFE7F2E9),
+                  backgroundColor: Color(0xFFE8EDFF),
                   child: Icon(
                     Icons.badge_outlined,
                     color: _green,
@@ -665,7 +665,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const CircleAvatar(
-                  backgroundColor: Color(0xFFE7F2E9),
+                  backgroundColor: Color(0xFFE8EDFF),
                   child: Icon(
                     Icons.lock_outline,
                     color: _green,
@@ -703,13 +703,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         margin: const EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
                           border: Border.all(
-                            color: const Color(0xFFD5E3D6),
+                            color: const Color(0xFFD3DCE5),
                           ),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: ListTile(
                           leading: const CircleAvatar(
-                            backgroundColor: Color(0xFFE7F2E9),
+                            backgroundColor: Color(0xFFE8EDFF),
                             child: Icon(Icons.pets, color: _green),
                           ),
                           title: Text(
@@ -792,13 +792,13 @@ class _HomeScreenState extends State<HomeScreen> {
         colorScheme: ColorScheme.fromSeed(seedColor: _green),
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F7F5),
+        backgroundColor: const Color(0xFFEEF1F5),
         appBar: AppBar(
-          backgroundColor: const Color(0xFFF5F7F5),
+          backgroundColor: const Color(0xFF172333), foregroundColor: Colors.white,
           title: const Text(
             'VetDental',
             style: TextStyle(
-              color: _green,
+              color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
           ),

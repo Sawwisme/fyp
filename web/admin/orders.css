@@ -22,7 +22,7 @@
     padding: 12px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: #fafbf9;
+    background: #f8faff;
     color: var(--ink);
     font: inherit;
     font-size: 14px;
@@ -57,7 +57,7 @@
 }
 
 .orders-table th {
-    background: #f6f8f6;
+    background: #f3f5fa;
     color: var(--muted);
     font-size: 12px;
     font-weight: 600;
@@ -105,7 +105,7 @@
     overflow-y: auto;
     border: 1px solid var(--border);
     border-radius: 16px;
-    background: #f6f8f7;
+    background: #eef1f5;
     box-shadow: 0 24px 80px #10271940;
 }
 
@@ -132,8 +132,8 @@
     padding: 0;
     border: 0;
     border-radius: 9px;
-    background: #f0f5f1;
-    color: #476052;
+    background: #e8edff;
+    color: #57697a;
     font-size: 24px;
 }
 
@@ -220,7 +220,7 @@
     padding: 12px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: #fafbf9;
+    background: #f8faff;
     color: var(--ink);
     font: inherit;
     font-size: 14px;
@@ -335,7 +335,7 @@
     border: 1px solid #cce1d1;
     border-radius: 8px;
     background: #edf6ef;
-    color: #176b32;
+    color: #2549c7;
     line-height: 1.5;
 }
 
@@ -382,7 +382,7 @@
     padding: 10px;
     border: 1px solid var(--border);
     border-radius: 7px;
-    background: #fafbf9;
+    background: #f8faff;
     font: inherit;
 }
 

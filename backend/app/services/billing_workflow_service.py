@@ -25,6 +25,8 @@ from app.services.consultation_billing_service import (
     utc_now,
 )
 
+from app.services.bill_deposit_service import apply_booking_deposit
+
 
 def list_billing_consultations(
     db,
@@ -194,31 +196,18 @@ def issue_bill(db, current_user, consultation_id, data):
                 "This draft already has a payment record.",
             )
 
-        # Deposit application will be connected in the deposit module.
-        # Never silently issue the full amount if a deposit exists.
-        deposit = db.scalar(
-            select(Payment.payment_id)
-            .where(
-                Payment.appointment_id == appointment.appointment_id,
-                Payment.order_id.is_(None),
-                Payment.payment_purpose == "booking_deposit",
-                Payment.payment_status.in_(["pending", "paid"]),
-            )
-            .limit(1)
+        apply_booking_deposit(
+            db,
+            current_user,
+            appointment,
+            bill,
         )
-
-        if deposit is not None:
-            raise HTTPException(
-                409,
-                "The booking deposit must be reconciled and "
-                "applied before this bill can be issued.",
-            )
 
         now = utc_now()
 
         bill.status = (
             "paid"
-            if bill.total_amount == Decimal("0.00")
+            if bill.balance_amount == Decimal("0.00")
             else "issued"
         )
         bill.issued_at = now
@@ -247,13 +236,20 @@ def issue_bill(db, current_user, consultation_id, data):
                     title="Your consultation bill is ready",
                     message=(
                         f"Bill #{bill.consultation_bill_id} "
-                        f"has been issued for "
-                        f"RM {bill.total_amount:.2f}. "
+                        f"has been issued. "
+                        f"Total charges: RM {bill.total_amount:.2f}. "
+                        f"Remaining balance: RM {bill.balance_amount:.2f}. "
                         + (
-                            "No payment is required."
-                            if bill.total_amount == Decimal("0.00")
-                            else "View the bill or contact the clinic "
-                                 "for payment."
+                            "No further payment is required. "
+                            if bill.balance_amount == Decimal("0.00")
+                            else "Open the bill to pay the balance. "
+                        )
+                        + (
+                            "An excess deposit refund of "
+                            f"RM {bill.deposit_excess_refund_amount:.2f} "
+                            "has been queued."
+                            if bill.deposit_excess_refund_amount > 0
+                            else ""
                         )
                     ),
                     resource_type="consultation_bill",

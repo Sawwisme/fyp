@@ -273,7 +273,7 @@
         get('billing-cash-amount').textContent = competingPayment
             ? 'Another payment is pending or recorded. ' +
             'Resolve it before accepting cash.'
-            : `Amount to collect: ${money(bill?.total_amount)}`;
+            : `Amount to collect: ${money(bill?.balance_amount)}`;
 
         get('billing-close').disabled = saving;
         get('billing-cancel').disabled = saving;
@@ -338,6 +338,55 @@
         return { items, totalCents };
     }
 
+    function renderBalanceSummary() {
+        const section = get('billing-balance-summary');
+
+        section.replaceChildren();
+
+        section.hidden =
+            !detailReady ||
+            !bill ||
+            bill.status === 'draft';
+
+        if (section.hidden) return;
+
+        section.appendChild(node('h3', 'Deposit & balance'));
+
+        const breakdown = node(
+            'dl',
+            '',
+            'billing-balance-breakdown'
+        );
+
+        const entries = [
+            ['Total charges', bill.total_amount],
+            ['Booking deposit received', bill.deposit_paid_amount],
+            ['Deposit applied', bill.deposit_applied_amount],
+            ['Balance after deposit', bill.balance_amount],
+            ['Amount still due', bill.amount_due],
+        ];
+
+        if (Number(bill.deposit_excess_refund_amount) > 0) {
+            entries.push([
+                'Excess deposit refund',
+                bill.deposit_excess_refund_amount,
+            ]);
+        }
+
+        for (const [title, amount] of entries) {
+            const row = node('div');
+
+            row.append(
+                node('dt', title),
+                node('dd', money(amount))
+            );
+
+            breakdown.appendChild(row);
+        }
+
+        section.appendChild(breakdown);
+    }
+
     function updatePreview() {
         try {
             const { totalCents } = readItems();
@@ -346,6 +395,8 @@
         } catch (_) {
             get('billing-total').textContent = '—';
         }
+
+        renderBalanceSummary();
     }
 
     function changed() {
@@ -574,6 +625,24 @@
             }
         }
 
+        add('p', `Total charges: ${money(bill.total_amount)}`);
+        add(
+            'p',
+            `Booking deposit applied: ${money(bill.deposit_applied_amount)}`
+        );
+        add(
+            'p',
+            `Balance after deposit: ${money(bill.balance_amount)}`
+        );
+
+        if (Number(bill.deposit_excess_refund_amount) > 0) {
+            add(
+                'p',
+                'Excess deposit refund amount: ' +
+                money(bill.deposit_excess_refund_amount)
+            );
+        }
+
         const total = add(
             'p',
             `Amount paid: ${money(payment.amount)}`
@@ -606,9 +675,12 @@
             section.appendChild(node(
                 'p',
                 bill.status === 'paid' &&
-                    Number(bill.total_amount) === 0
-                    ? 'No payment was required for this bill.'
-                    : 'No payment has been recorded.'
+                    Number(bill.deposit_applied_amount) > 0
+                    ? 'This bill was settled using its booking deposit.'
+                    : bill.status === 'paid' &&
+                        Number(bill.total_amount) === 0
+                        ? 'No payment was required for this bill.'
+                        : 'No balance payment has been recorded.'
             ));
             return;
         }
@@ -679,6 +751,7 @@
         get('billing-cash-confirm').checked = false;
         get('billing-cash-notes').value = '';
         get('billing-payment-summary').hidden = true;
+        get('billing-balance-summary').hidden = true;
         detailReady = false;
         dirty = false;
 
@@ -966,7 +1039,7 @@
             `${selected.consultation_id}/collect-cash`,
             {
                 expected_version: bill.version,
-                expected_amount: String(bill.total_amount),
+                expected_amount: String(bill.balance_amount),
                 cash_received: true,
                 notes: get('billing-cash-notes').value.trim() || null
             }

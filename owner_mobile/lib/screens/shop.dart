@@ -21,7 +21,7 @@ class ShopScreen extends StatefulWidget {
 }
 
 class _ShopScreenState extends State<ShopScreen> {
-  static const _green = Color(0xFF176B32);
+  static const _green = Color(0xFF2549C7);
   static const _pageSize = 10;
 
   final _searchController = TextEditingController();

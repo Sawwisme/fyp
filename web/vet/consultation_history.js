@@ -47,82 +47,74 @@
     }
 
     function renderVisit(visit) {
-        const details = document.createElement('details');
-        details.className = 'patient-history-visit';
-
-        const summary = document.createElement('summary');
-        summary.textContent =
-            `${formatDate(visit.consultation_date)} · ` +
-            visit.veterinarian_name;
-
+        const treatments = Array.isArray(visit.treatments) ? visit.treatments : [];
+        const prescriptions = Array.isArray(visit.prescriptions) ? visit.prescriptions : [];
+        function element(tag, className, value) {
+            const node = document.createElement(tag);
+            if (className) node.className = className;
+            if (value != null) node.textContent = String(value);
+            return node;
+        }
+        const details = element('details', 'patient-history-visit history-visit-card');
+        const summary = element('summary', 'history-visit-summary');
+        const dateText = formatDate(visit.consultation_date);
+        const date = element('div', 'history-visit-date', dateText);
+        const overview = element('div', 'history-visit-overview');
+        overview.appendChild(element('span', 'history-visit-diagnosis', visit.diagnosis || 'Diagnosis not recorded'));
+        overview.appendChild(element('span', 'history-visit-vet', visit.veterinarian_name || 'Veterinarian not recorded'));
+        const chips = element('div', 'history-visit-chips');
+        chips.append(
+            element('span', 'history-visit-chip', `${treatments.length} treatment${treatments.length === 1 ? '' : 's'}`),
+            element('span', 'history-visit-chip', `${prescriptions.length} prescription${prescriptions.length === 1 ? '' : 's'}`)
+        );
+        overview.appendChild(chips);
+        const reference = element('div', 'history-visit-reference');
+        reference.append(
+            element('span', 'history-visit-id', `#${visit.consultation_id}`),
+            element('span', 'history-visit-completed', 'Completed')
+        );
+        summary.append(date, overview, reference);
         details.appendChild(summary);
 
-        paragraph(
-            details,
-            'Consultation',
-            `#${visit.consultation_id}`
-        );
-        paragraph(
-            details,
-            'Complaint and history',
-            visit.consultation_information
-        );
-        paragraph(
-            details,
-            'Examination findings',
-            visit.examination_findings
-        );
-        paragraph(details, 'Diagnosis', visit.diagnosis);
-        paragraph(details, 'Notes', visit.notes);
+        const body = element('div', 'history-visit-body');
+        const fields = element('div', 'history-visit-fields');
+        paragraph(fields, 'Complaint and history', visit.consultation_information);
+        paragraph(fields, 'Examination findings', visit.examination_findings);
+        paragraph(fields, 'Diagnosis', visit.diagnosis);
+        paragraph(fields, 'Notes', visit.notes);
+        body.appendChild(fields);
 
-        const treatmentHeading = document.createElement('h3');
-        treatmentHeading.textContent = 'Treatments';
-        details.appendChild(treatmentHeading);
-
-        if (!visit.treatments.length) {
-            paragraph(details, 'Treatments', 'None recorded');
-        }
-
-        for (const treatment of visit.treatments) {
-            const card = document.createElement('div');
-            card.className = 'patient-history-item';
-
-            paragraph(card, 'Treatment', treatment.treatment_name);
+        const collections = element('div', 'history-visit-collections');
+        const treatmentSection = element('section', 'history-visit-collection');
+        treatmentSection.appendChild(element('h3', '', 'Treatments'));
+        if (!treatments.length) treatmentSection.appendChild(element('p', 'history-visit-empty', 'No treatments recorded.'));
+        for (const treatment of treatments) {
+            const card = element('div', 'patient-history-item history-visit-item');
+            card.appendChild(element('h4', '', treatment.treatment_name || 'Treatment name not recorded'));
             paragraph(card, 'Date', treatment.treatment_date);
-            paragraph(card, 'Status', treatment.status);
+            paragraph(card, 'Status', treatment.status ? treatment.status.replaceAll('_', ' ') : null);
             paragraph(card, 'Description', treatment.description);
-
-            details.appendChild(card);
+            treatmentSection.appendChild(card);
         }
-
-        const prescriptionHeading = document.createElement('h3');
-        prescriptionHeading.textContent = 'Prescriptions';
-        details.appendChild(prescriptionHeading);
-
-        if (!visit.prescriptions.length) {
-            paragraph(details, 'Prescriptions', 'None recorded');
-        }
-
-        for (const prescription of visit.prescriptions) {
-            const card = document.createElement('div');
-            card.className = 'patient-history-item';
-
-            paragraph(card, 'Medication', prescription.medication_name);
+        const medicationSection = element('section', 'history-visit-collection');
+        medicationSection.appendChild(element('h3', '', 'Prescriptions'));
+        if (!prescriptions.length) medicationSection.appendChild(element('p', 'history-visit-empty', 'No medications prescribed.'));
+        for (const prescription of prescriptions) {
+            const card = element('div', 'patient-history-item history-visit-item');
+            card.appendChild(element('h4', '', prescription.medication_name || 'Medication name not recorded'));
             paragraph(card, 'Dosage', prescription.dosage);
-            paragraph(
-                card,
-                'Route',
-                prescription.administration_route
-            );
+            paragraph(card, 'Route', prescription.administration_route);
             paragraph(card, 'Frequency', prescription.frequency);
             paragraph(card, 'Duration', prescription.duration);
             paragraph(card, 'Instructions', prescription.instructions);
-
-            details.appendChild(card);
+            medicationSection.appendChild(card);
         }
-
+        collections.append(treatmentSection, medicationSection);
+        body.appendChild(collections);
+        details.appendChild(body);
         return details;
     }
+
 
     async function loadHistory() {
         if (!authorized || loading) return;

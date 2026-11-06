@@ -168,14 +168,14 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFFDCE6DE)),
+        side: const BorderSide(color: Color(0xFFD3DCE5)),
       ),
       child: ExpansionTile(
         key: ValueKey(record['consultation_id']),
         tilePadding: const EdgeInsets.all(16),
         childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         expandedCrossAxisAlignment: CrossAxisAlignment.start,
-        iconColor: const Color(0xFF176B32),
+        iconColor: const Color(0xFF2549C7),
         collapsedIconColor: const Color(0xFF6B786E),
         shape: const Border(),
         collapsedShape: const Border(),
@@ -203,7 +203,7 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
               child: const Text(
                 'Completed',
                 style: TextStyle(
-                  color: Color(0xFF176B32),
+                  color: Color(0xFF2549C7),
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                 ),
@@ -376,7 +376,7 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
           color: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
-            side: const BorderSide(color: Color(0xFFDCE6DE)),
+            side: const BorderSide(color: Color(0xFFD3DCE5)),
           ),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
@@ -420,13 +420,13 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
                                 pet['species'].toString(),
                               ),
                               selected: isSelected,
-                              selectedColor: const Color(0xFF176B32),
+                              selectedColor: const Color(0xFF2549C7),
                               selectedTileColor:
                               const Color(0xFFEAF4ED),
                               trailing: isSelected
                                   ? const Icon(
                                 Icons.check,
-                                color: Color(0xFF176B32),
+                                color: Color(0xFF2549C7),
                               )
                                   : null,
                               onTap: () {
@@ -499,14 +499,14 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F5),
+      backgroundColor: const Color(0xFFEEF1F5),
       appBar: AppBar(
         title: const Text(
           'Medical History',
           style: TextStyle(fontWeight: FontWeight.w700),
         ),
-        backgroundColor: const Color(0xFFF5F7F5),
-        foregroundColor: const Color(0xFF176B32),
+        backgroundColor: const Color(0xFFEEF1F5),
+        foregroundColor: const Color(0xFF2549C7),
         surfaceTintColor: Colors.transparent,
         elevation: 0,
       ),

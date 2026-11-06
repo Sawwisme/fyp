@@ -25,7 +25,7 @@
     padding: 12px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: #fafbf9;
+    background: #f8faff;
     color: var(--ink);
     font: inherit;
 }
@@ -39,7 +39,7 @@
     padding: 18px;
     border: 1px solid var(--border);
     border-radius: 10px;
-    background: #fafcf9;
+    background: #f8faff;
 }
 
 .clinical-row-grid {
@@ -101,7 +101,7 @@
     margin: 8px 0 0;
     padding: 6px 12px;
     border-radius: 20px;
-    background: #e7f2e9;
+    background: #e8edff;
     color: var(--green);
     font-size: 13px;
 }
@@ -149,7 +149,7 @@
     padding: 16px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: #fafcf9;
+    background: #f8faff;
 }
 
 .consultation-record-row>.consultation-report-field+.consultation-report-field {
@@ -260,7 +260,7 @@
 .patient-history-item {
     margin-top: 10px;
     padding: 12px;
-    background: #f6f9f7;
+    background: #f3f5fa;
     border-radius: 8px;
 }
 
@@ -333,7 +333,7 @@
     gap: 16px;
     margin: 20px 0;
     padding: 18px;
-    background: #f4f8f5;
+    background: #f3f5fa;
     border: 1px solid var(--border);
     border-radius: 10px;
 }
@@ -402,7 +402,7 @@
     min-height: 44px;
     margin: 0;
     padding: 11px 12px;
-    background: #fafbf9;
+    background: #f8faff;
     color: var(--ink);
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -411,14 +411,14 @@
 }
 
 .consultation-ai #consultation-assessment:focus-visible {
-    outline: 3px solid #b9ddc3;
+    outline: 3px solid #9aaff7;
     outline-offset: 2px;
     border-color: var(--green);
 }
 
 .consultation-ai #consultation-assessment:disabled {
-    background: #f1f4f2;
-    color: #748078;
+    background: #f3f5fa;
+    color: #57697a;
     cursor: not-allowed;
 }
 

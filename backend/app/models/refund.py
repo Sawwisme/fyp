@@ -38,6 +38,12 @@ class Refund(Base):
             "status",
             "requested_at",
         ),
+        Index(
+            "ix_refund_purpose_status",
+            "refund_purpose",
+            "status",
+            "refund_id",
+        ),
     )
 
     refund_id = Column(
@@ -130,6 +136,11 @@ class Refund(Base):
 
     stock_return_items = Column(
         JSON,
+        nullable=True,
+    )
+
+    refund_purpose = Column(
+        String(30),
         nullable=True,
     )
 

@@ -22,7 +22,7 @@ class ShopOrderDetailsScreen extends StatefulWidget {
 class _ShopOrderDetailsScreenState
     extends State<ShopOrderDetailsScreen>
     with WidgetsBindingObserver {
-  static const _green = Color(0xFF176B32);
+  static const _green = Color(0xFF2549C7);
 
   Map<String, dynamic>? _order;
   String? _error;
@@ -611,7 +611,7 @@ class _ShopOrderDetailsScreenState
     return PopScope(
       canPop: !_cancelling && !_openingPayment,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F7F5),
+        backgroundColor: const Color(0xFFEEF1F5),
         appBar: AppBar(
           title: Text('Order #${widget.orderId}'),
           actions: [

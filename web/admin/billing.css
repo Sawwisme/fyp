@@ -22,7 +22,7 @@
     padding: 10px 12px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: #fafbf9;
+    background: #f8faff;
     color: var(--ink);
     font: inherit;
     font-size: 14px;
@@ -35,7 +35,7 @@
     overflow-y: auto;
     border: 1px solid var(--border);
     border-radius: 16px;
-    background: #f6f8f7;
+    background: #eef1f5;
     box-shadow: 0 24px 80px #10271940;
 }
 
@@ -73,8 +73,8 @@
     padding: 0;
     border: 0;
     border-radius: 9px;
-    background: #f0f5f1;
-    color: #476052;
+    background: #e8edff;
+    color: #57697a;
     font-size: 24px;
 }
 
@@ -180,4 +180,28 @@
     margin: 0 0 14px;
     padding: 0;
     border: 0;
+}
+
+.billing-balance-breakdown {
+    margin: 0;
+}
+
+.billing-balance-breakdown>div {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 20px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.billing-balance-breakdown dt {
+    color: var(--muted);
+}
+
+.billing-balance-breakdown dd {
+    margin: 0;
+    font-weight: 600;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
 }

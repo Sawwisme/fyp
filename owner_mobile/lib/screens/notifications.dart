@@ -21,7 +21,7 @@ class OwnerNotificationsScreen extends StatefulWidget {
 
 class _OwnerNotificationsScreenState
     extends State<OwnerNotificationsScreen> {
-  static const _green = Color(0xFF176B32);
+  static const _green = Color(0xFF2549C7);
   static const _pageSize = 20;
 
   List<Map<String, dynamic>> _items = [];
@@ -274,7 +274,7 @@ class _OwnerNotificationsScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F5),
+      backgroundColor: const Color(0xFFEEF1F5),
       appBar: AppBar(
         title: const Text('Notifications'),
         actions: [

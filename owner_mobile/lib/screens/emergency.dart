@@ -211,7 +211,7 @@ class _EmergencyRequestsScreenState
   Color _statusColor(String value) {
     switch (value) {
       case 'approved':
-        return const Color(0xFF176B32);
+        return const Color(0xFF2549C7);
       case 'rejected':
         return const Color(0xFFB3261E);
       case 'pending':

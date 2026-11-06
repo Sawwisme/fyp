@@ -1,0 +1,101 @@
+/* Shared Cobalt Pulse login and clinic registration presentation. */
+body.login-page, body.registration-page {
+    background-color: #e9eff9;
+    background-image:
+        radial-gradient(ellipse at 0% 0%, #2549c759 0, #2549c71f 27%, transparent 58%),
+        radial-gradient(ellipse at 100% 100%, #cbe95280 0, #cbe9522e 24%, transparent 52%),
+        radial-gradient(#2549c71c .8px, transparent .8px);
+    background-size: auto, auto, 20px 20px;
+    min-height: 100vh;
+}
+.login-page .login-shell { box-shadow: 0 24px 70px #1723331c, 0 0 0 1px #ffffff99; }
+
+body.registration-page { display: block; padding: clamp(20px, 3vw, 44px); }
+.registration-page .registration-shell {
+    display: grid;
+    grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+    align-items: start;
+    gap: 28px;
+    max-width: 1160px;
+    min-height: auto;
+    margin: 0 auto;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+.registration-visual {
+    position: sticky;
+    top: 24px;
+    isolation: isolate;
+    overflow: hidden;
+    min-width: 0;
+    padding: clamp(28px, 3vw, 44px);
+    border-radius: 20px;
+    background: #172333;
+    color: #f4f7ff;
+}
+.registration-visual::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    width: 280px;
+    height: 280px;
+    top: 170px;
+    right: -220px;
+    border: 48px solid #2549c7;
+    border-radius: 50%;
+    opacity: .6;
+    pointer-events: none;
+}
+.registration-visual-brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: #fff; font-size: 24px; font-weight: 750; letter-spacing: -.7px; }
+.registration-visual-mark { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: #cbe952; color: #172333; font-size: 25px; }
+.registration-visual-eyebrow { display: block; margin-top: 64px; color: #cbe952; font-size: 11px; font-weight: 650; letter-spacing: 1.8px; }
+.registration-visual h2 { margin: 20px 0; font-size: clamp(34px, 3.5vw, 48px); line-height: 1.1; letter-spacing: -1.9px; }
+.registration-visual h2 span { color: #cbe952; }
+.registration-visual > p { color: #c4d0df; font-size: 15px; line-height: 1.75; }
+.registration-steps { display: grid; gap: 24px; list-style: none; margin: 36px 0 44px; padding: 0; }
+.registration-steps li { display: flex; align-items: center; gap: 14px; font-size: 14px; font-weight: 600; }
+.registration-step-number { display: grid; place-items: center; flex: 0 0 34px; height: 34px; background: #283950; color: #cbe952; border-radius: 10px; font-size: 12px; }
+.registration-steps small { display: block; margin-top: 5px; color: #b7c6d9; font-size: 12px; font-weight: 400; line-height: 1.5; }
+.registration-visual-back { display: inline-block; color: #d4e0f0; font-size: 13px; text-underline-offset: 4px; }
+.registration-page .form-panel { min-width: 0; padding: clamp(26px, 3.5vw, 48px); background: #fff; border: 1px solid #dde4ef; border-radius: 20px; box-shadow: 0 12px 40px #17233309; }
+.registration-page .login-brand { display: none; }
+.registration-page .eyebrow { color: #63738a; font-size: 11px; letter-spacing: 1.8px; }
+.registration-page h1 { color: #172333; font-size: clamp(28px, 3vw, 36px); letter-spacing: -1px; margin: 12px 0 8px; }
+.registration-page .subtitle { margin-bottom: 28px; }
+.registration-section-title { display: flex; align-items: center; gap: 10px; margin: 30px 0 18px; padding-top: 24px; border-top: 1px solid #e4eaf3; color: #192737; font-size: 16px; font-weight: 650; }
+.registration-section-title:first-child { padding-top: 0; border-top: 0; margin-top: 0; }
+.registration-section-title > span { display: inline-grid; place-items: center; flex: 0 0 28px; height: 28px; border-radius: 8px; background: #e8edff; color: #2549c7; font-size: 11px; font-weight: 600; }
+.registration-page .registration-clinic-picker h2 { display: flex; align-items: center; gap: 10px; margin-top: 28px; padding-top: 24px; border-top: 1px solid #e4eaf3; font-size: 16px; }
+.registration-page .registration-clinic-picker { margin-top: 0; }
+.registration-page .field-label { margin-top: 18px; margin-bottom: 8px; font-size: 12px; color: #24354c; }
+.registration-page input:not([type=checkbox]):not([type=radio]),
+.registration-page select { min-height: 48px; border-radius: 9px; background: #f9fafd; border-color: #d3dce5; }
+.registration-page .password-field { border-radius: 9px; border-color: #d3dce5; background: #f9fafd; }
+.registration-page .password-field input { background: transparent; }
+.registration-page #manual-clinic-fields { margin: 20px 0; padding: 18px; border: 1px solid #d9e1f2; background: #f4f7ff; border-radius: 12px; }
+.registration-page #manual-clinic-fields legend { color: #2549c7; font-size: 13px; padding: 0 6px; }
+.registration-page .selected-clinic { padding: 15px 16px; background: #eef2ff; border-left: 3px solid #2549c7; border-radius: 0 9px 9px 0; color: #28418b; }
+.registration-page #registration-submit { margin-top: 8px; min-height: 50px; border-radius: 10px; background: #2549c7; border-color: #2549c7; font-size: 14px; }
+.registration-page #registration-submit:hover:not(:disabled) { background: #1d3ba4; }
+.registration-page .registration-back { margin-top: 24px; margin-bottom: 0; font-size: 13px; }
+.registration-page #clinic-map-results { background: #fff; border-color: #d3dce5; box-shadow: 0 10px 25px #17233314; }
+.registration-page .registration-note { font-size: 12px; line-height: 1.7; }
+@media (max-width: 850px) {
+    body.registration-page { padding: 20px; }
+    .registration-page .registration-shell { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 18px; }
+    .registration-visual, .registration-page .form-panel { padding: 26px; }
+    .registration-visual h2 { font-size: 34px; }
+}
+@media (max-width: 680px) {
+    body.registration-page { padding: 16px; }
+    .registration-page .registration-shell { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    .registration-visual { position: relative; top: auto; padding: 26px; border-radius: 16px; }
+    .registration-visual-eyebrow { margin-top: 26px; }
+    .registration-visual h2 { font-size: 32px; margin: 14px 0 0; }
+    .registration-visual > p, .registration-steps, .registration-visual-back { display: none; }
+    .registration-page .form-panel { padding: 28px 22px; border-radius: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .registration-visual { scroll-behavior: auto; } }

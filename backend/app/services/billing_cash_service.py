@@ -15,6 +15,9 @@ from app.services.consultation_billing_service import (
     utc_now,
 )
 
+from app.services.bill_deposit_validation import (
+    validate_bill_deposit,
+)
 
 def receipt_response(bill, payment):
     return BillCashReceipt(
@@ -90,7 +93,7 @@ def collect_cash(db, current_user, consultation_id, data):
                 or payment.payment_purpose != "consultation_balance"
                 or payment.appointment_id != appointment.appointment_id
                 or payment.order_id is not None
-                or payment.amount != bill.total_amount
+                or payment.amount != bill.balance_amount
                 or data.expected_amount != payment.amount
                 or not payment.receipt_number
                 or payment.payment_date is None
@@ -117,8 +120,8 @@ def collect_cash(db, current_user, consultation_id, data):
 
         if (
             bill.status != "issued"
-            or bill.total_amount <= 0
-            or bill.total_amount != data.expected_amount
+            or bill.balance_amount <= 0
+            or bill.balance_amount != data.expected_amount
         ):
             raise HTTPException(
                 409,
@@ -139,23 +142,11 @@ def collect_cash(db, current_user, consultation_id, data):
                 "Resolve it before accepting cash.",
             )
 
-        deposit = db.scalar(
-            select(Payment.payment_id)
-            .where(
-                Payment.appointment_id == appointment.appointment_id,
-                Payment.order_id.is_(None),
-                Payment.payment_purpose == "booking_deposit",
-                Payment.payment_status.in_(["pending", "paid"]),
-            )
-            .limit(1)
+        validate_bill_deposit(
+            db,
+            bill,
+            appointment,
         )
-
-        if deposit is not None:
-            raise HTTPException(
-                409,
-                "The appointment deposit must be reconciled "
-                "before collecting the balance.",
-            )
 
         _, calculated_total = prepare_items(bill.items)
 
@@ -181,7 +172,7 @@ def collect_cash(db, current_user, consultation_id, data):
             payment_purpose="consultation_balance",
             payment_method="cash",
             payment_status="paid",
-            amount=bill.total_amount,
+            amount=bill.balance_amount,
             payment_date=now,
             receipt_number=f"BILL-CASH-{uuid4().hex}",
             received_by_user_id=current_user.user_id,

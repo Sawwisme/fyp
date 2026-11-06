@@ -12,14 +12,16 @@ def resolve_booking_refund(
     payment,
     appointment,
     checkout,
+    allocation=None,
 ):
     """
-    Caller must lock the booking/payment/refund records and
-    commit the refund idempotency key and request timestamp
-    before calling this function.
+    Caller must lock the relevant records and commit the
+    refund key and request timestamp before calling Stripe.
     """
     intent_id = payment.gateway_reference
-    amount_cents = int(payment.amount * 100)
+
+    payment_cents = int(payment.amount * 100)
+    refund_cents = refund.refund_amount * 100
 
     if (
         payment.payment_method != "online_banking"
@@ -29,11 +31,13 @@ def resolve_booking_refund(
         or payment.appointment_id != appointment.appointment_id
         or checkout.appointment_id != appointment.appointment_id
         or checkout.payment_id != payment.payment_id
-        or checkout.amount_cents != amount_cents
+        or checkout.amount_cents != payment_cents
         or checkout.currency != "myr"
-        or refund.refund_amount != payment.amount
-        or refund.refund_amount != appointment.booking_deposit_amount
-        or amount_cents <= 0
+        or payment.amount != appointment.booking_deposit_amount
+        or payment_cents <= 0
+        or refund_cents <= 0
+        or refund_cents != refund_cents.to_integral_value()
+        or refund.refund_amount > payment.amount
         or not isinstance(intent_id, str)
         or not intent_id.startswith("pi_")
         or len(intent_id) > 100
@@ -43,22 +47,70 @@ def resolve_booking_refund(
             "The refund does not match the original booking deposit.",
         )
 
+    amount_cents = int(refund_cents)
+
+    if refund.refund_purpose == "booking_cancellation":
+        if (
+            allocation is not None
+            or refund.refund_amount != payment.amount
+        ):
+            raise HTTPException(
+                409,
+                "Cancellation refunds must match the full deposit.",
+            )
+
+        # Preserve the original metadata for safe retries of
+        # cancellation refunds that were already submitted.
+        refund_metadata = {
+            "purpose": "booking_deposit_refund",
+            "refund_id": str(refund.refund_id),
+            "appointment_id": str(appointment.appointment_id),
+            "payment_id": str(payment.payment_id),
+        }
+
+    elif refund.refund_purpose == "booking_excess":
+        if (
+            allocation is None
+            or allocation.payment_id != payment.payment_id
+            or allocation.excess_refund_id != refund.refund_id
+            or allocation.deposit_amount != payment.amount
+            or allocation.applied_amount < 0
+            or allocation.excess_refund_amount <= 0
+            or allocation.excess_refund_amount
+            != refund.refund_amount
+            or allocation.applied_amount
+            + allocation.excess_refund_amount
+            != payment.amount
+        ):
+            raise HTTPException(
+                409,
+                "The excess refund does not match its bill allocation.",
+            )
+
+        refund_metadata = {
+            "purpose": "booking_excess_refund",
+            "refund_id": str(refund.refund_id),
+            "appointment_id": str(appointment.appointment_id),
+            "payment_id": str(payment.payment_id),
+            "consultation_bill_id": str(
+                allocation.consultation_bill_id
+            ),
+        }
+
+    else:
+        raise HTTPException(
+            409,
+            "Unsupported booking refund purpose.",
+        )
+
     original_metadata = expected_metadata(
         checkout,
         appointment,
     )
 
-    refund_metadata = {
-        "purpose": "booking_deposit_refund",
-        "refund_id": str(refund.refund_id),
-        "appointment_id": str(appointment.appointment_id),
-        "payment_id": str(payment.payment_id),
-    }
-
     client = get_stripe_client()
 
     try:
-        # Verify the original payment before requesting money back.
         intent = client.v1.payment_intents.retrieve(
             intent_id
         ).to_dict()
@@ -70,8 +122,8 @@ def resolve_booking_refund(
             or intent.get("livemode") is not False
             or intent.get("status") != "succeeded"
             or intent.get("currency") != "myr"
-            or intent.get("amount") != amount_cents
-            or intent.get("amount_received") != amount_cents
+            or intent.get("amount") != payment_cents
+            or intent.get("amount_received") != payment_cents
             or any(
                 metadata.get(key) != value
                 for key, value in original_metadata.items()
@@ -142,8 +194,6 @@ def resolve_booking_refund(
                 "Invalid stored booking refund reference.",
             )
 
-        # An idempotent retry may replay the original creation
-        # response. Retrieve the refund's current state.
         remote = client.v1.refunds.retrieve(
             remote_id
         ).to_dict()

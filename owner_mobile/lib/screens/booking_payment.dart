@@ -23,10 +23,12 @@ class BookingPaymentScreen extends StatefulWidget {
 class _BookingPaymentScreenState
     extends State<BookingPaymentScreen>
     with WidgetsBindingObserver {
-  static const _green = Color(0xFF176B32);
+  static const _green = Color(0xFF2549C7);
 
   Map<String, dynamic>? _data;
   String? _error;
+  Map<String, dynamic>? _refund;
+  String? _refundError;
 
   bool _busy = false;
   bool _awaitingReturn = false;
@@ -43,8 +45,17 @@ class _BookingPaymentScreenState
     _timer = Timer.periodic(
       const Duration(seconds: 15),
           (_) {
+        final waitingForPayment =
+            _data?['checkout_status'] == 'processing';
+
+        final waitingForRefund = [
+          'approved',
+          'processing',
+          'requires_action',
+        ].contains(_refund?['status']);
+
         if (!_busy &&
-            _data?['checkout_status'] == 'processing' &&
+            (waitingForPayment || waitingForRefund) &&
             WidgetsBinding.instance.lifecycleState ==
                 AppLifecycleState.resumed) {
           _refresh();
@@ -92,6 +103,41 @@ class _BookingPaymentScreenState
       if (!mounted) return;
 
       setState(() => _data = data);
+
+      if ([
+        'cancelled',
+        'completed',
+      ].contains(data['appointment_status']) ||
+          [
+            'refunded',
+            'partially_refunded',
+          ].contains(data['payment_status'])) {
+        try {
+          final refund = await widget.service.getBookingRefund(
+            widget.appointmentId,
+          );
+
+          if (!mounted) return;
+
+          setState(() {
+            _refund = refund;
+            _refundError = null;
+          });
+        } catch (error) {
+          if (!mounted) return;
+
+          setState(() {
+            _refund = null;
+            _refundError =
+            'Cannot load refund details. Refresh to check again.';
+          });
+        }
+      } else {
+        setState(() {
+          _refund = null;
+          _refundError = null;
+        });
+      }
 
       if (!pay || data['checkout_url'] == null) return;
 
@@ -154,6 +200,116 @@ class _BookingPaymentScreenState
         '${two(date.hour)}:${two(date.minute)} MYT';
   }
 
+  Widget _refundPanel() {
+    final refund = _refund;
+
+    if (refund == null && _refundError == null) {
+      return const SizedBox.shrink();
+    }
+
+    const labels = {
+      'approved': 'Refund processing',
+      'processing': 'Refund processing',
+      'requires_action': 'Clinic assistance needed',
+      'succeeded': 'Refund confirmed',
+      'failed': 'Refund needs review',
+    };
+
+    const messages = {
+      'approved':
+      'Your refund has been approved '
+          'and is waiting to be processed.',
+      'processing':
+      'Your refund is being processed. '
+          'Refresh later to check its progress.',
+      'requires_action':
+      'The refund needs an additional step. '
+          'Contact the clinic for assistance.',
+      'succeeded':
+      'Stripe has confirmed that your deposit refund succeeded.',
+      'failed':
+      'The refund could not be completed. '
+          'Contact the clinic to review it.',
+    };
+
+    final status = refund?['status']?.toString();
+
+    final amount = num.tryParse(
+      refund?['refund_amount']?.toString() ?? '',
+    );
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: const Color(0xFFDCE6DF),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              refund?['refund_purpose'] == 'booking_excess'
+                  ? 'Excess deposit: ${labels[status] ?? 'Refund status'}'
+                  : labels[status] ?? 'Refund status',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            if (refund != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                amount == null
+                    ? '—'
+                    : 'RM ${amount.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  color: _green,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text('Refund #${refund['refund_id']}'),
+              const SizedBox(height: 10),
+              Text(
+                messages[status] ??
+                    'Contact the clinic to check this refund.',
+                style: const TextStyle(height: 1.5),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Requested: ${_deadline(refund['requested_at'])}',
+                style: const TextStyle(fontSize: 12),
+              ),
+              if (refund['processed_at'] != null) ...[
+                const SizedBox(height: 6),
+                Text(
+                  'Updated: ${_deadline(refund['processed_at'])}',
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ],
+            ],
+            if (_refundError != null) ...[
+              const SizedBox(height: 10),
+              Text(
+                _refundError!,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _body() {
     final data = _data;
 
@@ -182,18 +338,55 @@ class _BookingPaymentScreenState
     }
 
     final appointmentStatus = data['appointment_status'];
-    final paymentStatus = data['payment_status'];
     final checkoutStatus = data['checkout_status'];
+    final refundStatus = _refund?['status'];
 
-    final confirmed = paymentStatus == 'paid' &&
+    final originalDeposit = num.tryParse(
+      data['deposit_amount']?.toString() ?? '',
+    ) ?? 0;
+
+    final refundAmount = num.tryParse(
+      _refund?['refund_amount']?.toString() ?? '',
+    ) ?? 0;
+
+    final refundSucceeded = refundStatus == 'succeeded';
+
+    final refunded = data['payment_status'] == 'refunded' ||
+        (refundSucceeded &&
+            originalDeposit > 0 &&
+            refundAmount >= originalDeposit);
+
+    final paymentStatus = refunded
+        ? 'refunded'
+        : refundSucceeded
+        ? 'partially_refunded'
+        : data['payment_status'];
+
+    final refundProcessing = [
+      'approved',
+      'processing',
+    ].contains(refundStatus);
+
+    final refundNeedsAttention = [
+      'failed',
+      'requires_action',
+    ].contains(refundStatus);
+
+    final confirmed = [
+      'paid',
+      'partially_refunded',
+    ].contains(paymentStatus) &&
         [
           'confirmed',
           'in_progress',
           'completed',
         ].contains(appointmentStatus);
 
-    final needsReview = checkoutStatus == 'review_required' ||
-        (paymentStatus == 'paid' && !confirmed);
+    final needsReview = !refunded &&
+        !refundProcessing &&
+        (refundNeedsAttention ||
+            checkoutStatus == 'review_required' ||
+            (paymentStatus == 'paid' && !confirmed));
 
     final closed = [
       'cancelled',
@@ -213,7 +406,18 @@ class _BookingPaymentScreenState
 
     final String description;
 
-    if (needsReview) {
+    if (refunded) {
+      description =
+      'Your appointment deposit refund has been confirmed.';
+    } else if (refundProcessing) {
+      description =
+      'Your deposit refund is being processed. '
+          'You do not need to submit another refund request.';
+    } else if (refundNeedsAttention) {
+      description =
+      'Your deposit refund needs attention. '
+          'Contact the clinic for assistance.';
+    } else if (needsReview) {
       description =
       'This booking needs a clinic review. Contact the clinic '
           'before making another payment.';
@@ -261,7 +465,11 @@ class _BookingPaymentScreenState
               ),
               const SizedBox(height: 16),
               Text(
-                confirmed
+                refunded
+                    ? 'Deposit refunded'
+                    : refundProcessing
+                    ? 'Refund processing'
+                    : confirmed
                     ? 'Appointment confirmed'
                     : 'Appointment deposit',
                 style: const TextStyle(
@@ -306,6 +514,7 @@ class _BookingPaymentScreenState
             ],
           ),
         ),
+        _refundPanel(),
         if (_error != null) ...[
           const SizedBox(height: 16),
           Text(
@@ -355,7 +564,7 @@ class _BookingPaymentScreenState
     return PopScope(
       canPop: !_busy,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F7F5),
+        backgroundColor: const Color(0xFFEEF1F5),
         appBar: AppBar(
           title: const Text('Booking payment'),
         ),
