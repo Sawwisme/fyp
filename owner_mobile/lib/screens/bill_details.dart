@@ -25,6 +25,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen>
   late Future<Map<String, dynamic>> _future;
   bool _openingPayment = false;
   bool _checkingPayment = false;
+  bool _cancellingPayment = false;
   bool _awaitingPaymentReturn = false;
   bool _refreshAfterOpening = false;
   String? _paymentMessage;
@@ -60,6 +61,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen>
   Future<void> _pay(Map<String, dynamic> data) async {
     if (_openingPayment ||
         _checkingPayment ||
+        _cancellingPayment ||
         (data['bill'] as Map)['status'] != 'issued') {
       return;
     }
@@ -130,7 +132,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen>
   }
 
   Future<void> _checkPaymentResult() async {
-    if (!mounted || _checkingPayment) return;
+    if (!mounted || _checkingPayment || _cancellingPayment) return;
 
     _awaitingPaymentReturn = false;
 
@@ -198,6 +200,102 @@ class _BillDetailsScreenState extends State<BillDetailsScreen>
     } finally {
       if (mounted) {
         setState(() => _checkingPayment = false);
+      }
+    }
+  }
+
+  Future<void> _payAtClinic() async {
+    if (_openingPayment ||
+        _checkingPayment ||
+        _cancellingPayment) {
+      return;
+    }
+
+    setState(() => _cancellingPayment = true);
+
+    try {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Pay at clinic?'),
+          content: const Text(
+            'We will close your unpaid online payment page first. '
+                'Your bill remains unpaid until clinic staff receive '
+                'and confirm your cash payment.\n\n'
+                'If online payment has already completed or is processing, '
+                'switching to cash will be blocked.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(false);
+              },
+              child: const Text('Keep online payment'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(true);
+              },
+              child: const Text('Pay at clinic'),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed != true || !mounted) return;
+
+      setState(() {
+        _paymentMessage = 'Closing the online payment attempt…';
+      });
+
+      await widget.service.cancelOnlineAttempt(widget.billId);
+
+      _awaitingPaymentReturn = false;
+      _refreshAfterOpening = false;
+
+      final data = await widget.service.getBill(widget.billId);
+      if (!mounted) return;
+
+      final status = (data['bill'] as Map)['status'];
+      final payments = (data['payments'] as List).cast<Map>();
+
+      final hasUnresolvedPayment = payments.any(
+            (payment) => ![
+          'failed',
+          'cancelled',
+          'expired',
+        ].contains(payment['payment_status']),
+      );
+
+      setState(() {
+        _future = Future.value(data);
+
+        if (status == 'paid') {
+          _paymentMessage =
+          'Payment is already confirmed. No cash payment is needed.';
+        } else if (status == 'issued' && !hasUnresolvedPayment) {
+          _paymentMessage =
+          'The online payment attempt is closed. '
+              'You can pay cash at the clinic. '
+              'Staff will confirm payment after receiving it.';
+        } else {
+          _paymentMessage =
+          'The bill status has changed. Contact the clinic '
+              'before making another payment.';
+        }
+      });
+    } catch (error) {
+      if (!mounted) return;
+
+      setState(() {
+        _paymentMessage =
+        '$error\nRefresh the bill before paying at the clinic.';
+        _future = widget.service.getBill(widget.billId);
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _cancellingPayment = false);
       }
     }
   }
@@ -305,7 +403,8 @@ class _BillDetailsScreenState extends State<BillDetailsScreen>
               payment['payment_method'] != 'online_banking'),
     );
 
-    final busy = _openingPayment || _checkingPayment;
+    final busy =
+        _openingPayment || _checkingPayment || _cancellingPayment;
 
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -471,6 +570,25 @@ class _BillDetailsScreenState extends State<BillDetailsScreen>
                 ),
               ),
             ],
+            if (pendingOnline && !blockingPayment) ...[
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: busy ? null : _payAtClinic,
+                  icon: const Icon(Icons.payments_outlined),
+                  label: Text(
+                    _cancellingPayment
+                        ? 'Closing online attempt…'
+                        : 'Pay at clinic instead',
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: _green,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                  ),
+                ),
+              ),
+            ],
             if (!onlineEligible) ...[
               const SizedBox(height: 12),
               const Text(
@@ -536,10 +654,11 @@ class _BillDetailsScreenState extends State<BillDetailsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final busy = _openingPayment || _checkingPayment;
+    final busy =
+        _openingPayment || _checkingPayment || _cancellingPayment;
 
     return PopScope(
-      canPop: !_openingPayment,
+      canPop: !_openingPayment && !_cancellingPayment,
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F7F5),
         appBar: AppBar(

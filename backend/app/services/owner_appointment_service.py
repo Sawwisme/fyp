@@ -21,6 +21,15 @@ from app.services.pet_service import get_owner_profile
 from app.services.schedule_service import reject_occupied_slots
 from app.services.vet_absence_service import reject_absent_slots, get_rearrangement_ids
 
+from app.services.booking_deposit_service import (
+    prepare_booking_request,
+    prepare_deposit_payment,
+)
+
+from app.services.booking_refund_request_service import (
+    queue_booking_deposit_refund,
+)
+
 def create_appointment(
     db: Session,
     current_user: User,
@@ -66,6 +75,18 @@ def create_appointment(
             raise HTTPException(
                 409, "This clinic is unavailable for booking."
             )
+
+        existing = prepare_booking_request(
+            db,
+            owner,
+            clinic,
+            data,
+        )
+
+        if existing is not None:
+            db.commit()
+            db.refresh(existing)
+            return existing
 
         if data.followup_care_id is not None:
             if data.appointment_type != "follow_up":
@@ -272,10 +293,26 @@ def create_appointment(
             created_by_user_id=current_user.user_id,
             status="confirmed",
             followup_care_id=data.followup_care_id,
+            booking_request_id=(
+                str(data.booking_request_id)
+                if data.booking_request_id is not None
+                else None
+            ),
+            booking_deposit_amount=clinic.booking_deposit_amount,
         )
 
         slot.status = "booked"
         db.add(appointment)
+        db.flush()
+
+        prepare_deposit_payment(
+            db,
+            current_user,
+            schedule,
+            slot,
+            appointment,
+        )
+
         db.commit()
         db.refresh(appointment)
 
@@ -329,6 +366,8 @@ def list_my_appointments(
             Clinic.address.label("clinic_address"),
             Appointment.appointment_type,
             Appointment.status,
+            Appointment.booking_deposit_amount,
+            Appointment.payment_expires_at,
             pending_followup.label("has_pending_followup"),
         )
         .join(
@@ -523,6 +562,14 @@ def cancel_my_appointment(
                 409,
                 "An appointment that has started cannot be cancelled.",
             )
+
+        queue_booking_deposit_refund(
+            db,
+            appointment,
+            schedule,
+            slot,
+            actor_user_id=current_user.user_id,
+        )
 
         appointment.status = "cancelled"
         db.flush()

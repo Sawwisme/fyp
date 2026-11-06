@@ -73,40 +73,49 @@ class AppointmentService {
     required int timeSlotId,
     required String appointmentType,
     int? followupCareId,
+    String? bookingRequestId,
+    int? expectedPaymentVersion,
+    String? expectedDepositAmount,
   }) async {
-    dynamic data;
+    final body = <String, dynamic>{
+      'pet_id': petId,
+      'time_slot_id': timeSlotId,
+      'appointment_type': appointmentType,
+    };
 
-    try {
-      data = await api.post(
-        '/owner-appointments',
-        {
-          'pet_id': petId,
-          'time_slot_id': timeSlotId,
-          'appointment_type': appointmentType,
-          if (followupCareId != null)
-            'followup_care_id': followupCareId,
-        },
-      );
-    } on ApiException catch (error) {
-      if (error.statusCode == null ||
-          (error.statusCode != null && error.statusCode! >= 500)) {
+    if (followupCareId != null) {
+      body['followup_care_id'] = followupCareId;
+    }
+
+    if (bookingRequestId != null) {
+      if (expectedPaymentVersion == null ||
+          expectedDepositAmount == null) {
         throw const ApiException(
-          'Could not confirm the booking. Check My Appointments '
-              'before trying again.',
+          'Confirm the deposit amount before booking.',
+          statusCode: 422,
         );
       }
 
-      rethrow;
+      body['booking_request_id'] = bookingRequestId;
+      body['expected_payment_version'] = expectedPaymentVersion;
+      body['expected_deposit_amount'] = expectedDepositAmount;
     }
 
-    if (data is! Map<String, dynamic>) {
+    final data = await api.post(
+      '/owner-appointments',
+      body,
+    );
+
+    if (data is! Map ||
+        data['appointment_id'] is! int ||
+        data['status'] is! String) {
       throw const ApiException(
-        'Could not confirm the booking. Check My Appointments '
-            'before trying again.',
+        'Could not confirm the booking response. '
+            'Check the existing booking before trying again.',
       );
     }
 
-    return data;
+    return Map<String, dynamic>.from(data);
   }
 
   Future<List<Map<String, dynamic>>> getMyAppointments({
@@ -278,5 +287,55 @@ class AppointmentService {
     }
 
     return data;
+  }
+
+  Future<Map<String, dynamic>> getBookingPaymentQuote(
+      int clinicId,
+      ) async {
+    final data = await api.get(
+      '/owner-appointments/clinics/$clinicId/payment-quote',
+    );
+
+    if (data is! Map ||
+        data['clinic_id'] != clinicId ||
+        data['version'] is! int ||
+        (data['version'] as int) < 1) {
+      throw const ApiException('Invalid booking payment quote.');
+    }
+
+    final amount = num.tryParse(
+      data['deposit_amount']?.toString() ?? '',
+    );
+
+    if (amount == null ||
+        !amount.isFinite ||
+        amount < 0 ||
+        amount > 30000 ||
+        (amount > 0 && amount < 1)) {
+      throw const ApiException('Invalid booking deposit amount.');
+    }
+
+    return Map<String, dynamic>.from(data);
+  }
+
+  Future<Map<String, dynamic>> openBookingCheckout(
+      int appointmentId,
+      ) async {
+    final data = await api.post(
+      '/owner-appointments/$appointmentId/checkout',
+      {},
+    );
+
+    if (data is! Map ||
+        data['appointment_id'] != appointmentId ||
+        data['appointment_status'] is! String ||
+        data['payment_status'] is! String ||
+        data['checkout_status'] is! String ||
+        (data['checkout_url'] != null &&
+            data['checkout_url'] is! String)) {
+      throw const ApiException('Invalid booking payment response.');
+    }
+
+    return Map<String, dynamic>.from(data);
   }
 }

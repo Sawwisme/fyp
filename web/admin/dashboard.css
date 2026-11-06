@@ -542,3 +542,44 @@ input[readonly] {
         grid-template-columns: 1fr;
     }
 }
+
+#booking-payment-form {
+    max-width: 480px;
+}
+
+#booking-payment-fields {
+    border: 0;
+    padding: 0;
+    margin: 18px 0 0;
+    min-width: 0;
+}
+
+#booking-payment-fields label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+#booking-deposit-amount {
+    width: 100%;
+    min-height: 46px;
+    padding: 12px 14px;
+    border: 1px solid #ccd8cf;
+    border-radius: 10px;
+    background: #f8faf8;
+    font: inherit;
+    color: #23352a;
+    box-sizing: border-box;
+}
+
+#booking-deposit-amount:focus {
+    outline: 2px solid #92bd9e;
+    outline-offset: 2px;
+}
+
+#booking-payment-form .staff-actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+}

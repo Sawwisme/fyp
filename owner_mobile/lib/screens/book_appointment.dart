@@ -4,6 +4,9 @@ import '../services/api_client.dart';
 import '../services/appointment_service.dart';
 import '../services/pet_service.dart';
 import 'pet_form.dart';
+import 'dart:math';
+
+import 'booking_payment.dart';
 
 class BookAppointmentScreen extends StatefulWidget {
   final Map<String, dynamic> clinic;
@@ -29,6 +32,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   List<Map<String, dynamic>> _pets = [];
   List<Map<String, dynamic>> _vets = [];
   List<Map<String, dynamic>> _slots = [];
+  Map<String, dynamic>? _submittedBooking;
 
   int? _petId;
   int? _vetId;
@@ -247,21 +251,39 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
     await _loadOptions();
   }
 
+  String _newBookingRequestId() {
+    final random = Random.secure();
+
+    final bytes = List<int>.generate(
+      16,
+          (_) => random.nextInt(256),
+    );
+
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+    final hex = bytes
+        .map((value) => value.toRadixString(16).padLeft(2, '0'))
+        .join();
+
+    return '${hex.substring(0, 8)}-'
+        '${hex.substring(8, 12)}-'
+        '${hex.substring(12, 16)}-'
+        '${hex.substring(16, 20)}-'
+        '${hex.substring(20)}';
+  }
+
   Future<void> _book() async {
-    if (_saving || _loadingSlots || _uncertainBooking ||
-        _petId == null || _vetId == null || _slotId == null) {
+    if (_saving ||
+        _loadingSlots ||
+        _uncertainBooking ||
+        _petId == null ||
+        _vetId == null ||
+        _slotId == null) {
       return;
     }
 
-    final pet = _pets.firstWhere(
-          (item) => item['pet_id'] == _petId,
-    );
-    final vet = _vets.firstWhere(
-          (item) => item['veterinarian_id'] == _vetId,
-    );
-    final slot = _slots.firstWhere(
-          (item) => item['time_slot_id'] == _slotId,
-    );
+    var shouldSubmit = false;
 
     setState(() {
       _saving = true;
@@ -269,26 +291,102 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
     });
 
     try {
+      final pet = _pets.firstWhere(
+            (item) => item['pet_id'] == _petId,
+      );
+
+      final vet = _vets.firstWhere(
+            (item) => item['veterinarian_id'] == _vetId,
+      );
+
+      final slot = _slots.firstWhere(
+            (item) => item['time_slot_id'] == _slotId,
+      );
+
+      final quote = await widget.service.getBookingPaymentQuote(
+        widget.clinic['clinic_id'] as int,
+      );
+
+      if (!mounted) return;
+
+      final deposit = num.parse(
+        quote['deposit_amount'].toString(),
+      );
+
+      final requiresDeposit = deposit > 0;
+
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-          title: const Text('Confirm appointment'),
-          content: Text(
-            '${widget.clinic['clinic_name']}\n'
-                'Pet: ${pet['pet_name']}\n'
-                'Vet: ${vet['full_name']}\n'
-                'Date: ${_dateLabel(_date)}\n'
-                'Time: ${_timeLabel(slot)}\n'
-                'Type: ${_type.replaceAll('_', ' ')}',
+          title: const Text('Review appointment'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '${widget.clinic['clinic_name']}\n\n'
+                      'Pet: ${pet['pet_name']}\n'
+                      'Vet: ${vet['full_name']}\n'
+                      'Date: ${_dateLabel(_date)}\n'
+                      'Time: ${_timeLabel(slot)}\n'
+                      'Type: ${_type.replaceAll('_', ' ')}',
+                  style: const TextStyle(height: 1.6),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEAF3EC),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        requiresDeposit
+                            ? 'Deposit due: RM '
+                            '${deposit.toStringAsFixed(2)}'
+                            : 'No appointment deposit',
+                        style: const TextStyle(
+                          color: Color(0xFF176B32),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        requiresDeposit
+                            ? 'Your appointment is confirmed after '
+                            'payment is verified. The deposit '
+                            'will be deducted from your final '
+                            'consultation bill.'
+                            : 'Your appointment will be confirmed '
+                            'without an online payment.',
+                        style: const TextStyle(height: 1.5),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(false);
+              },
               child: const Text('Back'),
             ),
             FilledButton(
-              onPressed: () => Navigator.pop(dialogContext, true),
-              child: const Text('Confirm booking'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(true);
+              },
+              child: Text(
+                requiresDeposit
+                    ? 'Reserve & continue to payment'
+                    : 'Confirm booking',
+              ),
             ),
           ],
         ),
@@ -296,36 +394,118 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
 
       if (!mounted || confirmed != true) return;
 
-      await widget.service.createAppointment(
-        petId: _petId!,
-        timeSlotId: _slotId!,
-        appointmentType: _type,
-        followupCareId:
-        widget.followupContext?['followup_care_id'] as int?,
+      // Freeze the submitted details so a timeout retry
+      // uses exactly the same booking request.
+      _submittedBooking = {
+        'pet_id': _petId!,
+        'time_slot_id': _slotId!,
+        'appointment_type': _type,
+        'followup_care_id':
+        widget.followupContext?['followup_care_id'],
+        'booking_request_id': _newBookingRequestId(),
+        'expected_payment_version': quote['version'],
+        'expected_deposit_amount':
+        quote['deposit_amount'].toString(),
+      };
+
+      shouldSubmit = true;
+    } on ApiException catch (error) {
+      if (mounted) {
+        setState(() => _error = error.message);
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _error = 'Cannot load the booking details. Please try again.';
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _saving = false);
+      }
+    }
+
+    if (mounted && shouldSubmit) {
+      await _sendPreparedBooking();
+    }
+  }
+
+  Future<void> _sendPreparedBooking() async {
+    final request = _submittedBooking;
+
+    if (_saving || request == null) return;
+
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+
+    try {
+      final appointment = await widget.service.createAppointment(
+        petId: request['pet_id'] as int,
+        timeSlotId: request['time_slot_id'] as int,
+        appointmentType: request['appointment_type'] as String,
+        followupCareId: request['followup_care_id'] as int?,
+        bookingRequestId: request['booking_request_id'] as String,
+        expectedPaymentVersion:
+        request['expected_payment_version'] as int,
+        expectedDepositAmount:
+        request['expected_deposit_amount'] as String,
       );
 
       if (!mounted) return;
 
-      // Allow the route to close after saving has finished.
-      setState(() => _saving = false);
+      setState(() {
+        _uncertainBooking = false;
+        _saving = false;
+      });
+
+      if (appointment['status'] == 'pending_payment') {
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => BookingPaymentScreen(
+              service: widget.service,
+              appointmentId: appointment['appointment_id'] as int,
+            ),
+          ),
+        );
+      }
+
+      if (!mounted) return;
+
       Navigator.of(context).pop(true);
     } on ApiException catch (error) {
       if (!mounted) return;
 
+      final uncertain = error.statusCode == null ||
+          error.statusCode! >= 500;
+
       setState(() {
-        _error = error.message;
-        _uncertainBooking = error.statusCode == null;
+        _uncertainBooking = uncertain;
+
+        if (uncertain) {
+          _error =
+          'We could not confirm the booking response. '
+              'Use “Check booking again” to safely retry '
+              'the same booking.';
+        } else {
+          _error = error.message;
+          _submittedBooking = null;
+        }
       });
 
-      if (error.statusCode == 409 || error.statusCode == 400) {
+      if (!uncertain &&
+          (error.statusCode == 409 || error.statusCode == 400)) {
         await _loadSlots();
       }
     } catch (_) {
       if (mounted) {
         setState(() {
           _uncertainBooking = true;
-          _error = 'Could not confirm the booking. '
-              'Check My Appointments before trying again.';
+          _error =
+          'We could not confirm the booking response. '
+              'Use “Check booking again” before making '
+              'another booking.';
         });
       }
     } finally {
@@ -514,6 +694,17 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
             _error!,
             style: TextStyle(
               color: Theme.of(context).colorScheme.error,
+            ),
+          ),
+        ],
+
+        if (_uncertainBooking && _submittedBooking != null) ...[
+          const SizedBox(height: 16),
+          OutlinedButton.icon(
+            onPressed: _saving ? null : _sendPreparedBooking,
+            icon: const Icon(Icons.refresh),
+            label: Text(
+              _saving ? 'Checking…' : 'Check booking again',
             ),
           ),
         ],

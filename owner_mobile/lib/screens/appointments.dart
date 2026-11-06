@@ -10,6 +10,7 @@ import 'reschedule_appointment.dart';
 import 'appointment_details.dart';
 import '../services/followup_service.dart';
 import 'followup_care.dart';
+import 'booking_payment.dart';
 
 class AppointmentsPage extends StatefulWidget {
   final AppointmentService service;
@@ -242,7 +243,7 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
 
         if (outcome != null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(outcome!)),
+            SnackBar(content: Text(outcome)),
           );
         }
       }
@@ -250,7 +251,10 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
   }
 
   bool _isUpcoming(Map<String, dynamic> item) {
-    if (item['status'] == 'in_progress') {
+    if ([
+      'in_progress',
+      'pending_payment',
+    ].contains(item['status'])) {
       return true;
     }
 
@@ -330,6 +334,47 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
     }
   }
 
+  Future<void> _openBookingPayment(
+      Map<String, dynamic> item,
+      ) async {
+    if (_loading || _openingBooking) return;
+
+    setState(() => _openingBooking = true);
+
+    try {
+      await Navigator.of(context).push<bool>(
+        MaterialPageRoute(
+          builder: (_) => BookingPaymentScreen(
+            service: widget.service,
+            appointmentId: item['appointment_id'] as int,
+          ),
+        ),
+      );
+
+      if (mounted) {
+        await _load(reset: true);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _openingBooking = false);
+      }
+    }
+  }
+
+  String _depositDeadline(dynamic value) {
+    final parsed = DateTime.tryParse(value?.toString() ?? '');
+    if (parsed == null) return 'Not available';
+
+    final date = parsed.toUtc().add(
+      const Duration(hours: 8),
+    );
+
+    String two(int number) => number.toString().padLeft(2, '0');
+
+    return '${two(date.day)}/${two(date.month)}/${date.year} '
+        '${two(date.hour)}:${two(date.minute)} MYT';
+  }
+
   Widget _appointmentCard(Map<String, dynamic> item) {
     const green = Color(0xFF176B32);
     const muted = Color(0xFF6B7770);
@@ -340,6 +385,12 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
     final rearrangement = item['needs_rearrangement'] == true;
     final followup = item['has_pending_followup'] == true;
     final busy = _loading || _openingBooking;
+    final deposit = num.tryParse(
+      item['booking_deposit_amount']?.toString() ?? '',
+    );
+
+    final hasDeposit =
+        deposit != null && deposit.isFinite && deposit > 0;
 
     final statusLabels = {
       'pending': 'Pending',
@@ -348,13 +399,14 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
       'completed': 'Completed',
       'cancelled': 'Cancelled',
       'rejected': 'Rejected',
+      'pending_payment': 'Awaiting payment',
     };
 
     final statusColor = rearrangement
         ? const Color(0xFFB42318)
         : ['confirmed', 'completed'].contains(status)
         ? green
-        : status == 'pending'
+        : ['pending', 'pending_payment'].contains(status)
         ? const Color(0xFF946116)
         : muted;
 
@@ -362,7 +414,7 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
         ? const Color(0xFFFFEFED)
         : ['confirmed', 'completed'].contains(status)
         ? const Color(0xFFE8F3EB)
-        : status == 'pending'
+        : ['pending', 'pending_payment'].contains(status)
         ? const Color(0xFFFFF4DE)
         : const Color(0xFFF0F2F1);
 
@@ -511,6 +563,65 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
                 ],
               ),
             ],
+            if (hasDeposit) ...[
+              const SizedBox(height: 16),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF3F7F4),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Booking deposit: RM ${deposit.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        color: green,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (status == 'pending_payment') ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        'Payment deadline: '
+                            '${_depositDeadline(item['payment_expires_at'])}',
+                        style: const TextStyle(
+                          color: muted,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Your appointment is confirmed after payment '
+                            'is verified.',
+                        style: TextStyle(
+                          color: muted,
+                          fontSize: 12,
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: busy
+                      ? null
+                      : () => _openBookingPayment(item),
+                  icon: const Icon(Icons.account_balance_outlined),
+                  label: Text(
+                    status == 'pending_payment'
+                        ? 'Pay / check deposit'
+                        : 'View deposit payment',
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 12),
             const Divider(height: 1, color: Color(0xFFE8EDE9)),
             const SizedBox(height: 10),
@@ -578,6 +689,9 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
   @override
   Widget build(BuildContext context) {
     final visible = _appointments.where((item) {
+      if (_filter == 'payment') {
+        return item['status'] == 'pending_payment';
+      }
       if (_filter == 'upcoming') return _isUpcoming(item);
       if (_filter == 'history') return !_isUpcoming(item);
       return true;
@@ -677,6 +791,10 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
               DropdownMenuItem(
                 value: 'history',
                 child: Text('History'),
+              ),
+              DropdownMenuItem(
+                value: 'payment',
+                child: Text('Awaiting payment'),
               ),
             ],
             onChanged: _loading || _openingBooking

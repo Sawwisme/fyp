@@ -5,9 +5,12 @@ from app.database import get_db
 from app.dependencies import require_roles
 from app.models import User
 from app.schemas.clinic import ClinicResponse, ClinicUpdate
-from app.services import clinic_service
 from app.schemas.clinic_hours import WorkingHoursUpdate, WorkingPeriod
-from app.services import clinic_hours_service
+from app.services import clinic_hours_service, clinic_booking_payment_service, clinic_service
+from app.schemas.clinic_booking_payment import (
+    BookingPaymentSettingsResponse,
+    BookingPaymentSettingsUpdate,
+)
 
 
 router = APIRouter(
@@ -65,6 +68,39 @@ def replace_my_working_hours(
     db: Session = Depends(get_db),
 ):
     return clinic_hours_service.replace_my_hours(
+        db,
+        current_user,
+        data,
+    )
+
+@router.get(
+    "/me/booking-payment-settings",
+    response_model=BookingPaymentSettingsResponse,
+)
+def get_my_booking_payment_settings(
+    current_user: User = Depends(
+        require_roles("clinic_administrator")
+    ),
+    db: Session = Depends(get_db),
+):
+    return clinic_booking_payment_service.get_my_settings(
+        db,
+        current_user,
+    )
+
+
+@router.put(
+    "/me/booking-payment-settings",
+    response_model=BookingPaymentSettingsResponse,
+)
+def update_my_booking_payment_settings(
+    data: BookingPaymentSettingsUpdate,
+    current_user: User = Depends(
+        require_roles("clinic_administrator")
+    ),
+    db: Session = Depends(get_db),
+):
+    return clinic_booking_payment_service.update_my_settings(
         db,
         current_user,
         data,

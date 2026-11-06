@@ -28,6 +28,10 @@ from app.services.schedule_service import (
 )
 from app.services.vet_absence_service import reject_absent_slots
 
+from app.services.booking_refund_request_service import (
+    queue_booking_deposit_refund,
+)
+
 from app.services.vet_profile_service import get_profile
 
 def _validate_return_visit(
@@ -505,6 +509,14 @@ def cancel_appointment(
                 status_code=409,
                 detail="An appointment that has started cannot be cancelled.",
             )
+
+        queue_booking_deposit_refund(
+            db,
+            appointment,
+            schedule,
+            slot,
+            actor_user_id=current_user.user_id,
+        )
 
         appointment.status = "cancelled"
         db.flush()

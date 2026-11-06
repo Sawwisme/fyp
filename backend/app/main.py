@@ -46,6 +46,8 @@ from app.stripe_refund_worker import run_worker as run_stripe_refund_worker
 from app.routers.consultation_billing import router as consultation_billing_router
 from app.routers.owner_billing import router as owner_billing_router
 from app.billing_payment_worker import run_worker as run_billing_payment_worker
+from app.booking_payment_worker import run_worker as run_booking_payment_worker
+from app.booking_refund_worker import run_worker as run_booking_refund_worker
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -80,6 +82,18 @@ async def lifespan(app: FastAPI):
             target=run_billing_payment_worker,
             args=(stop_event,),
             name="billing-payments",
+            daemon=True,
+        ),
+        Thread(
+            target=run_booking_payment_worker,
+            args=(stop_event,),
+            name="booking-payments",
+            daemon=True,
+        ),
+        Thread(
+            target=run_booking_refund_worker,
+            args=(stop_event,),
+            name="booking-refunds",
             daemon=True,
         ),
     ]

@@ -56,4 +56,19 @@ class BillingService {
 
     return Map<String, dynamic>.from(data);
   }
+
+  Future<void> cancelOnlineAttempt(int billId) async {
+    final data = await api.post(
+      '/owner-billing/bills/$billId/cancel-online',
+      {},
+    );
+
+    if (data is! Map ||
+        data['consultation_bill_id'] != billId ||
+        data['payment_attempt_closed'] != true) {
+      throw const ApiException(
+        'Cannot confirm that the online payment attempt is closed.',
+      );
+    }
+  }
 }

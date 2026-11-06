@@ -17,6 +17,7 @@
     let selected = null;
     let bill = null;
     let payments = [];
+    let clinicName = '';
     let detailReady = false;
     let saving = false;
     let dirty = false;
@@ -430,6 +431,168 @@
         itemContainer.appendChild(row);
     }
 
+    function printReceipt(payment) {
+        if (
+            saving ||
+            !detailReady ||
+            !bill ||
+            !selected ||
+            payment.payment_status !== 'paid' ||
+            !payment.receipt_number ||
+            !payment.payment_date
+        ) {
+            return;
+        }
+
+        const receiptWindow = window.open(
+            '',
+            '_blank',
+            'width=900,height=750'
+        );
+
+        if (!receiptWindow) {
+            formMessage.textContent =
+                'Allow pop-ups for this website to print receipts.';
+            return;
+        }
+
+        receiptWindow.opener = null;
+
+        const doc = receiptWindow.document;
+        doc.title = `Receipt ${payment.receipt_number}`;
+        doc.documentElement.lang = 'en';
+
+        const style = doc.createElement('style');
+        style.textContent = `
+        * { box-sizing: border-box; }
+        body {
+            max-width: 780px;
+            margin: 40px auto;
+            padding: 0 24px;
+            color: #23352a;
+            font: 15px/1.6 Arial, sans-serif;
+        }
+        h1 { margin-bottom: 4px; font-size: 25px; }
+        h2 { margin-top: 0; color: #176b32; }
+        p { margin: 6px 0; }
+        table {
+            width: 100%;
+            margin-top: 24px;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            vertical-align: top;
+            overflow-wrap: anywhere;
+        }
+        th { background: #f3f7f4; }
+        th:last-child, td:last-child {
+            text-align: right;
+            white-space: nowrap;
+        }
+        .total {
+            margin-top: 24px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: right;
+        }
+        .actions { margin-top: 28px; }
+        button {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 7px;
+            background: #176b32;
+            color: white;
+            cursor: pointer;
+        }
+        @page { size: A4; margin: 18mm; }
+        @media print {
+            body { margin: 0; padding: 0; max-width: none; }
+            .actions { display: none; }
+            tr { break-inside: avoid; }
+            thead { display: table-header-group; }
+        }
+    `;
+        doc.head.appendChild(style);
+
+        function add(tag, text, parent = doc.body) {
+            const element = doc.createElement(tag);
+            element.textContent = text;
+            parent.appendChild(element);
+            return element;
+        }
+
+        add('h1', clinicName || 'Veterinary clinic');
+        add('h2', 'Payment receipt');
+        add('p', `Receipt: ${payment.receipt_number}`);
+        add('p', `Bill #${bill.consultation_bill_id}`);
+        add('p', `Consultation #${bill.consultation_id}`);
+        add('p', `Pet: ${selected.pet_name}`);
+        add('p', `Owner: ${selected.owner_name}`);
+
+        add(
+            'p',
+            `Paid: ${new Date(payment.payment_date).toLocaleString(
+                'en-MY',
+                { timeZone: 'Asia/Kuala_Lumpur' }
+            )} MYT`
+        );
+
+        add(
+            'p',
+            `Payment method: ${payment.payment_method === 'cash'
+                ? 'Cash at clinic'
+                : 'Online payment'
+            }`
+        );
+
+        const table = doc.createElement('table');
+        doc.body.appendChild(table);
+
+        const head = table.createTHead().insertRow();
+
+        for (const title of [
+            'Description', 'Quantity', 'Unit price', 'Subtotal'
+        ]) {
+            add('th', title, head);
+        }
+
+        const body = table.createTBody();
+
+        for (const item of bill.items) {
+            const row = body.insertRow();
+
+            for (const value of [
+                item.description,
+                item.quantity,
+                money(item.unit_price),
+                money(item.subtotal),
+            ]) {
+                add('td', String(value), row);
+            }
+        }
+
+        const total = add(
+            'p',
+            `Amount paid: ${money(payment.amount)}`
+        );
+        total.className = 'total';
+
+        const actions = add('div', '');
+        actions.className = 'actions';
+
+        const print = add('button', 'Print / Save PDF', actions);
+        print.type = 'button';
+        print.addEventListener('click', () => {
+            receiptWindow.focus();
+            receiptWindow.print();
+        });
+
+        receiptWindow.focus();
+    }
+
     function renderPayments() {
         const section = get('billing-payment-summary');
         section.replaceChildren();
@@ -479,6 +642,26 @@
                         { timeZone: 'Asia/Kuala_Lumpur' }
                     )} MYT`
                 ));
+            }
+
+            if (
+                payment.payment_status === 'paid' &&
+                payment.receipt_number &&
+                payment.payment_date
+            ) {
+                const print = node(
+                    'button',
+                    'Print receipt',
+                    'secondary compact-button'
+                );
+
+                print.type = 'button';
+                print.disabled = saving;
+                print.addEventListener('click', () => {
+                    printReceipt(payment);
+                });
+
+                entry.appendChild(print);
             }
 
             section.appendChild(entry);
@@ -745,6 +928,8 @@
 
         try {
             const profile = await request('/admins/me');
+
+            clinicName = profile.clinic_name || '';
 
             get('topbar-name').textContent = profile.user.full_name;
             get('topbar-avatar').textContent =

@@ -8,6 +8,7 @@ from sqlalchemy import (
     BigInteger,
     UniqueConstraint,
     Boolean,
+    CheckConstraint,
 )
 from sqlalchemy.orm import relationship
 
@@ -22,6 +23,15 @@ class Clinic(Base):
             "osm_type",
             "osm_id",
             name="uq_clinic_osm_identity",
+        ),
+        CheckConstraint(
+            "booking_deposit_amount = 0 OR "
+            "booking_deposit_amount BETWEEN 1.00 AND 30000.00",
+            name="chk_clinic_booking_deposit",
+        ),
+        CheckConstraint(
+            "booking_payment_version >= 1",
+            name="chk_clinic_booking_payment_version",
         ),
     )
     clinic_id = Column(Integer, primary_key=True, autoincrement=True)
@@ -78,6 +88,20 @@ class Clinic(Base):
     )
 
     shop_version = Column(
+        Integer,
+        nullable=False,
+        default=1,
+        server_default=text("1"),
+    )
+
+    booking_deposit_amount = Column(
+        Numeric(10, 2),
+        nullable=False,
+        default=0,
+        server_default=text("0.00"),
+    )
+
+    booking_payment_version = Column(
         Integer,
         nullable=False,
         default=1,

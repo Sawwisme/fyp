@@ -44,3 +44,4 @@ from app.models.stripe_checkout_session import StripeCheckoutSession
 from app.models.consultation_bill import ConsultationBill
 from app.models.consultation_bill_item import ConsultationBillItem
 from app.models.billing_stripe_session import BillingStripeSession
+from app.models.booking_stripe_session import BookingStripeSession

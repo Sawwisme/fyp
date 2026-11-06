@@ -3,12 +3,20 @@ from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException
 from stripe import StripeError
 
-from app.models import BillingStripeSession, StripeCheckoutSession
+from app.models import (
+    BillingStripeSession,
+    BookingStripeSession,
+    StripeCheckoutSession,
+)
 from app.services.stripe_gateway import get_stripe_client
 
 
 def resolve_remote_session(
-    checkout: StripeCheckoutSession | BillingStripeSession,
+    checkout: (
+        StripeCheckoutSession
+        | BillingStripeSession
+        | BookingStripeSession
+    ),
 ) -> dict:
     client = get_stripe_client()
 
@@ -63,5 +71,5 @@ def resolve_remote_session(
         raise HTTPException(
             503,
             "Cannot confirm the Stripe payment session. "
-            "Retry this order; a new payment request will not be created.",
+            "Retry the existing payment attempt.",
         ) from None
