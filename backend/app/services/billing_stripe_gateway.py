@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from stripe import StripeError
 
 from app.services.stripe_gateway import get_stripe_client
+from app.services.stripe_payment_method_service import verified_payment_method
 
 
 def expected_metadata(checkout, bill, appointment):
@@ -41,7 +42,7 @@ def validate_bill_session(
         or payment.appointment_id != appointment.appointment_id
         or payment.order_id is not None
         or payment.payment_purpose != "consultation_balance"
-        or payment.payment_method != "online_banking"
+        or payment.payment_method not in {"online_banking", "card"}
         or payment.amount != bill.balance_amount
         or payment.amount <= 0
         or any(
@@ -76,7 +77,8 @@ def verify_bill_payment_intent(
 
     try:
         intent = get_stripe_client().v1.payment_intents.retrieve(
-            intent_id
+            intent_id,
+            params={"expand": ["latest_charge"]},
         ).to_dict()
 
     except StripeError:
@@ -106,5 +108,7 @@ def verify_bill_payment_intent(
             409,
             "Stripe payment verification failed for this bill.",
         )
+
+    payment.payment_method = verified_payment_method(intent, payment)
 
     return intent_id

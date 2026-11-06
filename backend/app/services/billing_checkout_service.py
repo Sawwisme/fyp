@@ -90,7 +90,7 @@ def find_pending_attempt(payments, checkouts):
 
         if (
             payment.payment_status != "pending"
-            or payment.payment_method != "online_banking"
+            or payment.payment_method not in {"online_banking", "card"}
             or payment.payment_purpose != "consultation_balance"
             or payment.order_id is not None
             or checkout is None
@@ -119,7 +119,7 @@ def find_pending_attempt(payments, checkouts):
         )
 
     for payment in payments:
-        if payment.payment_method == "online_banking":
+        if payment.payment_method in {"online_banking", "card"}:
             matching = next(
                 (
                     item
@@ -204,7 +204,7 @@ def create_or_reopen_checkout(db, current_user, bill_id):
 
             checkout.request_payload = {
                 "mode": "payment",
-                "allowed_payment_method_types": ["fpx"],
+                "allowed_payment_method_types": ["fpx", "card"],
                 "client_reference_id": (
                     f"bill:{bill.consultation_bill_id}"
                 ),

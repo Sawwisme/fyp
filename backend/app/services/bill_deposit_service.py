@@ -64,7 +64,7 @@ def apply_booking_deposit(
         or not appointment.booking_request_id
         or appointment.booking_deposit_amount <= 0
         or payment.payment_status != "paid"
-        or payment.payment_method != "online_banking"
+        or payment.payment_method not in {"online_banking", "card"}
         or payment.order_id is not None
         or payment.consultation_bill_id is not None
         or payment.amount != appointment.booking_deposit_amount

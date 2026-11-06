@@ -167,3 +167,15 @@ class ConsultationBill(Base):
             return Decimal("0.00")
 
         return self.balance_amount
+
+    @property
+    def deposit_refund(self):
+        application = self.deposit_application
+
+        if (
+            application is None
+            or application.excess_refund_id is None
+        ):
+            return None
+
+        return application.excess_refund

@@ -225,7 +225,7 @@ def update_order_status(
             }
         else:
             if (
-                payment.payment_method != "online_banking"
+                payment.payment_method not in {"online_banking", "card"}
                 or payment.payment_status != "paid"
                 or payment.payment_date is None
             ):

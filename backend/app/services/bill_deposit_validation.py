@@ -52,7 +52,7 @@ def validate_bill_deposit(db, bill, appointment):
         or payment.appointment_id != appointment.appointment_id
         or payment.order_id is not None
         or payment.consultation_bill_id is not None
-        or payment.payment_method != "online_banking"
+        or payment.payment_method not in {"online_banking", "card"}
         or payment.payment_date is None
         or not payment.receipt_number
         or payment.amount != appointment.booking_deposit_amount

@@ -10,6 +10,8 @@ from fastapi.staticfiles import StaticFiles
 #router import
 from app.routers.auth import router as auth_router
 from app.routers.pets import router as pets_router
+from app.routers.reports import router as reports_router
+from app.routers.patients import router as patients_router
 from app.routers.owners import router as owners_router
 from app.routers.availability import router as availability_router
 from app.routers.admins import router as admins_router
@@ -122,6 +124,8 @@ app = FastAPI(
 
 app.include_router(auth_router)
 app.include_router(pets_router)
+app.include_router(reports_router)
+app.include_router(patients_router)
 app.include_router(owners_router)
 app.include_router(availability_router)
 app.include_router(admins_router)

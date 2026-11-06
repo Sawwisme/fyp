@@ -116,9 +116,7 @@ function buildVetLayout() {
             <button class="nav-item" type="button" disabled>
                 AI Assessments <small>Coming soon</small>
             </button>
-            <button class="nav-item" type="button" disabled>
-                Patients <small>Coming soon</small>
-            </button>
+            <a class="nav-item" href="/web/vet/patients.html" data-vet-page="patients">Patients</a>
 
             <a class="nav-item" href="/web/vet/consultations.html"
                 data-vet-page="consultations">
@@ -134,9 +132,7 @@ function buildVetLayout() {
             data-vet-page="followups">
                 Follow-up Care
             </a>
-            <button class="nav-item" type="button" disabled>
-                Reports <small>Coming soon</small>
-            </button>
+            <a class="nav-item" href="/web/vet/reports.html" data-vet-page="reports">Reports</a>
         </nav>
 
         <nav class="bottom-nav" aria-label="Account">
@@ -152,8 +148,8 @@ function buildVetLayout() {
 
     const pathname = window.location.pathname;
 
-    const currentVetPage =
-        pathname.endsWith('/profile.html')
+    const currentVetPage = window.location.pathname.endsWith('/reports.html') ? 'reports' :
+        pathname.endsWith('/patients.html') ? 'patients' : pathname.endsWith('/profile.html')
             ? 'profile'
             : pathname.endsWith('/schedules.html')
                 ? 'schedules'

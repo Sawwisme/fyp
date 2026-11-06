@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VetDental — Reports</title>
+
+    <link rel="stylesheet" href="/web/styles.css?v=cobalt-components-2">
+    <link rel="stylesheet" href="/web/admin/dashboard.css?v=cobalt-components-2">
+    <link rel="stylesheet" href="/web/admin/layout.css?v=cobalt-components-2">
+
+    <script src="/web/vet/layout.js" defer></script>
+    <script src="/web/reports.js?v=1" defer></script>
+    <link rel="stylesheet" href="/web/cobalt.css?v=cobalt-components-2">
+    <link rel="stylesheet" href="/web/workspace-design.css?v=1">
+    <link rel="stylesheet" href="/web/clinical-refinement.css?v=1">
+    <link rel="stylesheet" href="/web/workspace-polish.css?v=1">
+    <script src="/web/sidebar-controls.js?v=2" defer></script>
+    <link rel="stylesheet" href="/web/sidebar-motion.css?v=1">
+<link rel="stylesheet" href="/web/reports.css?v=1">
+</head>
+
+<body data-report-role="vet"><div id="vet-loading" class="loading"><p id="vet-loading-message" role="status">Loading your account…</p><button id="vet-retry" type="button" class="secondary" hidden>Try again</button><a href="/web/">Back to staff login</a></div><div id="vet-workspace" hidden class="workspace"><aside id="shared-sidebar" class="sidebar"></aside><div class="content-area"><header id="shared-topbar" class="topbar"></header><main class="main-content"><div class="report-heading"><div><h1>Reports</h1><p class="subtitle">Your appointments, consultations and patient care activity.</p></div><button id="report-export" type="button" class="secondary compact-button" disabled>Export CSV</button></div>
+<section class="panel"><form id="report-filters" class="report-filters"><div><label for="report-from">From date</label><input id="report-from" type="date" required></div><div><label for="report-to">To date</label><input id="report-to" type="date" required></div><button type="submit">Generate report</button></form><div class="report-shortcuts"><button type="button" class="secondary compact-button" data-report-period="today">Today</button><button type="button" class="secondary compact-button" data-report-period="month">This month</button><button type="button" class="secondary compact-button" data-report-period="year">This year</button></div></section>
+<p id="report-message" class="report-message" role="status" aria-live="polite">Loading reports…</p><button id="report-retry" type="button" class="secondary compact-button" hidden>Try again</button><div id="report-results" hidden>
+<h2>Clinical activity</h2><div id="report-clinical-cards" class="report-stats"></div><p id="report-clinical-extra" class="muted"></p>
+<section class="panel"><h2>Consultation trend</h2><div id="report-chart" class="report-chart" role="img" aria-label="Completed consultations over the selected period"></div><p id="report-chart-caption" class="muted"></p></section><div class="report-grid"><section class="panel"><h2>Appointment statuses</h2><div id="report-appointments"></div></section><section class="panel"><h2>Consultation statuses</h2><div id="report-consultations"></div></section><section class="panel"><h2>Treatment statuses</h2><div id="report-treatments"></div></section><section class="panel"><h2>Follow-up tasks due</h2><div id="report-followups"></div></section></div><p class="report-note">Appointments use their scheduled date; consultations use their recorded consultation date. Treatments and prescriptions include finalized consultations only and use their own recorded dates. Statuses show the current state. Follow-up counts use the recommended review date; tasks without one are excluded.</p></div></main></div></div></body></html>

@@ -68,6 +68,21 @@ class BillItemResponse(BaseModel):
     unit_price: Decimal
     subtotal: Decimal
 
+class BillDepositRefundResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    refund_id: int
+    status: str
+    refund_amount: Decimal
+    requested_at: datetime
+    processed_at: datetime | None
+
+    @field_validator("requested_at", "processed_at")
+    @classmethod
+    def include_utc_offset(cls, value):
+        if value is not None and value.tzinfo is None:
+            return value.replace(tzinfo=timezone.utc)
+        return value
 
 class BillResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -81,6 +96,7 @@ class BillResponse(BaseModel):
     deposit_paid_amount: Decimal
     deposit_applied_amount: Decimal
     deposit_excess_refund_amount: Decimal
+    deposit_refund: BillDepositRefundResponse | None = None
     balance_amount: Decimal
     amount_due: Decimal
     version: int

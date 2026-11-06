@@ -126,7 +126,7 @@ def lock_payment_state(
 
     if (
         payment.payment_status != "pending"
-        or payment.payment_method != "online_banking"
+        or payment.payment_method not in {"online_banking", "card"}
         or payment.amount != order.total_amount
         or payment.payment_date is not None
     ):
@@ -182,7 +182,7 @@ def create_or_reopen_checkout(
 
             payload = {
                 "mode": "payment",
-                "allowed_payment_method_types": ["fpx"],
+                "allowed_payment_method_types": ["fpx", "card"],
                 "client_reference_id": str(order.order_id),
                 "customer_email": current_user.email,
                 "metadata": metadata,

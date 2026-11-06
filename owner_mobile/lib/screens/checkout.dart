@@ -187,7 +187,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             items: [
               const DropdownMenuItem(
                 value: 'online_banking',
-                child: Text('Online banking'),
+                child: Text('Pay online (Card or FPX)'),
               ),
               if (_method == 'pickup')
                 const DropdownMenuItem(

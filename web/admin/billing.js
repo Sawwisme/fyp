@@ -338,6 +338,73 @@
         return { items, totalCents };
     }
 
+    function renderDepositRefund(section) {
+        if (Number(bill.deposit_excess_refund_amount) <= 0) {
+            return;
+        }
+
+        const refund = bill.deposit_refund;
+
+        const labels = {
+            approved: 'Queued',
+            processing: 'Processing',
+            requires_action: 'Needs attention',
+            succeeded: 'Refunded',
+            failed: 'Failed — needs review',
+        };
+
+        const box = node('div', '', 'billing-refund-status');
+
+        box.appendChild(node('h4', 'Excess deposit refund'));
+
+        box.appendChild(node(
+            'p',
+            refund
+                ? labels[refund.status] ?? 'Unknown status'
+                : 'Refund status unavailable. Refresh the bill.'
+        ));
+
+        if (refund) {
+            box.appendChild(node(
+                'p',
+                `Refund #${refund.refund_id} · ` +
+                money(refund.refund_amount)
+            ));
+
+            if (refund.processed_at) {
+                box.appendChild(node(
+                    'p',
+                    `Processed: ${date(refund.processed_at)}`
+                ));
+            }
+
+            if (refund.status === 'failed') {
+                box.appendChild(node(
+                    'p',
+                    'Check the failed refund in Stripe before ' +
+                    'arranging another refund.'
+                ));
+            }
+        }
+
+        const refresh = node(
+            'button',
+            'Refresh refund status',
+            'secondary compact-button'
+        );
+
+        refresh.type = 'button';
+
+        refresh.addEventListener('click', () => {
+            if (saving || !selected || !detailReady) return;
+
+            openEditor(selected);
+        });
+
+        box.appendChild(refresh);
+        section.appendChild(box);
+    }
+
     function renderBalanceSummary() {
         const section = get('billing-balance-summary');
 
@@ -385,6 +452,7 @@
         }
 
         section.appendChild(breakdown);
+        renderDepositRefund(section);
     }
 
     function updatePreview() {
@@ -595,7 +663,7 @@
             'p',
             `Payment method: ${payment.payment_method === 'cash'
                 ? 'Cash at clinic'
-                : 'Online payment'
+                : payment.payment_method === 'card' ? 'Card' : payment.payment_status === 'pending' ? 'Online payment (Card or FPX)' : 'FPX online banking'
             }`
         );
 
@@ -694,7 +762,7 @@
                     `${money(payment.amount)} · ` +
                     `${payment.payment_method === 'cash'
                         ? 'Cash'
-                        : 'Online payment'}`
+                        : payment.payment_method === 'card' ? 'Card' : payment.payment_status === 'pending' ? 'Online payment (Card or FPX)' : 'FPX online banking'}`
                 ),
                 node('p', `Status: ${label(payment.payment_status)}`)
             );

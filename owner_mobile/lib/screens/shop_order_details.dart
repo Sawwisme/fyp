@@ -437,7 +437,7 @@ class _ShopOrderDetailsScreenState
           const SizedBox(height: 12),
           Text(
             'Payment method: '
-                '${cash ? 'Cash at clinic pickup' : 'Online banking'}',
+                '${cash ? 'Cash at clinic pickup' : order['payment_method'] == 'card' ? 'Card' : order['payment_status'] == 'pending' ? 'Online payment (Card or FPX)' : 'FPX online banking'}',
           ),
           Text('Payment: ${_label(order['payment_status'])}'),
           Text('Placed: ${_date(order['order_date'])}'),

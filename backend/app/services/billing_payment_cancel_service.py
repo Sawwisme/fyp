@@ -82,7 +82,7 @@ def cancel_online_attempt(db, current_user, bill_id):
 
         if (
             payment.payment_status != "pending"
-            or payment.payment_method != "online_banking"
+            or payment.payment_method not in {"online_banking", "card"}
             or payment.payment_purpose != "consultation_balance"
             or payment.payment_date is not None
             or checkout is None

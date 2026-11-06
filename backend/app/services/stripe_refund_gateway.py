@@ -16,7 +16,7 @@ def resolve_stripe_refund(refund, payment, order) -> dict:
     cents = refund.refund_amount * Decimal("100")
 
     if (
-        payment.payment_method != "online_banking"
+        payment.payment_method not in {"online_banking", "card"}
         or not isinstance(intent_id, str)
         or not intent_id.startswith("pi_")
         or len(intent_id) > 100

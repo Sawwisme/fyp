@@ -58,9 +58,7 @@
                 Consultation Billing
             </a>
 
-            <button class="nav-item" type="button" disabled>
-                Reports <small>Coming soon</small>
-            </button>
+            <a class="nav-item" href="/web/admin/reports.html" data-page="reports">Reports</a>
         </nav>
 
         <nav class="bottom-nav" aria-label="Account">
@@ -91,7 +89,7 @@
     `;
 
     function highlightNavigation() {
-        const activePage = isBillingPage
+        const activePage = window.location.pathname.endsWith('/reports.html') ? 'reports' : isBillingPage
             ? 'billing'
             : isOrderPage
                 ? 'orders'

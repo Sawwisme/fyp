@@ -54,7 +54,7 @@ def queue_booking_deposit_refund(
         or payment.amount != appointment.booking_deposit_amount
         or payment.order_id is not None
         or payment.consultation_bill_id is not None
-        or payment.payment_method != "online_banking"
+        or payment.payment_method not in {"online_banking", "card"}
         or payment.payment_status not in {"paid", "refunded"}
         or payment.payment_date is None
         or not isinstance(payment.gateway_reference, str)

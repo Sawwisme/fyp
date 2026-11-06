@@ -222,7 +222,7 @@
                         'div',
                         order.payment_method === 'cash'
                             ? 'Cash at pickup'
-                            : 'Online banking',
+                            : order.payment_method === 'card' ? 'Card' : order.payment_status === 'pending' ? 'Online payment (Card or FPX)' : 'FPX online banking',
                         'muted'
                     )
                 );
@@ -1148,7 +1148,7 @@
                 'Payment method',
                 order.payment_method === 'cash'
                     ? 'Cash at clinic pickup'
-                    : 'Online banking'
+                    : order.payment_method === 'card' ? 'Card' : order.payment_status === 'pending' ? 'Online payment (Card or FPX)' : 'FPX online banking'
             );
             detailLine(status, 'Payment status', label(order.payment_status));
 

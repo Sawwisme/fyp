@@ -49,7 +49,7 @@ def run_pass(stop_event, after_id):
                 Payment.order_id.is_(None),
                 Payment.appointment_id.is_not(None),
                 Payment.payment_purpose == "booking_deposit",
-                Payment.payment_method == "online_banking",
+                Payment.payment_method.in_(["online_banking", "card"]),
             )
             .order_by(Refund.refund_id)
             .limit(10)

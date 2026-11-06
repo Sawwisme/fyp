@@ -204,7 +204,7 @@ def prepare_deposit_payment(
     # The worker can safely recover an interrupted request.
     checkout.request_payload = {
         "mode": "payment",
-        "allowed_payment_method_types": ["fpx"],
+        "allowed_payment_method_types": ["fpx", "card"],
         "client_reference_id": (
             f"booking:{appointment.appointment_id}"
         ),

@@ -1,0 +1,180 @@
+from fastapi import FastAPI
+from pathlib import Path
+import asyncio
+from contextlib import asynccontextmanager
+from threading import Event, Thread
+
+from app.automatic_scheduling_worker import run_worker
+from fastapi.staticfiles import StaticFiles
+
+#router import
+from app.routers.auth import router as auth_router
+from app.routers.pets import router as pets_router
+from app.routers.patients import router as patients_router
+from app.routers.owners import router as owners_router
+from app.routers.availability import router as availability_router
+from app.routers.admins import router as admins_router
+from app.routers.staff import router as staff_router
+from app.routers.veterinarians import router as veterinarians_router
+from app.routers.schedules import router as schedules_router
+from app.routers.clinics import router as clinics_router
+from app.routers.admin_registration import router as admin_registration_router
+from app.routers.clinic_discovery import router as clinic_discovery_router
+from app.routers.automatic_scheduling import router as automatic_scheduling_router
+from app.routers.clinic_customers import router as clinic_customers_router
+from app.routers.clinic_appointments import router as clinic_appointments_router
+from app.routers.owner_appointments import router as owner_appointments_router
+from app.routers.emergency_requests import router as emergency_requests_router
+from app.routers.consultations import router as consultations_router
+from app.routers.followups import router as followups_router
+from app.routers.treatment_progress import router as treatment_progress_router
+from app.routers.return_visits import router as return_visits_router
+from app.routers.owner_medical_history import router as owner_medical_history_router
+from app.routers.owner_followups import router as owner_followups_router
+from app.routers.followup_media import router as followup_media_router
+from app.routers.notifications import router as notifications_router
+from app.routers.products import router as products_router
+from app.routers.shop import router as shop_router
+from app.routers.cart import router as cart_router
+from app.routers.checkout import router as checkout_router
+from app.routers.shop_orders import router as shop_orders_router
+from app.order_expiry_worker import run_worker as run_order_expiry_worker
+from app.automatic_scheduling_worker import run_worker
+from app.routers.clinic_orders import router as clinic_orders_router
+from app.routers.stripe_payment import router as stripe_payments_router
+from app.stripe_event_worker import run_worker as run_stripe_event_worker
+from app.stripe_refund_worker import run_worker as run_stripe_refund_worker
+from app.routers.consultation_billing import router as consultation_billing_router
+from app.routers.owner_billing import router as owner_billing_router
+from app.billing_payment_worker import run_worker as run_billing_payment_worker
+from app.booking_payment_worker import run_worker as run_booking_payment_worker
+from app.booking_refund_worker import run_worker as run_booking_refund_worker
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    stop_event = Event()
+
+    workers = [
+        Thread(
+            target=run_worker,
+            args=(stop_event,),
+            name="automatic-scheduling",
+            daemon=True,
+        ),
+        Thread(
+            target=run_order_expiry_worker,
+            args=(stop_event,),
+            name="shop-order-expiry",
+            daemon=True,
+        ),
+        Thread(
+            target=run_stripe_event_worker,
+            args=(stop_event,),
+            name="stripe-events",
+            daemon=True,
+        ),
+        Thread(
+            target=run_stripe_refund_worker,
+            args=(stop_event,),
+            name="stripe-refunds",
+            daemon=True,
+        ),
+        Thread(
+            target=run_billing_payment_worker,
+            args=(stop_event,),
+            name="billing-payments",
+            daemon=True,
+        ),
+        Thread(
+            target=run_booking_payment_worker,
+            args=(stop_event,),
+            name="booking-payments",
+            daemon=True,
+        ),
+        Thread(
+            target=run_booking_refund_worker,
+            args=(stop_event,),
+            name="booking-refunds",
+            daemon=True,
+        ),
+    ]
+
+    for worker in workers:
+        worker.start()
+
+    try:
+        yield
+    finally:
+        stop_event.set()
+
+        await asyncio.gather(
+            *[
+                asyncio.to_thread(worker.join)
+                for worker in workers
+            ]
+        )
+
+app = FastAPI(
+    title="Veterinary Dental Care System API",
+    version="1.0.0",
+    lifespan=lifespan,
+)
+
+
+app.include_router(auth_router)
+app.include_router(pets_router)
+app.include_router(patients_router)
+app.include_router(owners_router)
+app.include_router(availability_router)
+app.include_router(admins_router)
+app.include_router(staff_router)
+app.include_router(veterinarians_router)
+app.include_router(schedules_router)
+app.include_router(clinics_router)
+app.include_router(admin_registration_router)
+app.include_router(clinic_discovery_router)
+app.include_router(automatic_scheduling_router)
+app.include_router(clinic_customers_router)
+app.include_router(clinic_appointments_router)
+app.include_router(owner_appointments_router)
+app.include_router(emergency_requests_router)
+app.include_router(consultations_router)
+app.include_router(followups_router)
+app.include_router(treatment_progress_router)
+app.include_router(return_visits_router)
+app.include_router(owner_medical_history_router)
+app.include_router(owner_followups_router)
+app.include_router(followup_media_router)
+app.include_router(notifications_router)
+app.include_router(products_router)
+app.include_router(shop_router)
+app.include_router(cart_router)
+app.include_router(checkout_router)
+app.include_router(shop_orders_router)
+app.include_router(clinic_orders_router)
+app.include_router(stripe_payments_router)
+app.include_router(consultation_billing_router)
+app.include_router(owner_billing_router)
+
+
+WEB_DIR = Path(__file__).resolve().parents[2] / "web"
+
+app.mount(
+    "/web",
+    StaticFiles(directory=str(WEB_DIR), html=True),
+    name="web",
+)
+
+
+@app.get("/")
+def root():
+    return {
+        "message": "Veterinary Dental Care System API is running"
+    }
+
+
+@app.get("/health")
+def health_check():
+    return {
+        "status": "healthy"
+    }

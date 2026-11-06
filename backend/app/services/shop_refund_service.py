@@ -106,7 +106,7 @@ def request_my_refund(
         payment = paid[0]
 
         if (
-            payment.payment_method not in {"cash", "online_banking"}
+            payment.payment_method not in {"cash", "online_banking", "card"}
             or payment.payment_date is None
             or payment.amount != order.total_amount
             or payment.amount <= 0

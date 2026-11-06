@@ -615,7 +615,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen>
                   ? 'An online payment attempt is pending. '
                   'Resume it or refresh this bill to check '
                   'whether payment was confirmed.'
-                  : 'Pay online through FPX, or pay cash at the clinic. '
+                  : 'Pay online by card or FPX, or pay cash at the clinic. '
                   'Staff will confirm cash after receiving it.',
               style: const TextStyle(height: 1.5),
             ),
@@ -708,7 +708,11 @@ class _BillDetailsScreenState extends State<BillDetailsScreen>
                   Text(
                     payment['payment_method'] == 'cash'
                         ? 'Cash at clinic'
-                        : 'Online payment',
+                        : payment['payment_method'] == 'card'
+                            ? 'Card'
+                            : payment['payment_status'] == 'pending'
+                                ? 'Online payment (Card or FPX)'
+                                : 'FPX online banking',
                   ),
                   Text('Status: ${_status(payment['payment_status'])}'),
                   if (payment['payment_date'] != null)

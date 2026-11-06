@@ -148,7 +148,7 @@ def review_refund(
                 or payment.payment_status != "paid"
                 or payment.payment_date is None
                 or payment.payment_method
-                not in {"cash", "online_banking"}
+                not in {"cash", "online_banking", "card"}
                 or transaction.transaction_type != "payment"
                 or transaction.transaction_status != "completed"
                 or refund.requested_by != transaction.user_id

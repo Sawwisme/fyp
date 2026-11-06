@@ -19,6 +19,7 @@ from app.services.order_reservation_service import (
     _release_stock,
 )
 from app.services.stripe_gateway import get_stripe_client
+from app.services.stripe_payment_method_service import verified_payment_method
 from app.services.stripe_reservation_service import (
     validate_remote_session,
 )
@@ -76,7 +77,8 @@ def record_paid(
         raise HTTPException(409, "Missing payment reference.")
 
     intent = client.v1.payment_intents.retrieve(
-        intent_id
+        intent_id,
+        params={"expand": ["latest_charge"]},
     ).to_dict()
 
     metadata = intent.get("metadata") or {}
@@ -97,6 +99,8 @@ def record_paid(
             409,
             "Stripe payment verification did not match the order.",
         )
+
+    payment.payment_method = verified_payment_method(intent, payment)
 
     payer_user_id = db.scalar(
         select(PetOwner.user_id)

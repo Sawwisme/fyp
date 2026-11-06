@@ -52,7 +52,7 @@ def get_saved_attempt(context):
         or checkout.appointment_id != appointment.appointment_id
         or payment.appointment_id != appointment.appointment_id
         or payment.payment_purpose != "booking_deposit"
-        or payment.payment_method != "online_banking"
+        or payment.payment_method not in {"online_banking", "card"}
         or payment.order_id is not None
         or payment.consultation_bill_id is not None
         or payment.amount != appointment.booking_deposit_amount

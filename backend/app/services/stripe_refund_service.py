@@ -85,7 +85,7 @@ def _lock_context(db, current_user, order_id, refund_id):
 
     if (
         payment is None
-        or payment.payment_method != "online_banking"
+        or payment.payment_method not in {"online_banking", "card"}
         or payment.payment_date is None
         or transaction.transaction_type != "payment"
         or transaction.transaction_status != "completed"

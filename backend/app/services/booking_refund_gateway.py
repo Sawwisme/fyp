@@ -24,7 +24,7 @@ def resolve_booking_refund(
     refund_cents = refund.refund_amount * 100
 
     if (
-        payment.payment_method != "online_banking"
+        payment.payment_method not in {"online_banking", "card"}
         or payment.payment_purpose != "booking_deposit"
         or payment.order_id is not None
         or payment.consultation_bill_id is not None
