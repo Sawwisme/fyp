@@ -57,6 +57,11 @@ def estimate_severity(
         return {
             "severity": "None",
             "disease_conditions": [],
+            "condition_count": 0,
+            "gradcam_category": "Not applicable",
+            "segmentation_category": "Not applicable",
+            "gingivitis_area_percent": round(float(gingivitis_area_percent), 2),
+            "calculus_area_percent": round(float(calculus_area_percent), 2),
             "max_gradcam_spread_percent": 0.0,
             "segmentation_area_percent": 0.0,
             "reason": "No dental disease condition was detected."

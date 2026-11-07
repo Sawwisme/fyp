@@ -50,6 +50,9 @@ from app.routers.owner_billing import router as owner_billing_router
 from app.billing_payment_worker import run_worker as run_billing_payment_worker
 from app.booking_payment_worker import run_worker as run_booking_payment_worker
 from app.booking_refund_worker import run_worker as run_booking_refund_worker
+from app.routers.dental_images import router as dental_images_router
+from app.routers.dental_assessments import router as dental_assessments_router
+from app.dental_assessment_worker import run_worker as run_dental_assessment_worker
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -96,6 +99,12 @@ async def lifespan(app: FastAPI):
             target=run_booking_refund_worker,
             args=(stop_event,),
             name="booking-refunds",
+            daemon=True,
+        ),
+        Thread(
+            target=run_dental_assessment_worker,
+            args=(stop_event,),
+            name="dental-assessments",
             daemon=True,
         ),
     ]
@@ -157,7 +166,8 @@ app.include_router(clinic_orders_router)
 app.include_router(stripe_payments_router)
 app.include_router(consultation_billing_router)
 app.include_router(owner_billing_router)
-
+app.include_router(dental_images_router)
+app.include_router(dental_assessments_router)
 
 WEB_DIR = Path(__file__).resolve().parents[2] / "web"
 

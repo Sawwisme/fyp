@@ -15,7 +15,8 @@ def save_combined_analysis_summary(
     image_path,
     gradcam_summary_path,
     segmentation_output_path,
-    severity_result
+    severity_result,
+    output_dir=None
 ):
     original = cv2.imread(
         image_path
@@ -214,7 +215,7 @@ def save_combined_analysis_summary(
         os.path.abspath(__file__)
     )
 
-    output_dir = os.path.join(
+    output_dir = output_dir or os.path.join(
         base_dir,
         "models",
         "analysis_outputs"
@@ -258,7 +259,8 @@ def save_combined_analysis_summary(
 # =========================================================
 
 def analyze_dental_image(
-    image_path
+    image_path,
+    output_dir=None
 ):
     """
     Run complete dental image analysis.
@@ -426,7 +428,8 @@ def analyze_dental_image(
                 "segmentation_output"
             ],
 
-            severity_result
+            severity_result,
+            output_dir=output_dir
         )
     )
 

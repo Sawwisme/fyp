@@ -18,6 +18,8 @@ import '../services/notification_service.dart';
 import 'notification_bell.dart';
 import '../services/billing_service.dart';
 import 'bills.dart';
+import '../services/dental_assessment_service.dart';
+import 'ai_scan.dart';
 
 class HomeScreen extends StatefulWidget {
   final Map<String, dynamic> user;
@@ -39,6 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
   static const _green = Color(0xFF2549C7);
 
   late final PetService _petService;
+  late final DentalAssessmentService _dentalAssessmentService;
   late final AppointmentService _appointmentService;
   late final ShopService _shopService;
   late Map<String, dynamic> _user;
@@ -56,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _user = Map<String, dynamic>.from(widget.user);
     _petService = PetService(widget.auth.api);
+    _dentalAssessmentService = DentalAssessmentService(widget.auth.api);
     _appointmentService = AppointmentService(widget.auth.api);
     _shopService = ShopService(widget.auth.api);
     _loadPet();
@@ -472,28 +476,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _comingSoon(IconData icon, String title, String message) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 64, color: _green),
-            const SizedBox(height: 20),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.headlineSmall,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            Text(message, textAlign: TextAlign.center),
-          ],
-        ),
-      ),
-    );
-  }
-
   Future<void> _editProfile() async {
     final result = await Navigator.of(context)
         .push<Map<String, dynamic>>(
@@ -770,11 +752,9 @@ class _HomeScreenState extends State<HomeScreen> {
           petService: _petService,
         );
       case 2:
-        return _comingSoon(
-          Icons.camera_alt_outlined,
-          'AI dental scan',
-          'Upload and review dental images here when scanning '
-              'becomes available.',
+        return AiScanPage(
+          petService: _petService,
+          service: _dentalAssessmentService,
         );
       case 3:
         return ShopScreen(service: _shopService);

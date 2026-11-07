@@ -46,3 +46,4 @@ from app.models.consultation_bill_item import ConsultationBillItem
 from app.models.billing_stripe_session import BillingStripeSession
 from app.models.booking_stripe_session import BookingStripeSession
 from app.models.consultation_bill_deposit import ConsultationBillDeposit
+from app.models.dental_assessment_job import DentalAssessmentJob
