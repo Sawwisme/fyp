@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>VetDental — Staff Login</title>
+
     <link rel="stylesheet" href="/web/styles.css?v=cobalt-components-2">
     <script src="/web/app.js" defer></script>
     <link rel="stylesheet" href="/web/cobalt.css?v=cobalt-components-2">
@@ -14,22 +16,81 @@
 
 <body class="login-page">
     <main class="login-shell">
+
         <aside class="login-visual" aria-labelledby="login-visual-title">
             <a class="login-visual-brand" href="/web/" aria-label="VetDental home">
                 <span class="login-visual-mark" aria-hidden="true">✚</span>
                 <span>VetDental</span>
             </a>
+
             <div class="login-visual-copy">
-                <span class="login-visual-eyebrow">THE CLINIC WORKSPACE</span>
-                <h2 id="login-visual-title">More care.<br><span>Less busywork.</span></h2>
-                <p>A clearer day for your team.<br>Better care for every pet.</p>
+                <span class="login-visual-eyebrow">
+                    THE CLINIC WORKSPACE
+                </span>
+
+                <h2 id="login-visual-title">
+                    More care.<br>
+                    <span>Less busywork.</span>
+                </h2>
+
+                <p>
+                    A clearer day for your team.<br>
+                    Better care for every pet.
+                </p>
+
                 <div class="login-workflow" aria-label="Your connected care workflow">
-                    <div><span class="login-step" aria-hidden="true">01</span><span>Plan the day<small>Appointments &amp; schedules</small></span></div>
-                    <div><span class="login-step" aria-hidden="true">02</span><span>Focus on care<small>Consultations &amp; prescriptions</small></span></div>
-                    <div><span class="login-step" aria-hidden="true">03</span><span>Stay connected<small>Follow-up care &amp; owner updates</small></span></div>
+                    <div>
+                        <span class="login-step" aria-hidden="true">
+                            01
+                        </span>
+
+                        <span>
+                            Plan the day
+
+                            <small>
+                                Appointments
+                                &amp; schedules
+                            </small>
+                        </span>
+                    </div>
+
+                    <div>
+                        <span class="login-step" aria-hidden="true">
+                            02
+                        </span>
+
+                        <span>
+                            Focus on care
+
+                            <small>
+                                Consultations
+                                &amp; prescriptions
+                            </small>
+                        </span>
+                    </div>
+
+                    <div>
+                        <span class="login-step" aria-hidden="true">
+                            03
+                        </span>
+
+                        <span>
+                            Stay connected
+
+                            <small>
+                                Follow-up care
+                                &amp; owner updates
+                            </small>
+                        </span>
+                    </div>
                 </div>
             </div>
-            <div class="login-visual-footer"><span class="login-footer-dot" aria-hidden="true"></span>One workspace. Every step of care.</div>
+
+            <div class="login-visual-footer">
+                <span class="login-footer-dot" aria-hidden="true"></span>
+                One workspace.
+                Every step of care.
+            </div>
         </aside>
 
         <div class="form-panel">
@@ -37,16 +98,23 @@
                 <span class="brand-icon" aria-hidden="true">✚</span>
                 VetDental
             </a>
+
             <section id="login-section">
-                <span class="eyebrow">WELCOME TO VETDENTAL</span>
+                <span class="eyebrow">
+                    WELCOME TO VETDENTAL
+                </span>
+
                 <h1>Welcome back.</h1>
+
                 <p class="subtitle">
                     Sign in to access your clinic workspace.
                 </p>
 
                 <form id="login-form" method="post" action="/auth/login">
                     <fieldset id="role-switch" class="role-switch">
-                        <legend class="sr-only">Staff role</legend>
+                        <legend class="sr-only">
+                            Staff role
+                        </legend>
 
                         <label>
                             <input type="radio" name="staff-role" value="veterinarian" checked>
@@ -59,11 +127,17 @@
                         </label>
                     </fieldset>
 
-                    <label class="field-label" for="email">Email address</label>
+                    <label class="field-label" for="email">
+                        Email address
+                    </label>
+
                     <input id="email" name="email" type="email" autocomplete="username" maxlength="255"
                         placeholder="you@clinic.com" required>
 
-                    <label class="field-label" for="password">Password</label>
+                    <label class="field-label" for="password">
+                        Password
+                    </label>
+
                     <div class="password-field">
                         <input id="password" name="password" type="password" autocomplete="current-password"
                             placeholder="Enter your password" required>
@@ -96,6 +170,7 @@
 
                 <div class="staff-note">
                     <span aria-hidden="true">ⓘ</span>
+
                     <p>
                         Register your clinic to create its first administrator account.
                         Veterinarian accounts are created by your clinic administrator.
@@ -104,9 +179,14 @@
             </section>
 
             <section id="account-section" hidden>
-                <span class="eyebrow">YOUR CLINIC WORKSPACE</span>
+                <span class="eyebrow">
+                    YOUR CLINIC WORKSPACE
+                </span>
+
                 <h1 id="account-name"></h1>
+
                 <p id="account-email" class="subtitle"></p>
+
                 <span id="account-role" class="badge"></span>
 
                 <p>Your clinic account is connected.</p>
@@ -117,14 +197,22 @@
             </section>
 
             <p id="message" class="message" role="status" aria-live="polite"></p>
-            <noscript>Enable JavaScript to use the staff portal.</noscript>
+
+            <noscript>
+                Enable JavaScript to use the staff portal.
+            </noscript>
         </div>
     </main>
 
     <dialog id="reset-dialog" aria-labelledby="reset-title">
         <div class="dialog-heading">
-            <h2 id="reset-title">Reset your password</h2>
-            <button id="close-reset" class="close-button" type="button" aria-label="Close">×</button>
+            <h2 id="reset-title">
+                Reset your password
+            </h2>
+
+            <button id="close-reset" class="close-button" type="button" aria-label="Close">
+                ×
+            </button>
         </div>
 
         <p class="subtitle">
@@ -132,7 +220,10 @@
         </p>
 
         <form id="reset-form" method="post" action="/auth/forgot-password">
-            <label class="field-label" for="reset-email">Email address</label>
+            <label class="field-label" for="reset-email">
+                Email address
+            </label>
+
             <input id="reset-email" name="email" type="email" autocomplete="email" maxlength="255" required>
 
             <button id="reset-button" class="primary" type="submit">

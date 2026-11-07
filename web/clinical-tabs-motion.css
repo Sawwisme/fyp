@@ -1,5 +1,9 @@
 @media screen {
-    .history-tabs-motion { position: relative; isolation: isolate; }
+    .history-tabs-motion {
+        position: relative;
+        isolation: isolate;
+    }
+
     .history-tabs-motion::before {
         content: '';
         position: absolute;
@@ -14,13 +18,28 @@
         pointer-events: none;
         z-index: 0;
     }
+
     .history-tabs-motion.history-tabs-motion-ready::before {
         transition: transform 200ms cubic-bezier(.22, 1, .36, 1), width 200ms cubic-bezier(.22, 1, .36, 1), height 200ms ease;
     }
-    .history-tabs-motion button { position: relative; z-index: 1; transition: color 140ms ease; }
-    .history-tabs-motion button[aria-selected="true"] { background: transparent; color: #fff; box-shadow: none; }
+
+    .history-tabs-motion button {
+        position: relative;
+        z-index: 1;
+        transition: color 140ms ease;
+    }
+
+    .history-tabs-motion button[aria-selected="true"] {
+        background: transparent;
+        color: #fff;
+        box-shadow: none;
+    }
 }
+
 @media (prefers-reduced-motion: reduce) {
+
     .history-tabs-motion.history-tabs-motion-ready::before,
-    .history-tabs-motion button { transition: none; }
+    .history-tabs-motion button {
+        transition: none;
+    }
 }

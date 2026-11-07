@@ -15,66 +15,185 @@
     --border: #d3dce5;
 }
 
-body { background: var(--canvas); color: var(--ink); }
+body {
+    background: var(--canvas);
+    color: var(--ink);
+}
 
 #shared-sidebar {
     background: var(--navy);
     border-right-color: #2c3b50;
     color: #f4f7ff;
 }
-#shared-sidebar .brand { color: #f4f7ff; }
+
+#shared-sidebar .brand {
+    color: #f4f7ff;
+}
+
 #shared-sidebar .brand small,
-#shared-sidebar .nav-item small { color: #b8c5d6; }
-#shared-sidebar .brand-icon { background: var(--lime); color: var(--navy); }
-#shared-sidebar .nav-item { color: #dce5f0; border-radius: 8px; }
+#shared-sidebar .nav-item small {
+    color: #b8c5d6;
+}
+
+#shared-sidebar .brand-icon {
+    background: var(--lime);
+    color: var(--navy);
+}
+
+#shared-sidebar .nav-item {
+    color: #dce5f0;
+    border-radius: 8px;
+}
+
 #shared-sidebar .nav-item.active,
 #shared-sidebar .nav-item:not(:disabled):hover {
     background: var(--cobalt);
     color: #fff;
 }
-#shared-sidebar .nav-item.active { box-shadow: inset 3px 0 var(--lime); }
-#shared-sidebar .nav-item:disabled { opacity: .65; }
-#shared-sidebar .bottom-nav { border-top-color: #344257; }
-#shared-sidebar .logout { color: #ffb4ab; }
-#shared-topbar { background: var(--surface); border-bottom-color: var(--border); }
-.avatar { background: var(--soft-blue); color: var(--cobalt); }
-.main-content h1 { font-weight: 750; letter-spacing: -.9px; }
+
+#shared-sidebar .nav-item.active {
+    box-shadow: inset 3px 0 var(--lime);
+}
+
+#shared-sidebar .nav-item:disabled {
+    opacity: .65;
+}
+
+#shared-sidebar .bottom-nav {
+    border-top-color: #344257;
+}
+
+#shared-sidebar .logout {
+    color: #ffb4ab;
+}
+
+#shared-topbar {
+    background: var(--surface);
+    border-bottom-color: var(--border);
+}
+
+.avatar {
+    background: var(--soft-blue);
+    color: var(--cobalt);
+}
+
+.main-content h1 {
+    font-weight: 750;
+    letter-spacing: -.9px;
+}
+
 .panel {
     border-color: var(--border);
     background: var(--surface);
     border-radius: 12px;
     box-shadow: 0 3px 12px #17233304;
 }
-.summary-card { border-top: 3px solid var(--cobalt); }
-.summary-card .summary-value { color: var(--ink); font-variant-numeric: tabular-nums; }
 
-.primary { background: var(--cobalt); border: 1px solid var(--cobalt); color: #fff; }
-.primary:hover:not(:disabled) { background: var(--cobalt-dark); }
-.secondary { background: #fff; border-color: var(--border); color: var(--cobalt); }
-.secondary:hover:not(:disabled) { background: var(--soft-blue); border-color: var(--cobalt); }
+.summary-card {
+    border-top: 3px solid var(--cobalt);
+}
+
+.summary-card .summary-value {
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+}
+
+.primary {
+    background: var(--cobalt);
+    border: 1px solid var(--cobalt);
+    color: #fff;
+}
+
+.primary:hover:not(:disabled) {
+    background: var(--cobalt-dark);
+}
+
+.secondary {
+    background: #fff;
+    border-color: var(--border);
+    color: var(--cobalt);
+}
+
+.secondary:hover:not(:disabled) {
+    background: var(--soft-blue);
+    border-color: var(--cobalt);
+}
+
 input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),
-select, textarea {
+select,
+textarea {
     background-color: #fbfcfe;
     border-color: var(--border);
     color: var(--ink);
 }
-input[type=checkbox], input[type=radio] { accent-color: var(--cobalt); }
-input:focus-visible, select:focus-visible, textarea:focus-visible,
-button:focus-visible, a:focus-visible { outline: 3px solid #9aaff7; outline-offset: 2px; }
-thead, th { background: #f3f5fa; color: #52647b; }
-td, th { border-color: var(--border); }
 
-.brand-panel { background: var(--navy); border-right-color: var(--navy); color: #f4f7ff; }
-.brand-panel .brand, .brand-panel .brand-eyebrow { color: var(--lime); }
-.brand-panel .brand-description { color: #c5d1e2; }
-.brand-panel .brand-icon { background: var(--lime); color: var(--navy); }
-.role-tab.active, .role-tab[aria-selected=true] { color: var(--cobalt); }
+input[type=checkbox],
+input[type=radio] {
+    accent-color: var(--cobalt);
+}
 
-dialog { border-color: var(--border); border-radius: 14px; }
-dialog::backdrop { background: #101b2e99; }
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+a:focus-visible {
+    outline: 3px solid #9aaff7;
+    outline-offset: 2px;
+}
+
+thead,
+th {
+    background: #f3f5fa;
+    color: #52647b;
+}
+
+td,
+th {
+    border-color: var(--border);
+}
+
+.brand-panel {
+    background: var(--navy);
+    border-right-color: var(--navy);
+    color: #f4f7ff;
+}
+
+.brand-panel .brand,
+.brand-panel .brand-eyebrow {
+    color: var(--lime);
+}
+
+.brand-panel .brand-description {
+    color: #c5d1e2;
+}
+
+.brand-panel .brand-icon {
+    background: var(--lime);
+    color: var(--navy);
+}
+
+.role-tab.active,
+.role-tab[aria-selected=true] {
+    color: var(--cobalt);
+}
+
+dialog {
+    border-color: var(--border);
+    border-radius: 14px;
+}
+
+dialog::backdrop {
+    background: #101b2e99;
+}
 
 /* Physical paper remains white in receipts and prescription previews. */
 @media print {
-    body { background: white; color: black; }
-    .panel { box-shadow: none; }
+    body {
+        background: white;
+        color: black;
+    }
+
+    .panel {
+        box-shadow: none;
+    }
 }

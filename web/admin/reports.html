@@ -17,13 +17,111 @@
     <link rel="stylesheet" href="/web/workspace-polish.css?v=1">
     <script src="/web/sidebar-controls.js?v=2" defer></script>
     <link rel="stylesheet" href="/web/sidebar-motion.css?v=1">
-<link rel="stylesheet" href="/web/reports.css?v=4">
+    <link rel="stylesheet" href="/web/reports.css?v=4">
 </head>
 
-<body class="reports-page" data-report-role="admin"><div  class="workspace"><aside id="shared-sidebar" class="sidebar"></aside><div class="content-area"><header id="shared-topbar" class="topbar"></header><main class="main-content"><div class="report-heading"><div><h1>Reports</h1><p class="subtitle">Choose a report, refine the filters, then print or export.</p></div><div class="report-actions"><button id="report-export" type="button" class="report-button" disabled>Export CSV</button><button id="report-print" type="button" class="report-button report-primary" disabled>Print / Save PDF</button></div></div>
-<section class="report-controls" aria-labelledby="report-controls-title"><div class="report-control-heading"><h2 id="report-controls-title">Report settings</h2><small>All dates use Malaysia time · Maximum 366 days</small></div><form id="report-filters"><div class="report-filter-grid"><div id="report-type-field" class="report-field report-field-wide"><label for="report-type">Report type</label><select id="report-type"><option value="overview">Activity overview</option><option value="appointments">Appointments</option><option value="consultations">Consultations</option><option value="treatments">Treatments</option><option value="prescriptions">Prescriptions</option><option value="followups">Follow-up care</option><option value="collections">Payment collections</option><option value="orders">Shop orders</option></select></div><div class="report-field report-field-wide"><label for="report-title">Report title <span class="muted">(optional)</span></label><input id="report-title" type="text" maxlength="120" placeholder="Use the selected report’s title"></div>
-<div class="report-field"><label for="report-from">From date</label><input id="report-from" type="date" min="1900-01-01" required></div><div class="report-field"><label for="report-to">To date</label><input id="report-to" type="date" min="1900-01-01" required></div><div id="report-status-field" class="report-field" hidden><label for="report-status">Status</label><select id="report-status"><option value="">All statuses</option></select></div><div id="report-vet-field" class="report-field"><label for="report-vet">Veterinarian</label><select id="report-vet"><option value="">All clinic veterinarians</option></select></div><div id="report-method-field" class="report-field" hidden><label for="report-method">Payment method</label><select id="report-method"><option value="">All methods</option><option value="card">Card</option><option value="online_banking">FPX</option><option value="cash">Cash</option></select></div><div id="report-source-field" class="report-field" hidden><label for="report-source">Payment source</label><select id="report-source"><option value="">All sources</option><option value="shop">Shop</option><option value="booking_deposit">Booking deposits</option><option value="consultation_balance">Consultation balances</option></select></div><div id="report-shipping-field" class="report-field" hidden><label for="report-shipping">Fulfilment</label><select id="report-shipping"><option value="">Pickup and delivery</option><option value="pickup">Clinic pickup</option><option value="delivery">Delivery</option></select></div><div id="report-medication-field" class="report-field" hidden><label for="report-medication">Medication name</label><input id="report-medication" type="search" maxlength="100" placeholder="Filter by medication"></div></div>
-<div class="report-filter-footer"><div class="report-shortcuts" role="group" aria-label="Quick date ranges"><button type="button" class="report-button" data-report-period="today">Today</button><button type="button" class="report-button" data-report-period="month">This month</button><button type="button" class="report-button" data-report-period="year">This year</button></div><button type="submit" class="report-button report-primary">Generate report</button></div></form></section>
-<p id="report-message" class="report-message" role="status" aria-live="polite">Loading reports…</p><button id="report-retry" type="button" class="report-button" hidden>Try again</button>
-<p class="report-print-empty">Generate a report before printing.</p><article id="report-results" class="report-document report-results" aria-labelledby="report-document-title" hidden><header class="report-document-header"><p class="report-document-brand">VetDental · Reports</p><p id="report-clinic-name" class="report-clinic-name"></p><h2 id="report-document-title"></h2><p id="report-document-period" class="report-document-meta"></p><p id="report-document-filters" class="report-document-meta"></p><p id="report-document-prepared" class="report-document-meta"></p></header><div id="report-cards" class="report-stats"></div><div id="report-sections" class="report-sections"></div><p id="report-definition" class="report-note"></p></article>
-</main></div></div></body></html>
+<body class="reports-page" data-report-role="admin">
+    <div class="workspace">
+        <aside id="shared-sidebar" class="sidebar"></aside>
+        <div class="content-area">
+            <header id="shared-topbar" class="topbar"></header>
+            <main class="main-content">
+                <div class="report-heading">
+                    <div>
+                        <h1>Reports</h1>
+                        <p class="subtitle">Choose a report, refine the filters, then print or export.</p>
+                    </div>
+                    <div class="report-actions"><button id="report-export" type="button" class="report-button"
+                            disabled>Export CSV</button><button id="report-print" type="button"
+                            class="report-button report-primary" disabled>Print / Save PDF</button></div>
+                </div>
+                <section class="report-controls" aria-labelledby="report-controls-title">
+                    <div class="report-control-heading">
+                        <h2 id="report-controls-title">Report settings</h2><small>All dates use Malaysia time · Maximum
+                            366 days</small>
+                    </div>
+                    <form id="report-filters">
+                        <div class="report-filter-grid">
+                            <div id="report-type-field" class="report-field report-field-wide"><label
+                                    for="report-type">Report type</label><select id="report-type">
+                                    <option value="overview">Activity overview</option>
+                                    <option value="appointments">Appointments</option>
+                                    <option value="consultations">Consultations</option>
+                                    <option value="treatments">Treatments</option>
+                                    <option value="prescriptions">Prescriptions</option>
+                                    <option value="followups">Follow-up care</option>
+                                    <option value="collections">Payment collections</option>
+                                    <option value="orders">Shop orders</option>
+                                </select></div>
+                            <div class="report-field report-field-wide"><label for="report-title">Report title <span
+                                        class="muted">(optional)</span></label><input id="report-title" type="text"
+                                    maxlength="120" placeholder="Use the selected report’s title"></div>
+                            <div class="report-field"><label for="report-from">From date</label><input id="report-from"
+                                    type="date" min="1900-01-01" required></div>
+                            <div class="report-field"><label for="report-to">To date</label><input id="report-to"
+                                    type="date" min="1900-01-01" required></div>
+                            <div id="report-status-field" class="report-field" hidden><label
+                                    for="report-status">Status</label><select id="report-status">
+                                    <option value="">All statuses</option>
+                                </select></div>
+                            <div id="report-vet-field" class="report-field"><label
+                                    for="report-vet">Veterinarian</label><select id="report-vet">
+                                    <option value="">All clinic veterinarians</option>
+                                </select></div>
+                            <div id="report-method-field" class="report-field" hidden><label for="report-method">Payment
+                                    method</label><select id="report-method">
+                                    <option value="">All methods</option>
+                                    <option value="card">Card</option>
+                                    <option value="online_banking">FPX</option>
+                                    <option value="cash">Cash</option>
+                                </select></div>
+                            <div id="report-source-field" class="report-field" hidden><label for="report-source">Payment
+                                    source</label><select id="report-source">
+                                    <option value="">All sources</option>
+                                    <option value="shop">Shop</option>
+                                    <option value="booking_deposit">Booking deposits</option>
+                                    <option value="consultation_balance">Consultation balances</option>
+                                </select></div>
+                            <div id="report-shipping-field" class="report-field" hidden><label
+                                    for="report-shipping">Fulfilment</label><select id="report-shipping">
+                                    <option value="">Pickup and delivery</option>
+                                    <option value="pickup">Clinic pickup</option>
+                                    <option value="delivery">Delivery</option>
+                                </select></div>
+                            <div id="report-medication-field" class="report-field" hidden><label
+                                    for="report-medication">Medication name</label><input id="report-medication"
+                                    type="search" maxlength="100" placeholder="Filter by medication"></div>
+                        </div>
+                        <div class="report-filter-footer">
+                            <div class="report-shortcuts" role="group" aria-label="Quick date ranges"><button
+                                    type="button" class="report-button" data-report-period="today">Today</button><button
+                                    type="button" class="report-button" data-report-period="month">This
+                                    month</button><button type="button" class="report-button"
+                                    data-report-period="year">This year</button></div><button type="submit"
+                                class="report-button report-primary">Generate report</button>
+                        </div>
+                    </form>
+                </section>
+                <p id="report-message" class="report-message" role="status" aria-live="polite">Loading reports…</p>
+                <button id="report-retry" type="button" class="report-button" hidden>Try again</button>
+                <p class="report-print-empty">Generate a report before printing.</p>
+                <article id="report-results" class="report-document report-results"
+                    aria-labelledby="report-document-title" hidden>
+                    <header class="report-document-header">
+                        <p class="report-document-brand">VetDental · Reports</p>
+                        <p id="report-clinic-name" class="report-clinic-name"></p>
+                        <h2 id="report-document-title"></h2>
+                        <p id="report-document-period" class="report-document-meta"></p>
+                        <p id="report-document-filters" class="report-document-meta"></p>
+                        <p id="report-document-prepared" class="report-document-meta"></p>
+                    </header>
+                    <div id="report-cards" class="report-stats"></div>
+                    <div id="report-sections" class="report-sections"></div>
+                    <p id="report-definition" class="report-note"></p>
+                </article>
+            </main>
+        </div>
+    </div>
+</body>
+
+</html>

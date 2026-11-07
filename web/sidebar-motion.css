@@ -1,14 +1,31 @@
 @media screen {
-    body { --shell-motion-duration: 280ms; --shell-motion-easing: cubic-bezier(.22, 1, .36, 1); }
-    #shared-sidebar, #shared-topbar, .workspace { transition: none; }
+    body {
+        --shell-motion-duration: 280ms;
+        --shell-motion-easing: cubic-bezier(.22, 1, .36, 1);
+    }
+
+    #shared-sidebar,
+    #shared-topbar,
+    .workspace {
+        transition: none;
+    }
+
     body.shell-motion-ready #shared-sidebar {
         transition: transform var(--shell-motion-duration) var(--shell-motion-easing), visibility 0s linear 0s;
     }
+
     body.shell-motion-ready.shell-sidebar-closed #shared-sidebar {
         transition: transform var(--shell-motion-duration) var(--shell-motion-easing), visibility 0s linear var(--shell-motion-duration);
     }
-    body.shell-motion-ready .workspace { transition: padding-left var(--shell-motion-duration) var(--shell-motion-easing); }
-    body.shell-motion-ready #shared-topbar { transition: left var(--shell-motion-duration) var(--shell-motion-easing); }
+
+    body.shell-motion-ready .workspace {
+        transition: padding-left var(--shell-motion-duration) var(--shell-motion-easing);
+    }
+
+    body.shell-motion-ready #shared-topbar {
+        transition: left var(--shell-motion-duration) var(--shell-motion-easing);
+    }
+
     #shell-sidebar-toggle {
         width: 36px;
         height: 36px;
@@ -23,24 +40,54 @@
         line-height: 1;
         box-shadow: none;
     }
-    #shell-sidebar-toggle:hover { background: #eef2f8; color: #2549c7; }
-    #shell-sidebar-toggle:focus-visible { outline: 3px solid #9aaff7; outline-offset: 2px; }
-    .shell-title-group { gap: 10px; }
-    .shell-sidebar-backdrop { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    #shell-sidebar-toggle:hover {
+        background: #eef2f8;
+        color: #2549c7;
+    }
+
+    #shell-sidebar-toggle:focus-visible {
+        outline: 3px solid #9aaff7;
+        outline-offset: 2px;
+    }
+
+    .shell-title-group {
+        gap: 10px;
+    }
+
+    .shell-sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
 }
+
 @media screen and (max-width: 760px) {
-    body.shell-motion-ready .workspace, body.shell-motion-ready #shared-topbar { transition: none; }
+
+    body.shell-motion-ready .workspace,
+    body.shell-motion-ready #shared-topbar {
+        transition: none;
+    }
+
     body.shell-motion-ready .shell-sidebar-backdrop {
         transition: opacity var(--shell-motion-duration) ease, visibility 0s linear var(--shell-motion-duration);
     }
+
     body:not(.shell-sidebar-closed) .shell-sidebar-backdrop {
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
         transition-delay: 0s;
     }
-    .shell-sidebar-backdrop:disabled { opacity: 0; cursor: default; }
+
+    .shell-sidebar-backdrop:disabled {
+        opacity: 0;
+        cursor: default;
+    }
 }
+
 @media (prefers-reduced-motion: reduce) {
-    body { --shell-motion-duration: 0ms; }
+    body {
+        --shell-motion-duration: 0ms;
+    }
 }

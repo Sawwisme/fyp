@@ -1,43 +1,134 @@
 /* Consultation editor, finalized records and prescription screen chrome. */
 @media screen {
-    :is(.clinical-consultation-page, .clinical-list-page) .main-content > .page-heading {
+    :is(.clinical-consultation-page, .clinical-list-page) .main-content>.page-heading {
         padding: 24px 26px;
         background: #172333;
         border: 0;
         border-radius: 14px;
         color: #fff;
     }
-    :is(.clinical-consultation-page, .clinical-list-page) .page-heading h1 { color: #fff; font-size: 28px; }
-    :is(.clinical-consultation-page, .clinical-list-page) .page-heading .subtitle { color: #c5d1e2; }
-    .clinical-consultation-page .page-heading a { color: #cbe952; font-size: 12px; }
-    .clinical-consultation-page .panel { padding: 22px; border-color: #d8e0ed; }
-    .clinical-consultation-page .panel > h2,
-    .clinical-consultation-page .panel > .staff-heading > h2 { margin: 0; font-size: 17px; letter-spacing: -.3px; }
-    .clinical-consultation-page .main-content > .panel:has(> #consultation-patient) {
+
+    :is(.clinical-consultation-page, .clinical-list-page) .page-heading h1 {
+        color: #fff;
+        font-size: 28px;
+    }
+
+    :is(.clinical-consultation-page, .clinical-list-page) .page-heading .subtitle {
+        color: #c5d1e2;
+    }
+
+    .clinical-consultation-page .page-heading a {
+        color: #cbe952;
+        font-size: 12px;
+    }
+
+    .clinical-consultation-page .panel {
+        padding: 22px;
+        border-color: #d8e0ed;
+    }
+
+    .clinical-consultation-page .panel>h2,
+    .clinical-consultation-page .panel>.staff-heading>h2 {
+        margin: 0;
+        font-size: 17px;
+        letter-spacing: -.3px;
+    }
+
+    .clinical-consultation-page .main-content>.panel:has(> #consultation-patient) {
         background: #e8edff;
         border: 0;
         border-left: 4px solid #2549c7;
     }
-    #consultation-patient { color: #172333; font-size: 24px; }
-    .clinical-consultation-page #consultation-state { border-radius: 7px; background: #172333; color: #cbe952; font-size: 12px; }
-    .clinical-consultation-page .consultation-patient-details { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 24px; }
-    .clinical-consultation-page .consultation-patient-details > div { min-width: 0; }
-    .clinical-consultation-page .consultation-patient-details dt { color: #57697a; font-size: 11px; }
-    .clinical-consultation-page .consultation-patient-details dd { margin: 5px 0 0; color: #192737; font-size: 14px; font-weight: 550; }
-    .clinical-consultation-page .consultation-appointment { background: #fff; }
-    .clinical-consultation-page .patient-history-panel { padding: 16px 22px; background: #f7f9fd; }
-    .clinical-consultation-page .patient-history-panel > summary { font-size: 14px; color: #2549c7; font-weight: 650; }
-    .clinical-consultation-page .consultation-ai { background: #f6f8fd; border-style: dashed; }
-    .clinical-consultation-page #assessment-picker select { width: 100%; padding: 12px; border: 1px solid #d3dce5; border-radius: 9px; font: inherit; }
-    .clinical-consultation-page #consultation-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; counter-reset: clinical-section; }
-    .clinical-consultation-page #consultation-fields > .panel { margin: 0; min-width: 0; }
-    .clinical-consultation-page #consultation-fields > .clinical-findings,
-    .clinical-consultation-page #consultation-fields > .panel:last-of-type,
-    .clinical-consultation-page #consultation-fields > .staff-actions { grid-column: 1 / -1; }
-    .clinical-consultation-page #consultation-fields > .panel > h2,
-    .clinical-consultation-page #consultation-fields > .panel > .staff-heading > h2 { display: flex; align-items: center; gap: 10px; }
-    .clinical-consultation-page #consultation-fields > .panel > h2::before,
-    .clinical-consultation-page #consultation-fields > .panel > .staff-heading > h2::before {
+
+    #consultation-patient {
+        color: #172333;
+        font-size: 24px;
+    }
+
+    .clinical-consultation-page #consultation-state {
+        border-radius: 7px;
+        background: #172333;
+        color: #cbe952;
+        font-size: 12px;
+    }
+
+    .clinical-consultation-page .consultation-patient-details {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px 24px;
+    }
+
+    .clinical-consultation-page .consultation-patient-details>div {
+        min-width: 0;
+    }
+
+    .clinical-consultation-page .consultation-patient-details dt {
+        color: #57697a;
+        font-size: 11px;
+    }
+
+    .clinical-consultation-page .consultation-patient-details dd {
+        margin: 5px 0 0;
+        color: #192737;
+        font-size: 14px;
+        font-weight: 550;
+    }
+
+    .clinical-consultation-page .consultation-appointment {
+        background: #fff;
+    }
+
+    .clinical-consultation-page .patient-history-panel {
+        padding: 16px 22px;
+        background: #f7f9fd;
+    }
+
+    .clinical-consultation-page .patient-history-panel>summary {
+        font-size: 14px;
+        color: #2549c7;
+        font-weight: 650;
+    }
+
+    .clinical-consultation-page .consultation-ai {
+        background: #f6f8fd;
+        border-style: dashed;
+    }
+
+    .clinical-consultation-page #assessment-picker select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #d3dce5;
+        border-radius: 9px;
+        font: inherit;
+    }
+
+    .clinical-consultation-page #consultation-fields {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+        counter-reset: clinical-section;
+    }
+
+    .clinical-consultation-page #consultation-fields>.panel {
+        margin: 0;
+        min-width: 0;
+    }
+
+    .clinical-consultation-page #consultation-fields>.clinical-findings,
+    .clinical-consultation-page #consultation-fields>.panel:last-of-type,
+    .clinical-consultation-page #consultation-fields>.staff-actions {
+        grid-column: 1 / -1;
+    }
+
+    .clinical-consultation-page #consultation-fields>.panel>h2,
+    .clinical-consultation-page #consultation-fields>.panel>.staff-heading>h2 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .clinical-consultation-page #consultation-fields>.panel>h2::before,
+    .clinical-consultation-page #consultation-fields>.panel>.staff-heading>h2::before {
         counter-increment: clinical-section;
         content: counter(clinical-section, decimal-leading-zero);
         display: inline-grid;
@@ -50,52 +141,225 @@
         font-size: 11px;
         font-weight: 600;
     }
-    .clinical-consultation-page .clinical-findings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; }
-    .clinical-consultation-page .clinical-findings > h2 { grid-column: 1 / -1; margin-bottom: 8px; }
-    .clinical-field { min-width: 0; }
-    .clinical-consultation-page #consultation-form label { font-size: 12px; color: #425570; }
-    .clinical-consultation-page #consultation-form textarea { min-height: 112px; background: #fbfcff; border-radius: 9px; line-height: 1.6; }
-    .clinical-consultation-page #consultation-form .clinical-row { padding: 16px; border-radius: 11px; border: 1px solid #d9e2f3; border-top: 3px solid #2549c7; background: #f7f9fe; }
-    .clinical-consultation-page .clinical-row-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
-    .clinical-consultation-page .clinical-row-grid > div { min-width: 0; }
-    .clinical-consultation-page .clinical-row .staff-actions { margin-top: 14px; padding-top: 12px; border-top: 1px solid #dfe6f1; }
+
+    .clinical-consultation-page .clinical-findings {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0 20px;
+    }
+
+    .clinical-consultation-page .clinical-findings>h2 {
+        grid-column: 1 / -1;
+        margin-bottom: 8px;
+    }
+
+    .clinical-field {
+        min-width: 0;
+    }
+
+    .clinical-consultation-page #consultation-form label {
+        font-size: 12px;
+        color: #425570;
+    }
+
+    .clinical-consultation-page #consultation-form textarea {
+        min-height: 112px;
+        background: #fbfcff;
+        border-radius: 9px;
+        line-height: 1.6;
+    }
+
+    .clinical-consultation-page #consultation-form .clinical-row {
+        padding: 16px;
+        border-radius: 11px;
+        border: 1px solid #d9e2f3;
+        border-top: 3px solid #2549c7;
+        background: #f7f9fe;
+    }
+
+    .clinical-consultation-page .clinical-row-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0 14px;
+    }
+
+    .clinical-consultation-page .clinical-row-grid>div {
+        min-width: 0;
+    }
+
+    .clinical-consultation-page .clinical-row .staff-actions {
+        margin-top: 14px;
+        padding-top: 12px;
+        border-top: 1px solid #dfe6f1;
+    }
+
     #consultation-prescriptions:empty::before,
-    #consultation-treatments:empty::before { display: block; padding: 24px 16px; border: 1px dashed #c8d4ea; border-radius: 10px; background: #f8faff; color: #63738a; font-size: 13px; text-align: center; }
-    #consultation-prescriptions:empty::before { content: 'No medication added. Use Add medication when required.'; }
-    #consultation-treatments:empty::before { content: 'No treatment added. Use Add treatment when required.'; }
-    .clinical-consultation-page #consultation-fields > .staff-actions { margin: 0; padding: 18px 22px; border: 1px solid #d3dce5; border-radius: 12px; background: #fff; }
-    .clinical-consultation-page #complete-consultation { background: #2549c7; border-color: #2549c7; color: #fff; }
-    .clinical-consultation-page .followup-toggle { display: flex !important; align-items: center; justify-content: flex-start; gap: 10px; }
-    .clinical-consultation-page .followup-toggle input { width: 18px; height: 18px; min-height: 0; flex: 0 0 18px; margin: 0; accent-color: #2549c7; }
-    .clinical-consultation-page .consultation-report-panel { border: 1px solid #d3dce5; border-top: 3px solid #2549c7; }
-    .clinical-consultation-page .consultation-record-row { border: 0; border-left: 3px solid #b9c8f7; background: #f3f6fd; border-radius: 0 9px 9px 0; padding: 18px; }
-    .clinical-consultation-page .consultation-report-field h3 { color: #63738a; font-size: 11px; }
-    .clinical-consultation-page .consultation-report-field p { color: #192737; font-size: 14px; }
-    .clinical-list-page .clinical-history-summary > .panel:first-child p { color: #c5d1e2; }
-    .clinical-list-page .clinical-history-summary > .panel:first-child strong { color: #cbe952; }
-    .clinical-list-page #clinical-history-panel > .staff-list-toolbar { grid-template-columns: minmax(180px, 1.6fr) repeat(4, minmax(130px, 1fr)); gap: 14px; }
-    .clinical-list-page .staff-summary > div { min-height: 120px; }
-    .clinical-list-page .staff-table td:first-child { color: #63738a; font-size: 13px; }
-    #prescription-preview { border-color: #d3dce5; box-shadow: 0 28px 100px #101b2e70; }
-    #prescription-preview::backdrop { background: #101b2ebb; }
-    #prescription-preview .rx-preview-header { background: #172333; color: #fff; border-bottom: 0; }
-    #prescription-preview .rx-preview-header h2 { color: #fff; }
-    #prescription-preview .rx-preview-header p { color: #c5d1e2; }
-    #prescription-preview #rx-preview-close { background: #2a3b52; color: #fff; }
-    #prescription-preview .rx-preview-body { background: #e9edf5; padding: 28px; }
-    #prescription-preview .rx-preview-actions { padding: 18px 24px; background: #fff; border-top-color: #d3dce5; }
-    #prescription-preview-content { border-color: #d3dce5; box-shadow: 0 6px 22px #17233315; }
+    #consultation-treatments:empty::before {
+        display: block;
+        padding: 24px 16px;
+        border: 1px dashed #c8d4ea;
+        border-radius: 10px;
+        background: #f8faff;
+        color: #63738a;
+        font-size: 13px;
+        text-align: center;
+    }
+
+    #consultation-prescriptions:empty::before {
+        content: 'No medication added. Use Add medication when required.';
+    }
+
+    #consultation-treatments:empty::before {
+        content: 'No treatment added. Use Add treatment when required.';
+    }
+
+    .clinical-consultation-page #consultation-fields>.staff-actions {
+        margin: 0;
+        padding: 18px 22px;
+        border: 1px solid #d3dce5;
+        border-radius: 12px;
+        background: #fff;
+    }
+
+    .clinical-consultation-page #complete-consultation {
+        background: #2549c7;
+        border-color: #2549c7;
+        color: #fff;
+    }
+
+    .clinical-consultation-page .followup-toggle {
+        display: flex !important;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
+    }
+
+    .clinical-consultation-page .followup-toggle input {
+        width: 18px;
+        height: 18px;
+        min-height: 0;
+        flex: 0 0 18px;
+        margin: 0;
+        accent-color: #2549c7;
+    }
+
+    .clinical-consultation-page .consultation-report-panel {
+        border: 1px solid #d3dce5;
+        border-top: 3px solid #2549c7;
+    }
+
+    .clinical-consultation-page .consultation-record-row {
+        border: 0;
+        border-left: 3px solid #b9c8f7;
+        background: #f3f6fd;
+        border-radius: 0 9px 9px 0;
+        padding: 18px;
+    }
+
+    .clinical-consultation-page .consultation-report-field h3 {
+        color: #63738a;
+        font-size: 11px;
+    }
+
+    .clinical-consultation-page .consultation-report-field p {
+        color: #192737;
+        font-size: 14px;
+    }
+
+    .clinical-list-page .clinical-history-summary>.panel:first-child p {
+        color: #c5d1e2;
+    }
+
+    .clinical-list-page .clinical-history-summary>.panel:first-child strong {
+        color: #cbe952;
+    }
+
+    .clinical-list-page #clinical-history-panel>.staff-list-toolbar {
+        grid-template-columns: minmax(180px, 1.6fr) repeat(4, minmax(130px, 1fr));
+        gap: 14px;
+    }
+
+    .clinical-list-page .staff-summary>div {
+        min-height: 120px;
+    }
+
+    .clinical-list-page .staff-table td:first-child {
+        color: #63738a;
+        font-size: 13px;
+    }
+
+    #prescription-preview {
+        border-color: #d3dce5;
+        box-shadow: 0 28px 100px #101b2e70;
+    }
+
+    #prescription-preview::backdrop {
+        background: #101b2ebb;
+    }
+
+    #prescription-preview .rx-preview-header {
+        background: #172333;
+        color: #fff;
+        border-bottom: 0;
+    }
+
+    #prescription-preview .rx-preview-header h2 {
+        color: #fff;
+    }
+
+    #prescription-preview .rx-preview-header p {
+        color: #c5d1e2;
+    }
+
+    #prescription-preview #rx-preview-close {
+        background: #2a3b52;
+        color: #fff;
+    }
+
+    #prescription-preview .rx-preview-body {
+        background: #e9edf5;
+        padding: 28px;
+    }
+
+    #prescription-preview .rx-preview-actions {
+        padding: 18px 24px;
+        background: #fff;
+        border-top-color: #d3dce5;
+    }
+
+    #prescription-preview-content {
+        border-color: #d3dce5;
+        box-shadow: 0 6px 22px #17233315;
+    }
 }
+
 @media screen and (max-width: 1200px) {
-    .clinical-consultation-page #consultation-fields { grid-template-columns: minmax(0, 1fr); }
-    .clinical-list-page #clinical-history-panel > .staff-list-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .clinical-list-page #clinical-history-panel > .staff-list-toolbar > div:first-child { grid-column: 1 / -1; }
+    .clinical-consultation-page #consultation-fields {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .clinical-list-page #clinical-history-panel>.staff-list-toolbar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .clinical-list-page #clinical-history-panel>.staff-list-toolbar>div:first-child {
+        grid-column: 1 / -1;
+    }
 }
+
 @media screen and (max-width: 700px) {
+
     .clinical-consultation-page .clinical-findings,
     .clinical-consultation-page .clinical-row-grid,
     .clinical-consultation-page .consultation-patient-details,
-    .clinical-list-page #clinical-history-panel > .staff-list-toolbar { grid-template-columns: minmax(0, 1fr); }
-    :is(.clinical-consultation-page, .clinical-list-page) .main-content > .page-heading { padding: 20px; }
-    #prescription-preview .rx-preview-body { padding: 16px; }
+    .clinical-list-page #clinical-history-panel>.staff-list-toolbar {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    :is(.clinical-consultation-page, .clinical-list-page) .main-content>.page-heading {
+        padding: 20px;
+    }
+
+    #prescription-preview .rx-preview-body {
+        padding: 16px;
+    }
 }

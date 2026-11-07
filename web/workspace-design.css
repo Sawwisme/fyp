@@ -1,17 +1,34 @@
 /* Cobalt Pulse workspace components. Loaded after all static page styles. */
-.main-content { color: var(--ink); }
-.main-content > .staff-heading,
-.main-content > .page-heading {
+.main-content {
+    color: var(--ink);
+}
+
+.main-content>.staff-heading,
+.main-content>.page-heading {
     padding-bottom: 20px;
     margin-bottom: 24px;
     border-bottom: 1px solid var(--border);
 }
-.staff-heading h1, .page-heading h1 { font-weight: 750; letter-spacing: -.9px; }
-.staff-heading .subtitle, .page-heading .subtitle { color: var(--muted); }
-.staff-summary { gap: 16px; margin: 22px 0 24px; }
-.staff-summary > div,
+
+.staff-heading h1,
+.page-heading h1 {
+    font-weight: 750;
+    letter-spacing: -.9px;
+}
+
+.staff-heading .subtitle,
+.page-heading .subtitle {
+    color: var(--muted);
+}
+
+.staff-summary {
+    gap: 16px;
+    margin: 22px 0 24px;
+}
+
+.staff-summary>div,
 .appointment-stat,
-.summary-grid > .summary-card {
+.summary-grid>.summary-card {
     min-width: 0;
     padding: 20px;
     border: 1px solid var(--border);
@@ -19,8 +36,9 @@
     background: #fff;
     box-shadow: none;
 }
+
 .staff-summary strong,
-.appointment-stat > strong,
+.appointment-stat>strong,
 .summary-grid .summary-value {
     display: block;
     color: var(--ink);
@@ -30,35 +48,84 @@
     letter-spacing: -.9px;
     font-variant-numeric: tabular-nums;
 }
-.staff-summary span, .appointment-stat > span,
-.appointment-stat > small { color: var(--muted); }
-.staff-summary > div:first-child,
+
+.staff-summary span,
+.appointment-stat>span,
+.appointment-stat>small {
+    color: var(--muted);
+}
+
+.staff-summary>div:first-child,
 .appointment-stat.appointment-stat-overall,
-.summary-grid > .summary-card:first-child {
+.summary-grid>.summary-card:first-child {
     background: var(--navy);
     border-color: var(--navy);
     color: #f4f7ff;
 }
-.staff-summary > div:first-child span,
-.appointment-stat-overall > span,
-.appointment-stat-overall > small,
-.summary-grid > .summary-card:first-child h2,
-.summary-grid > .summary-card:first-child p:not(.summary-value) {
+
+.staff-summary>div:first-child span,
+.appointment-stat-overall>span,
+.appointment-stat-overall>small,
+.summary-grid>.summary-card:first-child h2,
+.summary-grid>.summary-card:first-child p:not(.summary-value) {
     color: #c5d1e2;
 }
-.staff-summary > div:first-child strong,
-.appointment-stat-overall > strong,
-.summary-grid > .summary-card:first-child .summary-value { color: var(--lime); }
 
-.staff-list-toolbar { padding: 16px; background: #f4f6fb; border-radius: 10px; align-items: start; }
-.staff-list-toolbar .field-label { margin-top: 0; }
-.staff-list-toolbar input, .staff-list-toolbar select { background: #fff; border-color: var(--border); min-height: 44px; }
-.staff-table th { padding: 13px 16px; background: #eef2f8; color: #52647b; font-size: 12px; font-weight: 650; }
-.staff-table td { padding: 17px 16px; border-bottom-color: #e5eaf2; vertical-align: middle; }
-.staff-table tbody tr:hover { background: #f8faff; }
-.staff-table tbody tr:last-child td { border-bottom: 0; }
-#staff-workspace #vet-form-panel { border-top: 4px solid var(--cobalt); margin-bottom: 22px; }
-#staff-workspace #open-vet-form { min-height: 44px; padding: 11px 20px; }
+.staff-summary>div:first-child strong,
+.appointment-stat-overall>strong,
+.summary-grid>.summary-card:first-child .summary-value {
+    color: var(--lime);
+}
+
+.staff-list-toolbar {
+    padding: 16px;
+    background: #f4f6fb;
+    border-radius: 10px;
+    align-items: start;
+}
+
+.staff-list-toolbar .field-label {
+    margin-top: 0;
+}
+
+.staff-list-toolbar input,
+.staff-list-toolbar select {
+    background: #fff;
+    border-color: var(--border);
+    min-height: 44px;
+}
+
+.staff-table th {
+    padding: 13px 16px;
+    background: #eef2f8;
+    color: #52647b;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.staff-table td {
+    padding: 17px 16px;
+    border-bottom-color: #e5eaf2;
+    vertical-align: middle;
+}
+
+.staff-table tbody tr:hover {
+    background: #f8faff;
+}
+
+.staff-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+#staff-workspace #vet-form-panel {
+    border-top: 4px solid var(--cobalt);
+    margin-bottom: 22px;
+}
+
+#staff-workspace #open-vet-form {
+    min-height: 44px;
+    padding: 11px 20px;
+}
 
 /* A compact size alone must not leave an action with native browser chrome. */
 :where(.main-content, dialog) .compact-button:not(.primary):not(.secondary):not(.danger):not(.text-button) {
@@ -72,35 +139,68 @@
     font-size: 13px;
     font-weight: 650;
 }
+
 :where(.main-content, dialog) :is(.primary, .secondary) {
     border-radius: 8px;
     min-height: 40px;
     font-size: 13px;
     line-height: 1.4;
 }
+
 :where(.main-content, dialog) .primary {
     background: #2549c7;
     border-color: #2549c7;
     color: #fff;
 }
-:where(.main-content, dialog) .secondary { background: #fff; color: #2549c7; border-color: #d3dce5; }
-:where(.main-content, dialog) .secondary:hover:not(:disabled) { background: #e8edff; border-color: #9aaff7; }
-:where(.main-content, dialog) button:disabled { opacity: .45; cursor: not-allowed; }
+
+:where(.main-content, dialog) .secondary {
+    background: #fff;
+    color: #2549c7;
+    border-color: #d3dce5;
+}
+
+:where(.main-content, dialog) .secondary:hover:not(:disabled) {
+    background: #e8edff;
+    border-color: #9aaff7;
+}
+
+:where(.main-content, dialog) button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
 :where(.main-content, dialog) :is(.staff-actions, .dialog-actions, .absence-actions, .treatment-progress-actions) {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     align-items: center;
 }
+
 /* This dialog confirms cancellation, so it retains a destructive action colour. */
 #followup-action-submit {
     background: #b42318;
     border: 1px solid #b42318;
     color: #fff;
 }
-#absence-submit { background: #2549c7; border-color: #2549c7; color: #fff; }
-dialog .dialog-heading { padding-bottom: 14px; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
-dialog .dialog-heading h2 { color: var(--ink); font-size: 19px; letter-spacing: -.4px; }
+
+#absence-submit {
+    background: #2549c7;
+    border-color: #2549c7;
+    color: #fff;
+}
+
+dialog .dialog-heading {
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 18px;
+}
+
+dialog .dialog-heading h2 {
+    color: var(--ink);
+    font-size: 19px;
+    letter-spacing: -.4px;
+}
+
 dialog :is(.close-button, #absence-close, #treatment-progress-close, #followup-action-close) {
     display: inline-grid;
     place-items: center;
@@ -113,29 +213,112 @@ dialog :is(.close-button, #absence-close, #treatment-progress-close, #followup-a
     border-radius: 9px;
     color: #52647b;
 }
-dialog textarea { padding: 12px 14px; border-radius: 9px; border: 1px solid var(--border); background: #fbfcff; color: var(--ink); font: inherit; }
 
-.schedule-tabs { gap: 6px; padding: 5px; border: 1px solid var(--border); border-radius: 10px; width: fit-content; max-width: 100%; flex-wrap: wrap; background: #fff; }
-.schedule-tabs button { border: 0; border-radius: 7px; padding: 10px 16px; font-size: 13px; }
-.schedule-tabs button[aria-selected="true"] { background: var(--navy); color: #fff; box-shadow: inset 0 -3px var(--lime); }
-.schedule-entry { background: #f8faff; border-color: var(--border); }
-.calendar-vet, .vet-timeline-card { background: #eef2ff; border-left-color: var(--cobalt); }
-.calendar-vet:hover { background: #e1e8ff; }
-.calendar-day:not(.selected-day) { border-color: #dce3ee; }
-.calendar-weekday { color: #52647b; background: #eef2f8; }
-.calendar-navigation { margin-bottom: 14px; }
-.followup-more-trigger { color: #2549c7; background: #f3f6ff; border-color: #d3dce5; }
-.followup-more-options { border-color: #d3dce5; box-shadow: 0 12px 32px #1723331a; }
+dialog textarea {
+    padding: 12px 14px;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+    background: #fbfcff;
+    color: var(--ink);
+    font: inherit;
+}
+
+.schedule-tabs {
+    gap: 6px;
+    padding: 5px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    width: fit-content;
+    max-width: 100%;
+    flex-wrap: wrap;
+    background: #fff;
+}
+
+.schedule-tabs button {
+    border: 0;
+    border-radius: 7px;
+    padding: 10px 16px;
+    font-size: 13px;
+}
+
+.schedule-tabs button[aria-selected="true"] {
+    background: var(--navy);
+    color: #fff;
+    box-shadow: inset 0 -3px var(--lime);
+}
+
+.schedule-entry {
+    background: #f8faff;
+    border-color: var(--border);
+}
+
+.calendar-vet,
+.vet-timeline-card {
+    background: #eef2ff;
+    border-left-color: var(--cobalt);
+}
+
+.calendar-vet:hover {
+    background: #e1e8ff;
+}
+
+.calendar-day:not(.selected-day) {
+    border-color: #dce3ee;
+}
+
+.calendar-weekday {
+    color: #52647b;
+    background: #eef2f8;
+}
+
+.calendar-navigation {
+    margin-bottom: 14px;
+}
+
+.followup-more-trigger {
+    color: #2549c7;
+    background: #f3f6ff;
+    border-color: #d3dce5;
+}
+
+.followup-more-options {
+    border-color: #d3dce5;
+    box-shadow: 0 12px 32px #1723331a;
+}
 
 @media (max-width: 760px) {
-    .staff-summary { grid-template-columns: 1fr; gap: 10px; }
-    .staff-list-toolbar { padding: 12px; }
-    .staff-table th, .staff-table td { padding: 12px; }
-    .staff-heading { align-items: flex-start; }
+    .staff-summary {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .staff-list-toolbar {
+        padding: 12px;
+    }
+
+    .staff-table th,
+    .staff-table td {
+        padding: 12px;
+    }
+
+    .staff-heading {
+        align-items: flex-start;
+    }
 }
+
 @media print {
-    .staff-summary > div:first-child, .appointment-stat.appointment-stat-overall,
-    .summary-grid > .summary-card:first-child { background: #fff; color: #000; border-color: #ccc; }
-    .staff-summary > div:first-child strong, .appointment-stat-overall > strong,
-    .summary-grid > .summary-card:first-child .summary-value { color: #000; }
+
+    .staff-summary>div:first-child,
+    .appointment-stat.appointment-stat-overall,
+    .summary-grid>.summary-card:first-child {
+        background: #fff;
+        color: #000;
+        border-color: #ccc;
+    }
+
+    .staff-summary>div:first-child strong,
+    .appointment-stat-overall>strong,
+    .summary-grid>.summary-card:first-child .summary-value {
+        color: #000;
+    }
 }
