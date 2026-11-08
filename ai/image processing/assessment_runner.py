@@ -13,8 +13,12 @@ import shutil
 import sys
 from uuid import uuid4
 
-MODEL_FILES = ('dental_image_validator.keras', 'dental_classifier.keras',
-               'dental_segmentation_unet.keras')
+MODEL_FILES = (
+    "dental_image_validator.keras",
+    "dental_classifier.keras",
+    "dental_segmentation_mobilenet_unet.keras",
+)
+
 DEPENDENCIES = ('tensorflow', 'cv2', 'numpy', 'matplotlib')
 BASE_DIR = Path(__file__).resolve().parent
 

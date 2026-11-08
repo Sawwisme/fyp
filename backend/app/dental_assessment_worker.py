@@ -42,7 +42,7 @@ RESULT_DIRECTORY = (
 )
 
 CONDITIONS = ("healthy", "plaque", "gingivitis", "calculus")
-MODEL_VERSION = "dental-pipeline-v1"
+MODEL_VERSION = "dental-pipeline-v2-mobilenet-seg"
 
 PROCESS_TIMEOUT = 240
 LEASE_SECONDS = 360

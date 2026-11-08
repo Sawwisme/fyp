@@ -16,7 +16,7 @@ BASE_DIR = os.path.dirname(
 MODEL_PATH = os.path.join(
     BASE_DIR,
     "models",
-    "dental_segmentation_unet.keras"
+    "dental_segmentation_mobilenet_unet.keras"
 )
 
 IMAGE_SIZE = (256, 256)
@@ -51,48 +51,29 @@ print("Segmentation model loaded successfully.")
 # Load image
 # =========================================================
 
-def load_segmentation_image(
-    image_path
-):
-    image = cv2.imread(
-        image_path
+def load_segmentation_image(image_path):
+    original_image = cv2.imread(str(image_path))
+
+    if original_image is None:
+        raise ValueError(f"Unable to read image: {image_path}")
+
+    image = tf.io.decode_image(
+        tf.io.read_file(str(image_path)),
+        channels=3,
+        expand_animations=False,
     )
 
-    if image is None:
-        raise ValueError(
-            f"Unable to read image: {image_path}"
-        )
+    image = tf.image.resize(image, IMAGE_SIZE)
+    image = tf.cast(image, tf.float32)
 
-    original_image = image.copy()
-
-    image_rgb = cv2.cvtColor(
-        image,
-        cv2.COLOR_BGR2RGB
+    # MobileNetV2 expects [-1, 1].
+    image = tf.keras.applications.mobilenet_v2.preprocess_input(
+        image
     )
 
-    resized_image = cv2.resize(
-        image_rgb,
-        IMAGE_SIZE
-    )
+    input_image = image[None, ...].numpy()
 
-    resized_image = (
-        resized_image.astype(
-            np.float32
-        )
-        / 255.0
-    )
-
-    input_image = np.expand_dims(
-        resized_image,
-        axis=0
-    )
-
-    return (
-        original_image,
-        input_image
-    )
-
-
+    return original_image, input_image
 # =========================================================
 # Predict segmentation
 # =========================================================
