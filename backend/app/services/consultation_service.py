@@ -64,9 +64,52 @@ def _details_statement(veterinarian):
             selectinload(Consultation.appointment)
             .selectinload(Appointment.followup_task),
             selectinload(Consultation.clinic),
+            selectinload(Consultation.appointment)
+            .selectinload(Appointment.assessment_review)
+            .selectinload(AIAssessmentReview.reviewed_by)
+            .selectinload(Veterinarian.user),
+            selectinload(Consultation.appointment)
+            .selectinload(Appointment.assessment_review)
+            .selectinload(AIAssessmentReview.analysis)
+            .selectinload(AIAnalysisResult.dental_image),
         )
         .execution_options(populate_existing=True)
     )
+
+def _booking_ai_review(record):
+    review = record.appointment.assessment_review
+
+    if review is None:
+        return None
+
+    # Do not expose a review from a different pet or clinic.
+    if (
+        review.status != "reviewed"
+        or review.clinic_id != record.clinic_id
+        or review.analysis.dental_image.pet_id != record.pet_id
+    ):
+        return None
+
+    reviewed_at = review.reviewed_at
+
+    if reviewed_at is not None and reviewed_at.tzinfo is None:
+        reviewed_at = reviewed_at.replace(tzinfo=timezone.utc)
+
+    reviewer = review.reviewed_by
+
+    return {
+        "review_id": review.review_id,
+        "analysis_id": review.analysis_id,
+        "reviewed_severity": review.reviewed_severity,
+        "recommended_action": review.recommended_action,
+        "feedback": review.feedback,
+        "reviewed_by_name": (
+            reviewer.user.full_name
+            if reviewer is not None
+            else None
+        ),
+        "reviewed_at": reviewed_at,
+    }
 
 
 def _serialize(record):
@@ -140,6 +183,7 @@ def _serialize(record):
         "patient": record.pet,
         "ai_analysis_id": record.ai_analysis_id,
         "ai_assessment": record.ai_analysis,
+        "booking_ai_review": _booking_ai_review(record),
 
         "appointment": {
             "appointment_id": appointment.appointment_id,

@@ -727,6 +727,76 @@
         }
     }
 
+    function renderBookingAIReview(review) {
+        const section = get('booking-ai-review');
+        const root = get('booking-ai-review-details');
+
+        root.replaceChildren();
+        section.hidden = !review;
+
+        if (!review) return;
+
+        const severityLabels = {
+            none: 'No concern identified from the image',
+            mild: 'Mild',
+            moderate: 'Moderate',
+            severe: 'Severe',
+            unable_to_assess: 'Unable to assess from the image',
+        };
+
+        const actionLabels = {
+            routine_booking: 'Routine appointment',
+            prompt_clinic_assessment: 'Prompt clinic assessment',
+            home_care: 'Home-care guidance',
+            unable_to_assess: 'Unable to advise from the image',
+        };
+
+        const fields = [
+            ['Original assessment', `#${review.analysis_id}`],
+            [
+                'Reviewed by',
+                review.reviewed_by_name || 'Not recorded',
+            ],
+            ['Review date', assessmentDate(review.reviewed_at)],
+            [
+                'Reviewed severity',
+                severityLabels[review.reviewed_severity]
+                || review.reviewed_severity,
+            ],
+            [
+                'Recommended action',
+                actionLabels[review.recommended_action]
+                || review.recommended_action,
+            ],
+            ['Feedback for owner', review.feedback],
+        ];
+
+        for (const [label, value] of fields) {
+            const paragraph = document.createElement('p');
+            const heading = document.createElement('strong');
+
+            heading.textContent = `${label}: `;
+            paragraph.style.whiteSpace = 'pre-wrap';
+            paragraph.style.overflowWrap = 'anywhere';
+
+            paragraph.append(
+                heading,
+                document.createTextNode(value || 'Not recorded')
+            );
+
+            root.appendChild(paragraph);
+        }
+
+        const link = document.createElement('a');
+
+        link.href =
+            '/web/vet/ai_assessments.html?review=' +
+            review.review_id;
+
+        link.textContent = 'Open original assessment review';
+        root.appendChild(link);
+    }
+
     function render(data) {
         record = data;
         renderPrescriptionPrint(data);
@@ -743,6 +813,7 @@
         get('assessment-retry').hidden = true;
 
         showAssessment(data.ai_assessment);
+        renderBookingAIReview(data.booking_ai_review);
 
         if (data.status === 'draft') {
             loadAssessments();

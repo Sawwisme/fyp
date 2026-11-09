@@ -220,6 +220,15 @@ class PrescriptionHeader(BaseModel):
     veterinarian_name: str
     registration_number: str
 
+class ConsultationBookingAIReview(BaseModel):
+    review_id: int
+    analysis_id: int
+    reviewed_severity: str
+    recommended_action: str
+    feedback: str
+    reviewed_by_name: str | None
+    reviewed_at: datetime
+
 class ConsultationResponse(BaseModel):
     consultation_id: int
     appointment_id: int
@@ -250,6 +259,7 @@ class ConsultationResponse(BaseModel):
 
     ai_analysis_id: int | None
     ai_assessment: ConsultationAssessment | None
+    booking_ai_review: ConsultationBookingAIReview | None = None
 
     appointment: ConsultationAppointment
     followup_required: bool

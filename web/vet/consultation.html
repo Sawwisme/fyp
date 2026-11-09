@@ -44,19 +44,22 @@
             <header id="shared-topbar" class="topbar"></header>
 
             <main class="main-content">
-                <div class="clinical-page-header"><div class="page-heading">
-                    <h1>Consultation</h1>
-                    <p class="subtitle">
-                        Record findings, treatments and prescriptions.
-                    </p>
-                    <a href="/web/vet/appointments.html">
-                        Back to appointments
-                    </a>
-                </div><div class="staff-actions">
-                    <button id="print-prescription" type="button" class="secondary compact-button" hidden>
-                        Print Prescription
-                    </button>
-                </div></div>
+                <div class="clinical-page-header">
+                    <div class="page-heading">
+                        <h1>Consultation</h1>
+                        <p class="subtitle">
+                            Record findings, treatments and prescriptions.
+                        </p>
+                        <a href="/web/vet/appointments.html">
+                            Back to appointments
+                        </a>
+                    </div>
+                    <div class="staff-actions">
+                        <button id="print-prescription" type="button" class="secondary compact-button" hidden>
+                            Print Prescription
+                        </button>
+                    </div>
+                </div>
 
                 <section class="panel">
                     <h2 id="consultation-patient">Patient information</h2>
@@ -132,6 +135,18 @@
                     <div id="assessment-result"></div>
                 </section>
 
+                <section id="booking-ai-review" class="panel consultation-ai" hidden>
+                    <h2>Vet review linked to this booking</h2>
+
+                    <p class="muted">
+                        This is the earlier photo review that led to the booking.
+                        Record your findings and final diagnosis separately
+                        in this consultation.
+                    </p>
+
+                    <div id="booking-ai-review-details"></div>
+                </section>
+
                 <div id="consultation-readview" hidden></div>
 
                 <form id="consultation-form">
@@ -140,24 +155,28 @@
                             <h2>Clinical information</h2>
 
                             <div class="clinical-field"><label for="consultation-information">
-                                Presenting complaint and history
-                            </label>
-                            <textarea id="consultation-information" rows="4" maxlength="10000"></textarea></div>
+                                    Presenting complaint and history
+                                </label>
+                                <textarea id="consultation-information" rows="4" maxlength="10000"></textarea>
+                            </div>
 
                             <div class="clinical-field"><label for="examination-findings">
-                                Examination findings
-                            </label>
-                            <textarea id="examination-findings" rows="4" maxlength="10000"></textarea></div>
+                                    Examination findings
+                                </label>
+                                <textarea id="examination-findings" rows="4" maxlength="10000"></textarea>
+                            </div>
 
                             <div class="clinical-field"><label for="consultation-diagnosis">
-                                Diagnosis
-                            </label>
-                            <textarea id="consultation-diagnosis" rows="3" maxlength="10000"></textarea></div>
+                                    Diagnosis
+                                </label>
+                                <textarea id="consultation-diagnosis" rows="3" maxlength="10000"></textarea>
+                            </div>
 
                             <div class="clinical-field"><label for="consultation-notes">
-                                Additional notes
-                            </label>
-                            <textarea id="consultation-notes" rows="3" maxlength="10000"></textarea></div>
+                                    Additional notes
+                                </label>
+                                <textarea id="consultation-notes" rows="3" maxlength="10000"></textarea>
+                            </div>
                         </section>
 
                         <section class="panel">
