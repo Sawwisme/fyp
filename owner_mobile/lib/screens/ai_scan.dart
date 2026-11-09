@@ -8,6 +8,9 @@ import '../services/api_client.dart';
 import '../services/dental_assessment_service.dart';
 import '../services/pet_service.dart';
 
+import '../services/ai_assessment_review_service.dart';
+import 'ai_assessment_reviews.dart';
+
 class AiScanPage extends StatefulWidget {
   final PetService petService;
   final DentalAssessmentService service;
@@ -492,6 +495,17 @@ class _AiScanPageState extends State<AiScanPage>
     );
   }
 
+  Future<void> _openVetReviews({int? analysisId}) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => AIAssessmentReviewsScreen(
+          service: AIAssessmentReviewService(widget.service.api),
+          analysisId: analysisId,
+        ),
+      ),
+    );
+  }
+
   Widget _assessmentStatus() {
     final status = _job?['status'];
     final result = _job?['result'];
@@ -535,6 +549,17 @@ class _AiScanPageState extends State<AiScanPage>
             const SizedBox(height: 8),
             Text(severity['reason']?.toString() ?? ''),
             const SizedBox(height: 20),
+          ],
+
+          if (_job?['analysis_id'] is int) ...[
+            FilledButton.icon(
+              onPressed: () => _openVetReviews(
+                analysisId: _job!['analysis_id'] as int,
+              ),
+              icon: const Icon(Icons.medical_services_outlined),
+              label: const Text('Request vet review'),
+            ),
+            const SizedBox(height: 16),
           ],
 
           _resultImage('heatmap', 'Model attention'),
@@ -723,6 +748,13 @@ class _AiScanPageState extends State<AiScanPage>
           label: Text(
             _busy ? 'Please wait…' : 'Start assessment',
           ),
+        ),
+
+        const SizedBox(height: 12),
+        OutlinedButton.icon(
+          onPressed: _locked ? null : () => _openVetReviews(),
+          icon: const Icon(Icons.mark_chat_read_outlined),
+          label: const Text('My vet reviews & feedback'),
         ),
 
         _assessmentStatus(),

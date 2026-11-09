@@ -46,6 +46,12 @@ class OwnerAppointmentCreate(BaseModel):
         decimal_places=2,
     )
 
+    ai_assessment_review_id: int | None = Field(
+        default=None,
+        ge=1,
+        le=2147483647,
+    )
+
 
 class OwnerAppointmentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -59,6 +65,7 @@ class OwnerAppointmentResponse(BaseModel):
     status: str
     booking_deposit_amount: Decimal
     payment_expires_at: datetime | None
+    ai_assessment_review_id: int | None = None
 
     @field_validator("payment_expires_at")
     @classmethod

@@ -73,6 +73,7 @@ class AppointmentService {
     required int timeSlotId,
     required String appointmentType,
     int? followupCareId,
+    int? aiAssessmentReviewId,
     String? bookingRequestId,
     int? expectedPaymentVersion,
     String? expectedDepositAmount,
@@ -85,6 +86,10 @@ class AppointmentService {
 
     if (followupCareId != null) {
       body['followup_care_id'] = followupCareId;
+    }
+
+    if (aiAssessmentReviewId != null) {
+      body['ai_assessment_review_id'] = aiAssessmentReviewId;
     }
 
     if (bookingRequestId != null) {
@@ -111,6 +116,14 @@ class AppointmentService {
         data['status'] is! String) {
       throw const ApiException(
         'Could not confirm the booking response. '
+            'Check the existing booking before trying again.',
+      );
+    }
+
+    if (aiAssessmentReviewId != null &&
+        data['ai_assessment_review_id'] != aiAssessmentReviewId) {
+      throw const ApiException(
+        'The booking response did not confirm the assessment link. '
             'Check the existing booking before trying again.',
       );
     }

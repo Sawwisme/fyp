@@ -113,9 +113,11 @@ function buildVetLayout() {
                 Appointments
             </a>
 
-            <button class="nav-item" type="button" disabled>
-                AI Assessments <small>Coming soon</small>
-            </button>
+            <a class="nav-item" href="/web/vet/ai_assessments.html"
+            data-vet-page="ai-assessments">
+                AI Assessments
+            </a>
+
             <a class="nav-item" href="/web/vet/patients.html" data-vet-page="patients">Patients</a>
 
             <a class="nav-item" href="/web/vet/consultations.html"
@@ -148,23 +150,25 @@ function buildVetLayout() {
 
     const pathname = window.location.pathname;
 
-    const currentVetPage = window.location.pathname.endsWith('/reports.html') ? 'reports' :
-        pathname.endsWith('/patients.html') ? 'patients' : pathname.endsWith('/profile.html')
-            ? 'profile'
-            : pathname.endsWith('/schedules.html')
-                ? 'schedules'
-                : pathname.endsWith('/appointments.html')
-                    ? 'appointments'
-                    : pathname.endsWith('/followups.html')
-                        ? 'followups'
-                        : pathname.endsWith('/clinical_history.html')
-                            ? 'clinical-history'
-                            : (
-                                pathname.endsWith('/consultations.html') ||
-                                pathname.endsWith('/consultation.html')
-                            )
-                                ? 'consultations'
-                                : 'dashboard';
+    const currentVetPage =
+        pathname.endsWith('/ai_assessments.html') ? 'ai-assessments' :
+            pathname.endsWith('/reports.html') ? 'reports' :
+                pathname.endsWith('/patients.html') ? 'patients' : pathname.endsWith('/profile.html')
+                    ? 'profile'
+                    : pathname.endsWith('/schedules.html')
+                        ? 'schedules'
+                        : pathname.endsWith('/appointments.html')
+                            ? 'appointments'
+                            : pathname.endsWith('/followups.html')
+                                ? 'followups'
+                                : pathname.endsWith('/clinical_history.html')
+                                    ? 'clinical-history'
+                                    : (
+                                        pathname.endsWith('/consultations.html') ||
+                                        pathname.endsWith('/consultation.html')
+                                    )
+                                        ? 'consultations'
+                                        : 'dashboard';
 
     document.querySelectorAll('[data-vet-page]').forEach(link => {
         const active = link.dataset.vetPage === currentVetPage;

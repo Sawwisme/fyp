@@ -5,6 +5,8 @@ import '../services/notification_service.dart';
 import 'shop_order_details.dart';
 import '../services/billing_service.dart';
 import 'bill_details.dart';
+import '../services/ai_assessment_review_service.dart';
+import 'ai_assessment_reviews.dart';
 
 class OwnerNotificationsScreen extends StatefulWidget {
   final NotificationService service;
@@ -173,8 +175,39 @@ class _OwnerNotificationsScreenState
     }
   }
 
+  Future<void> _openAIReview(Map<String, dynamic> item) async {
+    if (_busy) return;
+
+    final reviewId = item['resource_id'];
+
+    if (item['resource_type'] != 'ai_assessment_review' ||
+        reviewId is! int ||
+        reviewId < 1 ||
+        reviewId > 2147483647) {
+      return;
+    }
+
+    await _markRead(item);
+    if (!mounted) return;
+
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => AIAssessmentReviewsScreen(
+          service: AIAssessmentReviewService(widget.service.api),
+          reviewId: reviewId,
+        ),
+      ),
+    );
+
+    if (mounted) {
+      await _load(_page);
+    }
+  }
+
   Widget _card(Map<String, dynamic> item) {
     final unread = item['read_at'] == null;
+    final aiReview =
+        item['resource_type'] == 'ai_assessment_review';
     final shopOrder = item['resource_type'] == 'shop_order';
     final consultationBill =
         item['resource_type'] == 'consultation_bill';
@@ -234,12 +267,19 @@ class _OwnerNotificationsScreenState
               fontSize: 12,
             ),
           ),
-          if (shopOrder || consultationBill || unread) ...[
+          if (shopOrder || consultationBill || aiReview || unread) ...[
             const SizedBox(height: 12),
             Wrap(
               spacing: 10,
               runSpacing: 8,
               children: [
+                if (aiReview)
+                  OutlinedButton(
+                    onPressed: _busy
+                        ? null
+                        : () => _openAIReview(item),
+                    child: const Text('View vet feedback'),
+                  ),
                 if (shopOrder)
                   OutlinedButton(
                     onPressed: _busy

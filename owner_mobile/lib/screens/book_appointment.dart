@@ -13,7 +13,8 @@ class BookAppointmentScreen extends StatefulWidget {
   final AppointmentService service;
   final PetService petService;
   final Map<String, dynamic>? followupContext;
-
+  final int? initialPetId;
+  final int? aiAssessmentReviewId;
 
   const BookAppointmentScreen({
     super.key,
@@ -21,6 +22,8 @@ class BookAppointmentScreen extends StatefulWidget {
     required this.service,
     required this.petService,
     this.followupContext,
+    this.initialPetId,
+    this.aiAssessmentReviewId,
   });
 
   @override
@@ -54,6 +57,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   void initState() {
     super.initState();
     _date = _today();
+    _petId = widget.initialPetId;
     _loadOptions();
   }
 
@@ -400,6 +404,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
         'pet_id': _petId!,
         'time_slot_id': _slotId!,
         'appointment_type': _type,
+        'ai_assessment_review_id': widget.aiAssessmentReviewId,
         'followup_care_id':
         widget.followupContext?['followup_care_id'],
         'booking_request_id': _newBookingRequestId(),
@@ -445,6 +450,8 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
         petId: request['pet_id'] as int,
         timeSlotId: request['time_slot_id'] as int,
         appointmentType: request['appointment_type'] as String,
+        aiAssessmentReviewId:
+        request['ai_assessment_review_id'] as int?,
         followupCareId: request['followup_care_id'] as int?,
         bookingRequestId: request['booking_request_id'] as String,
         expectedPaymentVersion:
@@ -578,6 +585,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
             );
           }).toList(),
           onChanged: widget.followupContext != null ||
+              widget.aiAssessmentReviewId != null ||
               _saving ||
               _uncertainBooking
               ? null

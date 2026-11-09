@@ -84,6 +84,7 @@ def prepare_booking_request(db, owner, clinic, data):
             Appointment.booking_request_id == request_id,
         )
         .execution_options(populate_existing=True)
+        .with_for_update()
     )
 
     if existing is not None:
@@ -93,6 +94,8 @@ def prepare_booking_request(db, owner, clinic, data):
             or existing.time_slot_id != data.time_slot_id
             or existing.appointment_type != data.appointment_type
             or existing.followup_care_id != data.followup_care_id
+            or existing.ai_assessment_review_id
+            != data.ai_assessment_review_id
             or existing.booking_deposit_amount
             != data.expected_deposit_amount
         ):

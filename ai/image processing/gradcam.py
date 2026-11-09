@@ -4,6 +4,11 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
+class ImageValidationError(ValueError):
+    def __init__(self, stage, message):
+        super().__init__(message)
+        self.stage = stage
+
 
 # =========================================================
 # Configuration
@@ -610,156 +615,288 @@ def overlay_heatmap(
 def save_gradcam_summary(
     original_image,
     gradcam_items,
-    image_name
+    image_name,
 ):
+    from matplotlib.colors import Normalize
+    from matplotlib.cm import ScalarMappable
 
-    total_images = (
-        1 + len(
-            gradcam_items
-        )
-    )
+    palette = {
+        "plaque": "#32d9ff",
+        "gingivitis": "#ff596e",
+        "calculus": "#ffd43b",
+    }
 
-    # -----------------------------------------------------
-    # Dynamic layout
-    # -----------------------------------------------------
+    height, width = original_image.shape[:2]
 
-    if total_images <= 2:
-
-        rows = 1
-        cols = 2
-
-    elif total_images <= 4:
-
-        rows = 2
-        cols = 2
-
-    else:
-
-        rows = 2
-        cols = 3
-
-    plt.figure(
-        figsize=(
-            6 * cols,
-            5 * rows
-        )
-    )
-
-    # -----------------------------------------------------
-    # Original image
-    # -----------------------------------------------------
-
-    plt.subplot(
-        rows,
-        cols,
-        1
-    )
-
-    plt.imshow(
-        original_image
-    )
-
-    plt.title(
-        "Original Image",
-        fontsize=14
-    )
-
-    plt.axis(
-        "off"
-    )
-
-    # -----------------------------------------------------
-    # Grad-CAM panels
-    # -----------------------------------------------------
-
-    for index, item in enumerate(
-        gradcam_items,
-        start=2
-    ):
-
-        plt.subplot(
-            rows,
-            cols,
-            index
-        )
-
-        plt.imshow(
-            item["overlay"]
-        )
-
-        condition = (
-            item["condition"]
-            .capitalize()
-        )
-
-        confidence = (
-            item["confidence"]
-        )
-
-        threshold = (
-            item["threshold"]
-        )
-
-        spread = (
-    item[
-        "gradcam_spread_percent"
+    items = [
+        item for item in gradcam_items
+        if item["condition"] in palette
+        and item["confidence"] >= item["threshold"]
     ]
-)
 
-        plt.title(
-            f"{condition}\n"
-            f"Confidence: "
-            f"{confidence:.2%} "
-            f"| Threshold: "
-            f"{threshold:.2f}\n"
-            f"Attention spread: "
-            f"{spread:.2f}%",
-            fontsize=13
+    maps = []
+
+    for item in items:
+        heatmap = np.asarray(
+            item["heatmap"],
+            dtype=np.float32,
         )
 
-        plt.axis(
-            "off"
+        heatmap = np.nan_to_num(
+            heatmap,
+            nan=0.0,
+            posinf=0.0,
+            neginf=0.0,
         )
 
-    plt.tight_layout()
+        heatmap = cv2.resize(
+            heatmap,
+            (width, height),
+        )
 
-    output_filename = (
-        f"{image_name}_"
-        f"gradcam_summary.png"
+        maps.append(np.clip(heatmap, 0.0, 1.0))
+
+    original = original_image.astype(np.float32) / 255.0
+
+    if maps:
+        # Preserve the strongest attention at each pixel.
+        merged = np.max(np.stack(maps), axis=0)
+        heatmap_colour = plt.get_cmap("jet")(merged)[..., :3]
+
+        display_image = np.clip(
+            original * 0.65 + heatmap_colour * 0.35,
+            0.0,
+            1.0,
+        )
+    else:
+        display_image = original
+
+    fig, ax = plt.subplots(figsize=(10, 9))
+
+    ax.imshow(display_image)
+    ax.axis("off")
+    ax.set_title(
+        "Combined Grad-CAM heatmap",
+        fontsize=17,
+        pad=15,
     )
+
+    boxes = []
+
+    for item, heatmap in zip(items, maps):
+        condition = item["condition"]
+        colour = palette[condition]
+
+        active = (heatmap >= 0.6).astype(np.uint8)
+
+        contours, _ = cv2.findContours(
+            active,
+            cv2.RETR_EXTERNAL,
+            cv2.CHAIN_APPROX_SIMPLE,
+        )
+
+        contours = [
+            contour for contour in contours
+            if cv2.contourArea(contour)
+            >= height * width * 0.002
+        ]
+
+        if not contours:
+            continue
+
+        # Show the strongest substantial region for each condition.
+        contour = max(contours, key=cv2.contourArea)
+        x, y, box_width, box_height = cv2.boundingRect(contour)
+
+        ax.add_patch(
+            plt.Rectangle(
+                (x, y),
+                box_width,
+                box_height,
+                fill=False,
+                edgecolor=colour,
+                linewidth=1.8,
+                linestyle=(
+                    "--" if condition == "calculus" else "-"
+                ),
+            )
+        )
+
+        boxes.append((
+            condition,
+            x,
+            y,
+            box_width,
+            box_height,
+        ))
+
+    if maps:
+        colour_bar = fig.colorbar(
+            ScalarMappable(
+                norm=Normalize(0, 1),
+                cmap="jet",
+            ),
+            ax=ax,
+            fraction=0.04,
+            pad=0.025,
+            shrink=0.8,
+        )
+
+        colour_bar.set_ticks([0, 0.5, 1])
+        colour_bar.set_ticklabels([
+            "Lower",
+            "Medium",
+            "Higher",
+        ])
+        colour_bar.set_label(
+            "Relative model attention",
+            labelpad=10,
+        )
+
+    if items:
+        score_text = "   |   ".join(
+            f'{item["condition"].capitalize()}: '
+            f'{item["confidence"]:.1%}'
+            for item in items
+        )
+
+        fig.text(
+            0.5,
+            0.078,
+            "Model scores — " + score_text,
+            ha="center",
+            fontsize=10,
+        )
+    else:
+        fig.text(
+            0.5,
+            0.078,
+            "No disease prediction exceeded its threshold.",
+            ha="center",
+            fontsize=10,
+        )
+
+    fig.text(
+        0.5,
+        0.045,
+        "Boxes identify model-attention regions, "
+        "not confirmed disease locations.",
+        ha="center",
+        fontsize=9,
+    )
+
+    fig.text(
+        0.5,
+        0.024,
+        "Heatmap colours indicate relative attention, "
+        "not disease type or severity.",
+        ha="center",
+        fontsize=9,
+    )
+
+    fig.tight_layout(rect=(0, 0.12, 1, 1))
+
+    # Place labels after fixing the layout, so collision checks
+    # use their actual displayed dimensions.
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    image_bounds = ax.get_window_extent(renderer)
+    placed_labels = []
+
+    for condition, x, y, box_width, box_height in boxes:
+        colour = palette[condition]
+        placed = False
+
+        # Prefer beside the box. Use an inside position if
+        # there is insufficient space near an image edge.
+        anchors = [
+            (x + box_width + 6, y + 5, "left"),
+            (x - 6, y + 5, "right"),
+            (
+                min(x + box_width - 8, width - 8),
+                y + 8,
+                "right",
+            ),
+            (max(x + 8, 8), y + 8, "left"),
+        ]
+
+        for shift in (0, 24, 48, 72, 96):
+            for text_x, text_y, alignment in anchors:
+                label = ax.text(
+                    text_x,
+                    text_y + shift,
+                    f"{condition.capitalize()} attention",
+                    ha=alignment,
+                    va="top",
+                    fontsize=10,
+                    color="white",
+                    bbox={
+                        "boxstyle": "round,pad=0.35",
+                        "facecolor": "#162331",
+                        "edgecolor": colour,
+                        "linewidth": 1.5,
+                        "alpha": 0.96,
+                    },
+                )
+
+                fig.canvas.draw()
+
+                bounds = (
+                    label.get_bbox_patch()
+                    .get_window_extent(renderer)
+                )
+
+                fits = (
+                    bounds.x0 >= image_bounds.x0
+                    and bounds.x1 <= image_bounds.x1
+                    and bounds.y0 >= image_bounds.y0
+                    and bounds.y1 <= image_bounds.y1
+                )
+
+                overlaps = any(
+                    bounds.overlaps(previous)
+                    for previous in placed_labels
+                )
+
+                if fits and not overlaps:
+                    placed_labels.append(
+                        bounds.expanded(1.03, 1.15)
+                    )
+                    placed = True
+                    break
+
+                label.remove()
+
+            if placed:
+                break
+
+        if not placed:
+            print(
+                f"Label omitted due to limited space: {condition}"
+            )
 
     output_path = os.path.join(
         OUTPUT_DIR,
-        output_filename
+        f"{image_name}_gradcam_summary.png",
     )
 
-    plt.savefig(
+    fig.savefig(
         output_path,
-        dpi=200,
-        bbox_inches="tight"
+        dpi=160,
+        bbox_inches="tight",
     )
+    plt.close(fig)
 
-    print(
-        "\nCombined Grad-CAM saved:"
-    )
-
-    print(
-        output_path
-    )
-
-    plt.show()
-
-    plt.close()
-
+    print("Combined Grad-CAM saved:", output_path)
     return output_path
-
 
 # =========================================================
 # Automatic dental analysis
 # =========================================================
 
 def run_automatic_gradcam(
-    image_path
+    image_path,
+    raise_on_rejection=False,
 ):
 
     print(
@@ -794,6 +931,9 @@ def run_automatic_gradcam(
             message
         )
 
+        if raise_on_rejection:
+            raise ImageValidationError("file", message)
+
         return None
 
     print(
@@ -819,6 +959,9 @@ def run_automatic_gradcam(
         print(
             quality_info
         )
+
+        if raise_on_rejection:
+            raise ImageValidationError("quality", quality_info)
 
         return None
 
@@ -877,6 +1020,9 @@ def run_automatic_gradcam(
         print(
             dental_message
         )
+
+        if raise_on_rejection:
+            raise ImageValidationError("content", dental_message)
 
         return None
 
@@ -1125,9 +1271,9 @@ def run_automatic_gradcam(
             "condition": condition,
             "confidence": confidence,
             "threshold": threshold,
-            "gradcam_spread_percent":
-                gradcam_spread_percent,
-            "overlay": overlay
+            "gradcam_spread_percent": gradcam_spread_percent,
+            "overlay": overlay,
+            "heatmap": heatmap,
         })
 
     # =====================================================

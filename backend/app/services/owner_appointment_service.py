@@ -30,6 +30,10 @@ from app.services.booking_refund_request_service import (
     queue_booking_deposit_refund,
 )
 
+from app.services.ai_review_booking_service import (
+    validate_review_booking,
+)
+
 def create_appointment(
     db: Session,
     current_user: User,
@@ -37,6 +41,16 @@ def create_appointment(
 ):
     try:
         owner = get_owner_profile(db, current_user)
+
+        if (
+            data.ai_assessment_review_id is not None
+            and data.followup_care_id is not None
+        ):
+            raise HTTPException(
+                422,
+                "Choose either an assessment review or a follow-up "
+                "as the booking context.",
+            )
 
         location = db.execute(
             select(
@@ -255,6 +269,14 @@ def create_appointment(
                 404, "Pet not found in your account."
             )
 
+        validate_review_booking(
+            db,
+            current_user,
+            pet,
+            clinic,
+            data.ai_assessment_review_id,
+        )
+
         overlapping = db.scalar(
             select(Appointment.appointment_id)
             .join(
@@ -293,6 +315,7 @@ def create_appointment(
             created_by_user_id=current_user.user_id,
             status="confirmed",
             followup_care_id=data.followup_care_id,
+            ai_assessment_review_id=data.ai_assessment_review_id,
             booking_request_id=(
                 str(data.booking_request_id)
                 if data.booking_request_id is not None

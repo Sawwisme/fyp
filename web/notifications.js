@@ -166,6 +166,23 @@
         controls.className = 'notification-card-actions';
 
         if (
+            item.resource_type === 'ai_assessment_review' &&
+            Number.isInteger(item.resource_id) &&
+            item.resource_id >= 1 &&
+            item.resource_id <= 2147483647 &&
+            window.location.pathname.startsWith('/web/vet/')
+        ) {
+            const link = document.createElement('a');
+
+            link.href =
+                '/web/vet/ai_assessments.html?review=' +
+                item.resource_id;
+
+            link.textContent = 'Open assessment review';
+            controls.appendChild(link);
+        }
+
+        if (
             item.resource_type === 'clinic_rearrangements' &&
             window.location.pathname.startsWith('/web/admin/')
         ) {

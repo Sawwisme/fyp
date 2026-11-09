@@ -22,6 +22,7 @@ from app.models import (
     Veterinarian,
     FollowupCare,
     TreatmentProgress,
+    AIAssessmentReview,
 )
 from app.schemas.consultations import ConsultationSave
 from app.services.schedule_service import lock_schedule
@@ -341,6 +342,40 @@ def start_consultation(
             )
         reject_absent_slots(db, [slot.time_slot_id])
 
+        linked_analysis_id = None
+
+        if appointment.ai_assessment_review_id is not None:
+            review = db.scalar(
+                select(AIAssessmentReview)
+                .join(
+                    AIAnalysisResult,
+                    AIAnalysisResult.analysis_id
+                    == AIAssessmentReview.analysis_id,
+                )
+                .join(
+                    DentalImage,
+                    DentalImage.dental_image_id
+                    == AIAnalysisResult.dental_image_id,
+                )
+                .where(
+                    AIAssessmentReview.review_id
+                    == appointment.ai_assessment_review_id,
+                    AIAssessmentReview.clinic_id
+                    == veterinarian.clinic_id,
+                    AIAssessmentReview.status == "reviewed",
+                    DentalImage.pet_id == appointment.pet_id,
+                )
+            )
+
+            if review is None:
+                raise HTTPException(
+                    409,
+                    "The linked assessment review does not match "
+                    "this appointment's pet and clinic.",
+                )
+
+            linked_analysis_id = review.analysis_id
+
         now = utc_now()
 
         record = Consultation(
@@ -352,6 +387,7 @@ def start_consultation(
             updated_at=now,
             status="draft",
             version=1,
+            ai_analysis_id=linked_analysis_id,
         )
 
         appointment.status = "in_progress"

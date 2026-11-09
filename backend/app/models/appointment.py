@@ -39,6 +39,18 @@ class Appointment(Base):
             "status",
             "payment_expires_at",
         ),
+
+        CheckConstraint(
+            "ai_assessment_review_id IS NULL OR "
+            "(followup_care_id IS NULL "
+            "AND planned_treatment_id IS NULL)",
+            name="chk_appointment_ai_review_context",
+        ),
+        Index(
+            "ix_appointment_ai_review_status",
+            "ai_assessment_review_id",
+            "status",
+        ),
     )
 
     appointment_id = Column(
@@ -80,6 +92,12 @@ class Appointment(Base):
     followup_care_id = Column(
         Integer,
         ForeignKey("followup_care.followup_care_id"),
+        nullable=True,
+    )
+
+    ai_assessment_review_id = Column(
+        Integer,
+        ForeignKey("ai_assessment_reviews.review_id"),
         nullable=True,
     )
 
@@ -136,4 +154,9 @@ class Appointment(Base):
     followup_task = relationship(
         "FollowupCare",
         foreign_keys=[followup_care_id],
+    )
+
+    assessment_review = relationship(
+        "AIAssessmentReview",
+        foreign_keys=[ai_assessment_review_id],
     )

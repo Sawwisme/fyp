@@ -397,13 +397,19 @@ def process_job(claimed, stop_event):
         )
 
         if payload["status"] == "rejected":
+            message = payload.get("message")
+
+            if not isinstance(message, str) or not message.strip():
+                message = (
+                    "The photo did not pass validation. "
+                    "Take a clearer photo of your pet's teeth and gums."
+                )
+
             finish_without_result(
                 job_id,
                 token,
                 "rejected",
-                "The photo did not pass image-quality or "
-                "dental-content checks. Take a clearer photo "
-                "of your pet's teeth and gums.",
+                message.strip()[:500],
             )
             return
 

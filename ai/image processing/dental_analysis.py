@@ -260,7 +260,8 @@ def save_combined_analysis_summary(
 
 def analyze_dental_image(
     image_path,
-    output_dir=None
+    output_dir=None,
+    raise_on_rejection=False,
 ):
     """
     Run complete dental image analysis.
@@ -295,10 +296,9 @@ def analyze_dental_image(
     # Classification + Grad-CAM
     # =====================================================
 
-    gradcam_result = (
-        run_automatic_gradcam(
-            image_path
-        )
+    gradcam_result = run_automatic_gradcam(
+        image_path,
+        raise_on_rejection=raise_on_rejection,
     )
 
     if gradcam_result is None:

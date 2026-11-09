@@ -74,13 +74,46 @@ def run(image_path, output_dir):
         segmentation_inference.OUTPUT_DIR = str(output/'segmentation')
         Path(gradcam.OUTPUT_DIR).mkdir()
         Path(segmentation_inference.OUTPUT_DIR).mkdir()
+        rejection_message = None
+
         try:
-            result = dental_analysis.analyze_dental_image(str(input_path), output_dir=str(output))
+            result = dental_analysis.analyze_dental_image(
+                str(input_path),
+                output_dir=str(output),
+                raise_on_rejection=True,
+            )
+
+        except gradcam.ImageValidationError as error:
+            result = None
+
+            if error.stage == "quality":
+                # Existing messages explain blur, lighting or resolution.
+                rejection_message = str(error)
+
+            elif error.stage == "content":
+                rejection_message = (
+                    "A suitable cat or dog dental region was not detected. "
+                    "Take a clear close-up of your pet's teeth and gums."
+                )
+
+            else:
+                rejection_message = (
+                    "The photo could not be processed. "
+                    "Choose a readable JPG or PNG image."
+                )
+
         finally:
-            plt.close('all')
+            plt.close("all")
+
     if result is None:
-        response = dict(status='rejected', request_id=request_id,
-            message='The image did not pass the existing image-quality or dental-content checks. Retake a clear pet dental photo.')
+        response = {
+            "status": "rejected",
+            "request_id": request_id,
+            "message": rejection_message or (
+                "The photo did not pass validation. "
+                "Take a clear close-up of your pet's teeth and gums."
+            ),
+        }
     else:
         response = dict(status='completed', request_id=request_id,
             severity_method='experimental_rule_based',
