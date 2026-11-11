@@ -21,6 +21,9 @@ from app.models import (
     DentalImage,
 )
 from app.services.dental_image_service import UPLOAD_DIRECTORY
+from app.services.dental_result_metrics import (
+    extract_segmentation_metrics,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -351,6 +354,9 @@ def save_result(job_id, token, payload, attempt_directory):
         job.result_summary = {
             "model_version": MODEL_VERSION,
             "predictions": public_predictions,
+            "segmentation": extract_segmentation_metrics(
+                result.get("segmentation")
+            ),
             "severity": {
                 "label": severity["severity"],
                 "method": "experimental_rule_based",

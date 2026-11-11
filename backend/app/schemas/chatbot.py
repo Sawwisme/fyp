@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict, Field
-
+from uuid import UUID
 
 class ConversationCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -16,6 +16,8 @@ class MessageCreate(BaseModel):
         extra="forbid",
         str_strip_whitespace=True,
     )
+
+    client_request_id: UUID
 
     message: str = Field(
         min_length=1,

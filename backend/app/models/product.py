@@ -8,6 +8,7 @@ from sqlalchemy import (
     Text,
     text,
     Index,
+    CheckConstraint,
 )
 from sqlalchemy.orm import relationship
 
@@ -18,6 +19,15 @@ class Product(Base):
     __tablename__ = "products"
 
     __table_args__ = (
+        CheckConstraint(
+            "target_species IN ('unknown', 'cat', 'dog', 'both')",
+            name="chk_product_target_species",
+        ),
+        CheckConstraint(
+            "minimum_age_months IS NULL OR "
+            "minimum_age_months BETWEEN 0 AND 600",
+            name="chk_product_minimum_age",
+        ),
         Index(
             "ix_product_clinic_status",
             "clinic_id",
@@ -39,6 +49,14 @@ class Product(Base):
     )
     product_name = Column(String(150), nullable=False)
     description = Column(Text, nullable=True)
+    target_species = Column(
+        String(20),
+        nullable=False,
+        default="unknown",
+        server_default=text("'unknown'"),
+    )
+    minimum_age_months = Column(Integer, nullable=True)
+    suitability_notes = Column(Text, nullable=True)
     price = Column(Numeric(10, 2), nullable=False)
     stock_quantity = Column(Integer, nullable=False)
     image_url = Column(String(500), nullable=True)

@@ -28,3 +28,6 @@ class ShopProductResponse(BaseModel):
     price: Decimal
     stock_quantity: int
     image_url: str | None
+    target_species: str
+    minimum_age_months: int | None
+    suitability_notes: str | None

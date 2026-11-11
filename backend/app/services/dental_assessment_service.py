@@ -112,25 +112,37 @@ def queue_assessment(db, current_user, image_id):
 def get_assessment(db, current_user, job_id):
     owner = get_owner_profile(db, current_user)
 
-    job = db.scalar(
-        select(DentalAssessmentJob)
+    record = db.execute(
+        select(
+            DentalAssessmentJob,
+            Pet.pet_id,
+        )
+        .select_from(DentalAssessmentJob)
         .join(
             DentalImage,
             DentalImage.dental_image_id
             == DentalAssessmentJob.dental_image_id,
         )
-        .join(Pet, Pet.pet_id == DentalImage.pet_id)
+        .join(
+            Pet,
+            Pet.pet_id == DentalImage.pet_id,
+        )
         .where(
             DentalAssessmentJob.assessment_job_id == job_id,
             DentalImage.uploaded_by == current_user.user_id,
             Pet.pet_owner_id == owner.pet_owner_id,
         )
-    )
+    ).one_or_none()
 
-    if job is None:
+    if record is None:
         raise HTTPException(404, "Assessment not found.")
 
-    return _serialize(job)
+    job, pet_id = record
+
+    response = _serialize(job)
+    response["pet_id"] = pet_id
+
+    return response
 
 def get_result_image_path(db, current_user, job_id, kind):
     # This checks that the assessment belongs to the logged-in owner.

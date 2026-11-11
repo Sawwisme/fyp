@@ -316,6 +316,10 @@
             get('product-name').value = item.product_name;
             get('product-category').value = String(item.category_id);
             get('product-description').value = item.description || '';
+            get('product-species').value = item.target_species || 'unknown';
+            get('product-minimum-age').value = item.minimum_age_months ?? '';
+            get('product-suitability-notes').value =
+                item.suitability_notes || '';
             get('product-price').value = item.price;
             get('product-status').value = item.status;
         }
@@ -352,12 +356,19 @@
             return;
         }
 
+        const minimumAge = get('product-minimum-age').value.trim();
+
         const body = {
             category_id: Number(get('product-category').value),
             product_name: productName,
             description: get('product-description').value.trim() || null,
             price: get('product-price').value,
-            status: get('product-status').value
+            status: get('product-status').value,
+            target_species: get('product-species').value,
+            minimum_age_months:
+                minimumAge === '' ? null : Number(minimumAge),
+            suitability_notes:
+                get('product-suitability-notes').value.trim() || null
         };
 
         const isEditing = Boolean(editing);

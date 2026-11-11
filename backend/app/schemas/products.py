@@ -31,6 +31,22 @@ class ProductCreate(BaseModel):
     stock_quantity: int = Field(ge=0, le=1000000)
     status: Literal["active", "inactive"] = "inactive"
 
+    target_species: Literal[
+        "unknown", "cat", "dog", "both"
+    ] = "unknown"
+
+    minimum_age_months: int | None = Field(
+        default=None,
+        ge=0,
+        le=600,
+        strict=True,
+    )
+
+    suitability_notes: str | None = Field(
+        default=None,
+        max_length=1000,
+    )
+
 
 class ProductResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -48,6 +64,9 @@ class ProductResponse(BaseModel):
     created_at: datetime
     updated_at: datetime | None
     version: int
+    target_species: str
+    minimum_age_months: int | None
+    suitability_notes: str | None
 
 class ProductUpdate(BaseModel):
     model_config = ConfigDict(
@@ -67,6 +86,22 @@ class ProductUpdate(BaseModel):
     )
 
     status: Literal["active", "inactive"]
+
+    target_species: Literal[
+        "unknown", "cat", "dog", "both"
+    ] = "unknown"
+
+    minimum_age_months: int | None = Field(
+        default=None,
+        ge=0,
+        le=600,
+        strict=True,
+    )
+
+    suitability_notes: str | None = Field(
+        default=None,
+        max_length=1000,
+    )
 
 class ProductStockAdjustment(BaseModel):
     model_config = ConfigDict(

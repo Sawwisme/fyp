@@ -20,6 +20,8 @@ import '../services/billing_service.dart';
 import 'bills.dart';
 import '../services/dental_assessment_service.dart';
 import 'ai_scan.dart';
+import '../services/chatbot_service.dart';
+import 'chatbot.dart';
 
 class HomeScreen extends StatefulWidget {
   final Map<String, dynamic> user;
@@ -783,6 +785,21 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           actions: [
+            IconButton(
+              tooltip: 'Dental care assistant',
+              onPressed: _loggingOut
+                  ? null
+                  : () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ChatbotScreen(
+                      service: ChatbotService(widget.auth.api),
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.chat_bubble_outline_rounded),
+            ),
             OwnerNotificationBell(
               service: NotificationService(widget.auth.api),
               enabled: !_loggingOut,

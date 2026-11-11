@@ -14,11 +14,15 @@ import 'ai_assessment_reviews.dart';
 class AiScanPage extends StatefulWidget {
   final PetService petService;
   final DentalAssessmentService service;
+  final int? initialPetId;
+  final int? initialAssessmentJobId;
 
   const AiScanPage({
     super.key,
     required this.petService,
     required this.service,
+    this.initialPetId,
+    this.initialAssessmentJobId,
   });
 
   @override
@@ -97,26 +101,79 @@ class _AiScanPageState extends State<AiScanPage>
           limit: 100,
         );
 
+        if (!mounted) return;
+
         pets.addAll(batch);
 
         if (batch.length < 100) break;
         offset += batch.length;
       }
 
+      var selectedId = widget.initialPetId;
+
+      if (selectedId != null &&
+          !pets.any((pet) => pet['pet_id'] == selectedId)) {
+        throw const ApiException(
+          'The selected pet is no longer available.',
+        );
+      }
+
+      Map<String, dynamic>? initialJob;
+      final jobId = widget.initialAssessmentJobId;
+
+      if (jobId != null) {
+        initialJob = await widget.service.getAssessment(jobId);
+
+        if (!mounted) return;
+
+        final jobPetId = initialJob['pet_id'];
+
+        if (jobPetId is! int ||
+            !pets.any((pet) => pet['pet_id'] == jobPetId)) {
+          throw const ApiException(
+            'The assessment pet could not be verified.',
+          );
+        }
+
+        if (selectedId != null && selectedId != jobPetId) {
+          throw const ApiException(
+            'This assessment does not belong to the selected pet.',
+          );
+        }
+
+        selectedId = jobPetId;
+      }
+
+      selectedId ??= pets.isEmpty
+          ? null
+          : pets.first['pet_id'] as int;
+
       if (!mounted) return;
 
       setState(() {
         _pets = pets;
-        _petId = pets.isEmpty ? null : pets.first['pet_id'] as int;
+        _petId = selectedId;
+        _job = initialJob;
+        _imageId = initialJob?['dental_image_id'] as int?;
+        _images.clear();
+        _accessDenied = false;
       });
+
+      _scheduleCheck();
     } on ApiException catch (error) {
-      if (mounted) setState(() => _error = error.message);
+      if (mounted) {
+        setState(() => _error = error.message);
+      }
     } catch (_) {
       if (mounted) {
-        setState(() => _error = 'Unable to load your pets.');
+        setState(() {
+          _error = 'Unable to load the selected pet or assessment.';
+        });
       }
     } finally {
-      if (mounted) setState(() => _loading = false);
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 

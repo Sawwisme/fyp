@@ -54,6 +54,7 @@ from app.routers.dental_images import router as dental_images_router
 from app.routers.dental_assessments import router as dental_assessments_router
 from app.dental_assessment_worker import run_worker as run_dental_assessment_worker
 from app.routers.ai_assessment_reviews import router as ai_assessment_reviews_router
+from app.routers.chatbot import router as chatbot_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -170,6 +171,7 @@ app.include_router(owner_billing_router)
 app.include_router(dental_images_router)
 app.include_router(dental_assessments_router)
 app.include_router(ai_assessment_reviews_router)
+app.include_router(chatbot_router)
 
 WEB_DIR = Path(__file__).resolve().parents[2] / "web"
 

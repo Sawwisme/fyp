@@ -141,6 +141,9 @@ def create_product(
             price=data.price,
             stock_quantity=data.stock_quantity,
             status=data.status,
+            target_species=data.target_species,
+            minimum_age_months=data.minimum_age_months,
+            suitability_notes=data.suitability_notes or None,
         )
 
         db.add(product)
@@ -288,6 +291,13 @@ def update_product(
         product.description = data.description or None
         product.price = data.price
         product.status = data.status
+        for field in (
+            "target_species",
+            "minimum_age_months",
+            "suitability_notes",
+        ):
+            if field in data.model_fields_set:
+                setattr(product, field, getattr(data, field))
         product.version += 1
         product.updated_at = datetime.now(
             timezone.utc
