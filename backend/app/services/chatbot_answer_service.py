@@ -474,13 +474,17 @@ def generate_contextual_reply(
         )
 
     elif intent == "product_recommendation":
+        products = []
+
         reply, action = product_reply(
             db,
             current_user,
             conversation.pet_id,
+            products=products,
         )
 
         answer["reply"] = reply
+        answer["products"] = products
         answer["recommended_action"] = action
 
     elif intent == "my_followup_care":

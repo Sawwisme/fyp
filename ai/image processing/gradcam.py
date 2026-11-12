@@ -1306,6 +1306,18 @@ def run_automatic_gradcam(
         }
         for item in gradcam_items
     ],
+
+    "_heatmaps": {
+        item["condition"]: item["heatmap"]
+        for item in gradcam_items
+        if item["condition"] in {
+            "plaque",
+            "gingivitis",
+            "calculus",
+        }
+        and item["confidence"] >= item["threshold"]
+    },
+
     "gradcam_summary": summary_path
     }
 

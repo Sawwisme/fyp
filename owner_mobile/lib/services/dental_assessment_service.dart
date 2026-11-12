@@ -85,4 +85,24 @@ class DentalAssessmentService {
       '/dental-assessments/$jobId/media/$kind',
     );
   }
+
+  Future<Map<String, dynamic>> getHistory({
+    required int petId,
+    int offset = 0,
+  }) async {
+    final data = await api.get(
+      '/dental-assessments/history'
+          '?pet_id=$petId&offset=$offset&limit=20',
+    );
+
+    if (data is! Map<String, dynamic> ||
+        data['items'] is! List ||
+        data['has_more'] is! bool) {
+      throw const ApiException(
+        'Invalid assessment history response.',
+      );
+    }
+
+    return data;
+  }
 }

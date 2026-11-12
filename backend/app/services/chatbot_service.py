@@ -18,7 +18,7 @@ CHAT_ACTIONS = {
     "explain_gradcam": "OPEN_AI_ANALYSIS",
     "explain_segmentation": "OPEN_AI_ANALYSIS",
     "request_review": "OPEN_AI_ANALYSIS",
-    "book_appointment": "OPEN_APPOINTMENTS",
+    "book_appointment": "OPEN_APPOINTMENT_BOOKING",
     "upcoming_appointment": "OPEN_APPOINTMENTS",
     "cancel_appointment": "OPEN_APPOINTMENTS",
     "my_followup_care": "OPEN_FOLLOWUP_CARE",
@@ -329,6 +329,7 @@ def send_message(
                 "sources": answer["sources"],
                 "similarity": answer["similarity"],
                 "context_reference": answer.get("context_reference"),
+                "products": answer.get("products", []),
                 "recommended_action": answer.get(
                     "recommended_action",
                     CHAT_ACTIONS.get(answer["intent"], "NONE"),

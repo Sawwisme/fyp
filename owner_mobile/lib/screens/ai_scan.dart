@@ -11,11 +11,14 @@ import '../services/pet_service.dart';
 import '../services/ai_assessment_review_service.dart';
 import 'ai_assessment_reviews.dart';
 
+import 'assessment_history.dart';
+
 class AiScanPage extends StatefulWidget {
   final PetService petService;
   final DentalAssessmentService service;
   final int? initialPetId;
   final int? initialAssessmentJobId;
+  final Map<String, dynamic>? _completedJob;
 
   const AiScanPage({
     super.key,
@@ -23,7 +26,15 @@ class AiScanPage extends StatefulWidget {
     required this.service,
     this.initialPetId,
     this.initialAssessmentJobId,
-  });
+  }) : _completedJob = null;
+
+  const AiScanPage._result({
+    required this.petService,
+    required this.service,
+    required Map<String, dynamic> job,
+  }) : _completedJob = job,
+       initialPetId = null,
+       initialAssessmentJobId = null;
 
   @override
   State<AiScanPage> createState() => _AiScanPageState();
@@ -47,8 +58,14 @@ class _AiScanPageState extends State<AiScanPage>
   bool _busy = false;
   bool _checking = false;
   bool _accessDenied = false;
+  bool _historyOpen = false;
 
   String? _error;
+  String? _progressNote;
+  int _pollFailures = 0;
+  int? _openedResultJobId;
+  bool _resultOpen = false;
+  bool _showSummaryImage = false;
 
   bool get _processing =>
       _job?['status'] == 'queued' || _job?['status'] == 'running';
@@ -64,7 +81,12 @@ class _AiScanPageState extends State<AiScanPage>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _loadPets();
+    if (widget._completedJob != null) {
+      _job = widget._completedJob;
+      _loading = false;
+    } else {
+      _loadPets();
+    }
   }
 
   @override
@@ -181,6 +203,9 @@ class _AiScanPageState extends State<AiScanPage>
     _timer?.cancel();
     _imageId = null;
     _job = null;
+    _progressNote = null;
+    _pollFailures = 0;
+    _openedResultJobId = null;
     _images.clear();
     _error = null;
     _accessDenied = false;
@@ -274,56 +299,80 @@ class _AiScanPageState extends State<AiScanPage>
     }
   }
 
+  Future<void> _showCompletedResult({bool reopen = false}) async {
+    final job = _job;
+    final id = job?['assessment_job_id'];
+    if (!mounted || widget._completedJob != null || _resultOpen ||
+        job == null || job['status'] != 'completed' ||
+        job['result'] is! Map || id is! int ||
+        (!reopen && _openedResultJobId == id)) return;
+
+    _timer?.cancel();
+    _openedResultJobId = id;
+    _resultOpen = true;
+    try {
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute(
+          builder: (_) => AiScanPage._result(
+            petService: widget.petService,
+            service: widget.service,
+            job: Map<String, dynamic>.unmodifiable(job),
+          ),
+        ),
+      );
+    } finally {
+      _resultOpen = false;
+    }
+  }
+
   void _scheduleCheck() {
     _timer?.cancel();
+    if (!mounted || widget._completedJob != null) return;
 
-    if (!mounted || !_processing || !_appActive || _accessDenied) {
+    if (_job?['status'] == 'completed') {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _appActive) _showCompletedResult();
+      });
       return;
     }
 
-    _timer = Timer(
-      const Duration(seconds: 5),
-      _checkStatus,
-    );
+    if (!_processing || !_appActive || _accessDenied) return;
+    const delays = [3, 6, 12, 20];
+    _timer = Timer(Duration(seconds: delays[_pollFailures]), _checkStatus);
   }
 
   Future<void> _checkStatus() async {
     final jobId = _job?['assessment_job_id'];
-
-    if (!mounted ||
-        jobId is! int ||
-        _checking ||
-        !_appActive ||
-        _accessDenied) {
-      return;
-    }
+    if (!mounted || jobId is! int || !_processing || _checking ||
+        !_appActive || _accessDenied) return;
 
     _timer?.cancel();
     setState(() => _checking = true);
-
     try {
       final job = await widget.service.getAssessment(jobId);
-
-      if (!mounted) return;
-
+      if (!mounted || _job?['assessment_job_id'] != jobId ||
+          !_processing) return;
       setState(() {
         _job = job;
         _error = null;
+        _progressNote = null;
+        _pollFailures = 0;
       });
-    } on ApiException catch (error) {
-      if (!mounted) return;
-
+    } catch (error) {
+      if (!mounted || _job?['assessment_job_id'] != jobId ||
+          !_processing) return;
+      final status = error is ApiException ? error.statusCode : null;
       setState(() {
-        _error = error.message;
-        _accessDenied =
-            error.statusCode == 401 || error.statusCode == 403;
+        _accessDenied = status == 401 || status == 403 || status == 404;
+        if (_accessDenied) {
+          _error = error.toString();
+          _progressNote = null;
+        } else {
+          if (_pollFailures < 3) _pollFailures++;
+          _progressNote = 'Connection interrupted. Your assessment may '
+              'still be processing. Retrying the same assessment…';
+        }
       });
-    } catch (_) {
-      if (mounted) {
-        setState(() {
-          _error = 'Unable to refresh assessment progress.';
-        });
-      }
     } finally {
       if (mounted) {
         setState(() => _checking = false);
@@ -333,32 +382,27 @@ class _AiScanPageState extends State<AiScanPage>
   }
 
   Future<void> _openImage(Uint8List bytes, String title) async {
-    await showDialog<void>(
-      context: context,
-      builder: (dialogContext) => Dialog(
-        child: SizedBox(
-          width: MediaQuery.sizeOf(dialogContext).width * 0.9,
-          height: MediaQuery.sizeOf(dialogContext).height * 0.8,
-          child: Column(
-            children: [
-              ListTile(
-                title: Text(title),
-                trailing: IconButton(
-                  tooltip: 'Close image',
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                  icon: const Icon(Icons.close),
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.white,
+            title: Text(title),
+          ),
+          body: SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) => InteractiveViewer(
+                minScale: 1,
+                maxScale: 6,
+                child: SizedBox(
+                  width: constraints.maxWidth,
+                  height: constraints.maxHeight,
+                  child: Image.memory(bytes, fit: BoxFit.contain),
                 ),
               ),
-              Expanded(
-                child: InteractiveViewer(
-                  minScale: 0.5,
-                  maxScale: 5,
-                  child: Center(
-                    child: Image.memory(bytes, fit: BoxFit.contain),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -380,7 +424,37 @@ class _AiScanPageState extends State<AiScanPage>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: Theme.of(context).textTheme.titleMedium),
+            if (title.isNotEmpty)
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            if (kind == 'segmentation') ...[
+              const SizedBox(height: 12),
+              Wrap(spacing: 16, runSpacing: 8, children: [
+                _legend(const Color(0xFFFF0000), 'Predicted gingivitis'),
+                _legend(
+                  _job?['result']?['segmentation_palette'] == 'red-yellow-v1'
+                      ? const Color(0xFFFFD600)
+                      : const Color(0xFF00FF00),
+                  'Predicted calculus',
+                ),
+              ]),
+              const SizedBox(height: 8),
+              const Text(
+                'Colours mark model-predicted regions, not confirmed '
+                'disease. Uncoloured areas do not establish healthy tissue.',
+                style: TextStyle(fontSize: 12),
+              ),
+            ],
+            if (kind == 'heatmap') ...[
+              const SizedBox(height: 8),
+              const Text(
+                'Heatmap colours show model attention strength. They '
+                'use a different colour scale from segmentation.',
+                style: TextStyle(fontSize: 12),
+              ),
+            ],
             const SizedBox(height: 12),
             FutureBuilder<Uint8List>(
               future: future,
@@ -405,12 +479,15 @@ class _AiScanPageState extends State<AiScanPage>
                 }
 
                 return InkWell(
-                  onTap: () => _openImage(bytes, title),
+                  onTap: () => _openImage(
+                    bytes,
+                    title.isEmpty ? 'Combined AI view' : title,
+                  ),
                   child: Column(
                     children: [
                       Image.memory(
                         bytes,
-                        height: 220,
+                        height: kind == 'summary' ? 420 : 220,
                         width: double.infinity,
                         fit: BoxFit.contain,
                       ),
@@ -552,6 +629,75 @@ class _AiScanPageState extends State<AiScanPage>
     );
   }
 
+  Future<void> _openHistory() async {
+    final petId = _petId;
+
+    if (_historyOpen ||
+        _locked ||
+        petId == null ||
+        _pets.isEmpty) {
+      return;
+    }
+
+    setState(() => _historyOpen = true);
+
+    try {
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute(
+          builder: (_) => AssessmentHistoryScreen(
+            service: widget.service,
+            pets: _pets,
+            initialPetId: petId,
+            onOpen: (item) async {
+              final job = await widget.service.getAssessment(
+                item['assessment_job_id'] as int,
+              );
+
+              if (!mounted) return;
+
+              if (job['pet_id'] != item['pet_id']) {
+                throw const ApiException(
+                  'The assessment pet does not match.',
+                );
+              }
+
+              final complete =
+                  job['status'] == 'completed' &&
+                      job['result'] is Map;
+
+              await Navigator.of(context).push<void>(
+                MaterialPageRoute(
+                  builder: (_) => complete
+                      ? AiScanPage._result(
+                    petService: widget.petService,
+                    service: widget.service,
+                    job: Map<String, dynamic>.unmodifiable(job),
+                  )
+                      : Scaffold(
+                    appBar: AppBar(
+                      title: const Text('Assessment details'),
+                    ),
+                    body: AiScanPage(
+                      petService: widget.petService,
+                      service: widget.service,
+                      initialPetId: item['pet_id'] as int,
+                      initialAssessmentJobId:
+                      item['assessment_job_id'] as int,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _historyOpen = false);
+      }
+    }
+  }
+
   Future<void> _openVetReviews({int? analysisId}) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
@@ -563,29 +709,105 @@ class _AiScanPageState extends State<AiScanPage>
     );
   }
 
+  Widget _legend(Color colour, String label) {
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      Container(width: 14, height: 14,
+          decoration: BoxDecoration(color: colour,
+              borderRadius: BorderRadius.circular(4))),
+      const SizedBox(width: 6),
+      Text(label, style: const TextStyle(fontSize: 12)),
+    ]);
+  }
+
+  Widget _summaryCard(Map result) {
+    final severity = result['severity'];
+    final label = severity is Map ? '${severity['label'] ?? 'Unavailable'}'
+        : 'Unavailable';
+    final reason = severity is Map ? '${severity['reason'] ?? ''}' : '';
+    final predictions = result['predictions'];
+    final flagged = predictions is List ? predictions.whereType<Map>()
+        .where((p) => p['positive'] == true && p['condition'] != 'healthy')
+        .length : 0;
+    return Container(
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        color: const Color(0xFF172333),
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Row(children: [
+          Icon(Icons.auto_awesome, color: Color(0xFFD1F04B)),
+          SizedBox(width: 10),
+          Text('Assessment summary', style: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.w700)),
+        ]),
+        const SizedBox(height: 22),
+        const Text('Estimated severity',
+            style: TextStyle(color: Colors.white70)),
+        const SizedBox(height: 6),
+        Text(label, style: const TextStyle(color: Color(0xFFD1F04B),
+            fontSize: 30, fontWeight: FontWeight.w800)),
+        const SizedBox(height: 10),
+        Text('$flagged possible finding${flagged == 1 ? '' : 's'} flagged',
+            style: const TextStyle(color: Colors.white, fontSize: 16)),
+        if (reason.isNotEmpty) ...[
+          const SizedBox(height: 14),
+          Text(reason, style: const TextStyle(color: Colors.white, height: 1.5)),
+        ],
+        const Padding(padding: EdgeInsets.symmetric(vertical: 16),
+            child: Divider(color: Colors.white24)),
+        const Text('AI screening reference · A vet can review these findings.',
+            style: TextStyle(color: Colors.white70, height: 1.5)),
+      ]),
+    );
+  }
+
   Widget _assessmentStatus() {
     final status = _job?['status'];
     final result = _job?['result'];
 
     if (status == 'completed' && result is Map) {
+      if (widget._completedJob == null) {
+        return Card(
+          margin: const EdgeInsets.only(top: 20),
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Assessment ready',
+                    style: TextStyle(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 8),
+                const Text('Your result is saved. Open it to view the findings.'),
+                const SizedBox(height: 12),
+                FilledButton.icon(
+                  onPressed: () => _showCompletedResult(reopen: true),
+                  icon: const Icon(Icons.arrow_forward),
+                  label: const Text('View assessment'),
+                ),
+                TextButton(
+                  onPressed: () => setState(() {
+                    _clearAssessment();
+                    _photo = null;
+                  }),
+                  child: const Text('Scan another photo'),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
       final predictions = result['predictions'] as List? ?? [];
-      final severity = result['severity'];
+
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 24),
-          Text(
-            'Assessment results',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            result['interpretation']?.toString() ??
-                'AI screening results require veterinary review.',
-          ),
-          const SizedBox(height: 16),
-
+          _summaryCard(result),
+          const SizedBox(height: 20),
+          Text('Findings in this photo',
+              style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 12),
           for (final prediction in predictions)
             if (prediction is Map)
               _predictionCard(prediction),
@@ -597,16 +819,6 @@ class _AiScanPageState extends State<AiScanPage>
               style: TextStyle(fontSize: 12),
             ),
           ),
-
-          if (severity is Map) ...[
-            Text(
-              'Experimental severity estimate: ${severity['label']}',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(severity['reason']?.toString() ?? ''),
-            const SizedBox(height: 20),
-          ],
 
           if (_job?['analysis_id'] is int) ...[
             FilledButton.icon(
@@ -621,7 +833,18 @@ class _AiScanPageState extends State<AiScanPage>
 
           _resultImage('heatmap', 'Model attention'),
           _resultImage('segmentation', 'Predicted image regions'),
-          _resultImage('summary', 'Assessment summary'),
+          Card(
+            child: ExpansionTile(
+              title: const Text('Combined AI view'),
+              subtitle: const Text('Heatmap with predicted region outlines'),
+              onExpansionChanged: (open) =>
+                  setState(() => _showSummaryImage = open),
+              children: [
+                if (_showSummaryImage)
+                  _resultImage('summary', ''),
+              ],
+            ),
+          ),
         ],
       );
     }
@@ -653,9 +876,13 @@ class _AiScanPageState extends State<AiScanPage>
               ),
               const SizedBox(height: 8),
               const Text(
-                'Processing may take a few minutes.',
+                'Your photo is processed in the background.',
                 style: TextStyle(fontSize: 12),
               ),
+              if (_progressNote != null) ...[
+                const SizedBox(height: 8),
+                Text(_progressNote!, style: const TextStyle(fontSize: 12)),
+              ],
               TextButton.icon(
                 onPressed: _checking || _accessDenied
                     ? null
@@ -674,6 +901,15 @@ class _AiScanPageState extends State<AiScanPage>
 
   @override
   Widget build(BuildContext context) {
+    if (widget._completedJob != null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Dental assessment')),
+        body: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [_assessmentStatus(), const SizedBox(height: 24)],
+        ),
+      );
+    }
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -812,6 +1048,15 @@ class _AiScanPageState extends State<AiScanPage>
           onPressed: _locked ? null : () => _openVetReviews(),
           icon: const Icon(Icons.mark_chat_read_outlined),
           label: const Text('My vet reviews & feedback'),
+        ),
+
+        const SizedBox(height: 12),
+        OutlinedButton.icon(
+          onPressed: _locked || _historyOpen || _petId == null
+              ? null
+              : _openHistory,
+          icon: const Icon(Icons.history_rounded),
+          label: const Text('Assessment history'),
         ),
 
         _assessmentStatus(),

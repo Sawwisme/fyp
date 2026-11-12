@@ -16,6 +16,10 @@ import '../services/shop_service.dart';
 import 'shop.dart';
 import 'medical_history.dart';
 
+import '../services/cart_service.dart';
+import 'chat_product_card.dart';
+import 'clinic_picker.dart';
+import 'book_appointment.dart';
 
 class ChatbotScreen extends StatefulWidget {
   final ChatbotService service;
@@ -33,6 +37,10 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   static const _blue = Color(0xFF2549C7);
   static const _navy = Color(0xFF172333);
 
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _chatSearch = TextEditingController();
+
+  bool _sidebarVisible = true;
   final _input = TextEditingController();
   final _scroll = ScrollController();
 
@@ -50,7 +58,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   @override
   void initState() {
     super.initState();
-    _loadChats();
+    _initialiseChat();
   }
 
   @override
@@ -58,6 +66,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     _input.dispose();
     _scroll.dispose();
     super.dispose();
+    _chatSearch.dispose();
   }
 
   List<Map<String, dynamic>> _messageItems(
@@ -147,6 +156,107 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
       });
       _scrollToLatest();
     });
+  }
+
+  Future<void> _initialiseChat() async {
+    await _loadChats();
+
+    if (!mounted || _error != null || _selected != null) {
+      return;
+    }
+
+    // Resume an existing general chat instead of creating one
+    // every time the chatbot opens.
+    for (final chat in _chats) {
+      if (chat['pet_id'] == null && chat['status'] == 'active') {
+        await _openChat(chat);
+        return;
+      }
+    }
+
+    await _newGeneralChat();
+  }
+
+  Future<void> _newGeneralChat() async {
+    if (_busy || _pending != null) return;
+
+    await _run(() async {
+      final chat = await widget.service.createConversation();
+
+      if (!mounted) return;
+
+      setState(() {
+        _selected = chat;
+
+        _chats = [
+          chat,
+          ..._chats.where(
+                (item) =>
+            item['conversation_id'] != chat['conversation_id'],
+          ),
+        ];
+
+        _messages = [];
+        _hasOlder = false;
+        _olderCursor = null;
+        _input.clear();
+      });
+    });
+  }
+
+  Widget _welcome() {
+    final enabled = !_busy &&
+        _pending == null &&
+        _selected?['status'] == 'active';
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: 28,
+        horizontal: 12,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(
+            Icons.chat_bubble_outline_rounded,
+            size: 36,
+            color: _blue,
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Hi! How can I help?',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+              color: _navy,
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'Ask a general dental question or get help using VetDental. '
+                'Select a pet only when you want to discuss its records.',
+          ),
+          const SizedBox(height: 20),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final question in [
+                'What is gingivitis?',
+                'How do I book an appointment?',
+                'How often should I brush my pet’s teeth?',
+              ])
+                ActionChip(
+                  label: Text(question),
+                  onPressed: enabled
+                      ? () => _askSuggested(question)
+                      : null,
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _newChat() async {
@@ -506,6 +616,33 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     late Widget page;
 
     switch (action) {
+      case 'OPEN_APPOINTMENT_BOOKING':
+        await _run(() async {
+          final clinic = await Navigator.of(context)
+              .push<Map<String, dynamic>>(
+            MaterialPageRoute(
+              builder: (_) => ClinicPickerScreen(
+                service: AppointmentService(api),
+              ),
+            ),
+          );
+
+          if (!mounted || clinic == null) return;
+
+          await Navigator.of(context).push<bool>(
+            MaterialPageRoute(
+              builder: (_) => BookAppointmentScreen(
+                clinic: clinic,
+                service: AppointmentService(api),
+                petService: PetService(api),
+                initialPetId: reference?['pet_id'] is int
+                    ? reference!['pet_id'] as int
+                    : _selected?['pet_id'] as int?,
+              ),
+            ),
+          );
+        });
+        return;
       case 'OPEN_AI_ANALYSIS':
         page = Scaffold(
           appBar: AppBar(
@@ -605,8 +742,24 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
       'OPEN_FOLLOWUP_CARE': 'Open follow-up care',
       'OPEN_SHOP': 'Browse clinic shops',
       'OPEN_MEDICAL_HISTORY': 'Open medical history',
+      'OPEN_APPOINTMENT_BOOKING': 'Choose appointment time',
     };
     final rawSources = metadata is Map ? metadata['sources'] : null;
+    final rawProducts = metadata is Map ? metadata['products'] : null;
+
+    final products = rawProducts is List
+        ? rawProducts
+        .whereType<Map>()
+        .map((item) => Map<String, dynamic>.from(item))
+        .where(
+          (item) =>
+      item['product_id'] is int &&
+          item['clinic_id'] is int,
+    )
+        .take(6)
+        .toList()
+        : <Map<String, dynamic>>[];
+
 
     final sources = rawSources is List
         ? rawSources.whereType<String>().toList()
@@ -629,15 +782,17 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              mine ? 'You' : 'VetDental assistant',
-              style: TextStyle(
-                color: mine ? Colors.white70 : _blue,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
+            if (!mine) ...[
+              const Text(
+                'VetDental assistant',
+                style: TextStyle(
+                  color: _blue,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-            ),
-            const SizedBox(height: 7),
+              const SizedBox(height: 7),
+            ],
             SelectableText(
               message['message_text'] as String? ?? '',
               style: TextStyle(
@@ -660,6 +815,17 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                 label: Text(actionLabels[action]!),
               ),
             ],
+            if (!mine)
+              for (final product in products)
+                ChatProductCard(
+                  key: ValueKey(
+                    '${message['message_id']}:${product['clinic_id']}:'
+                        '${product['product_id']}',
+                  ),
+                  service: CartService(widget.service.api),
+                  product: product,
+                  enabled: !_busy && _pending == null,
+                ),
             for (final source in sources)
               TextButton.icon(
                 onPressed: () => _openSource(source),
@@ -675,217 +841,426 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  String _chatTitle(Map<String, dynamic> chat) {
+    final id = chat['conversation_id'];
+
+    return chat['pet_id'] == null
+        ? 'General chat #$id'
+        : '${chat['pet_name'] ?? 'Pet'} · Chat #$id';
+  }
+
+  String _chatDate(Map<String, dynamic> chat) {
+    final date = DateTime.tryParse('${chat['started_at']}');
+
+    if (date == null) return '';
+
+    final myt = date.toUtc().add(const Duration(hours: 8));
+
+    return '${myt.day}/${myt.month}/${myt.year}'
+        '${chat['status'] == 'closed' ? ' · Closed' : ''}';
+  }
+
+  Future<void> _sidebarAction(
+      Future<void> Function() action,
+      ) async {
+    if (_busy || _pending != null) return;
+
+    _scaffoldKey.currentState?.closeDrawer();
+
+    await action();
+  }
+
+  Widget _chatSidebar() {
+    final query = _chatSearch.text.trim().toLowerCase();
+
+    final visible = _chats
+        .where(
+          (chat) => _chatTitle(chat).toLowerCase().contains(query),
+    )
+        .toList();
+
+    final disabled = _busy || _pending != null;
+
+    return ColoredBox(
+      color: _navy,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'Your conversations',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Tooltip(
+                message: 'New general chat',
+                child: FilledButton.icon(
+                  onPressed: disabled
+                      ? null
+                      : () => _sidebarAction(_newGeneralChat),
+                  icon: const Icon(Icons.add),
+                  label: const Text('New chat'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: _blue,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size.fromHeight(46),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: disabled
+                    ? null
+                    : () => _sidebarAction(_newChat),
+                icon: const Icon(
+                  Icons.pets_outlined,
+                  size: 18,
+                ),
+                label: const Text('Chat about a pet'),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white70,
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _chatSearch,
+                onChanged: (_) => setState(() {}),
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'Search chats',
+                  hintStyle: const TextStyle(
+                    color: Colors.white54,
+                  ),
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: Colors.white54,
+                  ),
+                  filled: true,
+                  fillColor: const Color(0xFF243247),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Divider(color: Colors.white12),
+              Expanded(
+                child: visible.isEmpty
+                    ? const Center(
+                  child: Text(
+                    'No chats found.',
+                    style: TextStyle(
+                      color: Colors.white54,
+                    ),
+                  ),
+                )
+                    : ListView.builder(
+                  itemCount: visible.length,
+                  itemBuilder: (context, index) {
+                    final chat = visible[index];
+
+                    final selected =
+                        chat['conversation_id'] ==
+                            _selected?['conversation_id'];
+
+                    return Padding(
+                      padding: const EdgeInsets.only(
+                        bottom: 6,
+                      ),
+                      child: ListTile(
+                        selected: selected,
+                        selectedTileColor: _blue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                          BorderRadius.circular(12),
+                        ),
+                        leading: Icon(
+                          chat['pet_id'] == null
+                              ? Icons.chat_bubble_outline
+                              : Icons.pets_outlined,
+                          size: 19,
+                          color: Colors.white70,
+                        ),
+                        title: Text(
+                          _chatTitle(chat),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                        subtitle: Text(
+                          _chatDate(chat),
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 11,
+                          ),
+                        ),
+                        enabled: !disabled,
+                        onTap: disabled
+                            ? null
+                            : () => _sidebarAction(
+                              () => _openChat(chat),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              TextButton.icon(
+                onPressed: disabled ? null : _loadChats,
+                icon: const Icon(Icons.refresh, size: 18),
+                label: const Text('Refresh history'),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white70,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _conversationBody() {
     final canSend =
         _selected != null && _selected!['status'] == 'active';
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFEEF1F5),
-      appBar: AppBar(
-        title: const Text('Dental care assistant'),
-        backgroundColor: _navy,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            tooltip: 'Refresh recent chats',
-            onPressed: _busy || _pending != null ? null : _loadChats,
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  const Text(
-                    'Dental information and app guidance. '
-                        'For diagnosis or treatment, contact your veterinarian.',
-                    style: TextStyle(
-                      color: Color(0xFF52647C),
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: DropdownButtonFormField<int>(
-                          key: ValueKey(_selected?['conversation_id']),
-                          initialValue:
-                          _selected?['conversation_id'] as int?,
-                          isExpanded: true,
-                          decoration: const InputDecoration(
-                            labelText: 'Your chats',
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(),
-                          ),
-                          items: _chats.map((chat) {
-                            final id = chat['conversation_id'] as int;
-
-                            return DropdownMenuItem<int>(
-                              value: id,
-                              child: Text(
-                                'Chat #$id'
-                                    '${chat['pet_name'] == null ? '' : ' · ${chat['pet_name']}'}',
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: _busy || _pending != null
-                              ? null
-                              : (id) {
-                            if (id == null) return;
-                            _openChat(
-                              _chats.firstWhere(
-                                    (chat) =>
-                                chat['conversation_id'] == id,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      IconButton.filled(
-                        tooltip: 'New chat',
-                        onPressed:
-                        _busy || _pending != null ? null : _newChat,
-                        icon: const Icon(Icons.add),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            if (_selected != null)
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE3E9FF),
-                  borderRadius: BorderRadius.circular(12),
-                ),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+          child: Row(
+            children: [
+              Expanded(
                 child: Text(
-                  _selected!['pet_id'] == null
-                      ? 'General chat · No pet records used'
-                      : 'Chat about ${_selected!['pet_name'] ?? 'your pet'}'
-                      ' · Start a new chat to choose another pet',
+                  _selected?['pet_id'] == null
+                      ? 'General chat'
+                      : 'Chat about '
+                      '${_selected?['pet_name'] ?? 'your pet'}',
                   style: const TextStyle(
                     color: _navy,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-            if (_busy) const LinearProgressIndicator(),
-            if (_error != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
+              TextButton.icon(
+                onPressed: _busy || _pending != null
+                    ? null
+                    : _newChat,
+                icon: const Icon(
+                  Icons.pets_outlined,
+                  size: 17,
                 ),
-                child: Text(
-                  _error!,
-                  style: const TextStyle(color: Color(0xFFB42318)),
-                ),
+                label: const Text('Select pet'),
               ),
-            Expanded(
-              child: _selected == null
-                  ? const Center(
-                child: Text('Select a recent chat or tap + to begin.'),
-              )
-                  : ListView(
-                controller: _scroll,
-                padding: const EdgeInsets.all(16),
-                children: [
-                  if (_hasOlder)
-                    TextButton(
-                      onPressed: _busy ? null : _loadOlder,
-                      child: const Text('Load older messages'),
-                    ),
-                  if (_messages.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.all(24),
-                      child: Text(
-                        'Ask about plaque, tartar, gum inflammation, '
-                            'booking or follow-up care.',
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ..._messages.map(_messageBubble),
-                ],
+            ],
+          ),
+        ),
+        if (_busy) const LinearProgressIndicator(),
+        if (_error != null)
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Text(
+              _error!,
+              style: const TextStyle(
+                color: Color(0xFFB42318),
               ),
             ),
-            if (_pending != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    const Expanded(
-                      child: Text(
-                        'Waiting for confirmation. Retry the same message.',
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: _busy ? null : _send,
-                      child: const Text('Retry'),
-                    ),
-                  ],
+          ),
+        Expanded(
+          child: _selected == null
+              ? Center(
+            child: TextButton(
+              onPressed: _busy ? null : _initialiseChat,
+              child: const Text('Open chat'),
+            ),
+          )
+              : ListView(
+            controller: _scroll,
+            padding: const EdgeInsets.all(16),
+            children: [
+              if (_hasOlder)
+                TextButton(
+                  onPressed: _busy ? null : _loadOlder,
+                  child: const Text('Load older messages'),
                 ),
-              ),
-            if (_selected != null)
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      tooltip: 'Suggested questions',
-                      onPressed: _busy || _pending != null || !canSend
-                          ? null
-                          : _showQuestions,
-                      icon: const Icon(
-                        Icons.lightbulb_outline_rounded,
-                        color: _blue,
-                      ),
-                    ),
-                    Expanded(
-                      child: TextField(
-                        controller: _input,
-                        enabled: !_busy && _pending == null && canSend,
-                        minLines: 1,
-                        maxLines: 4,
-                        maxLength: 2000,
-                        decoration: InputDecoration(
-                          hintText: canSend
-                              ? 'Ask a question…'
-                              : 'This chat is closed.',
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          counterText: '',
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    IconButton.filled(
-                      tooltip: 'Send message',
-                      onPressed: _busy || !canSend || _pending != null
-                          ? null
-                          : _send,
-                      icon: const Icon(Icons.send_rounded),
-                    ),
-                  ],
-                ),
-              ),
-          ],
+              if (_messages.isEmpty) _welcome(),
+              ..._messages.map(_messageBubble),
+            ],
+          ),
         ),
-      ),
+        if (_pending != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+            ),
+            child: Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'Waiting for confirmation. '
+                        'Retry the same message.',
+                  ),
+                ),
+                TextButton(
+                  onPressed: _busy ? null : _send,
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          ),
+        if (_selected != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 8, 16, 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                IconButton(
+                  tooltip: 'Suggested questions',
+                  onPressed: _busy ||
+                      _pending != null ||
+                      !canSend
+                      ? null
+                      : _showQuestions,
+                  icon: const Icon(
+                    Icons.lightbulb_outline_rounded,
+                    color: _blue,
+                  ),
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: _input,
+                    enabled:
+                    !_busy && _pending == null && canSend,
+                    minLines: 1,
+                    maxLines: 4,
+                    maxLength: 2000,
+                    decoration: InputDecoration(
+                      hintText: canSend
+                          ? 'Message VetDental…'
+                          : 'This chat is closed.',
+                      filled: true,
+                      fillColor: Colors.white,
+                      counterText: '',
+                      border: OutlineInputBorder(
+                        borderRadius:
+                        BorderRadius.circular(20),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton.filled(
+                  tooltip: 'Send message',
+                  onPressed:
+                  _busy || !canSend || _pending != null
+                      ? null
+                      : _send,
+                  icon: const Icon(
+                    Icons.arrow_upward_rounded,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        const Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            bottom: 8,
+          ),
+          child: Text(
+            'AI guidance does not replace veterinary care.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 11,
+              color: Color(0xFF687284),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final wide = constraints.maxWidth >= 850;
+
+        return Scaffold(
+          key: _scaffoldKey,
+          backgroundColor: const Color(0xFFEEF1F5),
+          drawer: wide
+              ? null
+              : Drawer(
+            width: 290,
+            child: _chatSidebar(),
+          ),
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            leading: Navigator.of(context).canPop()
+                ? const BackButton()
+                : null,
+            title: const Text('Dental care assistant'),
+            backgroundColor: _navy,
+            foregroundColor: Colors.white,
+            actions: [
+              IconButton(
+                tooltip: wide
+                    ? (_sidebarVisible
+                    ? 'Hide chats'
+                    : 'Show chats')
+                    : 'Chat history',
+                icon: const Icon(Icons.menu_rounded),
+                onPressed: () {
+                  if (wide) {
+                    setState(() {
+                      _sidebarVisible = !_sidebarVisible;
+                    });
+                  } else {
+                    _scaffoldKey.currentState?.openDrawer();
+                  }
+                },
+              ),
+            ],
+          ),
+          body: SafeArea(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (wide)
+                  AnimatedContainer(
+                    duration:
+                    const Duration(milliseconds: 220),
+                    curve: Curves.easeInOut,
+                    width: _sidebarVisible ? 280 : 0,
+                    child: ClipRect(
+                      child: OverflowBox(
+                        minWidth: 280,
+                        maxWidth: 280,
+                        alignment: Alignment.topLeft,
+                        child: _chatSidebar(),
+                      ),
+                    ),
+                  ),
+                Expanded(
+                  child: _conversationBody(),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

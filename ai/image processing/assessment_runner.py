@@ -125,12 +125,33 @@ def run(image_path, output_dir):
     return json.loads(encoded)
 
 
+def serve():
+    # Serial requests reuse the models imported by run(). Logs stay on stderr.
+    for line in sys.stdin:
+        request_id = None
+        try:
+            request = json.loads(line)
+            request_id = request["id"]
+            with redirect_stdout(sys.stderr):
+                response = run(request["image"], request["output_dir"])
+        except Exception as error:
+            print(f"Assessment runner: {type(error).__name__}: {error}",
+                  file=sys.stderr, flush=True)
+            response = {"status": "failed"}
+        print(json.dumps({"id": request_id, "response": response},
+                         default=json_value, allow_nan=False), flush=True)
+    return 0
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--check', action='store_true')
+    parser.add_argument('--serve', action='store_true')
     parser.add_argument('--image')
     parser.add_argument('--output-dir')
     args = parser.parse_args()
+    if args.serve:
+        return serve()
     if not args.check and (not args.image or not args.output_dir):
         parser.error('Provide --image and --output-dir, or use --check.')
     try:

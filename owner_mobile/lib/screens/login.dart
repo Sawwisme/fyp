@@ -93,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Veterinary Dental Care')),
+      appBar: AppBar(title: const Text('VetDental')),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),

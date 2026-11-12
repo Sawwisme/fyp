@@ -1,6 +1,13 @@
 import os
 import cv2
 import matplotlib.pyplot as plt
+from pathlib import Path
+
+import numpy as np
+
+from matplotlib.lines import Line2D
+from matplotlib.cm import ScalarMappable
+from matplotlib.colors import Normalize
 
 from gradcam import run_automatic_gradcam
 from segmentation_inference import run_segmentation
@@ -13,251 +20,242 @@ from severity_estimation import estimate_severity
 
 def save_combined_analysis_summary(
     image_path,
-    gradcam_summary_path,
-    segmentation_output_path,
-    severity_result,
-    output_dir=None
+    heatmaps,
+    mask,
+    output_dir=None,
 ):
-    original = cv2.imread(
-        image_path
-    )
+    original = cv2.imread(str(image_path))
 
     if original is None:
+        raise ValueError(f"Unable to read image: {image_path}")
+
+    rgb = cv2.cvtColor(original, cv2.COLOR_BGR2RGB)
+    height, width = rgb.shape[:2]
+
+    # Match the segmentation mask to the original photo.
+    mask = np.asarray(mask)
+
+    if mask.ndim != 2 or not np.isin(mask, [0, 1, 2]).all():
         raise ValueError(
-            f"Unable to read original image: {image_path}"
+            "Expected a segmentation mask with classes 0, 1 and 2."
         )
 
-    original = cv2.cvtColor(
-        original,
-        cv2.COLOR_BGR2RGB
+    mask = cv2.resize(
+        mask.astype(np.uint8),
+        (width, height),
+        interpolation=cv2.INTER_NEAREST,
     )
 
-    gradcam_summary = cv2.imread(
-        gradcam_summary_path
-    )
+    maps = []
 
-    if gradcam_summary is None:
-        raise ValueError(
-            f"Unable to read Grad-CAM summary: "
-            f"{gradcam_summary_path}"
+    for condition, values in heatmaps.items():
+        if condition not in {"plaque", "gingivitis", "calculus"}:
+            continue
+
+        values = np.asarray(values, dtype=np.float32)
+
+        if values.ndim != 2 or values.size == 0:
+            raise ValueError(
+                "Expected a two-dimensional Grad-CAM map."
+            )
+
+        values = np.nan_to_num(
+            values,
+            nan=0,
+            posinf=0,
+            neginf=0,
         )
 
-    gradcam_summary = cv2.cvtColor(
-        gradcam_summary,
-        cv2.COLOR_BGR2RGB
-    )
-
-    segmentation = cv2.imread(
-        segmentation_output_path
-    )
-
-    if segmentation is None:
-        raise ValueError(
-            f"Unable to read segmentation output: "
-            f"{segmentation_output_path}"
+        values = cv2.resize(
+            values,
+            (width, height),
+            interpolation=cv2.INTER_LINEAR,
         )
 
-    segmentation = cv2.cvtColor(
-        segmentation,
-        cv2.COLOR_BGR2RGB
+        maps.append(np.clip(values, 0, 1))
+
+    display = rgb.astype(np.float32) / 255.0
+
+    has_attention = bool(maps) and any(
+        np.any(values > 0)
+        for values in maps
     )
 
-    # =====================================================
-    # Create figure
-    # =====================================================
+    if has_attention:
+        # Show the strongest disease attention at each pixel.
+        merged = np.max(np.stack(maps), axis=0)
+        colours = plt.get_cmap("jet")(merged)[..., :3]
 
-    plt.figure(
-        figsize=(16, 12)
-    )
+        # Stronger attention gets a stronger overlay.
+        # Zero attention leaves the original photo unchanged.
+        # Stronger visual overlay; raw scores remain unchanged.
+        alpha = (0.65 * np.sqrt(merged))[..., None]
 
-    # -----------------------------------------------------
-    # Original image
-    # -----------------------------------------------------
-
-    plt.subplot(
-        2,
-        2,
-        1
-    )
-
-    plt.imshow(
-        original
-    )
-
-    plt.title(
-        "Original Image",
-        fontsize=14
-    )
-
-    plt.axis(
-        "off"
-    )
-
-    # -----------------------------------------------------
-    # Grad-CAM
-    # -----------------------------------------------------
-
-    plt.subplot(
-        2,
-        2,
-        2
-    )
-
-    plt.imshow(
-        gradcam_summary
-    )
-
-    plt.title(
-        "Grad-CAM Attention",
-        fontsize=14
-    )
-
-    plt.axis(
-        "off"
-    )
-
-    # -----------------------------------------------------
-    # Segmentation
-    # -----------------------------------------------------
-
-    plt.subplot(
-        2,
-        2,
-        3
-    )
-
-    plt.imshow(
-        segmentation
-    )
-
-    plt.title(
-        "Segmentation\n"
-        "Red = Gingivitis | Green = Calculus",
-        fontsize=14
-    )
-
-    plt.axis(
-        "off"
-    )
-
-    # -----------------------------------------------------
-    # Severity result
-    # -----------------------------------------------------
-
-    plt.subplot(
-        2,
-        2,
-        4
-    )
-
-    plt.axis(
-        "off"
-    )
-
-    disease_conditions = (
-        severity_result.get(
-            "disease_conditions",
-            []
-        )
-    )
-
-    if disease_conditions:
-        conditions_text = ", ".join(
-            condition.capitalize()
-            for condition
-            in disease_conditions
-        )
-    else:
-        conditions_text = (
-            "No disease condition detected"
+        display = np.clip(
+            display * (1 - alpha) + colours * alpha,
+            0,
+            1,
         )
 
-    severity_text = (
-        f"Estimated Severity\n"
-        f"{severity_result['severity']}\n\n"
+    figure_height = max(
+        5,
+        min(10, 10 * height / width),
+    ) + 1
 
-        f"Detected Conditions\n"
-        f"{conditions_text}\n\n"
-
-        f"Grad-CAM Attention\n"
-        f"Category: "
-        f"{severity_result['gradcam_category']}\n"
-        f"Maximum Spread: "
-        f"{severity_result['max_gradcam_spread_percent']:.2f}%\n\n"
-
-        f"Segmentation Reference\n"
-        f"Category: "
-        f"{severity_result['segmentation_category']}\n"
-        f"Estimated Area: "
-        f"{severity_result['segmentation_area_percent']:.2f}%\n\n"
-
-        f"Gingivitis Area: "
-        f"{severity_result['gingivitis_area_percent']:.2f}%\n"
-        f"Calculus Area: "
-        f"{severity_result['calculus_area_percent']:.2f}%"
+    fig, ax = plt.subplots(
+        figsize=(10, figure_height),
     )
 
-    plt.text(
-        0.05,
-        0.95,
-        severity_text,
-        fontsize=14,
-        verticalalignment="top"
-    )
+    try:
+        fig.patch.set_facecolor("#F3F5FA")
 
-    plt.tight_layout()
+        ax.imshow(display)
+        ax.set_axis_off()
 
-    # =====================================================
-    # Output folder
-    # =====================================================
-
-    base_dir = os.path.dirname(
-        os.path.abspath(__file__)
-    )
-
-    output_dir = output_dir or os.path.join(
-        base_dir,
-        "models",
-        "analysis_outputs"
-    )
-
-    os.makedirs(
-        output_dir,
-        exist_ok=True
-    )
-
-    image_name = os.path.splitext(
-        os.path.basename(
-            image_path
+        ax.set_title(
+            "Model attention + predicted regions",
+            fontsize=15,
+            color="#172333",
+            pad=15,
+            fontweight="bold",
         )
-    )[0]
 
-    output_path = os.path.join(
-        output_dir,
-        f"{image_name}_analysis_summary.png"
-    )
+        classes = [
+            (1, "#FF0000"),
+            (2, "#FFD600"),
+        ]
 
-    # =====================================================
-    # Save
-    # =====================================================
+        for class_id, colour in classes:
+            binary = (mask == class_id).astype(np.uint8)
 
-    plt.savefig(
-        output_path,
-        dpi=200,
-        bbox_inches="tight"
-    )
+            contours, _ = cv2.findContours(
+                binary,
+                cv2.RETR_EXTERNAL,
+                cv2.CHAIN_APPROX_SIMPLE,
+            )
 
-    plt.show()
+            for contour in contours:
+                if len(contour) < 3:
+                    continue
 
-    plt.close()
+                points = contour[:, 0, :]
+                points = np.vstack([points, points[0]])
 
-    return output_path
+                ax.plot(
+                    points[:, 0],
+                    points[:, 1],
+                    color="black",
+                    linewidth=3.5,
+                )
 
+                ax.plot(
+                    points[:, 0],
+                    points[:, 1],
+                    color=colour,
+                    linewidth=1.8,
+                )
 
-# =========================================================
-# Complete dental analysis pipeline
-# =========================================================
+        if has_attention:
+            bar = fig.colorbar(
+                ScalarMappable(
+                    norm=Normalize(0, 1),
+                    cmap="jet",
+                ),
+                ax=ax,
+                fraction=0.035,
+                pad=0.02,
+                shrink=0.8,
+            )
 
+            bar.set_label(
+                "Relative model attention",
+                fontsize=9,
+            )
+
+            bar.set_ticks(
+                [0, 0.5, 1],
+                labels=["Lower", "Medium", "Higher"],
+            )
+
+            bar.ax.tick_params(labelsize=8)
+
+        else:
+            fig.text(
+                0.5,
+                0.105,
+                "No disease attention map is available for this photo.",
+                ha="center",
+                fontsize=9,
+                color="#53627A",
+            )
+
+        fig.legend(
+            handles=[
+                Line2D(
+                    [0],
+                    [0],
+                    color="#FF0000",
+                    lw=3,
+                    label="Gingivitis region",
+                ),
+                Line2D(
+                    [0],
+                    [0],
+                    color="#FFD600",
+                    lw=3,
+                    label="Calculus region",
+                ),
+            ],
+            loc="lower center",
+            bbox_to_anchor=(0.5, 0.055),
+            ncol=2,
+            frameon=False,
+        )
+
+        fig.text(
+            0.5,
+            0.025,
+            "Heatmap = model attention. "
+            "Outlines = segmentation predictions, not confirmed disease.",
+            ha="center",
+            fontsize=8,
+            color="#53627A",
+        )
+
+        fig.subplots_adjust(
+            left=0.02,
+            right=0.95,
+            top=0.90,
+            bottom=0.15,
+        )
+
+        directory = (
+            Path(output_dir)
+            if output_dir
+            else Path(__file__).resolve().parent
+            / "models"
+            / "analysis_outputs"
+        )
+
+        directory.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        target = directory / (
+            f"{Path(image_path).stem}_analysis_summary.png"
+        )
+
+        fig.savefig(
+            target,
+            dpi=160,
+            facecolor=fig.get_facecolor(),
+        )
+
+        return str(target)
+
+    finally:
+        plt.close(fig)
 def analyze_dental_image(
     image_path,
     output_dir=None,
@@ -415,22 +413,11 @@ def analyze_dental_image(
     # Generate combined summary
     # =====================================================
 
-    combined_summary_path = (
-        save_combined_analysis_summary(
-
-            image_path,
-
-            gradcam_result[
-                "gradcam_summary"
-            ],
-
-            segmentation_result[
-                "segmentation_output"
-            ],
-
-            severity_result,
-            output_dir=output_dir
-        )
+    combined_summary_path = save_combined_analysis_summary(
+        image_path,
+        heatmaps=gradcam_result.pop("_heatmaps"),
+        mask=segmentation_result.pop("_mask"),
+        output_dir=output_dir,
     )
 
     # =====================================================

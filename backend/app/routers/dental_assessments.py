@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Depends, Path, Query
 from sqlalchemy.orm import Session
 
 from typing import Literal
@@ -29,6 +29,21 @@ def start_assessment(
         image_id,
     )
 
+@router.get("/history")
+def list_history(
+    pet_id: int = Query(ge=1, le=2147483647),
+    offset: int = Query(default=0, ge=0),
+    limit: int = Query(default=20, ge=1, le=100),
+    current_user: User = Depends(require_roles("pet_owner")),
+    db: Session = Depends(get_db),
+):
+    return dental_assessment_service.list_assessment_history(
+        db,
+        current_user,
+        pet_id,
+        offset=offset,
+        limit=limit,
+    )
 
 @router.get("/{job_id}")
 def get_assessment(

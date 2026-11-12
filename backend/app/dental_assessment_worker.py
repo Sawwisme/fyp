@@ -4,12 +4,12 @@ import math
 import os
 import re
 import shutil
-import subprocess
-import sys
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
 from uuid import uuid4
+from threading import local
+from app.services.model_process_client import ModelProcessClient
 
 from sqlalchemy import and_, or_, select
 
@@ -158,73 +158,15 @@ def uploaded_image_path(image_id):
     return target
 
 
+_model_process = local()
+
+
 def run_models(image_path, output_directory, stop_event):
-    environment = os.environ.copy()
-    environment["TF_NUM_INTRAOP_THREADS"] = "2"
-    environment["TF_NUM_INTEROP_THREADS"] = "2"
-    environment["TF_CPP_MIN_LOG_LEVEL"] = "2"
-    environment["MPLBACKEND"] = "Agg"
-
-    command = [
-        sys.executable,
-        "-B",
-        str(RUNNER),
-        "--image",
-        str(image_path),
-        "--output-dir",
-        str(output_directory),
-    ]
-
-    process = subprocess.Popen(
-        command,
-        cwd=str(RUNNER.parent),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        env=environment,
-        creationflags=(
-            subprocess.CREATE_NO_WINDOW
-            if os.name == "nt"
-            else 0
-        ),
-    )
-
-    deadline = utc_now() + timedelta(seconds=PROCESS_TIMEOUT)
-
-    try:
-        while True:
-            if stop_event.is_set():
-                raise InterruptedError("Worker is stopping.")
-
-            if utc_now() >= deadline:
-                raise TimeoutError("Model processing timed out.")
-
-            try:
-                stdout, stderr = process.communicate(timeout=1)
-                break
-            except subprocess.TimeoutExpired:
-                continue
-
-        if process.returncode != 0:
-            logger.error(
-                "Dental model runner failed: %s",
-                stderr[-2000:],
-            )
-            raise RuntimeError("Model runner failed.")
-
-        result = json.loads(stdout)
-
-        if result.get("status") not in {"completed", "rejected"}:
-            raise ValueError("Unexpected model runner response.")
-
-        return result
-
-    finally:
-        if process.poll() is None:
-            process.kill()
-            process.communicate()
+    client = getattr(_model_process, "client", None)
+    if client is None:
+        client = ModelProcessClient(RUNNER, timeout=PROCESS_TIMEOUT)
+        _model_process.client = client
+    return client.run(image_path, output_directory, stop_event)
 
 
 def validate_predictions(result):
@@ -353,6 +295,7 @@ def save_result(job_id, token, payload, attempt_directory):
         # Do not store local filesystem paths in this response.
         job.result_summary = {
             "model_version": MODEL_VERSION,
+            "segmentation_palette": "red-yellow-v1",
             "predictions": public_predictions,
             "segmentation": extract_segmentation_metrics(
                 result.get("segmentation")
@@ -451,15 +394,21 @@ def process_job(claimed, stop_event):
 
 
 def run_worker(stop_event):
-    while not stop_event.is_set():
-        try:
-            claimed = claim_job()
+    try:
+        while not stop_event.is_set():
+            try:
+                claimed = claim_job()
 
-            if claimed is not None:
-                process_job(claimed, stop_event)
-                continue
+                if claimed is not None:
+                    process_job(claimed, stop_event)
+                    continue
 
-        except Exception:
-            logger.exception("Dental assessment worker failed")
+            except Exception:
+                logger.exception("Dental assessment worker failed")
 
-        stop_event.wait(3)
+            stop_event.wait(3)
+    finally:
+        client = getattr(_model_process, "client", None)
+        if client is not None:
+            client.close()
+            del _model_process.client

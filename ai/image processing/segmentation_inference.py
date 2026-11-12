@@ -171,10 +171,10 @@ def create_colored_mask(
         mask == 1
     ] = [255, 0, 0]
 
-    # Calculus = Green
+    # Calculus = Yellow
     colored_mask[
         mask == 2
-    ] = [0, 255, 0]
+    ] = [255, 214, 0]
 
     return colored_mask
 
@@ -265,7 +265,7 @@ def save_segmentation_result(
 
     plt.title(
         "Dental Segmentation Result\n"
-        "Red = Gingivitis | Green = Calculus"
+        "Red = Gingivitis | Yellow = Calculus"
     )
 
     plt.axis("off")
@@ -331,6 +331,8 @@ def run_segmentation(
     )
 
     return {
+        "_mask": result["mask"],
+
         "gingivitis_area_percent":
             result[
                 "gingivitis_area_percent"

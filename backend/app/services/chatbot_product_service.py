@@ -29,7 +29,7 @@ def pet_age_months(pet):
         - int(today.day < born.day)
     )
 
-def product_reply(db, current_user, pet_id):
+def product_reply(db, current_user, pet_id, *, products=None):
     # Checks owner access and selected-pet ownership.
     context = build_chat_context(db, current_user, pet_id)
 
@@ -127,6 +127,7 @@ def product_reply(db, current_user, pet_id):
     records = db.execute(
         select(
             Product.product_id,
+            Product.clinic_id,
             Product.product_name,
             Product.price,
             ProductCategory.category_name,
@@ -178,6 +179,18 @@ def product_reply(db, current_user, pet_id):
             "Some products may have incomplete suitability details. "
             "Browse Shop or ask the clinic before choosing.",
             "OPEN_SHOP",
+        )
+
+    if products is not None:
+        products.extend(
+            {
+                "product_id": product["product_id"],
+                "clinic_id": product["clinic_id"],
+                "product_name": product["product_name"],
+                "clinic_name": product["clinic_name"],
+                "price": str(product["price"]),
+            }
+            for product in records
         )
     
     sections = [
