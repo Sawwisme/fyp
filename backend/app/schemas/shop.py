@@ -12,6 +12,8 @@ class ShopClinicResponse(BaseModel):
     clinic_name: str
     address: str | None
     phone_number: str | None
+    latitude: float | None = None
+    longitude: float | None = None
     completed_visit_count: int = 0
     last_visit_date: date | None = None
 

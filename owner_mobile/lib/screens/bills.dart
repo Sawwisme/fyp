@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../services/billing_service.dart';
 import 'bill_details.dart';
+import '../services/checkout_service.dart';
+import 'shop_orders.dart';
 
-class BillsScreen extends StatefulWidget {
+class BillsScreen extends StatelessWidget {
   final BillingService service;
 
   const BillsScreen({
@@ -12,10 +14,58 @@ class BillsScreen extends StatefulWidget {
   });
 
   @override
-  State<BillsScreen> createState() => _BillsScreenState();
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFEEF1F5),
+        appBar: AppBar(
+          title: const Text('Bills & Receipts'),
+          bottom: const TabBar(
+            labelColor: Color(0xFF5B83E8),
+            unselectedLabelColor: Color(0xFF8297BD),
+            indicatorColor: Color(0xFF7CA2F5),
+            tabs: [
+              Tab(
+                icon: Icon(Icons.medical_services_outlined),
+                text: 'Consultations',
+              ),
+              Tab(
+                icon: Icon(Icons.shopping_bag_outlined),
+                text: 'Shop purchases',
+              ),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            ConsultationBillsScreen(
+              service: service,
+            ),
+            ShopOrdersScreen(
+              service: CheckoutService(service.api),
+              embedded: true,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-class _BillsScreenState extends State<BillsScreen> {
+class ConsultationBillsScreen extends StatefulWidget {
+  final BillingService service;
+
+  const ConsultationBillsScreen({
+    super.key,
+    required this.service,
+  });
+
+  @override
+  State<ConsultationBillsScreen> createState() => _ConsultationBillsScreenState();
+}
+
+class _ConsultationBillsScreenState extends State<ConsultationBillsScreen> {
   static const _green = Color(0xFF2549C7);
   static const _pageSize = 10;
 
@@ -213,16 +263,6 @@ class _BillsScreenState extends State<BillsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFEEF1F5),
-      appBar: AppBar(
-        title: const Text('Bills & Receipts'),
-        actions: [
-          IconButton(
-            tooltip: 'Refresh bills',
-            onPressed: _openingBill ? null : () => _reload(),
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
-      ),
       body: Column(
         children: [
           Padding(

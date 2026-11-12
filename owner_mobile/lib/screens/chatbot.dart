@@ -20,6 +20,7 @@ import '../services/cart_service.dart';
 import 'chat_product_card.dart';
 import 'clinic_picker.dart';
 import 'book_appointment.dart';
+import 'chat_booking_flow.dart';
 
 class ChatbotScreen extends StatefulWidget {
   final ChatbotService service;
@@ -36,6 +37,7 @@ class ChatbotScreen extends StatefulWidget {
 class _ChatbotScreenState extends State<ChatbotScreen> {
   static const _blue = Color(0xFF2549C7);
   static const _navy = Color(0xFF172333);
+  bool _showChatBooking = false;
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _chatSearch = TextEditingController();
@@ -617,32 +619,10 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
     switch (action) {
       case 'OPEN_APPOINTMENT_BOOKING':
-        await _run(() async {
-          final clinic = await Navigator.of(context)
-              .push<Map<String, dynamic>>(
-            MaterialPageRoute(
-              builder: (_) => ClinicPickerScreen(
-                service: AppointmentService(api),
-              ),
-            ),
-          );
-
-          if (!mounted || clinic == null) return;
-
-          await Navigator.of(context).push<bool>(
-            MaterialPageRoute(
-              builder: (_) => BookAppointmentScreen(
-                clinic: clinic,
-                service: AppointmentService(api),
-                petService: PetService(api),
-                initialPetId: reference?['pet_id'] is int
-                    ? reference!['pet_id'] as int
-                    : _selected?['pet_id'] as int?,
-              ),
-            ),
-          );
-        });
+        setState(() => _showChatBooking = true);
+        _scrollToLatest();
         return;
+
       case 'OPEN_AI_ANALYSIS':
         page = Scaffold(
           appBar: AppBar(
@@ -720,6 +700,34 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     );
   }
 
+  Future<void> _openRegularBookingPage() async {
+    if (_busy || _pending != null) return;
+
+    final api = widget.service.api;
+
+    final clinic = await Navigator.of(context)
+        .push<Map<String, dynamic>>(
+      MaterialPageRoute(
+        builder: (_) => ClinicPickerScreen(
+          service: AppointmentService(api),
+        ),
+      ),
+    );
+
+    if (!mounted || clinic == null) return;
+
+    await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => BookAppointmentScreen(
+          clinic: clinic,
+          service: AppointmentService(api),
+          petService: PetService(api),
+          initialPetId: _selected?['pet_id'] as int?,
+        ),
+      ),
+    );
+  }
+
   Widget _messageBubble(Map<String, dynamic> message) {
     final mine = message['sender_type'] == 'user';
     final metadata = message['response_metadata'];
@@ -742,7 +750,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
       'OPEN_FOLLOWUP_CARE': 'Open follow-up care',
       'OPEN_SHOP': 'Browse clinic shops',
       'OPEN_MEDICAL_HISTORY': 'Open medical history',
-      'OPEN_APPOINTMENT_BOOKING': 'Choose appointment time',
+      'OPEN_APPOINTMENT_BOOKING': 'Book with assistant',
     };
     final rawSources = metadata is Map ? metadata['sources'] : null;
     final rawProducts = metadata is Map ? metadata['products'] : null;
@@ -1095,6 +1103,12 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                 ),
               if (_messages.isEmpty) _welcome(),
               ..._messages.map(_messageBubble),
+              if (_showChatBooking)
+                ChatBookingFlow(
+                  appointments: AppointmentService(widget.service.api),
+                  pets: PetService(widget.service.api),
+                  onOpenBookingPage: _openRegularBookingPage,
+                ),
             ],
           ),
         ),

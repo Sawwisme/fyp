@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Depends, Path, Query
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -12,6 +12,16 @@ router = APIRouter(
     prefix="/shop/cart",
     tags=["Owner Cart"],
 )
+
+
+@router.get("", response_model=list[CartResponse])
+def list_my_carts(
+    offset: int = Query(default=0, ge=0),
+    limit: int = Query(default=20, ge=1, le=100),
+    current_user: User = Depends(require_roles("pet_owner")),
+    db: Session = Depends(get_db),
+):
+    return cart_service.list_my_carts(db, current_user, offset, limit)
 
 
 @router.get(

@@ -81,9 +81,15 @@ def list_shop_clinics(
 
     if keyword:
         statement = statement.where(
-            Clinic.clinic_name.contains(
-                keyword,
-                autoescape=True,
+            or_(
+                Clinic.clinic_name.contains(
+                    keyword,
+                    autoescape=True,
+                ),
+                Clinic.address.contains(
+                    keyword,
+                    autoescape=True,
+                ),
             )
         )
 
@@ -105,6 +111,16 @@ def list_shop_clinics(
             clinic_name=clinic.clinic_name,
             address=clinic.address,
             phone_number=clinic.phone_number,
+            latitude=(
+                float(clinic.latitude)
+                if clinic.latitude is not None
+                else None
+            ),
+            longitude=(
+                float(clinic.longitude)
+                if clinic.longitude is not None
+                else None
+            ),
             completed_visit_count=int(count),
             last_visit_date=last_visit,
         )

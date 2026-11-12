@@ -5,10 +5,12 @@ import 'shop_order_details.dart';
 
 class ShopOrdersScreen extends StatefulWidget {
   final CheckoutService service;
+  final bool embedded;
 
   const ShopOrdersScreen({
     super.key,
     required this.service,
+    this.embedded = false,
   });
 
   @override
@@ -222,16 +224,18 @@ class _ShopOrdersScreenState extends State<ShopOrdersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFEEF1F5),
-      appBar: AppBar(
-        title: const Text('My Orders'),
-        actions: [
-          IconButton(
-            tooltip: 'Refresh orders',
-            onPressed: () => _load(0),
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
-      ),
+      appBar: widget.embedded
+          ? null
+          : AppBar(
+              title: const Text('My Orders'),
+              actions: [
+                IconButton(
+                  tooltip: 'Refresh orders',
+                  onPressed: () => _load(0),
+                  icon: const Icon(Icons.refresh),
+                ),
+              ],
+            ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _future,
         builder: (context, snapshot) {

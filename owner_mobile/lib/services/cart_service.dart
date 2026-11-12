@@ -15,6 +15,18 @@ class CartService {
     return data;
   }
 
+  Future<List<Map<String, dynamic>>> getMyCarts() async {
+    final carts = <Map<String, dynamic>>[];
+    for (var offset = 0; ; offset += 100) {
+      final data = await api.get('/shop/cart?offset=$offset&limit=100');
+      if (data is! List) {
+        throw const ApiException('Invalid cart list response.');
+      }
+      carts.addAll(data.map(_readCart));
+      if (data.length < 100) return carts;
+    }
+  }
+
   Future<Map<String, dynamic>> getCart(int clinicId) async {
     return _readCart(
       await api.get('/shop/cart/$clinicId'),

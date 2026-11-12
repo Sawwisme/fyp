@@ -236,3 +236,20 @@ def set_cart_quantity(
     except Exception:
         db.rollback()
         raise
+
+def list_my_carts(db: Session, current_user: User, offset: int, limit: int):
+    owner = get_owner_profile(db, current_user)
+    clinics = db.scalars(
+        select(Clinic)
+        .join(Cart, Cart.clinic_id == Clinic.clinic_id)
+        .where(
+            Cart.pet_owner_id == owner.pet_owner_id,
+            select(CartItem.cart_item_id)
+            .where(CartItem.cart_id == Cart.cart_id)
+            .exists(),
+        )
+        .order_by(Clinic.clinic_name, Clinic.clinic_id)
+        .offset(offset)
+        .limit(limit)
+    ).all()
+    return [_build_cart(db, owner.pet_owner_id, clinic) for clinic in clinics]

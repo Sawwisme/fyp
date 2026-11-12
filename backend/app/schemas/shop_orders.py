@@ -89,6 +89,10 @@ class ShopOrderResponse(BaseModel):
     order_status: str
     payment_status: str
     payment_method: str
+    payment_id: int | None = None
+    receipt_number: str | None = None
+    payment_date: datetime | None = None
+    paid_amount: Decimal | None = None
 
     shipping_method: str
     shipping_address: str
@@ -107,7 +111,7 @@ class ShopOrderResponse(BaseModel):
     payment_expires_at: datetime | None
     items: list[ShopOrderItemResponse]
 
-    @field_validator("order_date", "payment_expires_at")
+    @field_validator("order_date", "payment_expires_at", "payment_date")
     @classmethod
     def include_utc_offset(cls, value):
         if value is not None and value.tzinfo is None:

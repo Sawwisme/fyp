@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/checkout_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'shop_refunds.dart';
+import 'shop_receipt.dart';
 
 class ShopOrderDetailsScreen extends StatefulWidget {
   final CheckoutService service;
@@ -200,6 +201,24 @@ class _ShopOrderDetailsScreenState
         }
       }
     }
+  }
+
+  Future<void> _openReceipt() async {
+    if (_loading ||
+        _cancelling ||
+        _openingPayment ||
+        _checkingPayment) {
+      return;
+    }
+
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => ShopReceiptScreen(
+          service: widget.service,
+          orderId: widget.orderId,
+        ),
+      ),
+    );
   }
 
   Future<void> _refreshPaymentResult() async {
@@ -526,6 +545,14 @@ class _ShopOrderDetailsScreenState
           const Divider(),
           _amount('Total', order['total_amount'], total: true),
         ]),
+        if (order['payment_status'] == 'paid') ...[
+          OutlinedButton.icon(
+            onPressed: busy || _error != null ? null : _openReceipt,
+            icon: const Icon(Icons.receipt_long_outlined),
+            label: const Text('View / save receipt'),
+          ),
+          const SizedBox(height: 16),
+        ],
         if (_paymentMessage != null)
           Padding(
             padding: const EdgeInsets.only(bottom: 16),

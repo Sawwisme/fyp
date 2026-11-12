@@ -71,6 +71,21 @@ def build_order_response(db: Session, order: Order):
         payment_status=(
             payment.payment_status if payment is not None else "unavailable"
         ),
+        payment_id=(
+            payment.payment_id if payment is not None else None
+        ),
+        receipt_number=(
+            payment.receipt_number if payment is not None else None
+        ),
+        payment_date=(
+            payment.payment_date if payment is not None else None
+        ),
+        paid_amount=(
+            payment.amount
+            if payment is not None
+            and payment.payment_status == "paid"
+            else None
+        ),
         shipping_method=order.shipping_method,
         shipping_address=order.shipping_address,
         recipient_name=order.recipient_name,
