@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/web/styles.css?v=cobalt-components-2">
     <link rel="stylesheet" href="/web/admin/dashboard.css?v=cobalt-components-2">
     <link rel="stylesheet" href="/web/admin/layout.css?v=cobalt-components-2">
+    <link rel="stylesheet" href="/web/staff-dashboard.css?v=1">
 
     <script src="/web/admin/layout.js" defer></script>
     <script src="/web/admin/dashboard.js" defer></script>
@@ -16,8 +17,10 @@
     <link rel="stylesheet" href="/web/cobalt.css?v=cobalt-components-2">
     <link rel="stylesheet" href="/web/workspace-design.css?v=1">
     <link rel="stylesheet" href="/web/workspace-polish.css?v=1">
-    <script src="/web/sidebar-controls.js?v=2" defer></script>
-    <link rel="stylesheet" href="/web/sidebar-motion.css?v=1">
+    <script src="/web/sidebar-controls.js?v=3" defer></script>
+    <link rel="stylesheet" href="/web/sidebar-motion.css?v=3">
+    <script src="/web/staff-dashboard.js?v=1" defer></script>
+    <script src="/web/dashboard-work.js?v=1" defer></script>
 </head>
 
 <body>
@@ -36,72 +39,94 @@
             <header id="shared-topbar" class="topbar"></header>
 
             <main class="main-content">
-                <section id="dashboard-view" aria-labelledby="dashboard-title">
-                    <div class="page-heading">
-                        <h1 id="dashboard-title" tabindex="-1">Dashboard</h1>
-                        <p class="subtitle">
-                            Welcome back, <span id="admin-name"></span>.
-                        </p>
-                    </div>
+                <section id="dashboard-view" class="staff-dash" data-dashboard-role="admin"
+                    aria-labelledby="dashboard-title">
 
-                    <div class="summary-grid">
-                        <article class="panel summary-card">
-                            <h2>Total users</h2>
-                            <p class="summary-value">—</p>
-                            <p>User management coming soon</p>
-                        </article>
+                    <section class="dash-hero">
+                        <p class="dash-eyebrow">YOUR CLINIC WORKSPACE</p>
+                        <h1 id="dashboard-title" tabindex="-1">
+                            Hello, <span id="admin-name"></span>.
+                        </h1>
+                        <p>Keep your team, appointments and clinic operations connected.</p>
+                    </section>
 
-                        <article class="panel summary-card">
-                            <h2>Appointments</h2>
-                            <p class="summary-value">—</p>
-                            <p>Appointment management coming soon</p>
-                        </article>
-
-                        <article class="panel summary-card">
-                            <h2>Monthly revenue</h2>
-                            <p class="summary-value">—</p>
-                            <p>Financial overview coming soon</p>
-                        </article>
-
-                        <article class="panel summary-card">
-                            <h2>Pending orders</h2>
-                            <p class="summary-value">—</p>
-                            <p>Order management coming soon</p>
-                        </article>
-                    </div>
-
-                    <section class="panel section-panel" aria-labelledby="appointments-title">
-                        <h2 id="appointments-title">
-                            Today’s appointments
+                    <section aria-labelledby="admin-shortcuts">
+                        <h2 id="admin-shortcuts" class="dash-section-heading">
+                            Quick access
                         </h2>
 
-                        <div class="empty-state">
-                            <h3>Your appointment overview will appear here</h3>
-                            <p>
-                                This section will become available after
-                                schedules and booking are ready.
-                            </p>
+                        <nav class="dash-actions" aria-label="Clinic shortcuts">
+                            <a class="dash-action" href="/web/admin/schedules.html">
+                                <span aria-hidden="true">▦</span>
+                                Appointment schedule
+                            </a>
+                            <a class="dash-action" href="/web/admin/user_management.html">
+                                <span aria-hidden="true">♙</span>
+                                Staff accounts
+                            </a>
+                            <a class="dash-action" href="/web/admin/products.html">
+                                <span aria-hidden="true">□</span>
+                                Products
+                            </a>
+                            <a class="dash-action" href="/web/admin/orders.html">
+                                <span aria-hidden="true">▣</span>
+                                Shop orders
+                            </a>
+                            <a class="dash-action" href="/web/admin/billing.html">
+                                <span aria-hidden="true">▤</span>
+                                Consultation billing
+                            </a>
+                            <a class="dash-action" href="/web/admin/reports.html">
+                                <span aria-hidden="true">↗</span>
+                                Reports
+                            </a>
+                        </nav>
+                    </section>
+
+                    <section>
+                        <div class="dash-toolbar">
+                            <h2 class="dash-section-heading">Clinic overview</h2>
+                            <button type="button" class="secondary compact-button" data-dash-refresh>
+                                Refresh
+                            </button>
+                        </div>
+
+                        <p class="dash-note" data-dash-date></p>
+                        <p role="status" data-dash-error></p>
+
+                        <div class="dash-stats">
+                            <article class="dash-stat">
+                                <p>Today’s appointments</p>
+                                <strong data-dash-value="appointments">—</strong>
+                                <small>All clinic vets and appointment statuses</small>
+                            </article>
+                            <article class="dash-stat">
+                                <p>Completed consultations</p>
+                                <strong data-dash-value="consultations">—</strong>
+                                <small>This month to date</small>
+                            </article>
+                            <article class="dash-stat">
+                                <p>Shop orders this month</p>
+                                <strong data-dash-value="orders">—</strong>
+                                <small>Orders placed, including cancelled orders</small>
+                            </article>
+                            <article class="dash-stat">
+                                <p>Net collections this month</p>
+                                <strong data-dash-value="collections">—</strong>
+                                <small>Recorded collections minus refunds; not profit</small>
+                            </article>
                         </div>
                     </section>
 
-                    <div class="lower-grid">
-                        <section class="panel" aria-labelledby="alerts-title">
-                            <h2 id="alerts-title">Clinic alerts</h2>
-                            <p class="muted">
-                                Appointment and inventory alerts will
-                                appear here when those modules are ready.
-                            </p>
-                        </section>
-
-                        <section class="panel" aria-labelledby="setup-title">
-                            <h2 id="setup-title">Next setup step</h2>
-                            <h3>Veterinarian accounts</h3>
-                            <p class="muted">
-                                Add your clinic’s veterinarians before
-                                setting up their schedules.
-                            </p>
-                        </section>
-                    </div>
+                    <section class="dash-panel">
+                        <div class="dash-toolbar">
+                            <h2 class="dash-section-heading">
+                                Today’s appointment status
+                            </h2>
+                            <a href="/web/admin/schedules.html">Open schedule →</a>
+                        </div>
+                        <div data-dash-statuses aria-live="polite"></div>
+                    </section>
                 </section>
 
                 <section id="profile-view" hidden aria-labelledby="profile-title">
