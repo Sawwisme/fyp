@@ -26,6 +26,7 @@ class _ChatProductCardState extends State<ChatProductCard> {
   bool _busy = false;
   bool _uncertain = false;
   String? _message;
+  int _quantity = 1;
 
   Future<void> _add({required bool checkout}) async {
     if (_busy || _uncertain || !widget.enabled) return;
@@ -38,9 +39,37 @@ class _ChatProductCardState extends State<ChatProductCard> {
     var added = false;
 
     try {
-      await widget.service.addProduct(
-        clinicId: widget.product['clinic_id'] as int,
-        productId: widget.product['product_id'] as int,
+      final clinicId = widget.product['clinic_id'] as int;
+      final productId = widget.product['product_id'] as int;
+
+// Read the current cart so existing quantities are preserved.
+      final cart = await widget.service.getCart(clinicId);
+
+      var existingQuantity = 0;
+
+      for (final entry in cart['items'] as List) {
+        final item = Map<String, dynamic>.from(entry as Map);
+
+        if (item['product_id'] == productId) {
+          existingQuantity = item['quantity'] as int;
+          break;
+        }
+      }
+
+      final requestedQuantity = existingQuantity + _quantity;
+
+      if (requestedQuantity > 99) {
+        throw const ApiException(
+          'The cart can contain up to 99 units of one product.',
+          statusCode: 422,
+        );
+      }
+
+      await widget.service.setQuantity(
+        clinicId: clinicId,
+        productId: productId,
+        expectedVersion: cart['version'] as int,
+        quantity: requestedQuantity,
       );
 
       added = true;
@@ -48,7 +77,8 @@ class _ChatProductCardState extends State<ChatProductCard> {
       if (!mounted) return;
 
       setState(() {
-        _message = 'One item added to your clinic cart.';
+        _message = '$_quantity '
+            '${_quantity == 1 ? 'item' : 'items'} added to your clinic cart.';
       });
 
       if (checkout) {
@@ -139,6 +169,75 @@ class _ChatProductCardState extends State<ChatProductCard> {
                 : 'RM ${price.toStringAsFixed(2)}',
           ),
           const SizedBox(height: 10),
+          if ((widget.product['recommendation_reason'] ?? '')
+              .toString()
+              .trim()
+              .isNotEmpty) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEAF0FF),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Why this matches',
+                    style: TextStyle(
+                      color: Color(0xFF2549C7),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    '${widget.product['recommendation_reason']}',
+                    style: const TextStyle(fontSize: 12, height: 1.5),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
+
+          if ((widget.product['suitability_notes'] ?? '')
+              .toString()
+              .trim()
+              .isNotEmpty) ...[
+            Text(
+              'Label notes: ${widget.product['suitability_notes']}',
+              style: const TextStyle(
+                fontSize: 12,
+                color: Color(0xFF53627A),
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
+
+          DropdownButtonFormField<int>(
+            initialValue: _quantity,
+            decoration: const InputDecoration(
+              labelText: 'Quantity to add',
+              border: OutlineInputBorder(),
+              isDense: true,
+            ),
+            items: [
+              for (var value = 1; value <= 10; value++)
+                DropdownMenuItem(
+                  value: value,
+                  child: Text('$value'),
+                ),
+            ],
+            onChanged: canAdd
+                ? (value) {
+              if (value == null) return;
+              setState(() => _quantity = value);
+            }
+                : null,
+          ),
+          const SizedBox(height: 12),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -159,8 +258,9 @@ class _ChatProductCardState extends State<ChatProductCard> {
           ),
           const SizedBox(height: 6),
           const Text(
-            'Buy now adds one item and opens this clinic’s cart checkout. '
-                'Existing cart items are included. Price and stock are rechecked.',
+            'Buy now adds the selected quantity and opens checkout. '
+                'Existing items in this clinic’s cart are included. '
+                'Price and stock are checked again.',
             style: TextStyle(
               fontSize: 12,
               color: Color(0xFF53627A),

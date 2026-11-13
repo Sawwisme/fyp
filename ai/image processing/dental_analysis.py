@@ -408,6 +408,54 @@ def analyze_dental_image(
         )
     )
 
+    # Diagnostic output for tracing incorrect severity results.
+# This does not change predictions or the displayed result.
+import json
+
+healthy_positive = (
+    predictions.get("healthy", {}).get("positive") is True
+)
+
+positive_diseases = [
+    name
+    for name in ("plaque", "gingivitis", "calculus")
+    if predictions.get(name, {}).get("positive") is True
+]
+
+diagnostic = {
+    "classification": {
+        name: {
+            "score": float(values["confidence"]),
+            "threshold": float(values["threshold"]),
+            "positive": bool(values["positive"]),
+        }
+        for name, values in predictions.items()
+    },
+    "healthy_and_disease_conflict": (
+        healthy_positive and bool(positive_diseases)
+    ),
+    "positive_diseases": positive_diseases,
+    "gradcam_spread_percent": {
+        name: float(value)
+        for name, value in gradcam_spreads.items()
+    },
+    "segmentation": {
+        "gingivitis_area_percent": float(gingivitis_area),
+        "calculus_area_percent": float(calculus_area),
+    },
+    "severity": severity_result,
+}
+
+print(
+    "DENTAL_DIAGNOSTIC "
+    + json.dumps(
+        diagnostic,
+        ensure_ascii=False,
+        allow_nan=False,
+    ),
+    flush=True,
+)
+
     # =====================================================
     # STEP 6:
     # Generate combined summary

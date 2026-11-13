@@ -10,19 +10,23 @@ class ChatBookingFlow extends StatefulWidget {
   final AppointmentService appointments;
   final PetService pets;
   final VoidCallback onOpenBookingPage;
+  final VoidCallback onCancel;
 
   const ChatBookingFlow({
     super.key,
     required this.appointments,
     required this.pets,
     required this.onOpenBookingPage,
+    required this.onCancel,
   });
 
   @override
   State<ChatBookingFlow> createState() => _ChatBookingFlowState();
 }
 
-class _ChatBookingFlowState extends State<ChatBookingFlow> {
+class _ChatBookingFlowState extends State<ChatBookingFlow> with AutomaticKeepAliveClientMixin<ChatBookingFlow> {
+  @override
+  bool get wantKeepAlive => true;
   static const _blue = Color(0xFF2549C7);
 
   final _history = <String>[];
@@ -336,6 +340,8 @@ class _ChatBookingFlowState extends State<ChatBookingFlow> {
     final appointment = _appointment;
     if (_busy || appointment == null) return;
 
+    final appointmentId = appointment['appointment_id'] as int;
+
     setState(() => _busy = true);
 
     try {
@@ -343,18 +349,40 @@ class _ChatBookingFlowState extends State<ChatBookingFlow> {
         MaterialPageRoute(
           builder: (_) => BookingPaymentScreen(
             service: widget.appointments,
-            appointmentId: appointment['appointment_id'] as int,
+            appointmentId: appointmentId,
+            onStatusChanged: (data) {
+              if (!mounted ||
+                  data['appointment_id'] != appointmentId ||
+                  _appointment?['appointment_id'] != appointmentId) {
+                return;
+              }
+
+              final status = data['appointment_status'];
+              if (status is! String) return;
+
+              setState(() {
+                _appointment = {
+                  ..._appointment!,
+                  'status': status,
+                  'payment_status': data['payment_status'],
+                  'checkout_status': data['checkout_status'],
+                };
+              });
+            },
           ),
         ),
       );
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (mounted) {
+        setState(() => _busy = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final appointment = _appointment;
+    super.build(context);
 
     return Container(
       width: double.infinity,
@@ -368,16 +396,30 @@ class _ChatBookingFlowState extends State<ChatBookingFlow> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.calendar_month_rounded, color: _blue),
-              SizedBox(width: 10),
-              Text(
-                'Appointment assistant',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
+              const Icon(
+                Icons.calendar_month_rounded,
+                color: _blue,
+              ),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Text(
+                  'Appointment assistant',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
+              ),
+              IconButton(
+                tooltip: appointment != null
+                    ? 'Close booking summary'
+                    : 'Cancel booking steps',
+                onPressed: _busy || (_request != null && appointment == null)
+                    ? null
+                    : widget.onCancel,
+                icon: const Icon(Icons.close_rounded),
               ),
             ],
           ),
@@ -396,10 +438,19 @@ class _ChatBookingFlowState extends State<ChatBookingFlow> {
 
           if (appointment != null) ...[
             Text(
-              appointment['status'] == 'confirmed'
-                  ? 'Appointment #${appointment['appointment_id']} confirmed.'
-                  : 'Appointment #${appointment['appointment_id']} created. '
-                  'Status: ${appointment['status']}.',
+              switch (appointment['status']) {
+                'confirmed' =>
+                'Appointment #${appointment['appointment_id']} confirmed.',
+                'pending_payment' =>
+                'Appointment #${appointment['appointment_id']} is awaiting payment.',
+                'cancelled' =>
+                'Appointment #${appointment['appointment_id']} was cancelled.',
+                'completed' =>
+                'Appointment #${appointment['appointment_id']} is completed.',
+                _ =>
+                'Appointment #${appointment['appointment_id']}: '
+                    '${appointment['status'].toString().replaceAll('_', ' ')}.',
+              },
               style: const TextStyle(fontWeight: FontWeight.w700),
             ),
             if (appointment['status'] == 'pending_payment') ...[

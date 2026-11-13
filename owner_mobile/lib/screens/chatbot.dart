@@ -37,7 +37,7 @@ class ChatbotScreen extends StatefulWidget {
 class _ChatbotScreenState extends State<ChatbotScreen> {
   static const _blue = Color(0xFF2549C7);
   static const _navy = Color(0xFF172333);
-  bool _showChatBooking = false;
+  final Set<int> _bookingChatIds = {};
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _chatSearch = TextEditingController();
@@ -619,7 +619,14 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
     switch (action) {
       case 'OPEN_APPOINTMENT_BOOKING':
-        setState(() => _showChatBooking = true);
+        final conversationId = _selected?['conversation_id'];
+
+        if (conversationId is! int) return;
+
+        setState(() {
+          _bookingChatIds.add(conversationId);
+        });
+
         _scrollToLatest();
         return;
 
@@ -1103,11 +1110,21 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                 ),
               if (_messages.isEmpty) _welcome(),
               ..._messages.map(_messageBubble),
-              if (_showChatBooking)
-                ChatBookingFlow(
-                  appointments: AppointmentService(widget.service.api),
-                  pets: PetService(widget.service.api),
-                  onOpenBookingPage: _openRegularBookingPage,
+              for (final conversationId in _bookingChatIds)
+                Offstage(
+                  key: ValueKey('booking-chat-$conversationId'),
+                  offstage:
+                  _selected?['conversation_id'] != conversationId,
+                  child: ChatBookingFlow(
+                    appointments: AppointmentService(widget.service.api),
+                    pets: PetService(widget.service.api),
+                    onOpenBookingPage: _openRegularBookingPage,
+                    onCancel: () {
+                      setState(() {
+                        _bookingChatIds.remove(conversationId);
+                      });
+                    },
+                  ),
                 ),
             ],
           ),

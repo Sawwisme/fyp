@@ -182,17 +182,30 @@ def product_reply(db, current_user, pet_id, *, products=None):
         )
 
     if products is not None:
-        products.extend(
-            {
+        for product in records:
+            if age_months is None:
+                reason = (
+                    f"Listed for {species}s with no minimum-age restriction. "
+                    "Your pet's age is not recorded; check the full label."
+                )
+            else:
+                reason = (
+                    f"Matches the recorded species ({species}) and age "
+                    f"({age_months} months). Minimum product age: "
+                    f"{product['minimum_age_months']} months."
+                )
+
+            products.append({
                 "product_id": product["product_id"],
                 "clinic_id": product["clinic_id"],
                 "product_name": product["product_name"],
                 "clinic_name": product["clinic_name"],
                 "price": str(product["price"]),
-            }
-            for product in records
-        )
-    
+                "category_name": product["category_name"],
+                "recommendation_reason": reason,
+                "suitability_notes": product["suitability_notes"],
+            })
+            
     sections = [
         f"Catalogue options matching {pet['name']}'s recorded "
         "species and minimum-age criteria. This does not establish "

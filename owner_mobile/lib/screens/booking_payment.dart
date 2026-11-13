@@ -8,11 +8,13 @@ import '../services/appointment_service.dart';
 class BookingPaymentScreen extends StatefulWidget {
   final AppointmentService service;
   final int appointmentId;
+  final ValueChanged<Map<String, dynamic>>? onStatusChanged;
 
   const BookingPaymentScreen({
     super.key,
     required this.service,
     required this.appointmentId,
+    this.onStatusChanged,
   });
 
   @override
@@ -103,6 +105,10 @@ class _BookingPaymentScreenState
       if (!mounted) return;
 
       setState(() => _data = data);
+
+      widget.onStatusChanged?.call(
+        Map<String, dynamic>.from(data),
+      );
 
       if ([
         'cancelled',
