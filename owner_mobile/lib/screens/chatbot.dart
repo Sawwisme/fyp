@@ -738,6 +738,23 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   Widget _messageBubble(Map<String, dynamic> message) {
     final mine = message['sender_type'] == 'user';
     final metadata = message['response_metadata'];
+    final rawSuggestions =
+    metadata is Map ? metadata['suggested_questions'] : null;
+
+    final suggestions = rawSuggestions is List
+        ? rawSuggestions
+        .whereType<String>()
+        .where((text) => text.trim().isNotEmpty)
+        .take(2)
+        .toList()
+        : <String>[];
+
+    final isLatestMessage = _messages.isNotEmpty &&
+        _messages.last['message_id'] == message['message_id'];
+
+    final canChooseSuggestion = !_busy &&
+        _pending == null &&
+        _selected?['status'] == 'active';
 
     final rawReference = metadata is Map
         ? metadata['context_reference']
@@ -815,6 +832,50 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                 height: 1.5,
               ),
             ),
+            if (!mine && isLatestMessage && suggestions.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final question in suggestions)
+                    ActionChip(
+                      avatar: const Icon(
+                        Icons.chat_bubble_outline_rounded,
+                        size: 16,
+                        color: _blue,
+                      ),
+                      label: Text(
+                        question,
+                        style: const TextStyle(
+                          color: _blue,
+                          fontSize: 12,
+                        ),
+                      ),
+                      backgroundColor: const Color(0xFFEDF2FF),
+                      side: const BorderSide(
+                        color: Color(0xFFD5DFFF),
+                      ),
+                      onPressed: canChooseSuggestion
+                          ? () {
+                        if (_input.text.trim().isNotEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Send or clear your draft first.',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+
+                        _askSuggested(question);
+                      }
+                          : null,
+                    ),
+                ],
+              ),
+            ],
             if (!mine &&
                 action is String &&
                 actionLabels.containsKey(action)) ...[
@@ -855,7 +916,6 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     );
   }
 
-  @override
   String _chatTitle(Map<String, dynamic> chat) {
     final id = chat['conversation_id'];
 

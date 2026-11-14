@@ -30,10 +30,65 @@ STOP_WORDS.update({
     "display",
 })
 
+CHAT_ALIASES = {
+    # Common shortcuts
+    "pls": "please",
+    "plz": "please",
+    "u": "you",
+    "ur": "your",
+    "abt": "about",
+    "appt": "appointment",
+    "appts": "appointments",
+    "msg": "message",
+    "pic": "photo",
+    "pics": "photos",
+    "meds": "medicine",
+    "rec": "recommend",
+
+    # Preserve the meaning of negatives
+    "cant": "cannot",
+    "can't": "cannot",
+    "cannot": "cannot",
+    "dont": "do not",
+    "don't": "do not",
+    "doesnt": "does not",
+    "doesn't": "does not",
+    "isnt": "is not",
+    "isn't": "is not",
+    "wont": "will not",
+    "won't": "will not",
+
+    # Explicit common misspellings
+    "appoinment": "appointment",
+    "appointmnt": "appointment",
+    "apointment": "appointment",
+    "appoitment": "appointment",
+    "recomend": "recommend",
+    "recommed": "recommend",
+    "recomendation": "recommendation",
+    "gingivits": "gingivitis",
+    "gingivitus": "gingivitis",
+    "toothpast": "toothpaste",
+    "presciption": "prescription",
+    "perscription": "prescription",
+}
+
+
+def expand_chat_text(text):
+    text = text.replace("’", "'")
+
+    return re.sub(
+        r"[a-z]+(?:'[a-z]+)?",
+        lambda match: CHAT_ALIASES.get(
+            match.group(0),
+            match.group(0),
+        ),
+        text,
+    )
 
 def normalize(text):
     text = unicodedata.normalize("NFKC", text).casefold()
-    text = text.replace("’", "'").replace("can't", "cannot")
+    text = expand_chat_text(text)
 
     text = " ".join(
         re.findall(r"[a-z0-9]+", text)
@@ -164,6 +219,48 @@ def detect_specific_intent(text):
         return "pet_next_steps"
 
     return None
+
+def clarification_from_matches(ranking, entries):
+    choices = []
+
+    for intent, score in ranking:
+        if score < 0.20:
+            continue
+
+        questions = entries[intent].get("questions") or []
+
+        if questions:
+            choices.append(questions[0])
+
+        if len(choices) == 2:
+            break
+
+    if choices:
+        reply = (
+            "I’m not sure which question you mean. "
+            "Are you asking:\n\n"
+            + "\n".join(
+                f"• {question.capitalize()}?"
+                for question in choices
+            )
+        )
+    else:
+        reply = (
+            "Could you describe what you need help with? "
+            "For example: explain a scan result, view an "
+            "appointment, check follow-up instructions, "
+            "or find a dental-care product."
+        )
+
+    answer = response(
+        intent="clarify",
+        reply=reply,
+        mode="fallback",
+    )
+
+    answer["suggested_questions"] = choices
+
+    return answer
 
 
 class HybridChatbot:
@@ -424,18 +521,6 @@ class HybridChatbot:
             else 0.0
         )
 
-        if coverage < 0.5:
-            return response(
-                intent="clarify",
-                reply=(
-                    "I could not match that to a supported topic. "
-                    "You can ask about pet dental care, AI results, "
-                    "appointments, follow-up care or clinic products. "
-                    "Please rephrase your question."
-                ),
-                mode="fallback",
-            )
-
         specific_intent = detect_specific_intent(text)
 
         if specific_intent is not None:
@@ -491,17 +576,14 @@ class HybridChatbot:
         )
 
         # Initial thresholds, to be evaluated with test questions.
-        if best < 0.30 or best - runner_up < 0.05:
-            return response(
-                intent="clarify",
-                reply=(
-                    "I could not confidently match that question. "
-                    "Please ask one question about plaque, calculus, "
-                    "gingivitis, AI results, vet reviews, booking, "
-                    "cancellation or follow-up photos. For symptoms "
-                    "or treatment decisions, contact your veterinarian."
-                ),
-                mode="fallback",
+        if (
+            coverage < 0.5
+            or best < 0.30
+            or best - runner_up < 0.05
+        ):
+            return clarification_from_matches(
+                ranking,
+                entries,
             )
 
         entry = entries[intent]

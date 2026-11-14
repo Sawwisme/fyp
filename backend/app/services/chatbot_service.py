@@ -325,6 +325,11 @@ def send_message(
             client_request_id=request_id,
             response_metadata={
                 "intent": answer["intent"],
+                "suggested_questions": (
+                    answer.get("suggested_questions", [])
+                    if answer["intent"] == "clarify"
+                    else []
+                ),
                 "mode": answer["mode"],
                 "sources": answer["sources"],
                 "similarity": answer["similarity"],

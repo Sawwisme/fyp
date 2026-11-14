@@ -127,12 +127,32 @@ def generate_reply(message):
         ):
             raise ValueError("Invalid similarity score.")
 
+        suggested_questions = answer.get(
+            "suggested_questions",
+            [],
+        )
+
+        if (
+            not isinstance(suggested_questions, list)
+            or len(suggested_questions) > 2
+            or any(
+                not isinstance(question, str)
+                or not 1 <= len(question.strip()) <= 200
+                for question in suggested_questions
+            )
+        ):
+            raise ValueError("Invalid suggested questions.")
+
+        if answer["intent"] != "clarify":
+            suggested_questions = []
+
         return {
             "intent": answer["intent"],
             "reply": answer["reply"],
             "mode": answer["mode"],
             "sources": sources,
             "similarity": similarity,
+            "suggested_questions": suggested_questions,
         }
 
     except (ValueError, KeyError, TypeError):

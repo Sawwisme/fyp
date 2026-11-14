@@ -361,7 +361,7 @@ def product_reply(db, current_user, pet_id, *, products=None,
                 "suitability_notes": product["suitability_notes"],
             })
             
-        sections = []
+    sections = []
 
     if review_note:
         sections.append(review_note)
