@@ -48,3 +48,4 @@ from app.models.booking_stripe_session import BookingStripeSession
 from app.models.consultation_bill_deposit import ConsultationBillDeposit
 from app.models.dental_assessment_job import DentalAssessmentJob
 from app.models.ai_assessment_review import AIAssessmentReview
+from app.models.consultation_product_recommendation import ConsultationProductRecommendation

@@ -4,6 +4,9 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from app.services.product_recommendation_rules import (
+    validate_recommendation_tags,
+)
 
 class ProductCategoryResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -46,6 +49,16 @@ class ProductCreate(BaseModel):
         default=None,
         max_length=1000,
     )
+    recommendation_enabled: bool = False
+    recommendation_tags: list[str] = Field(
+        default_factory=list,
+        max_length=3,
+    )
+
+    @field_validator("recommendation_tags")
+    @classmethod
+    def check_recommendation_tags(cls, value):
+        return validate_recommendation_tags(value)
 
 
 class ProductResponse(BaseModel):
@@ -67,6 +80,8 @@ class ProductResponse(BaseModel):
     target_species: str
     minimum_age_months: int | None
     suitability_notes: str | None
+    recommendation_enabled: bool
+    recommendation_tags: list[str] | None = None
 
 class ProductUpdate(BaseModel):
     model_config = ConfigDict(
@@ -102,6 +117,17 @@ class ProductUpdate(BaseModel):
         default=None,
         max_length=1000,
     )
+
+    recommendation_enabled: bool = False
+    recommendation_tags: list[str] = Field(
+        default_factory=list,
+        max_length=3,
+    )
+
+    @field_validator("recommendation_tags")
+    @classmethod
+    def check_recommendation_tags(cls, value):
+        return validate_recommendation_tags(value)
 
 class ProductStockAdjustment(BaseModel):
     model_config = ConfigDict(

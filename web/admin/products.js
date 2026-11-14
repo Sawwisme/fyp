@@ -300,6 +300,16 @@
 
         editing = item;
         form.reset();
+        get('product-recommendation-enabled').value =
+            item?.recommendation_enabled ? 'true' : 'false';
+
+        const recommendationTags = new Set(
+            item?.recommendation_tags || []
+        );
+
+        for (const option of get('product-recommendation-tags').options) {
+            option.selected = recommendationTags.has(option.value);
+        }
         get('product-form-message').textContent = '';
         get('product-stock-field').hidden = Boolean(item);
         get('product-stock').required = !item;
@@ -360,6 +370,13 @@
 
         const body = {
             category_id: Number(get('product-category').value),
+            recommendation_enabled:
+                get('product-recommendation-enabled').value === 'true',
+
+            recommendation_tags: Array.from(
+                get('product-recommendation-tags').selectedOptions,
+                option => option.value
+            ),
             product_name: productName,
             description: get('product-description').value.trim() || null,
             price: get('product-price').value,

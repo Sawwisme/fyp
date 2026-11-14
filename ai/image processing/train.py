@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent
 MODEL_DIR = BASE_DIR / "models"
 MODEL_DIR.mkdir(exist_ok=True)
 
-BEST_MODEL_PATH = MODEL_DIR / "dental_classifier.keras"
+BEST_MODEL_PATH = MODEL_DIR / "dental_classifier_candidate.keras"
 
 NUM_CLASSES = 4
 
@@ -267,33 +267,32 @@ def build_model():
 # 7. CALLBACKS
 # ============================================================
 
-def get_callbacks():
-
+def get_callbacks(best_loss=None):
     return [
-
         tf.keras.callbacks.ModelCheckpoint(
             filepath=str(BEST_MODEL_PATH),
             monitor="val_loss",
+            mode="min",
             save_best_only=True,
-            verbose=1
+            initial_value_threshold=best_loss,
+            verbose=1,
         ),
-
         tf.keras.callbacks.EarlyStopping(
             monitor="val_loss",
+            mode="min",
             patience=5,
             restore_best_weights=True,
-            verbose=1
+            verbose=1,
         ),
-
         tf.keras.callbacks.ReduceLROnPlateau(
             monitor="val_loss",
+            mode="min",
             factor=0.5,
             patience=2,
             min_lr=1e-7,
-            verbose=1
-        )
+            verbose=1,
+        ),
     ]
-
 
 # ============================================================
 # 8. MAIN TRAINING
@@ -315,10 +314,6 @@ def main():
 
     validation_dataset = pack_dataset(
         validation_dataset
-    )
-
-    test_dataset = pack_dataset(
-        test_dataset
     )
 
     print("\n===================================")
@@ -392,32 +387,14 @@ def main():
         train_dataset,
         validation_data=validation_dataset,
         epochs=FINE_TUNE_EPOCHS,
-        callbacks=get_callbacks()
+        callbacks=get_callbacks(
+            best_loss=min(history_stage1.history["val_loss"])
+        )
     )
 
     # ========================================================
     # TEST DATASET
     # ========================================================
-
-    print("\n===================================")
-    print("Testing final model")
-    print("===================================")
-
-    test_results = model.evaluate(
-        test_dataset,
-        verbose=1
-    )
-
-    print("\nTest results:")
-
-    for name, value in zip(
-        model.metrics_names,
-        test_results
-    ):
-        print(
-            f"{name}: {value:.4f}"
-        )
-
     print("\n===================================")
     print("Training completed")
     print("===================================")

@@ -137,8 +137,16 @@ def process_sample(
     if training:
         image = data_augmentation(
             image,
-            training=True
+            training=True,
         )
+
+        # Input remains in the 0–255 range used by EfficientNet.
+        image = tf.image.random_brightness(
+            image,
+            max_delta=12.0,
+        )
+        
+        image = tf.clip_by_value(image, 0.0, 255.0)
 
     labels = tf.cast(
         labels,

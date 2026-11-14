@@ -209,6 +209,37 @@
                 </div>
 
                 <div class="product-wide">
+                    <label for="product-recommendation-enabled">
+                        Chatbot recommendations
+                    </label>
+                    <select id="product-recommendation-enabled">
+                        <option value="false">Not enabled</option>
+                        <option value="true">Allow chatbot to suggest this product</option>
+                    </select>
+                </div>
+
+                <div class="product-wide">
+                    <label for="product-recommendation-tags">
+                        Label-supported care purposes
+                    </label>
+                    <select id="product-recommendation-tags" multiple size="3">
+                        <option value="routine_oral_hygiene">
+                            Routine oral hygiene
+                        </option>
+                        <option value="plaque_control">
+                            Plaque control
+                        </option>
+                        <option value="breath_freshening">
+                            Breath freshening
+                        </option>
+                    </select>
+                    <p class="muted">
+                        Select purposes supported by the product label.
+                        Hold Ctrl to select multiple purposes.
+                    </p>
+                </div>
+
+                <div class="product-wide">
                     <label for="product-description">Description</label>
                     <textarea id="product-description" rows="3" maxlength="5000"></textarea>
                 </div>

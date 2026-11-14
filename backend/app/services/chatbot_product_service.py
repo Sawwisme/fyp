@@ -1,8 +1,13 @@
-from sqlalchemy import or_, select
+from sqlalchemy import case, func, or_, select
 from datetime import date, datetime, timedelta, timezone
+import re
+from decimal import Decimal
 
 from app.models import Clinic, Product, ProductCategory
 from app.services.chatbot_context_service import build_chat_context
+from app.services.product_recommendation_rules import (
+    build_product_match,
+)
 
 def pet_age_months(pet):
     value = pet.get("date_of_birth")
@@ -29,7 +34,55 @@ def pet_age_months(pet):
         - int(today.day < born.day)
     )
 
-def product_reply(db, current_user, pet_id, *, products=None):
+def product_request_filters(message):
+    text = (message or "").lower().strip()
+
+    category_patterns = {
+        "Toothbrushes": r"\b(toothbrush(?:es)?|tooth brush(?:es)?)\b",
+        "Pet Toothpaste": r"\b(toothpaste|tooth paste)\b",
+        "Dental Chews": r"\b(dental chews?|chews?)\b",
+        "Dental Toys": r"\b(dental toys?|toys?)\b",
+        "Oral Care Solutions": (
+            r"\b(water additives?|oral rinses?|oral sprays?|"
+            r"mouthwash|oral care solutions?)\b"
+        ),
+        "Dental Care Accessories": r"\b(dental accessories)\b",
+    }
+
+    categories = [
+        category
+        for category, pattern in category_patterns.items()
+        if re.search(pattern, text)
+    ]
+
+    # Examples: "under RM30", "below 25", "budget RM 40".
+    budget_match = re.search(
+        r"\b(?:under|below|up to|maximum|max|budget)"
+        r"\s*(?:of\s*)?(?:rm\s*)?"
+        r"(\d+(?:\.\d{1,2})?)(?![\d.])",
+        text,
+    )
+
+    budget = (
+        Decimal(budget_match.group(1))
+        if budget_match
+        else None
+    )
+
+    filters = [Product.price > 0]
+
+    if categories:
+        filters.append(
+            ProductCategory.category_name.in_(categories)
+        )
+
+    if budget is not None:
+        filters.append(Product.price <= budget)
+
+    return filters, categories, budget
+
+def product_reply(db, current_user, pet_id, *, products=None,
+ request_text="",):
     # Checks owner access and selected-pet ownership.
     context = build_chat_context(db, current_user, pet_id)
 
@@ -123,7 +176,77 @@ def product_reply(db, current_user, pet_id, *, products=None):
             "The AI estimate is not a confirmed diagnosis.",
             "OPEN_APPOINTMENTS",
         )
+
+    request_filters, requested_categories, budget = (
+        product_request_filters(request_text)
+    )
+
+    care_context = build_product_match(context, request_text)
+    care_tags = care_context["tags"]
+
+    if care_context["blocked_reason"]:
+        return (
+            care_context["blocked_reason"],
+            "OPEN_MEDICAL_HISTORY",
+        )
+
+    request_filters.append(
+        Product.recommendation_enabled == 1
+    )
+
+    if not care_tags:
+        if context.get("latest_consultation"):
+            return (
+                "I could not match the latest consultation "
+                "to a supported product-care purpose. "
+                "I have not selected unrelated products. "
+                "You can still browse the clinic shop.",
+                "OPEN_SHOP",
+            )
+
+        return (
+            "What would you like help with: routine brushing, "
+            "plaque control, or breath care? "
+            "You can include a product type and budget.",
+            None,
+        )
+
+    if care_tags:
+        request_filters.append(
+            or_(*[
+                func.json_contains(
+                    Product.recommendation_tags,
+                    func.json_quote(tag),
+                ) == 1
+                for tag in sorted(care_tags)
+            ])
+        )
+
+    consultation = context.get("latest_consultation")
+
+    preferred_clinic_id = (
+        consultation["clinic_id"]
+        if consultation
+        else None
+    )
     
+    match_score = sum(
+        (
+            case(
+                (
+                    func.json_contains(
+                        Product.recommendation_tags,
+                        func.json_quote(tag),
+                    ) == 1,
+                    1,
+                ),
+                else_=0,
+            )
+            for tag in sorted(care_tags)
+        ),
+        0,
+    )
+
     records = db.execute(
         select(
             Product.product_id,
@@ -135,6 +258,7 @@ def product_reply(db, current_user, pet_id, *, products=None):
             Product.target_species,
             Product.minimum_age_months,
             Product.suitability_notes,
+            Product.recommendation_tags,
         )
         .join(
             ProductCategory,
@@ -147,6 +271,7 @@ def product_reply(db, current_user, pet_id, *, products=None):
         .where(
             Product.status == "active",
             Product.stock_quantity > 0,
+            *request_filters,
             Clinic.status == "active",
             or_(
                 Clinic.shop_pickup_enabled.is_(True),
@@ -165,19 +290,22 @@ def product_reply(db, current_user, pet_id, *, products=None):
             ),
         )
         .order_by(
-            Clinic.clinic_name,
-            Product.product_name,
-            Product.product_id,
+            match_score.desc(),
+            case(
+                (Product.clinic_id == preferred_clinic_id, 0),
+                else_=1,
+            ),
+            Product.price.asc(),
+            Product.product_id.asc(),
         )
         .limit(6)
     ).mappings().all()
 
     if not records:
         return (
-            "I found no in-stock products with recorded species "
-            "and minimum-age information matching this pet. "
-            "Some products may have incomplete suitability details. "
-            "Browse Shop or ask the clinic before choosing.",
+            "No available products match the requested product type, "
+            "budget, and this pet's recorded species/age criteria. "
+            "Try another product type or budget, or browse the clinic shops.",
             "OPEN_SHOP",
         )
 
@@ -195,6 +323,33 @@ def product_reply(db, current_user, pet_id, *, products=None):
                     f"{product['minimum_age_months']} months."
                 )
 
+            if requested_categories:
+                reason += (
+                    f" Matches your requested category: "
+                    f"{product['category_name']}."
+                )
+
+            if budget is not None:
+                reason += f" Within your RM {budget:.2f} per-item budget."
+
+            matched_tags = sorted(
+                care_tags.intersection(
+                    product["recommendation_tags"] or []
+                )
+            )
+
+            if matched_tags:
+                purposes = ", ".join(
+                    tag.replace("_", " ")
+                    for tag in matched_tags
+                )
+
+                reason += (
+                    f" Care-purpose match: {purposes}. "
+                    f"Source: {care_context['source']}. "
+                    "Selected automatically by the chatbot."
+                )
+
             products.append({
                 "product_id": product["product_id"],
                 "clinic_id": product["clinic_id"],
@@ -206,32 +361,35 @@ def product_reply(db, current_user, pet_id, *, products=None):
                 "suitability_notes": product["suitability_notes"],
             })
             
-    sections = [
-        f"Catalogue options matching {pet['name']}'s recorded "
-        "species and minimum-age criteria. This does not establish "
-        "medical suitability or a treatment recommendation:"
-    ]
+        sections = []
 
     if review_note:
-        sections.insert(0, review_note)
+        sections.append(review_note)
 
-    for product in records:
+    sections.append(
+        f"I found {len(records)} care-product option(s) "
+        f"for {pet['name']} using {care_context['source']}."
+    )
+
+    if care_context["explanation"]:
+        sections.append(care_context["explanation"])
+
+    if requested_categories:
         sections.append(
-            f"• {product['product_name']}\n"
-            f"Category: {product['category_name']}\n"
-            f"Clinic: {product['clinic_name']}\n"
-            f"Price: RM {product['price']:.2f}"
-            f"\nLabelled species: {product['target_species']}"
-            f"\nMinimum age: {product['minimum_age_months']} months"
-            f"\nLabel notes: "
-            f"{product['suitability_notes'] or 'Not recorded'}"
+            "Product type: "
+            + ", ".join(requested_categories)
+            + "."
+        )
+
+    if budget is not None:
+        sections.append(
+            f"Budget: up to RM {budget:.2f} per item."
         )
 
     sections.append(
-        "Matching uses clinic-recorded product information. "
-        "Read all label restrictions and ask your vet about "
-        "medical suitability. Products do not replace treatment. "
-        "Open Shop to select the clinic and view full details."
+        "The cards below explain each match. "
+        "These are automatic home-care suggestions, "
+        "not prescriptions or replacements for treatment."
     )
 
     return "\n\n".join(sections), "OPEN_SHOP"

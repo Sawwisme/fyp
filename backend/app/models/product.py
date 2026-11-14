@@ -6,10 +6,12 @@ from sqlalchemy import (
     Numeric,
     String,
     Text,
+    JSON,
     text,
     Index,
     CheckConstraint,
 )
+
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -57,6 +59,17 @@ class Product(Base):
     )
     minimum_age_months = Column(Integer, nullable=True)
     suitability_notes = Column(Text, nullable=True)
+    recommendation_tags = Column(
+        JSON,
+        nullable=True,
+    )
+
+    recommendation_enabled = Column(
+        Integer,
+        nullable=False,
+        default=0,
+        server_default=text("0"),
+    )
     price = Column(Numeric(10, 2), nullable=False)
     stock_quantity = Column(Integer, nullable=False)
     image_url = Column(String(500), nullable=True)

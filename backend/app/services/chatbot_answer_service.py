@@ -7,6 +7,9 @@ from app.services.chatbot_followup_service import resolve_followup
 from app.services.chatbot_care_service import followup_care_reply
 from app.services.chatbot_product_service import product_reply
 from app.services.chatbot_medical_service import medical_record_reply
+from app.services.chatbot_product_followup_service import (
+    resolve_product_budget,
+)
 
 from datetime import datetime, timezone
 
@@ -449,6 +452,16 @@ def generate_contextual_reply(
         answer,
     ))
 
+    product_request = resolve_product_budget(
+        db,
+        conversation,
+        message,
+        answer,
+    )
+
+    if product_request is not None:
+        answer["intent"] = "product_recommendation"
+
     intent = answer["intent"]
 
     reference = {
@@ -476,11 +489,16 @@ def generate_contextual_reply(
     elif intent == "product_recommendation":
         products = []
 
+        effective_request = product_request or message
+
+        reference["product_request"] = effective_request
+
         reply, action = product_reply(
             db,
             current_user,
             conversation.pet_id,
             products=products,
+            request_text=effective_request,
         )
 
         answer["reply"] = reply

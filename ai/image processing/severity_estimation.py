@@ -139,15 +139,6 @@ def estimate_severity(
     else:
         severity_level = 2
 
-    # -----------------------------------------------------
-    # Grad-CAM adjustment
-    # -----------------------------------------------------
-
-    if (
-        gradcam_category == "Widespread"
-        and severity_level < 3
-    ):
-        severity_level += 1
 
     # -----------------------------------------------------
     # Segmentation adjustment
@@ -160,22 +151,12 @@ def estimate_severity(
     ):
         severity_level += 1
 
-    # Multiple conditions + meaningful visual involvement
+# Experimental segmentation-based adjustment.
+# Grad-CAM attention is excluded from severity scoring.
     if (
         condition_count >= 2
         and severity_level < 3
-        and (
-            gradcam_category
-            in [
-                "Moderate",
-                "Widespread"
-            ]
-            or segmentation_category
-            in [
-                "Medium",
-                "Large"
-            ]
-        )
+        and segmentation_category == "Medium"
     ):
         severity_level += 1
 
@@ -207,9 +188,8 @@ def estimate_severity(
     )
 
     reasons.append(
-        f"Maximum Grad-CAM attention spread: "
-        f"{max_gradcam_spread:.2f}% "
-        f"({gradcam_category})."
+    "Grad-CAM is displayed for classification explanation "
+    "and is not used to calculate severity."
     )
 
     reasons.append(

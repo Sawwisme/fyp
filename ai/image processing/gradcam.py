@@ -50,9 +50,9 @@ LABELS = [
 
 THRESHOLDS = {
     "healthy": 0.35,
-    "plaque": 0.25,
-    "gingivitis": 0.45,
-    "calculus": 0.60
+    "plaque": 0.35,
+    "gingivitis": 0.60,
+    "calculus": 0.80,
 }
 
 LAST_CONV_LAYER_NAME = "top_activation"

@@ -144,6 +144,8 @@ def create_product(
             target_species=data.target_species,
             minimum_age_months=data.minimum_age_months,
             suitability_notes=data.suitability_notes or None,
+            recommendation_enabled=data.recommendation_enabled,
+            recommendation_tags=data.recommendation_tags,
         )
 
         db.add(product)
@@ -295,6 +297,8 @@ def update_product(
             "target_species",
             "minimum_age_months",
             "suitability_notes",
+            "recommendation_enabled",
+            "recommendation_tags",
         ):
             if field in data.model_fields_set:
                 setattr(product, field, getattr(data, field))

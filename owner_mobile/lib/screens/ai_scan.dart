@@ -720,45 +720,149 @@ class _AiScanPageState extends State<AiScanPage>
   }
 
   Widget _summaryCard(Map result) {
+    final rawPredictions = result['predictions'];
+
+    final predictions = rawPredictions is List
+        ? rawPredictions.whereType<Map>().toList()
+        : <Map>[];
+
+    final healthyPositive = predictions.any(
+          (prediction) =>
+      prediction['condition'] == 'healthy' &&
+          prediction['positive'] == true,
+    );
+
+    final diseaseFindings = predictions.where(
+          (prediction) =>
+      {'plaque', 'gingivitis', 'calculus'}
+          .contains(prediction['condition']) &&
+          prediction['positive'] == true,
+    ).toList();
+
+    final conflict = healthyPositive && diseaseFindings.isNotEmpty;
+    final noPositive = !healthyPositive && diseaseFindings.isEmpty;
+
     final severity = result['severity'];
-    final label = severity is Map ? '${severity['label'] ?? 'Unavailable'}'
+    final severityLabel = severity is Map
+        ? '${severity['label'] ?? 'Unavailable'}'
         : 'Unavailable';
-    final reason = severity is Map ? '${severity['reason'] ?? ''}' : '';
-    final predictions = result['predictions'];
-    final flagged = predictions is List ? predictions.whereType<Map>()
-        .where((p) => p['positive'] == true && p['condition'] != 'healthy')
-        .length : 0;
+
+    final severityReason = severity is Map
+        ? '${severity['reason'] ?? ''}'
+        : '';
+
+    final String heading;
+    final String label;
+    final String explanation;
+
+    if (conflict) {
+      heading = 'Result needs review';
+      label = 'Conflicting predictions';
+      explanation =
+      'The model flagged both healthy appearance and possible '
+          'disease features. An overall severity is not shown because '
+          'these predictions conflict.';
+    } else if (noPositive) {
+      heading = 'Result needs review';
+      label = 'Inconclusive';
+      explanation =
+      'No condition exceeded its prediction threshold. '
+          'This does not confirm that the teeth and gums are healthy.';
+    } else if (healthyPositive) {
+      heading = 'Image screening result';
+      label = 'No disease flags';
+      explanation =
+      'The healthy score exceeded its threshold and no disease '
+          'score exceeded its threshold. This image result does not '
+          'exclude dental problems.';
+    } else {
+      heading = 'Experimental severity estimate';
+      label = severityLabel;
+      explanation = severityReason;
+    }
+
+    final accent = conflict || noPositive
+        ? const Color(0xFFFFD493)
+        : const Color(0xFFD1F04B);
+
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
         color: const Color(0xFF172333),
         borderRadius: BorderRadius.circular(22),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Row(children: [
-          Icon(Icons.auto_awesome, color: Color(0xFFD1F04B)),
-          SizedBox(width: 10),
-          Text('Assessment summary', style: TextStyle(
-              color: Colors.white, fontWeight: FontWeight.w700)),
-        ]),
-        const SizedBox(height: 22),
-        const Text('Estimated severity',
-            style: TextStyle(color: Colors.white70)),
-        const SizedBox(height: 6),
-        Text(label, style: const TextStyle(color: Color(0xFFD1F04B),
-            fontSize: 30, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 10),
-        Text('$flagged possible finding${flagged == 1 ? '' : 's'} flagged',
-            style: const TextStyle(color: Colors.white, fontSize: 16)),
-        if (reason.isNotEmpty) ...[
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                conflict || noPositive
+                    ? Icons.info_outline_rounded
+                    : Icons.auto_awesome,
+                color: accent,
+              ),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Text(
+                  'Assessment summary',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 22),
+          Text(
+            heading,
+            style: const TextStyle(color: Colors.white70),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: TextStyle(
+              color: accent,
+              fontSize: 26,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
           const SizedBox(height: 14),
-          Text(reason, style: const TextStyle(color: Colors.white, height: 1.5)),
+          if (explanation.isNotEmpty)
+            Text(
+              explanation,
+              style: const TextStyle(
+                color: Colors.white,
+                height: 1.5,
+              ),
+            ),
+          if (diseaseFindings.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Text(
+              'Model flags: ${diseaseFindings.map(
+                    (item) => item['condition'],
+              ).join(', ')}',
+              style: const TextStyle(
+                color: Colors.white70,
+                height: 1.5,
+              ),
+            ),
+          ],
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Divider(color: Colors.white24),
+          ),
+          const Text(
+            'AI screening reference. A veterinarian can review '
+                'the image and clinical findings.',
+            style: TextStyle(
+              color: Colors.white70,
+              height: 1.5,
+            ),
+          ),
         ],
-        const Padding(padding: EdgeInsets.symmetric(vertical: 16),
-            child: Divider(color: Colors.white24)),
-        const Text('AI screening reference · A vet can review these findings.',
-            style: TextStyle(color: Colors.white70, height: 1.5)),
-      ]),
+      ),
     );
   }
 

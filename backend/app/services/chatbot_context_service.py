@@ -8,6 +8,8 @@ from app.models import (
     AIAssessmentReview,
     DentalAssessmentJob,
     DentalImage,
+    Appointment,
+    Consultation,
 )
 from app.services.pet_service import get_owner_profile, get_pet
 from app.services.dental_result_metrics import (
@@ -120,7 +122,7 @@ def build_chat_context(db, current_user, pet_id):
             "A pet owner account is required.",
         )
 
-    get_owner_profile(db, current_user)
+    owner = get_owner_profile(db, current_user)
 
     context = {
         "retrieved_at": datetime.now(timezone.utc).isoformat(),
@@ -129,6 +131,7 @@ def build_chat_context(db, current_user, pet_id):
         "latest_analysis": None,
         "dental_history": [],
         "vet_reviews": [],
+        "latest_consultation": None,
     }
 
     # General questions can work without selecting a pet.
@@ -151,6 +154,43 @@ def build_chat_context(db, current_user, pet_id):
             else None
         ),
     }
+
+    # Retrieve only a completed consultation for this owner's pet.
+    consultation = db.scalar(
+        select(Consultation)
+        .join(
+            Appointment,
+            Appointment.appointment_id == Consultation.appointment_id,
+        )
+        .where(
+            Consultation.pet_id == pet.pet_id,
+            Appointment.pet_id == pet.pet_id,
+            Appointment.pet_owner_id == owner.pet_owner_id,
+            Consultation.status == "completed",
+        )
+        .order_by(
+            Consultation.consultation_date.desc(),
+            Consultation.consultation_id.desc(),
+        )
+        .limit(1)
+    )
+
+    if consultation is not None:
+        context["latest_consultation"] = {
+            "consultation_id": consultation.consultation_id,
+            "clinic_id": consultation.clinic_id,
+            "consultation_date": iso_utc(
+                consultation.consultation_date
+            ),
+            "diagnosis": consultation.diagnosis,
+            "home_care_instructions": (
+                consultation.followup_instructions
+            ),
+            "followup_required": consultation.followup_required,
+            "in_clinic_review_required": (
+                consultation.followup_visit_required
+            ),
+        }
 
     records = db.execute(
         select(DentalAssessmentJob, AIAnalysisResult)

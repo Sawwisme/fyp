@@ -141,6 +141,102 @@ print("===================================")
 
 val_y_true, val_masks, val_predictions = predict_split(validation_df)
 
+# Validation-only threshold comparison.
+# This does not change the model or application thresholds.
+
+comparison_rows = []
+
+healthy_index = LABELS.index("healthy")
+healthy_validation = (
+    (val_masks[:, healthy_index] == 1)
+    & (val_y_true[:, healthy_index] == 1)
+)
+
+def ratio(numerator, denominator):
+    return (
+        float(numerator / denominator)
+        if denominator
+        else None
+    )
+
+for index, condition in enumerate(LABELS):
+    if condition == "healthy":
+        continue
+
+    known = val_masks[:, index] == 1
+    actual = val_y_true[known, index].astype(int)
+    scores = val_predictions[known, index]
+
+    # Check a range instead of choosing a threshold from one photo.
+    for threshold in np.round(np.arange(0.10, 0.96, 0.05), 2):
+        predicted = (scores >= threshold).astype(int)
+
+        tn, fp, fn, tp = confusion_matrix(
+            actual,
+            predicted,
+            labels=[0, 1],
+        ).ravel()
+
+        healthy_scores = val_predictions[
+            healthy_validation, index
+        ]
+
+        healthy_flag_count = int(
+            np.sum(healthy_scores >= threshold)
+        )
+
+        healthy_count = len(healthy_scores)
+
+        comparison_rows.append({
+            "condition": condition,
+            "threshold": float(threshold),
+            "precision": ratio(tp, tp + fp),
+            "recall": ratio(tp, tp + fn),
+            "false_positive_rate": ratio(fp, fp + tn),
+            "healthy_image_flag_rate": ratio(
+                healthy_flag_count,
+                healthy_count,
+            ),
+            "healthy_images_flagged": healthy_flag_count,
+            "healthy_images": healthy_count,
+            "known_positive_samples": int(tp + fn),
+            "known_negative_samples": int(tn + fp),
+        })
+
+comparison = pd.DataFrame(comparison_rows)
+
+comparison_path = os.path.join(
+    BASE_DIR,
+    "models",
+    "validation_threshold_comparison.csv",
+)
+
+comparison.to_csv(comparison_path, index=False)
+
+print("\n=== VALIDATION THRESHOLD COMPARISON ===")
+
+# Display a manageable range; the CSV contains every candidate.
+for condition in ("plaque", "gingivitis", "calculus"):
+    rows = comparison[
+        (comparison["condition"] == condition)
+        & (comparison["threshold"] >= 0.25)
+        & (comparison["threshold"] <= 0.90)
+    ]
+
+    print(f"\n{condition.upper()}")
+    print(
+        rows[
+            [
+                "threshold",
+                "precision",
+                "recall",
+                "false_positive_rate",
+                "healthy_image_flag_rate",
+            ]
+        ].round(3).to_string(index=False)
+    )
+
+print("\nSaved:", comparison_path)
 
 # =========================================================
 # Find best threshold for each condition
@@ -201,6 +297,124 @@ print("Predicting test set")
 print("===================================")
 
 test_y_true, test_masks, test_predictions = predict_split(test_df)
+
+# Evaluate the thresholds currently used by the app.
+APP_THRESHOLDS = {
+    "healthy": 0.35,
+    "plaque": 0.35,
+    "gingivitis": 0.60,
+    "calculus": 0.80,
+}
+
+print("\n=== CURRENT APP THRESHOLD RESULTS ===")
+
+for index, condition in enumerate(LABELS):
+    known = test_masks[:, index] == 1
+
+    if not np.any(known):
+        print(f"{condition}: no known test labels")
+        continue
+
+    actual = test_y_true[known, index].astype(int)
+    predicted = (
+        test_predictions[known, index] >= APP_THRESHOLDS[condition]
+    ).astype(int)
+
+    tn, fp, fn, tp = confusion_matrix(
+        actual,
+        predicted,
+        labels=[0, 1],
+    ).ravel()
+
+    recall = tp / (tp + fn) if tp + fn else None
+    false_positive_rate = fp / (fp + tn) if fp + tn else None
+
+    print(
+        f"{condition}: "
+        f"TP={tp}, FN={fn}, FP={fp}, TN={tn}, "
+        f"recall={recall}, false_positive_rate={false_positive_rate}"
+    )
+
+# Inspect images explicitly labelled healthy.
+healthy_index = LABELS.index("healthy")
+
+healthy_rows = (
+    (test_masks[:, healthy_index] == 1)
+    & (test_y_true[:, healthy_index] == 1)
+)
+
+print("\n=== DATASET-LABELLED HEALTHY IMAGES ===")
+print("Healthy test images:", int(healthy_rows.sum()))
+
+errors = []
+
+for row_index in np.flatnonzero(healthy_rows):
+    scores = test_predictions[row_index]
+
+    disease_flags = [
+        condition
+        for index, condition in enumerate(LABELS)
+        if condition != "healthy"
+        and scores[index] >= APP_THRESHOLDS[condition]
+    ]
+
+    healthy_detected = (
+        scores[healthy_index] >= APP_THRESHOLDS["healthy"]
+    )
+
+    if disease_flags or not healthy_detected:
+        errors.append({
+            "filename": test_df.iloc[row_index]["filename"],
+            "healthy_detected": bool(healthy_detected),
+            "disease_flags": ", ".join(disease_flags),
+            **{
+                f"{condition}_score": float(scores[index])
+                for index, condition in enumerate(LABELS)
+            },
+        })
+
+healthy_count = int(healthy_rows.sum())
+
+if healthy_count:
+    healthy_scores = test_predictions[healthy_rows]
+
+    healthy_recall = np.mean(
+        healthy_scores[:, healthy_index]
+        >= APP_THRESHOLDS["healthy"]
+    )
+
+    disease_indices = [
+        index
+        for index, condition in enumerate(LABELS)
+        if condition != "healthy"
+    ]
+
+    disease_thresholds = np.array([
+        APP_THRESHOLDS[LABELS[index]]
+        for index in disease_indices
+    ])
+
+    any_disease_flag = np.any(
+        healthy_scores[:, disease_indices] >= disease_thresholds,
+        axis=1,
+    )
+
+    print(f"Healthy recall: {healthy_recall:.2%}")
+    print(
+        "Healthy images receiving a disease flag: "
+        f"{any_disease_flag.mean():.2%}"
+    )
+else:
+    print("No healthy-labelled test images; this metric cannot be measured.")
+
+output_path = os.path.join(
+    BASE_DIR,
+    "models",
+    "healthy_prediction_errors.csv",
+)
+
+pd.DataFrame(errors).to_csv(output_path, index=False)
+print("Saved healthy-example errors:", output_path)
 
 
 # =========================================================
