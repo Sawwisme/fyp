@@ -121,3 +121,97 @@ def resolve_product_budget(db, conversation, message, answer):
     ).strip()
 
     return f"{text}\n{previous_request}"[:2000]
+
+def explain_previous_products(db, conversation, message):
+    text = " ".join(
+        re.findall(r"[a-z0-9]+", message.casefold())
+    )
+
+    supported = {
+        "why this product",
+        "why these products",
+        "why recommend this",
+        "why did you recommend these",
+        "explain these recommendations",
+    }
+
+    if text not in supported:
+        return None
+
+    previous = db.scalar(
+        select(ChatbotMessage)
+        .where(
+            ChatbotMessage.conversation_id
+            == conversation.conversation_id,
+            ChatbotMessage.sender_type == "assistant",
+        )
+        .order_by(ChatbotMessage.message_id.desc())
+        .limit(1)
+    )
+
+    if previous is None:
+        return None
+
+    metadata = previous.response_metadata or {}
+    reference = metadata.get("context_reference") or {}
+
+    if reference.get("pet_id") != conversation.pet_id:
+        return None
+
+    previous_intent = metadata.get("intent")
+
+    if previous_intent == "product_recommendation":
+        products = metadata.get("products") or []
+    elif previous_intent == "product_explanation":
+        products = reference.get("explained_products") or []
+    else:
+        return None
+
+    if not isinstance(products, list) or not products:
+        return None
+
+    snapshots = []
+    sections = [
+        "Here is why the previously shown products matched:"
+    ]
+
+    for product in products[:6]:
+        if not isinstance(product, dict):
+            continue
+
+        name = product.get("product_name")
+        reason = product.get("recommendation_reason")
+
+        if not isinstance(name, str) or not isinstance(reason, str):
+            continue
+
+        snapshots.append({
+            "product_name": name,
+            "recommendation_reason": reason,
+        })
+
+        sections.append(f"• {name}\n{reason}")
+
+    if not snapshots:
+        return None
+
+    sections.append(
+        "These explain the matches when the products were shown. "
+        "Price, stock and suitability information may change. "
+        "The suggestions do not replace prescribed treatment."
+    )
+
+    return {
+        "intent": "product_explanation",
+        "reply": "\n\n".join(sections),
+        "mode": "rule",
+        "sources": [],
+        "similarity": None,
+        "products": [],
+        "suggested_questions": [],
+        "recommended_action": "NONE",
+        "context_reference": {
+            "pet_id": conversation.pet_id,
+            "explained_products": snapshots,
+        },
+    }

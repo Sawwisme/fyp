@@ -3,7 +3,10 @@ import re
 import unicodedata
 from collections import Counter
 
-from chatbot_knowledge import KNOWLEDGE
+if __package__:
+    from .chatbot_knowledge import KNOWLEDGE
+else:
+    from chatbot_knowledge import KNOWLEDGE
 
 
 STOP_WORDS = {

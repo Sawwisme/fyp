@@ -71,6 +71,18 @@ TIME_PHRASES = {
     "which vet",
 }
 
+PREVIOUS_PHRASES.update({
+    "what about my previous result",
+    "what about the previous result",
+    "show the earlier result",
+})
+
+TIME_PHRASES.update({
+    "which clinic",
+    "what time",
+    "where is my appointment",
+})
+
 
 def clarification():
     return {
@@ -85,6 +97,20 @@ def clarification():
         "similarity": None,
     }
 
+CHOICE_REPLIES = {
+    "1": 0,
+    "one": 0,
+    "first": 0,
+    "first one": 0,
+    "the first one": 0,
+    "option 1": 0,
+    "2": 1,
+    "two": 1,
+    "second": 1,
+    "second one": 1,
+    "the second one": 1,
+    "option 2": 1,
+}
 
 def resolve_followup(db, conversation, message, answer):
     # Never replace an urgent, medication or other rule response.
@@ -102,7 +128,9 @@ def resolve_followup(db, conversation, message, answer):
         | TIME_PHRASES
     )
 
-    if text not in followup_phrases:
+    is_choice = text in CHOICE_REPLIES
+
+    if text not in followup_phrases and not is_choice:
         return answer
 
     previous = db.scalar(
@@ -123,6 +151,40 @@ def resolve_followup(db, conversation, message, answer):
 
     if not isinstance(metadata, dict):
         return clarification()
+
+    if is_choice:
+        choices = metadata.get("suggested_questions")
+
+        if (
+            metadata.get("intent") != "clarify"
+            or not isinstance(choices, list)
+        ):
+            return answer
+
+        index = CHOICE_REPLIES[text]
+
+        if index >= len(choices):
+            return {
+                "intent": "clarify",
+                "reply": (
+                    "That option is not available. "
+                    "Please tap one of the suggested questions."
+                ),
+                "mode": "fallback",
+                "sources": [],
+                "similarity": None,
+                "suggested_questions": choices[:2],
+            }
+
+        question = choices[index]
+
+        if (
+            not isinstance(question, str)
+            or not 1 <= len(question.strip()) <= 200
+        ):
+            return clarification()
+
+        return generate_reply(question)
 
     previous_intent = metadata.get("intent")
     canonical_question = None

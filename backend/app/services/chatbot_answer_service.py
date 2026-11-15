@@ -9,9 +9,11 @@ from app.services.chatbot_product_service import product_reply
 from app.services.chatbot_medical_service import medical_record_reply
 from app.services.chatbot_product_followup_service import (
     resolve_product_budget,
+    explain_previous_products,
 )
 
 from datetime import datetime, timezone
+import re
 
 CONTEXT_INTENTS = {
     "explain_latest_analysis",
@@ -39,6 +41,9 @@ def date_label(analysis):
 
 def severity_label(analysis):
     value = analysis.get("estimated_severity")
+
+    if value == "inconclusive":
+        return "inconclusive — no severity assigned"
 
     if value == "none":
         return "no disease severity assigned"
@@ -436,6 +441,41 @@ def contextual_reply(intent, context):
         "clinical improvement or deterioration."
     )
 
+RESET_PHRASES = {
+    "never mind",
+    "nevermind",
+    "forget that",
+    "change topic",
+    "change the topic",
+    "new topic",
+    "start over",
+    "reset chat",
+}
+
+def is_topic_reset(message):
+    text = " ".join(
+        re.findall(r"[a-z0-9]+", message.casefold())
+    )
+    return text in RESET_PHRASES
+
+
+PET_SWITCH_PHRASES = {
+    "change pet",
+    "switch pet",
+    "select another pet",
+    "switch to another pet",
+    "i mean my other pet",
+    "i meant my other pet",
+    "this is about my other pet",
+    "wrong pet",
+}
+
+
+def is_pet_switch(message):
+    text = " ".join(
+        re.findall(r"[a-z0-9]+", message.casefold())
+    )
+    return text in PET_SWITCH_PHRASES
 
 def generate_contextual_reply(
     db,
@@ -443,7 +483,59 @@ def generate_contextual_reply(
     conversation,
     message,
 ):
+    if is_topic_reset(message):
+        return {
+            "intent": "conversation_reset",
+            "reply": (
+                "Okay, let’s start a new topic. "
+                "What would you like help with?"
+            ),
+            "mode": "rule",
+            "sources": [],
+            "similarity": None,
+            "products": [],
+            "suggested_questions": [],
+            "recommended_action": "NONE",
+            "context_reference": {
+                "pet_id": conversation.pet_id,
+                "topic_reset": True,
+                "retrieved_at": (
+                    datetime.now(timezone.utc).isoformat()
+                ),
+            },
+        }
+
     answer = generate_reply(message)
+
+    if answer.get("mode") != "rule" and is_pet_switch(message):
+        return {
+            "intent": "change_pet",
+            "reply": (
+                "Which pet do you mean? Tap Select pet below. "
+                "A fresh conversation will open for your selection. "
+                "Until then, this chat remains linked to its current pet."
+            ),
+            "mode": "rule",
+            "sources": [],
+            "similarity": None,
+            "products": [],
+            "suggested_questions": [],
+            "recommended_action": "SELECT_PET",
+            "context_reference": {
+                "pet_id": conversation.pet_id,
+                "topic_reset": True,
+            },
+        }
+
+    if answer.get("mode") != "rule":
+        explanation = explain_previous_products(
+            db,
+            conversation,
+            message,
+        )
+
+        if explanation is not None:
+            return explanation
 
     answer = dict(resolve_followup(
         db,

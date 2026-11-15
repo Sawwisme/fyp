@@ -618,6 +618,21 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     late Widget page;
 
     switch (action) {
+      case 'SELECT_PET':
+        if (_selected?['status'] != 'active') return;
+
+        if (_input.text.trim().isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Send or clear your draft first.'),
+            ),
+          );
+          return;
+        }
+
+        await _newChat();
+        return;
+
       case 'OPEN_APPOINTMENT_BOOKING':
         final conversationId = _selected?['conversation_id'];
 
@@ -775,6 +790,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
       'OPEN_SHOP': 'Browse clinic shops',
       'OPEN_MEDICAL_HISTORY': 'Open medical history',
       'OPEN_APPOINTMENT_BOOKING': 'Book with assistant',
+      'SELECT_PET': 'Select pet',
     };
     final rawSources = metadata is Map ? metadata['sources'] : null;
     final rawProducts = metadata is Map ? metadata['products'] : null;

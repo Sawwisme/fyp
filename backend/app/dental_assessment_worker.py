@@ -24,7 +24,9 @@ from app.services.dental_image_service import UPLOAD_DIRECTORY
 from app.services.dental_result_metrics import (
     extract_segmentation_metrics,
 )
-
+from app.services.assessment_interpretation import (
+    normalize_assessment,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -321,6 +323,10 @@ def save_result(job_id, token, payload, attempt_directory):
                 ),
             },
         }
+        
+        job.result_summary = normalize_assessment(
+            job.result_summary
+        )
 
         db.commit()
 

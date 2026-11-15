@@ -9,7 +9,9 @@ from sqlalchemy import select
 from app.models import DentalAssessmentJob, DentalImage, Pet
 from app.services.dental_image_service import get_image_path
 from app.services.pet_service import get_owner_profile, get_pet
-
+from app.services.assessment_interpretation import (
+    normalize_assessment,
+)
 
 def _owned_image(db, current_user, image_id, lock=False):
     owner = get_owner_profile(db, current_user)
@@ -53,7 +55,7 @@ def _serialize(job):
         "finished_at": _timestamp(job.finished_at),
         "message": job.error_message,
         "result": (
-            job.result_summary
+            normalize_assessment(job.result_summary)
             if job.status == "completed"
             else None
         ),
@@ -241,7 +243,7 @@ def list_assessment_history(
             if job.status == "completed"
             else None
         )
-        result = result if isinstance(result, dict) else {}
+        result = normalize_assessment(result)
 
         severity = result.get("severity")
         predictions = result.get("predictions")

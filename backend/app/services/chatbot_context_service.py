@@ -15,6 +15,9 @@ from app.services.pet_service import get_owner_profile, get_pet
 from app.services.dental_result_metrics import (
     extract_segmentation_metrics,
 )
+from app.services.assessment_interpretation import (
+    normalize_assessment,
+)
 
 
 def iso_utc(value):
@@ -33,6 +36,8 @@ def analysis_context(job, analysis):
         if isinstance(job.result_summary, dict)
         else {}
     )
+
+    summary = normalize_assessment(summary)
 
     predictions = []
     detected_conditions = []
@@ -86,7 +91,14 @@ def analysis_context(job, analysis):
         if isinstance(label, str):
             label = label.lower()
 
-            if label in {"none", "mild", "moderate", "severe"}:
+            if label in {
+                "none",
+                "mild",
+                "moderate",
+                "severe",
+                "inconclusive",
+                "unavailable",
+            }:
                 severity = label
 
         severity_method = raw_severity.get("method")

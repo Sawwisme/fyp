@@ -21,7 +21,9 @@ from app.models import (
 )
 from app.services.pet_service import get_owner_profile
 from app.services.vet_profile_service import get_profile
-
+from app.services.assessment_interpretation import (
+    normalize_assessment,
+)
 
 def utc_now():
     return datetime.now(timezone.utc).replace(tzinfo=None)
@@ -176,6 +178,8 @@ def get_review(db, current_user, review_id):
         if job is not None and isinstance(job.result_summary, dict)
         else {}
     )
+
+    summary = normalize_assessment(summary)
 
     severity = summary.get("severity")
 
