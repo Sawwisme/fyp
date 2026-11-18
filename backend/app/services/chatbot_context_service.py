@@ -70,15 +70,22 @@ def analysis_context(job, analysis):
         ):
             confidence = None
 
-        positive = item.get("positive") is True
+        assessed = (
+            item.get("assessed", True) is True
+            and item.get("supported", True) is True
+            and type(item.get("positive")) is bool
+        )
+
+        positive = item["positive"] if assessed else None
 
         predictions.append({
             "condition": condition,
-            "confidence": confidence,
+            "confidence": confidence if assessed else None,
             "positive": positive,
+            "assessed": assessed,
         })
 
-        if positive:
+        if assessed and positive is True:
             detected_conditions.append(condition)
 
     raw_severity = summary.get("severity")
@@ -112,6 +119,7 @@ def analysis_context(job, analysis):
         "predictions": predictions,
         "estimated_severity": severity,
         "severity_method": severity_method,
+        "assessment_decision": summary.get("decision", {}),
 
         # Availability only: never expose local file paths.
         "gradcam": {
@@ -202,6 +210,7 @@ def build_chat_context(db, current_user, pet_id):
             "in_clinic_review_required": (
                 consultation.followup_visit_required
             ),
+            "ai_analysis_id": consultation.ai_analysis_id,
         }
 
     records = db.execute(

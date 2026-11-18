@@ -10,9 +10,9 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+from app.schemas.checkout_selection import CheckoutSelection
 
-
-class ShopOrderCreate(BaseModel):
+class ShopOrderCreate(CheckoutSelection):
     model_config = ConfigDict(
         extra="forbid",
         str_strip_whitespace=True,

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../config/api_config.dart';
 import '../services/shop_service.dart';
 import '../services/cart_service.dart';
-import 'cart.dart';
 import 'my_carts.dart';
 import 'add_to_cart_button.dart';
 import '../services/checkout_service.dart';
@@ -42,14 +41,44 @@ class _ShopScreenState extends State<ShopScreen> {
   int _page = 0;
   bool _openingProduct = false;
 
+  int? _cartQuantity;
+  int _cartCountRequest = 0;
+
+  Future<void> _refreshCartCount() async {
+    final request = ++_cartCountRequest;
+
+    try {
+      final carts =
+      await CartService(widget.service.api).getMyCarts();
+
+      if (!mounted || request != _cartCountRequest) return;
+
+      final quantity = carts.fold<int>(
+        0,
+            (total, cart) =>
+        total + (cart['total_quantity'] as num).toInt(),
+      );
+
+      setState(() => _cartQuantity = quantity);
+    } catch (_) {
+      if (!mounted || request != _cartCountRequest) return;
+
+      // Unknown is different from an empty cart.
+      setState(() => _cartQuantity = null);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _future = _loadInitialShop();
+    CartService.changes.addListener(_refreshCartCount);
+    _refreshCartCount();
   }
 
   @override
   void dispose() {
+    CartService.changes.removeListener(_refreshCartCount);
     _searchController.dispose();
     super.dispose();
   }
@@ -416,6 +445,12 @@ class _ShopScreenState extends State<ShopScreen> {
                     service: CartService(widget.service.api),
                     clinicId: product['clinic_id'] as int,
                     productId: product['product_id'] as int,
+                    productName:
+                    product['product_name'].toString(),
+                    price: num.parse(
+                      product['price'].toString(),
+                    ).toStringAsFixed(2),
+                    stockQuantity: stock,
                     inStock: stock > 0,
                   ),
                 ],
@@ -679,35 +714,25 @@ class _ShopScreenState extends State<ShopScreen> {
   }
 
   Future<void> _openCart() async {
-    final clinic = _clinic;
-    if (clinic == null) {
-      await Navigator.of(context).push<void>(
-        MaterialPageRoute(
-          builder: (_) => MyCartsScreen(
-            service: CartService(widget.service.api),
-          ),
-        ),
-      );
-      if (mounted) _load(_page);
-      return;
-    }
-
     await Navigator.of(context).push<void>(
       MaterialPageRoute(
-        builder: (_) => CartScreen(
+        builder: (_) => MyCartsScreen(
           service: CartService(widget.service.api),
-          clinicId: clinic['clinic_id'] as int,
         ),
       ),
     );
 
-    if (mounted) _load(_page);
+    if (mounted) {
+      _load(_page);
+      await _refreshCartCount();
+    }
   }
 
   Widget _shopHeaderAction({
     required String tooltip,
     required IconData icon,
     required VoidCallback onPressed,
+    int? badgeCount,
   }) {
     return SizedBox(
       width: 48,
@@ -715,7 +740,17 @@ class _ShopScreenState extends State<ShopScreen> {
       child: IconButton(
         tooltip: tooltip,
         onPressed: onPressed,
-        icon: Icon(icon, size: 22),
+        icon: Badge(
+          isLabelVisible: (badgeCount ?? 0) > 0,
+          backgroundColor: const Color(0xFF2549C7),
+          textColor: Colors.white,
+          label: Text(
+            (badgeCount ?? 0) > 99
+                ? '99+'
+                : '${badgeCount ?? 0}',
+          ),
+          child: Icon(icon, size: 22),
+        ),
         style: IconButton.styleFrom(
           foregroundColor: const Color(0xFF2549C7),
           backgroundColor: Colors.white,
@@ -741,6 +776,17 @@ class _ShopScreenState extends State<ShopScreen> {
             children: [
               Row(
                 children: [
+                  if (_clinic != null) ...[
+                    IconButton(
+                      tooltip: 'Back to all clinic shops',
+                      onPressed: () => _selectClinic(null),
+                      icon: const Icon(
+                        Icons.arrow_back_rounded,
+                        color: Color(0xFF2549C7),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                  ],
                   const Expanded(
                     child: Text(
                       'Dental care shop',
@@ -758,9 +804,12 @@ class _ShopScreenState extends State<ShopScreen> {
                   ),
                   const SizedBox(width: 8),
                   _shopHeaderAction(
-                    tooltip: 'My cart',
+                    tooltip: _cartQuantity == null
+                        ? 'My cart'
+                        : 'My cart: $_cartQuantity item(s)',
                     icon: Icons.shopping_cart_outlined,
                     onPressed: _openCart,
+                    badgeCount: _cartQuantity,
                   ),
                 ],
               ),

@@ -63,7 +63,7 @@ class ModelProcessClient:
 
         Thread(target=read_responses, daemon=True).start()
 
-    def run(self, image_path, output_directory, stop_event):
+    def run(self, image_path, output_directory, stop_event, species=None):
         if stop_event.is_set():
             raise InterruptedError("Worker is stopping.")
         if self.process is None or self.process.poll() is not None:
@@ -75,6 +75,7 @@ class ModelProcessClient:
                 "id": request_id,
                 "image": str(image_path),
                 "output_dir": str(output_directory),
+                "species": species,
             }) + "\n")
             self.process.stdin.flush()
             while True:

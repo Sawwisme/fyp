@@ -19,6 +19,7 @@ from app.models import (
     AIAnalysisResult,
     DentalAssessmentJob,
     DentalImage,
+    Pet,
 )
 from app.services.dental_image_service import UPLOAD_DIRECTORY
 from app.services.dental_result_metrics import (
@@ -26,6 +27,10 @@ from app.services.dental_result_metrics import (
 )
 from app.services.assessment_interpretation import (
     normalize_assessment,
+)
+
+from app.services.assessment_image_caption import (
+    caption_assessment_image,
 )
 
 logger = logging.getLogger(__name__)
@@ -47,7 +52,7 @@ RESULT_DIRECTORY = (
 )
 
 CONDITIONS = ("healthy", "plaque", "gingivitis", "calculus")
-MODEL_VERSION = "dental-pipeline-v2-mobilenet-seg"
+MODEL_VERSION = "grouped-cls-20261118-species-policy-v1"
 
 PROCESS_TIMEOUT = 240
 LEASE_SECONDS = 360
@@ -162,13 +167,45 @@ def uploaded_image_path(image_id):
 
 _model_process = local()
 
+def uploaded_pet_species(image_id):
+    with SessionLocal() as db:
+        image = db.get(DentalImage, image_id)
 
-def run_models(image_path, output_directory, stop_event):
+        if image is None:
+            raise ValueError("Uploaded image record is missing.")
+
+        pet = db.get(Pet, image.pet_id)
+
+        if pet is None:
+            raise ValueError("Pet record is missing.")
+
+        aliases = {
+            "cat": "cat",
+            "feline": "cat",
+            "dog": "dog",
+            "canine": "dog",
+        }
+
+        species = aliases.get(str(pet.species).strip().lower())
+
+        if species is None:
+            raise ValueError("Dental assessment supports cats and dogs.")
+
+        return species
+
+def run_models(image_path, output_directory, stop_event, species):
     client = getattr(_model_process, "client", None)
+
     if client is None:
         client = ModelProcessClient(RUNNER, timeout=PROCESS_TIMEOUT)
         _model_process.client = client
-    return client.run(image_path, output_directory, stop_event)
+
+    return client.run(
+        image_path,
+        output_directory,
+        stop_event,
+        species=species,
+    )
 
 
 def validate_predictions(result):
@@ -182,9 +219,12 @@ def validate_predictions(result):
 
     for condition in CONDITIONS:
         prediction = predictions[condition]
+
+        if not isinstance(prediction, dict):
+            raise ValueError("Invalid prediction result.")
+
         confidence = prediction.get("confidence")
         threshold = prediction.get("threshold")
-        positive = prediction.get("positive")
 
         for value in (confidence, threshold):
             if (
@@ -194,14 +234,34 @@ def validate_predictions(result):
             ):
                 raise ValueError("Invalid prediction score.")
 
-        if type(positive) is not bool:
-            raise ValueError("Invalid prediction decision.")
+        # Older runner results remain compatible.
+        assessed = prediction.get("assessed", True)
 
-        if positive != (confidence >= threshold):
+        if type(assessed) is not bool:
+            raise ValueError("Invalid assessment support flag.")
+
+        raw_positive = prediction.get(
+            "raw_positive",
+            prediction.get("positive"),
+        )
+
+        if type(raw_positive) is not bool:
+            raise ValueError("Invalid raw prediction decision.")
+
+        if raw_positive != (confidence >= threshold):
             raise ValueError("Prediction threshold mismatch.")
 
-    return predictions
+        positive = prediction.get("positive")
 
+        if assessed:
+            if type(positive) is not bool or positive != raw_positive:
+                raise ValueError("Invalid assessed prediction.")
+        elif positive is not None:
+            raise ValueError(
+                "An unsupported prediction must have positive=None."
+            )
+
+    return predictions
 
 def copy_artifact(source_path, destination, attempt_directory):
     source = Path(source_path).resolve()
@@ -275,8 +335,13 @@ def save_result(job_id, token, payload, attempt_directory):
                     confidence_score=Decimal(
                         str(prediction["confidence"])
                     ).quantize(Decimal("0.00001")),
-                    predicted_positive=prediction["positive"],
-                    supported=True,
+                    # Retain the raw threshold decision for traceability.
+                    # supported=False excludes it from interpretation.
+                    predicted_positive=prediction.get(
+                        "raw_positive",
+                        prediction["positive"],
+                    ),
+                    supported=prediction.get("assessed", True),
                 )
             )
 
@@ -285,6 +350,8 @@ def save_result(job_id, token, payload, attempt_directory):
                 "confidence": prediction["confidence"],
                 "threshold": prediction["threshold"],
                 "positive": prediction["positive"],
+                "assessed": prediction.get("assessed", True),
+                "assessment_note": prediction.get("assessment_note"),
             })
 
         job.analysis_id = analysis.analysis_id
@@ -306,6 +373,12 @@ def save_result(job_id, token, payload, attempt_directory):
                 "label": severity["severity"],
                 "method": "experimental_rule_based",
                 "reason": severity.get("reason"),
+                "calculation_version": severity.get(
+                    "calculation_version"
+                ),
+                "scored_conditions": severity.get(
+                    "scored_conditions", []
+                ),
             },
             "interpretation": (
                 "AI screening results for veterinary review. "
@@ -328,6 +401,17 @@ def save_result(job_id, token, payload, attempt_directory):
             job.result_summary
         )
 
+        for image_kind in (
+            "heatmap",
+            "segmentation",
+            "summary",
+        ):
+            caption_assessment_image(
+                attempt_directory / f"{image_kind}.png",
+                job.result_summary,
+                image_kind,
+            )
+
         db.commit()
 
 
@@ -345,10 +429,13 @@ def process_job(claimed, stop_event):
 
         attempt_directory.mkdir(parents=True, exist_ok=False)
 
+        species = uploaded_pet_species(image_id)
+
         payload = run_models(
             image_path,
             attempt_directory,
             stop_event,
+            species=species,
         )
 
         if payload["status"] == "rejected":

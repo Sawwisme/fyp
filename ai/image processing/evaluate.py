@@ -434,7 +434,7 @@ for i, label in enumerate(LABELS):
     y_true = test_y_true[known, i]
     y_prob = test_predictions[known, i]
 
-    threshold = best_thresholds[i]
+    threshold = APP_THRESHOLDS[label]
 
     y_pred = (y_prob >= threshold).astype(int)
 
@@ -530,7 +530,7 @@ for species in species_list:
         y_true = species_y_true[known, i]
         y_prob = species_predictions[known, i]
 
-        threshold = best_thresholds[i]
+        threshold = APP_THRESHOLDS[label]
 
         y_pred = (y_prob >= threshold).astype(int)
 
@@ -578,7 +578,7 @@ results_df = pd.DataFrame(results)
 OUTPUT_PATH = os.path.join(
     BASE_DIR,
     "models",
-    "evaluation_results.csv"
+    "evaluation_current_app.csv"
 )
 
 results_df.to_csv(

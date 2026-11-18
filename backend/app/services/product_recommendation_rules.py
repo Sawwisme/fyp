@@ -33,10 +33,32 @@ def validate_recommendation_tags(value):
 
     return tags
 
+def prepare_care_text(value):
+    import re
+
+    text = (value or "").lower().replace("’", "'")
+    clauses = re.split(r"[,.;!?\n]+", text)
+
+    # Recognize only complete, explicit negative observations.
+    # Do not remove negatives from instructions or diagnoses.
+    negative_observation = re.compile(
+        r"(?:(?:no|not)\s+(?:pain|bleeding)"
+        r"(?:\s+(?:noted|observed|reported))?"
+        r"|(?:pain|bleeding)\s+"
+        r"(?:absent|not present|not observed|not reported))"
+    )
+
+    return "; ".join(
+        clause.strip()
+        for clause in clauses
+        if clause.strip()
+        and not negative_observation.fullmatch(clause.strip())
+    )
+
 def match_care_tags(value):
     import re
 
-    text = (value or "").lower()
+    text = prepare_care_text(value)
 
     # Free-text restrictions and uncertainty need interpretation.
     # Do not silently override them with keyword matches.
@@ -96,7 +118,9 @@ def build_product_match(context, request_text):
         f"Consultation #{consultation['consultation_id']}"
     )
 
-    combined = f"{diagnosis}\n{instructions}".lower()
+    combined = prepare_care_text(
+        f"{diagnosis}\n{instructions}"
+    )
 
     # Conservative handling of restrictions and complex cases.
     # This is not a complete clinical language interpreter.

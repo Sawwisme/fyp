@@ -15,7 +15,7 @@ from uuid import uuid4
 
 MODEL_FILES = (
     "dental_image_validator.keras",
-    "dental_classifier.keras",
+    "dental_classifier_grouped_candidate.keras",
     "dental_segmentation_mobilenet_unet.keras",
 )
 
@@ -41,7 +41,7 @@ def json_value(value):
     raise TypeError(f'Unsupported result type: {type(value).__name__}')
 
 
-def run(image_path, output_dir):
+def run(image_path, output_dir, species=None):
     source = Path(image_path).resolve(strict=True)
     if not source.is_file() or source.suffix.lower() not in {'.jpg', '.jpeg', '.png'}:
         raise ValueError('Choose a JPG or PNG image file.')
@@ -81,6 +81,7 @@ def run(image_path, output_dir):
                 str(input_path),
                 output_dir=str(output),
                 raise_on_rejection=True,
+                species=species,
             )
 
         except gradcam.ImageValidationError as error:
@@ -133,7 +134,11 @@ def serve():
             request = json.loads(line)
             request_id = request["id"]
             with redirect_stdout(sys.stderr):
-                response = run(request["image"], request["output_dir"])
+                response = run(
+                    request["image"],
+                    request["output_dir"],
+                    species=request.get("species"),
+                )
         except Exception as error:
             print(f"Assessment runner: {type(error).__name__}: {error}",
                   file=sys.stderr, flush=True)

@@ -108,9 +108,31 @@
         $('ar-owner-message').textContent = record.owner_message || 'No message provided.';
         $('ar-predictions').replaceChildren();
         for (const prediction of record.predictions || []) {
-            const state = prediction.supported === false ? 'Not supported' : prediction.positive ? 'Above model threshold' : 'Below model threshold';
-            const score = Number(prediction.confidence);
-            $('ar-predictions').appendChild(node('div', `${prediction.condition}: ${Number.isFinite(score) ? (score * 100).toFixed(1) + '%' : 'Not recorded'} · ${state}`, 'ar-prediction'));
+            const assessed =
+                prediction.supported !== false &&
+                prediction.assessed !== false &&
+                typeof prediction.positive === 'boolean';
+
+            let text;
+
+            if (!assessed) {
+                text = `${prediction.condition}: Not assessed for this species`;
+            } else {
+                const score = prediction.confidence;
+                const scoreText = Number.isFinite(score)
+                    ? `${(score * 100).toFixed(1)}%`
+                    : 'Not recorded';
+
+                const state = prediction.positive
+                    ? 'Above model threshold'
+                    : 'Below model threshold';
+
+                text = `${prediction.condition}: ${scoreText} · ${state}`;
+            }
+
+            $('ar-predictions').appendChild(
+                node('div', text, 'ar-prediction')
+            );
         }
         $('ar-form').reset();
         $('ar-form').hidden = record.status !== 'pending';

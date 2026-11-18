@@ -23,8 +23,16 @@ from app.schemas.shop_orders import ShopOrderCreate, ShopOrderResponse
 from app.services.pet_service import get_owner_profile
 from app.services.shop_notification_service import notify_shop_event
 
+from app.services.checkout_selection_service import (
+    select_checkout_items,
+)
+
 def _fingerprint(clinic_id: int, data: ShopOrderCreate) -> str:
     payload = data.model_dump(mode="json")
+
+    if data.selected_product_ids is None:
+        # Preserve fingerprints for existing checkout retries.
+        payload.pop("selected_product_ids", None)
     # Preserve compatibility with existing online checkout retries.
     if data.payment_method == "online_banking":
         payload.pop("payment_method", None)
@@ -197,6 +205,11 @@ def create_order(
             .with_for_update()
         ).all()
 
+        cart_items = select_checkout_items(
+            cart_items,
+            data.selected_product_ids,
+        )
+
         if not cart_items:
             raise HTTPException(422, "Your cart is empty.")
 
@@ -240,15 +253,21 @@ def create_order(
             if item.quantity > product.stock_quantity:
                 raise HTTPException(
                     409,
-                    f"Insufficient stock for {product.product_name}.",
+                    f"{product.product_name}: you selected "
+                    f"{item.quantity}, but only "
+                    f"{product.stock_quantity} remain. "
+                    "Return to your cart and reduce the quantity.",
                 )
 
             subtotal += product.price * item.quantity
 
         if data.shipping_method == "pickup":
             if not clinic.shop_pickup_enabled:
-                raise HTTPException(409, "Pickup is unavailable.")
-
+                raise HTTPException(
+                    409,
+                    "This clinic is not accepting pickup orders right now. "
+                    "Choose delivery if available, or try again later.",
+                )
             address = (clinic.address or "").strip()
 
             if not address:
@@ -260,7 +279,11 @@ def create_order(
             shipping_fee = Decimal("0.00")
         else:
             if not clinic.shop_delivery_enabled:
-                raise HTTPException(409, "Delivery is unavailable.")
+                raise HTTPException(
+                    409,
+                    "This clinic is not accepting delivery orders right now. "
+                    "Choose clinic pickup if available.",
+                )
 
             address = data.delivery_address
             shipping_fee = clinic.shop_delivery_fee
@@ -273,8 +296,12 @@ def create_order(
         if total != data.expected_total_amount:
             raise HTTPException(
                 409,
-                "Product prices changed. Reload checkout "
-                "and review the new total.",
+                "The price or delivery fee changed. "
+                f"Your previous total was RM "
+                f"{data.expected_total_amount:.2f}; "
+                f"the current total is RM {total:.2f}. "
+                "Reload checkout and review the new total "
+                "before placing the order again.",
             )
 
         now = datetime.now(timezone.utc).replace(tzinfo=None)

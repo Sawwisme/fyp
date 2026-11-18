@@ -16,6 +16,9 @@ from decimal import Decimal
 
 from app.services.cart_service import _build_cart
 from app.services.pet_service import get_owner_profile
+from app.services.checkout_selection_service import (
+    select_checkout_items,
+)
 
 def _settings_response(clinic: Clinic):
     return ShopSettingsResponse(
@@ -149,18 +152,58 @@ def get_checkout_quote(
             "Your cart changed. Return to the cart and review it.",
         )
 
-    if not cart.items:
+    selected_items = select_checkout_items(
+        cart.items,
+        data.selected_product_ids,
+    )
+
+    if not selected_items:
         raise HTTPException(422, "Your cart is empty.")
 
-    if not cart.can_checkout:
-        raise HTTPException(
-            409,
-            "Some items are unavailable. Review your cart.",
+    problems = []
+
+    for item in selected_items:
+        if item.available:
+            continue
+
+        if item.stock_quantity < item.quantity:
+            problems.append(
+                f"{item.product_name}: you selected "
+                f"{item.quantity}, but only "
+                f"{item.stock_quantity} remain."
+            )
+        else:
+            problems.append(
+                f"{item.product_name}: this product "
+                "is currently unavailable."
+            )
+
+    if problems:
+        message = (
+            "Return to your cart and update these items:\n"
+            + "\n".join(f"• {problem}" for problem in problems[:3])
         )
+
+        if len(problems) > 3:
+            message += (
+                f"\n• {len(problems) - 3} more item(s) "
+                "also need attention."
+            )
+
+        raise HTTPException(409, message)
+
+    subtotal = sum(
+        (item.line_total for item in selected_items),
+        Decimal("0.00"),
+    )
 
     if data.shipping_method == "pickup":
         if not clinic.shop_pickup_enabled:
-            raise HTTPException(409, "Pickup is unavailable.")
+            raise HTTPException(
+                409,
+                "This clinic is not accepting pickup orders right now. "
+                "Choose delivery if available, or try again later.",
+            )
 
         if not (clinic.address or "").strip():
             raise HTTPException(
@@ -172,12 +215,16 @@ def get_checkout_quote(
         pickup_address = clinic.address
     else:
         if not clinic.shop_delivery_enabled:
-            raise HTTPException(409, "Delivery is unavailable.")
+            raise HTTPException(
+                409,
+                "This clinic is not accepting delivery orders right now. "
+                "Choose clinic pickup if available.",
+            )
 
         fee = clinic.shop_delivery_fee
         pickup_address = None
 
-    total = cart.subtotal + fee
+    total = subtotal + fee
 
     if total > Decimal("99999999.99"):
         raise HTTPException(
@@ -192,8 +239,8 @@ def get_checkout_quote(
         settings_version=clinic.shop_version,
         shipping_method=data.shipping_method,
         pickup_address=pickup_address,
-        items=cart.items,
-        subtotal=cart.subtotal,
+        items=selected_items,
+        subtotal=subtotal,
         shipping_fee=fee,
         total_amount=total,
     )

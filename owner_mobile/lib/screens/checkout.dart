@@ -9,11 +9,13 @@ import 'shop_order_details.dart';
 class CheckoutScreen extends StatefulWidget {
   final CheckoutService service;
   final int clinicId;
+  final List<int>? selectedProductIds;
 
   const CheckoutScreen({
     super.key,
     required this.service,
     required this.clinicId,
+    this.selectedProductIds,
   });
 
   @override
@@ -23,6 +25,7 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   static const _green = Color(0xFF2549C7);
 
+  late final List<int>? _selectedProductIds;
   Map<String, dynamic>? _cart;
   Map<String, dynamic>? _settings;
   Map<String, dynamic>? _quote;
@@ -97,6 +100,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         'owner_note': _noteController.text.trim().isEmpty
             ? null
             : _noteController.text.trim(),
+        if (_selectedProductIds != null)
+          'selected_product_ids': _selectedProductIds,
       };
     }
 
@@ -321,6 +326,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   @override
   void initState() {
     super.initState();
+    _selectedProductIds = widget.selectedProductIds == null
+        ? null
+        : List<int>.unmodifiable(widget.selectedProductIds!);
     _load();
   }
 
@@ -386,6 +394,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         clinicId: widget.clinicId,
         cartVersion: _cart!['version'] as int,
         shippingMethod: method,
+        selectedProductIds: _selectedProductIds,
       );
 
       if (!mounted) return;

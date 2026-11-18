@@ -302,10 +302,16 @@ class _AiScanPageState extends State<AiScanPage>
   Future<void> _showCompletedResult({bool reopen = false}) async {
     final job = _job;
     final id = job?['assessment_job_id'];
-    if (!mounted || widget._completedJob != null || _resultOpen ||
-        job == null || job['status'] != 'completed' ||
-        job['result'] is! Map || id is! int ||
-        (!reopen && _openedResultJobId == id)) return;
+    if (!mounted ||
+        widget._completedJob != null ||
+        _resultOpen ||
+        job == null ||
+        job['status'] != 'completed' ||
+        job['result'] is! Map ||
+        id is! int ||
+        (!reopen && _openedResultJobId == id)) {
+      return;
+    }
 
     _timer?.cancel();
     _openedResultJobId = id;
@@ -343,15 +349,24 @@ class _AiScanPageState extends State<AiScanPage>
 
   Future<void> _checkStatus() async {
     final jobId = _job?['assessment_job_id'];
-    if (!mounted || jobId is! int || !_processing || _checking ||
-        !_appActive || _accessDenied) return;
+    if (!mounted ||
+        jobId is! int ||
+        !_processing ||
+        _checking ||
+        !_appActive ||
+        _accessDenied) {
+      return;
+    }
 
     _timer?.cancel();
     setState(() => _checking = true);
     try {
       final job = await widget.service.getAssessment(jobId);
-      if (!mounted || _job?['assessment_job_id'] != jobId ||
-          !_processing) return;
+      if (!mounted ||
+          _job?['assessment_job_id'] != jobId ||
+          !_processing) {
+        return;
+      }
       setState(() {
         _job = job;
         _error = null;
@@ -359,8 +374,11 @@ class _AiScanPageState extends State<AiScanPage>
         _pollFailures = 0;
       });
     } catch (error) {
-      if (!mounted || _job?['assessment_job_id'] != jobId ||
-          !_processing) return;
+      if (!mounted ||
+          _job?['assessment_job_id'] != jobId ||
+          !_processing) {
+        return;
+      }
       final status = error is ApiException ? error.statusCode : null;
       setState(() {
         _accessDenied = status == 401 || status == 403 || status == 404;
@@ -542,7 +560,9 @@ class _AiScanPageState extends State<AiScanPage>
         prediction['condition']?.toString().toLowerCase() ?? '';
 
     final information = _conditionInformation[condition];
-    final positive = prediction['positive'] == true;
+    final assessed = prediction['assessed'] != false &&
+        prediction['positive'] is bool;
+    final positive = assessed && prediction['positive'] == true;
     final healthy = condition == 'healthy';
     final score = prediction['confidence'];
 
@@ -550,17 +570,40 @@ class _AiScanPageState extends State<AiScanPage>
     final description = information?['description'] ??
         'Ask your veterinarian to explain this screening result.';
 
-    final colour = positive && !healthy
+    final colour = !assessed
+        ? const Color(0xFF64748B)
+        : positive && !healthy
         ? const Color(0xFF9A5A16)
         : const Color(0xFF2549C7);
 
-    final status = healthy
-        ? (positive
-        ? 'Healthy appearance suggested by the model'
-        : 'Healthy-image category below threshold')
-        : (positive
-        ? 'Possible finding — veterinary review needed'
-        : 'Not flagged in this photo');
+    final String status;
+
+    if (!assessed) {
+      status = 'Not assessed for this species';
+    } else if (healthy) {
+      status = positive
+          ? 'Healthy appearance suggested by the model'
+          : 'Healthy-image category below threshold';
+    } else {
+      status = positive
+          ? 'Possible finding — veterinary review needed'
+          : 'Not flagged in this photo';
+    }
+
+    final subtitle = !assessed
+        ? status
+        : '$status\nModel score: '
+        '${score is num ? '${(score * 100).toStringAsFixed(1)}%' : 'Unavailable'}';
+
+    final explanation = !assessed
+        ? 'This classifier has insufficient labelled data to assess '
+        'this condition reliably for this species. '
+        'Not assessed does not mean absent.'
+        : positive && !healthy
+        ? 'The AI flagged a possible finding. '
+        'Your veterinarian must confirm its meaning.'
+        : 'A result below the threshold does not rule out '
+        'a dental problem.';
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -576,7 +619,9 @@ class _AiScanPageState extends State<AiScanPage>
         leading: CircleAvatar(
           backgroundColor: colour.withValues(alpha: 0.10),
           child: Icon(
-            healthy
+            !assessed
+                ? Icons.help_outline_rounded
+                : healthy && positive
                 ? Icons.check_circle_outline
                 : Icons.info_outline,
             color: colour,
@@ -589,8 +634,7 @@ class _AiScanPageState extends State<AiScanPage>
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 6),
           child: Text(
-            '$status\n'
-                'Model score: ${score is num ? '${(score * 100).toStringAsFixed(1)}%' : 'Unavailable'}',
+            subtitle,
             style: const TextStyle(height: 1.5),
           ),
         ),
@@ -601,7 +645,7 @@ class _AiScanPageState extends State<AiScanPage>
               const Divider(),
               const SizedBox(height: 8),
               const Text(
-                'What does this mean?',
+                'About this condition',
                 style: TextStyle(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 8),
@@ -611,11 +655,7 @@ class _AiScanPageState extends State<AiScanPage>
               ),
               const SizedBox(height: 12),
               Text(
-                positive && !healthy
-                    ? 'The AI flagged a possible finding. '
-                    'Your veterinarian must confirm its meaning.'
-                    : 'A result below the threshold does not rule out '
-                    'a dental problem.',
+                explanation,
                 style: TextStyle(
                   fontSize: 12,
                   height: 1.5,
@@ -726,11 +766,10 @@ class _AiScanPageState extends State<AiScanPage>
         ? rawPredictions.whereType<Map>().toList()
         : <Map>[];
 
-    final healthyPositive = predictions.any(
-          (prediction) =>
-      prediction['condition'] == 'healthy' &&
-          prediction['positive'] == true,
-    );
+    final notAssessed = predictions
+        .where((prediction) => prediction['assessed'] == false)
+        .map((prediction) => prediction['condition'].toString())
+        .toList();
 
     final diseaseFindings = predictions.where(
           (prediction) =>
@@ -739,49 +778,59 @@ class _AiScanPageState extends State<AiScanPage>
           prediction['positive'] == true,
     ).toList();
 
-    final conflict = healthyPositive && diseaseFindings.isNotEmpty;
-    final noPositive = !healthyPositive && diseaseFindings.isEmpty;
-
+    final decision = result['decision'];
     final severity = result['severity'];
+
+    final status = decision is Map
+        ? decision['status']?.toString() ?? 'unavailable'
+        : 'unavailable';
+
     final severityLabel = severity is Map
-        ? '${severity['label'] ?? 'Unavailable'}'
+        ? severity['label']?.toString() ?? 'Unavailable'
         : 'Unavailable';
 
+    final decisionReason = decision is Map
+        ? decision['reason']?.toString() ?? ''
+        : '';
+
     final severityReason = severity is Map
-        ? '${severity['reason'] ?? ''}'
+        ? severity['reason']?.toString() ?? ''
         : '';
 
     final String heading;
     final String label;
     final String explanation;
 
-    if (conflict) {
-      heading = 'Result needs review';
-      label = 'Conflicting predictions';
-      explanation =
-      'The model flagged both healthy appearance and possible '
-          'disease features. An overall severity is not shown because '
-          'these predictions conflict.';
-    } else if (noPositive) {
+    if (status == 'inconclusive') {
       heading = 'Result needs review';
       label = 'Inconclusive';
-      explanation =
-      'No condition exceeded its prediction threshold. '
-          'This does not confirm that the teeth and gums are healthy.';
-    } else if (healthyPositive) {
+      explanation = decisionReason;
+    } else if (status == 'healthy_pattern') {
       heading = 'Image screening result';
-      label = 'No disease flags';
-      explanation =
-      'The healthy score exceeded its threshold and no disease '
-          'score exceeded its threshold. This image result does not '
-          'exclude dental problems.';
-    } else {
+      label = 'No supported disease flags';
+      explanation = decisionReason;
+    } else if (status == 'disease_flags' &&
+        {'Mild', 'Moderate', 'Severe'}.contains(severityLabel)) {
       heading = 'Experimental severity estimate';
       label = severityLabel;
       explanation = severityReason;
+    } else if (status == 'disease_flags') {
+      heading = 'Image screening result';
+      label = 'Severity unavailable';
+      explanation = decisionReason;
+    } else {
+      heading = 'Result unavailable';
+      label = 'Unavailable';
+      explanation = decisionReason.isNotEmpty
+          ? decisionReason
+          : 'Reopen this assessment after updating the backend.';
     }
 
-    final accent = conflict || noPositive
+    final needsReview = status == 'inconclusive' ||
+        status == 'unavailable' ||
+        label == 'Severity unavailable';
+
+    final accent = needsReview
         ? const Color(0xFFFFD493)
         : const Color(0xFFD1F04B);
 
@@ -797,7 +846,7 @@ class _AiScanPageState extends State<AiScanPage>
           Row(
             children: [
               Icon(
-                conflict || noPositive
+                needsReview
                     ? Icons.info_outline_rounded
                     : Icons.auto_awesome,
                 color: accent,
@@ -837,6 +886,17 @@ class _AiScanPageState extends State<AiScanPage>
                 height: 1.5,
               ),
             ),
+          if (notAssessed.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Text(
+              'Not assessed: ${notAssessed.join(', ')}. '
+                  'These conditions have not been ruled out.',
+              style: const TextStyle(
+                color: Colors.white70,
+                height: 1.5,
+              ),
+            ),
+          ],
           if (diseaseFindings.isNotEmpty) ...[
             const SizedBox(height: 14),
             Text(

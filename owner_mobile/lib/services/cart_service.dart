@@ -1,7 +1,14 @@
 import 'api_client.dart';
+import 'package:flutter/foundation.dart';
 
 class CartService {
   final ApiClient api;
+
+  static final changes = ValueNotifier<int>(0);
+
+  static void notifyChanged() {
+    changes.value++;
+  }
 
   CartService(this.api);
 
@@ -39,7 +46,7 @@ class CartService {
     required int expectedVersion,
     required int quantity,
   }) async {
-    return _readCart(
+    final cart = _readCart(
       await api.put(
         '/shop/cart/$clinicId/items/$productId',
         {
@@ -48,22 +55,31 @@ class CartService {
         },
       ),
     );
+
+    notifyChanged();
+    return cart;
   }
 
   Future<Map<String, dynamic>> addProduct({
     required int clinicId,
     required int productId,
+    int quantityToAdd = 1,
   }) async {
     final cart = await getCart(clinicId);
     final items = cart['items'] as List;
 
-    var quantity = 1;
+    if (quantityToAdd < 1 || quantityToAdd > 99) {
+      throw const ApiException('Choose a quantity from 1 to 99.');
+    }
+
+    var quantity = quantityToAdd;
 
     for (final entry in items) {
       final item = Map<String, dynamic>.from(entry as Map);
 
       if (item['product_id'] == productId) {
-        quantity = (item['quantity'] as int) + 1;
+        quantity =
+            (item['quantity'] as int) + quantityToAdd;
         break;
       }
     }

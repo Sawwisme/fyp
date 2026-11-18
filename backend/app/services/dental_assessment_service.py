@@ -267,6 +267,8 @@ def list_assessment_history(
                 item["condition"]
                 for item in predictions
                 if isinstance(item, dict)
+                and item.get("assessed", True) is True
+                and item.get("supported", True) is True
                 and item.get("positive") is True
                 and item.get("condition") in {
                     "plaque",

@@ -10,6 +10,20 @@ from app.services.chatbot_answer_service import (
 )
 from app.services.pet_service import get_owner_profile, get_pet
 
+from app.services.chatbot_engine_service import load_chatbot_module
+
+multilingual_safety_reply = load_chatbot_module(
+    "chatbot_safety"
+).multilingual_safety_reply
+
+from app.services.chatbot_language_service import (
+    requested_language,
+    saved_language,
+    language_preference_reply,
+    prepare_multilingual_question,
+    localize_faq_answer,
+)
+
 CHAT_ACTIONS = {
     "explain_latest_analysis": "OPEN_AI_ANALYSIS",
     "explain_pet_severity": "OPEN_AI_ANALYSIS",
@@ -299,12 +313,47 @@ def send_message(
                 "This conversation is closed. Start a new chat.",
             )
 
-        answer = generate_contextual_reply(
-            db,
-            current_user,
-            conversation,
+        language = saved_language(db, conversation)
+
+        # Check the original message before FAQ translation,
+        # topic recall or language-switch handling.
+        safety_answer = multilingual_safety_reply(
             message,
+            preferred_language=language,
         )
+
+        if safety_answer is not None:
+            answer = safety_answer
+            language = answer["language"]
+
+        else:
+            language_request = requested_language(message)
+
+            if language_request is not None:
+                language = language_request
+                answer = language_preference_reply(language)
+            else:
+                engine_message, language = (
+                    prepare_multilingual_question(
+                        message,
+                        language,
+                    )
+                )
+
+                answer = generate_contextual_reply(
+                    db,
+                    current_user,
+                    conversation,
+                    engine_message,
+                    language=language,
+                )
+
+                answer = localize_faq_answer(
+                    answer,
+                    language,
+                )
+
+        answer["language"] = language
         now = utc_now()
 
         user_message = ChatbotMessage(
@@ -325,6 +374,8 @@ def send_message(
             client_request_id=request_id,
             response_metadata={
                 "intent": answer["intent"],
+                "language": answer["language"],
+                "urgency_level": answer.get("urgency_level"),
                 "suggested_questions": (
                     answer.get("suggested_questions", [])
                     if answer["intent"] == "clarify"

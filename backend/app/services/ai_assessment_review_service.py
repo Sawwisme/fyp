@@ -79,9 +79,18 @@ def serialize_review(record):
         "predictions": [
             {
                 "condition": prediction.condition_name,
-                "confidence": float(prediction.confidence_score),
-                "positive": prediction.predicted_positive,
-                "supported": prediction.supported,
+                "confidence": (
+                    float(prediction.confidence_score)
+                    if prediction.supported
+                    else None
+                ),
+                "positive": (
+                    prediction.predicted_positive
+                    if prediction.supported
+                    else None
+                ),
+                "supported": bool(prediction.supported),
+                "assessed": bool(prediction.supported),
             }
             for prediction in analysis.predictions
         ],

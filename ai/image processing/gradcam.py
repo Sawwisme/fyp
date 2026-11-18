@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
+from classification_policy import apply_species_policy
 
 class ImageValidationError(ValueError):
     def __init__(self, stage, message):
@@ -19,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(
     BASE_DIR,
     "models",
-    "dental_classifier.keras"
+    "dental_classifier_grouped_candidate.keras"
 )
 
 DENTAL_VALIDATOR_MODEL_PATH = os.path.join(
@@ -897,6 +898,7 @@ def save_gradcam_summary(
 def run_automatic_gradcam(
     image_path,
     raise_on_rejection=False,
+    species=None,
 ):
 
     print(
@@ -1048,167 +1050,58 @@ def run_automatic_gradcam(
             dental_message
         )
 
-    # =====================================================
-    # STEP 5: Condition prediction
-    # =====================================================
-
+       # STEP 5: Classification and species coverage
     predictions = model.predict(
         input_image,
-        verbose=0
+        verbose=0,
     )[0]
 
-    print(
-        "\n==================================="
-    )
+    raw_results = {}
 
-    print(
-        "Condition Predictions"
-    )
+    for i, label in enumerate(LABELS):
+        confidence = float(predictions[i])
+        threshold = float(THRESHOLDS[label])
 
-    print(
-        "==================================="
-    )
+        raw_results[label] = {
+            "confidence": confidence,
+            "threshold": threshold,
+            "positive": confidence >= threshold,
+        }
 
+    results = apply_species_policy(raw_results, species)
+
+    # STEP 6: Only assessed, positive conditions get Grad-CAM.
+    # Do not fall back to an unsupported or below-threshold class.
     positive_conditions = []
 
-    results = {}
+    for i, label in enumerate(LABELS):
+        item = results[label]
 
-    for i, label in enumerate(
-        LABELS
-    ):
-
-        confidence = float(
-            predictions[i]
-        )
-
-        threshold = (
-            THRESHOLDS[
-                label
-            ]
-        )
-
-        is_positive = (
-            confidence
-            >= threshold
-        )
-
-        status = (
-            "POSITIVE"
-            if is_positive
-            else "NEGATIVE"
-        )
+        if not item["assessed"]:
+            status = "NOT ASSESSED"
+        elif item["positive"] is True:
+            status = "POSITIVE"
+            positive_conditions.append((
+                label,
+                item["confidence"],
+                item["threshold"],
+                i,
+            ))
+        else:
+            status = "NEGATIVE"
 
         print(
             f"{label:<12} "
-            f"{confidence:.4f} "
-            f"(threshold="
-            f"{threshold:.2f}) "
+            f"{item['confidence']:.4f} "
+            f"(threshold={item['threshold']:.2f}) "
             f"{status}"
         )
 
-        results[label] = {
-            "confidence": confidence,
-            "threshold": threshold,
-            "positive": is_positive
-        }
-
-        if is_positive:
-
-            positive_conditions.append(
-                (
-                    label,
-                    confidence,
-                    threshold,
-                    i
-                )
-            )
-
-    # =====================================================
-    # STEP 6: Detected conditions
-    # =====================================================
-
-    print(
-        "\n==================================="
-    )
-
-    print(
-        "Detected Conditions"
-    )
-
-    print(
-        "==================================="
-    )
-
-    # -----------------------------------------------------
-    # No positive label fallback
-    # -----------------------------------------------------
-
-    if len(
-        positive_conditions
-    ) == 0:
-
-        top_index = int(
-            np.argmax(
-                predictions
-            )
-        )
-
-        top_label = (
-            LABELS[
-                top_index
-            ]
-        )
-
-        top_confidence = float(
-            predictions[
-                top_index
-            ]
-        )
-
-        top_threshold = (
-            THRESHOLDS[
-                top_label
-            ]
-        )
-
+    if not positive_conditions:
         print(
-            "No condition exceeded "
-            "its classification threshold."
+            "No supported classification passed its threshold. "
+            "No class-specific heatmap will be generated."
         )
-
-        print(
-            f"Highest model response: "
-            f"{top_label} "
-            f"({top_confidence:.4f})"
-        )
-
-        print(
-            "Generating Grad-CAM for "
-            "the highest model response."
-        )
-
-        positive_conditions.append(
-            (
-                top_label,
-                top_confidence,
-                top_threshold,
-                top_index
-            )
-        )
-
-    else:
-
-        for (
-            condition,
-            confidence,
-            threshold,
-            _
-        ) in positive_conditions:
-
-            print(
-                f"- {condition}: "
-                f"{confidence:.4f}"
-            )
 
     # =====================================================
     # STEP 7: Generate Grad-CAM overlays

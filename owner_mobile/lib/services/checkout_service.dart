@@ -27,6 +27,7 @@ class CheckoutService {
     required int clinicId,
     required int cartVersion,
     required String shippingMethod,
+    List<int>? selectedProductIds,
   }) async {
     return _readMap(
       await api.post(
@@ -34,6 +35,7 @@ class CheckoutService {
         {
           'expected_cart_version': cartVersion,
           'shipping_method': shippingMethod,
+          'selected_product_ids': ?selectedProductIds,
         },
       ),
     );
@@ -43,12 +45,15 @@ class CheckoutService {
     required int clinicId,
     required Map<String, dynamic> payload,
   }) async {
-    return _readMap(
+    final order = _readMap(
       await api.post(
         '/shop/clinics/$clinicId/orders',
         payload,
       ),
     );
+
+    CartService.notifyChanged();
+    return order;
   }
 
   Future<Map<String, dynamic>> getOrder(int orderId) async {

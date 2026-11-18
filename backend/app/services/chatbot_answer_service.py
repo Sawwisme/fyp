@@ -1,5 +1,7 @@
 from app.services.chatbot_context_service import build_chat_context
-from app.services.chatbot_engine_service import generate_reply
+from app.services.chatbot_engine_service import generate_reply, load_chatbot_module
+
+_assessment_text = load_chatbot_module("chatbot_assessment_text")
 from app.services.chatbot_appointment_service import (
     upcoming_appointment_reply,
 )
@@ -55,24 +57,49 @@ def severity_label(analysis):
 
 
 def latest_description(pet_name, analysis):
+    prefix = (
+        f"{pet_name}'s latest completed assessment "
+        f"({date_label(analysis)})"
+    )
+
+    decision = analysis.get("assessment_decision") or {}
+    status = decision.get("status")
+    reason = decision.get("reason") or ""
+
+    if status == "inconclusive":
+        return (
+            f"{prefix} is inconclusive. {reason} "
+            "The model flags are retained for review, "
+            "but no overall severity is assigned. "
+            "This does not establish either disease or health."
+        )
+
+    if status == "unavailable":
+        return (
+            f"{prefix} does not have a usable interpretation. "
+            f"{reason}"
+        )
+
+    if status == "healthy_pattern":
+        return (
+            f"{prefix} has no disease flags above their thresholds. "
+            "This image-screening result does not rule out "
+            "dental problems."
+        )
+
     conditions = [
-        CONDITION_NAMES.get(condition, condition)
+        condition
         for condition in analysis.get("detected_conditions", [])
+        if condition in {"plaque", "gingivitis", "calculus"}
     ]
 
-    detected = (
-        ", ".join(conditions)
-        if conditions
-        else "no positive condition labels"
-    )
+    flags = ", ".join(conditions) or "no disease flags"
 
     return (
-        f"{pet_name}'s latest completed assessment "
-        f"({date_label(analysis)}) recorded {detected}. "
-        f"Estimated Severity: {severity_label(analysis)}. "
-        "This is a system estimate, not a confirmed diagnosis."
+        f"{prefix} recorded model flags for: {flags}. "
+        f"Experimental severity: {severity_label(analysis)}. "
+        "These are screening outputs, not confirmed diagnoses."
     )
-
 
 def vet_feedback(context, analysis_id):
     # Only feedback for this particular analysis.
@@ -182,6 +209,17 @@ def next_steps(context):
     severity = latest.get("estimated_severity")
     introduction = latest_description(name, latest)
 
+    if severity == "inconclusive":
+        return (
+            introduction
+            + " You can request a veterinary review of this "
+            "assessment or submit another clear image. "
+            "Do not use an inconclusive result to decide "
+            "that treatment is unnecessary. Follow any "
+            "existing veterinary instructions.",
+            "OPEN_AI_ANALYSIS",
+        )
+
     if severity in {"moderate", "severe"}:
         return (
             introduction
@@ -257,6 +295,17 @@ def contextual_reply(intent, context):
 
         for prediction in predictions:
             condition = prediction["condition"]
+            if (
+                prediction.get("assessed", True) is not True
+                or prediction.get("supported", True) is not True
+                or type(prediction.get("positive")) is not bool
+            ):
+                lines.append(
+                    f"• {condition.title()}: not assessed "
+                    "for this species; this does not mean absent."
+                )
+                continue
+                       
             score = prediction.get("confidence")
             positive = prediction.get("positive") is True
 
@@ -482,6 +531,7 @@ def generate_contextual_reply(
     current_user,
     conversation,
     message,
+    language="en",
 ):
     if is_topic_reset(message):
         return {
@@ -627,6 +677,13 @@ def generate_contextual_reply(
                 intent,
                 context,
             )
+
+        if answer.get("mode") != "rule":
+            translated_reply = _assessment_text.render_assessment_reply(
+                intent, context, language
+            )
+            if translated_reply is not None:
+                answer["reply"] = translated_reply
 
         latest = context.get("latest_analysis")
 

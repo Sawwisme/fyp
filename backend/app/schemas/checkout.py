@@ -3,7 +3,7 @@ from typing import Literal
 
 from app.schemas.cart import CartItemResponse
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-
+from app.schemas.checkout_selection import CheckoutSelection
 
 class ShopSettingsUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -33,7 +33,7 @@ class ShopSettingsResponse(BaseModel):
     pickup_address: str | None
     version: int
 
-class CheckoutQuoteRequest(BaseModel):
+class CheckoutQuoteRequest(CheckoutSelection):
     model_config = ConfigDict(extra="forbid")
 
     expected_cart_version: int = Field(

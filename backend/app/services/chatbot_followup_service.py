@@ -112,6 +112,66 @@ CHOICE_REPLIES = {
     "option 2": 1,
 }
 
+def remembered_topic(db, conversation):
+    messages = db.scalars(
+        select(ChatbotMessage)
+        .where(
+            ChatbotMessage.conversation_id
+            == conversation.conversation_id,
+            ChatbotMessage.sender_type == "assistant",
+        )
+        .order_by(ChatbotMessage.message_id.desc())
+        .limit(20)
+    ).all()
+
+    for previous in messages:
+        metadata = previous.response_metadata
+
+        if not isinstance(metadata, dict):
+            return None
+
+        intent = metadata.get("intent")
+        reference = metadata.get("context_reference")
+
+        if not isinstance(reference, dict):
+            reference = {}
+
+        # Never carry a topic across an explicit reset or pet switch.
+        if (
+            intent in {"conversation_reset", "change_pet"}
+            or reference.get("topic_reset") is True
+        ):
+            return None
+
+        # Changing language does not change the conversation topic.
+        if intent == "language_preference":
+            continue
+
+        # Do not revive an earlier topic after a safety/rule reply.
+        if metadata.get("mode") == "rule":
+            return None
+
+        # Reject references explicitly linked to another pet.
+        saved_pet_id = reference.get("pet_id")
+
+        if (
+            saved_pet_id is not None
+            and saved_pet_id != conversation.pet_id
+        ):
+            return None
+
+        # A clarification does not erase the previous topic.
+        if intent == "clarify":
+            continue
+
+        if intent in TOPIC_QUESTIONS:
+            return intent
+
+        # Unknown topics are boundaries, not permission to guess.
+        return None
+
+    return None
+
 def resolve_followup(db, conversation, message, answer):
     # Never replace an urgent, medication or other rule response.
     if answer.get("mode") == "rule":
@@ -186,7 +246,7 @@ def resolve_followup(db, conversation, message, answer):
 
         return generate_reply(question)
 
-    previous_intent = metadata.get("intent")
+    previous_intent = remembered_topic(db, conversation)
     canonical_question = None
 
     if text in REPEAT_PHRASES:

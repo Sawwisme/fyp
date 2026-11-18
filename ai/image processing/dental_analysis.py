@@ -196,14 +196,14 @@ def save_combined_analysis_summary(
                     [0],
                     color="#FF0000",
                     lw=3,
-                    label="Gingivitis region",
+                    label="Predicted gingivitis outline",
                 ),
                 Line2D(
                     [0],
                     [0],
                     color="#FFD600",
                     lw=3,
-                    label="Calculus region",
+                    label="Predicted calculus outline",
                 ),
             ],
             loc="lower center",
@@ -215,11 +215,13 @@ def save_combined_analysis_summary(
         fig.text(
             0.5,
             0.025,
-            "Heatmap = model attention. "
-            "Outlines = segmentation predictions, not confirmed disease.",
+            "Heatmap: classifier attention, not confirmed disease location.\n"
+            "Outlines: a separate segmentation model; they do not override "
+            "classifier coverage or veterinary findings.",
             ha="center",
             fontsize=8,
             color="#53627A",
+            linespacing=1.5,
         )
 
         fig.subplots_adjust(
@@ -256,10 +258,12 @@ def save_combined_analysis_summary(
 
     finally:
         plt.close(fig)
+
 def analyze_dental_image(
     image_path,
     output_dir=None,
     raise_on_rejection=False,
+    species=None,
 ):
     """
     Run complete dental image analysis.
@@ -297,6 +301,7 @@ def analyze_dental_image(
     gradcam_result = run_automatic_gradcam(
         image_path,
         raise_on_rejection=raise_on_rejection,
+        species=species,
     )
 
     if gradcam_result is None:
@@ -427,7 +432,8 @@ def analyze_dental_image(
             name: {
                 "score": float(values["confidence"]),
                 "threshold": float(values["threshold"]),
-                "positive": bool(values["positive"]),
+                "positive": values["positive"],
+                "assessed": values.get("assessed", True),
             }
             for name, values in predictions.items()
         },

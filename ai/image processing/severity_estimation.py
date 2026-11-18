@@ -55,6 +55,8 @@ def estimate_severity(
 
     if not disease_conditions:
         return {
+            "calculation_version": "supported-conditions-v1",
+            "scored_conditions": sorted(set(disease_conditions)),
             "severity": "None",
             "disease_conditions": [],
             "condition_count": 0,
@@ -100,9 +102,16 @@ def estimate_severity(
     # Segmentation extent
     # -----------------------------------------------------
 
+    # Only use areas corresponding to supported, positive
+    # classifier flags passed through detected_conditions.
     segmentation_area = (
-        gingivitis_area_percent
-        + calculus_area_percent
+        float(gingivitis_area_percent)
+        if "gingivitis" in disease_conditions
+        else 0.0
+    ) + (
+        float(calculus_area_percent)
+        if "calculus" in disease_conditions
+        else 0.0
     )
 
     segmentation_area = max(
@@ -199,6 +208,8 @@ def estimate_severity(
     )
 
     return {
+        "calculation_version": "supported-conditions-v1",
+        "scored_conditions": sorted(set(disease_conditions)),
         "severity": severity,
 
         "disease_conditions":

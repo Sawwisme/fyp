@@ -1,0 +1,16 @@
+﻿split,species,source,images,healthy_images
+test,cat,cat_dental_classification,108,17
+test,cat,generic_manual_screening,9,5
+test,dog,generic_manual_screening,3,1
+test,dog,pawpawhealth,54,0
+test,dog,screened_healthy_dog,17,17
+train,cat,cat_dental_classification,524,95
+train,cat,generic_manual_screening,19,7
+train,dog,generic_manual_screening,22,10
+train,dog,pawpawhealth,248,0
+train,dog,screened_healthy_dog,75,75
+validation,cat,cat_dental_classification,113,21
+validation,cat,generic_manual_screening,4,1
+validation,dog,generic_manual_screening,8,4
+validation,dog,pawpawhealth,51,0
+validation,dog,screened_healthy_dog,14,14

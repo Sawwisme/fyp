@@ -112,3 +112,12 @@ def generate_reply(message):
             status_code=503,
             detail="The chatbot could not respond. Please try again.",
         ) from None
+
+@lru_cache(maxsize=None)
+def load_chatbot_module(name):
+    if name not in {"chatbot_language", "chatbot_safety", "chatbot_assessment_text"}:
+        raise ValueError("Unsupported chatbot helper module.")
+    project_path = str(PROJECT_ROOT)
+    if project_path not in sys.path:
+        sys.path.insert(0, project_path)
+    return import_module(f"ai.chatbot.{name}")

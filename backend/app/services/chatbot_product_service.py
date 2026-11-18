@@ -81,6 +81,51 @@ def product_request_filters(message):
 
     return filters, categories, budget
 
+def parse_record_time(value):
+    if not isinstance(value, str):
+        return None
+
+    try:
+        parsed = datetime.fromisoformat(
+            value.replace("Z", "+00:00")
+        )
+    except ValueError:
+        return None
+
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+
+    return parsed.astimezone(timezone.utc)
+
+
+def consultation_covers_analysis(consultation, analysis):
+    if not consultation or not analysis:
+        return False
+
+    if (
+        consultation.get("ai_analysis_id") is None
+        or consultation["ai_analysis_id"]
+        != analysis.get("analysis_id")
+    ):
+        return False
+
+    # Keep an outstanding clinic-review requirement active.
+    if consultation.get("in_clinic_review_required"):
+        return False
+
+    consultation_time = parse_record_time(
+        consultation.get("consultation_date")
+    )
+    analysis_time = parse_record_time(
+        analysis.get("analysis_date")
+    )
+
+    return (
+        consultation_time is not None
+        and analysis_time is not None
+        and consultation_time >= analysis_time
+    )
+
 def product_reply(db, current_user, pet_id, *, products=None,
  request_text="",):
     # Checks owner access and selected-pet ownership.
@@ -116,12 +161,51 @@ def product_reply(db, current_user, pet_id, *, products=None,
     latest = context.get("latest_analysis")
     review_note = None
 
+    consultation = context.get("latest_consultation")
+
+    covered_by_consultation = consultation_covers_analysis(
+        consultation,
+        latest,
+    )
+
     reviews = [
         review
         for review in context.get("vet_reviews", [])
         if latest is not None
         and review["analysis_id"] == latest["analysis_id"]
     ]
+
+    if covered_by_consultation:
+        consultation_time = parse_record_time(
+            consultation.get("consultation_date")
+        )
+
+        remaining_reviews = []
+
+        for review in reviews:
+            review_time = parse_record_time(
+                review.get("reviewed_at")
+            )
+
+            superseded = (
+                review.get("clinic_id")
+                == consultation.get("clinic_id")
+                and review_time is not None
+                and review_time <= consultation_time
+            )
+
+            if not superseded:
+                remaining_reviews.append(review)
+
+        reviews = remaining_reviews
+
+        review_note = (
+            f"Using consultation "
+            f"#{consultation['consultation_id']}, "
+            "which is linked to this assessment. "
+            "Product suggestions follow its recorded "
+            "diagnosis and care instructions."
+        )
 
     if len(reviews) > 1:
         return (
@@ -166,6 +250,7 @@ def product_reply(db, current_user, pet_id, *, products=None,
     elif (
         latest is not None
         and latest.get("estimated_severity") == "severe"
+        and not covered_by_consultation
     ):
         return (
             "The latest AI assessment has Estimated Severity: "
