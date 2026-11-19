@@ -271,3 +271,526 @@ FAQ_QUESTIONS.update({
     "apa perlu buat selepas scan": ("what should I do after my dental scan", "ms"),
     "apa saya perlu buat selepas imbasan gigi": ("what should I do after my dental scan", "ms"),
 })
+
+
+FAQ_QUESTIONS.update({
+    "显示评估历史": ("show my pet previous results", "zh"),
+    "我的扫描历史": ("show my pet previous results", "zh"),
+    "查看扫描历史": ("show my pet previous results", "zh"),
+    "比较最新和上次结果": ("compare my latest scan with the earlier one", "zh"),
+    "比较两次扫描": ("compare my latest scan with the earlier one", "zh"),
+    "sejarah scan saya": ("show my pet previous results", "ms"),
+    "tunjuk sejarah penilaian": ("show my pet previous results", "ms"),
+    "bandingkan keputusan scan": ("compare my latest scan with the earlier one", "ms"),
+    "bandingkan dengan keputusan sebelum ini": ("compare my latest scan with the earlier one", "ms"),
+})
+
+def render_upcoming_appointments(
+    pet_name,
+    records,
+    rearrangement_ids=(),
+    language="en",
+):
+    labels = {
+        "en": {
+            "select": "Select a pet to check its appointments.",
+            "empty": "No upcoming appointment was found for {name}. Open Booking to check all appointments.",
+            "heading": "Upcoming bookings for {name} (Malaysia time):",
+            "appointment": "Appointment",
+            "date": "Date",
+            "clinic": "Clinic",
+            "vet": "Veterinarian",
+            "type": "Type",
+            "status": "Status",
+            "address": "Address",
+            "missing": "Not recorded",
+            "rearrange": (
+                "This appointment needs rearrangement because of "
+                "a reported veterinarian absence. Contact the clinic."
+            ),
+            "footer": (
+                "Open Booking to view or manage these appointments. "
+                "This chat has not created or changed a booking."
+            ),
+        },
+        "ms": {
+            "select": "Pilih haiwan untuk menyemak janji temunya.",
+            "empty": "Tiada janji temu akan datang untuk {name}. Buka Booking untuk menyemak semua janji temu.",
+            "heading": "Tempahan akan datang untuk {name} (waktu Malaysia):",
+            "appointment": "Janji temu",
+            "date": "Tarikh",
+            "clinic": "Klinik",
+            "vet": "Doktor veterinar",
+            "type": "Jenis",
+            "status": "Status",
+            "address": "Alamat",
+            "missing": "Tidak direkodkan",
+            "rearrange": (
+                "Janji temu ini perlu dijadualkan semula kerana "
+                "ketidakhadiran doktor veterinar yang dilaporkan. "
+                "Hubungi klinik."
+            ),
+            "footer": (
+                "Buka Booking untuk melihat atau mengurus janji temu. "
+                "Perbualan ini tidak mencipta atau mengubah tempahan."
+            ),
+        },
+        "zh": {
+            "select": "请先选择宠物，再查看其预约。",
+            "empty": "没有找到{name}即将到来的预约。请打开 Booking 查看全部预约。",
+            "heading": "{name}即将到来的预约（马来西亚时间）：",
+            "appointment": "预约",
+            "date": "日期",
+            "clinic": "诊所",
+            "vet": "兽医",
+            "type": "类型",
+            "status": "状态",
+            "address": "地址",
+            "missing": "未记录",
+            "rearrange": (
+                "因已报告的兽医缺勤，此预约需要重新安排。"
+                "请联系诊所。"
+            ),
+            "footer": (
+                "请打开 Booking 查看或管理预约。"
+                "本次聊天没有创建或更改预约。"
+            ),
+        },
+    }
+
+    statuses = {
+        "en": {
+            "pending": "Pending clinic confirmation",
+            "confirmed": "Confirmed",
+            "pending_payment": "Awaiting payment — not confirmed",
+        },
+        "ms": {
+            "pending": "Menunggu pengesahan klinik",
+            "confirmed": "Disahkan",
+            "pending_payment": "Menunggu bayaran — belum disahkan",
+        },
+        "zh": {
+            "pending": "等待诊所确认",
+            "confirmed": "已确认",
+            "pending_payment": "等待付款 — 尚未确认",
+        },
+    }
+
+    language = language if language in labels else "en"
+    text = labels[language]
+
+    if pet_name is None:
+        return text["select"]
+
+    if not records:
+        return text["empty"].format(name=pet_name)
+
+    sections = [text["heading"].format(name=pet_name)]
+
+    for record in records:
+        appointment_id = record["appointment_id"]
+        date = record["schedule_date"].strftime("%d %b %Y")
+        start = record["start_time"].strftime("%H:%M")
+        end = record["end_time"].strftime("%H:%M")
+        status = statuses[language].get(
+            record["status"],
+            record["status"],
+        )
+
+        section = (
+            f"{text['appointment']} #{appointment_id}\n"
+            f"{text['date']}: {date}, {start}–{end}\n"
+            f"{text['clinic']}: {record['clinic_name']}\n"
+            f"{text['vet']}: {record['vet_name']}\n"
+            f"{text['type']}: {record['appointment_type']}\n"
+            f"{text['status']}: {status}\n"
+            f"{text['address']}: "
+            f"{record['address'] or text['missing']}"
+        )
+
+        if appointment_id in rearrangement_ids:
+            section += "\n" + text["rearrange"]
+
+        sections.append(section)
+
+    sections.append(text["footer"])
+    return "\n\n".join(sections)
+
+FAQ_QUESTIONS.update({
+    "我的下一次预约": ("when is my next appointment", "zh"),
+    "查看我的预约": ("when is my next appointment", "zh"),
+    "我的appointment是什么时候": ("when is my next appointment", "zh"),
+    "bila appointment saya": ("when is my next appointment", "ms"),
+    "bila janji temu saya": ("when is my next appointment", "ms"),
+    "tunjuk appointment saya": ("when is my next appointment", "ms"),
+})
+
+def render_followup_care(pet_name, tasks, language="en"):
+    labels = {
+        "en": {
+            "select": "Select a pet to check its follow-up care.",
+            "empty": "No open follow-up task was found for {name}.",
+            "heading": "Open follow-up tasks for {name}:",
+            "task": "Follow-up",
+            "clinic": "Clinic",
+            "status": "Status",
+            "date": "Recommended review date",
+            "reason": "Recorded reason",
+            "care": "Vet instructions — original text",
+            "photos": "Photo instructions — original text",
+            "missing": "Not recorded",
+            "submit": "You can submit an update through this task.",
+            "wait": "Another submission is not currently allowed. Check the task for feedback.",
+            "visit": "An in-clinic review is required. Check the linked appointment before booking another visit.",
+            "footer": "A recommended review date is not a booked appointment. This chat has not submitted photos or changed a follow-up.",
+        },
+        "ms": {
+            "select": "Pilih haiwan untuk menyemak penjagaan susulannya.",
+            "empty": "Tiada tugasan susulan terbuka untuk {name}.",
+            "heading": "Tugasan susulan terbuka untuk {name}:",
+            "task": "Susulan",
+            "clinic": "Klinik",
+            "status": "Status",
+            "date": "Tarikh pemeriksaan semula yang disyorkan",
+            "reason": "Sebab yang direkodkan",
+            "care": "Arahan veterinar — teks asal",
+            "photos": "Arahan foto — teks asal",
+            "missing": "Tidak direkodkan",
+            "submit": "Anda boleh menghantar kemas kini melalui tugasan ini.",
+            "wait": "Penghantaran lain belum dibenarkan. Semak tugasan untuk maklum balas.",
+            "visit": "Pemeriksaan di klinik diperlukan. Semak janji temu berkaitan sebelum membuat tempahan lain.",
+            "footer": "Tarikh pemeriksaan yang disyorkan bukan janji temu yang telah ditempah. Perbualan ini tidak menghantar foto atau mengubah susulan.",
+        },
+        "zh": {
+            "select": "请先选择宠物，再查看后续护理。",
+            "empty": "没有找到{name}尚未结束的后续护理任务。",
+            "heading": "{name}尚未结束的后续护理任务：",
+            "task": "后续护理",
+            "clinic": "诊所",
+            "status": "状态",
+            "date": "建议复查日期",
+            "reason": "记录的原因",
+            "care": "兽医指示 — 原文",
+            "photos": "照片要求 — 原文",
+            "missing": "未记录",
+            "submit": "您可以通过此任务提交更新。",
+            "wait": "目前不允许再次提交。请查看任务中的审核反馈。",
+            "visit": "需要到诊所复查。新增预约前，请先查看关联预约。",
+            "footer": "建议复查日期不代表已预约。本次聊天没有提交照片或更改后续护理任务。",
+        },
+    }
+
+    states = {
+        "action_needed": (
+            "An update can be submitted",
+            "Kemas kini boleh dihantar",
+            "可以提交更新",
+        ),
+        "awaiting_review": (
+            "Awaiting vet review",
+            "Menunggu semakan veterinar",
+            "等待兽医审核",
+        ),
+        "update_requested": (
+            "Another update requested",
+            "Kemas kini tambahan diminta",
+            "兽医要求再次更新",
+        ),
+        "visit_required": (
+            "In-clinic review required",
+            "Pemeriksaan di klinik diperlukan",
+            "需要到诊所复查",
+        ),
+        "reviewed": (
+            "Reviewed",
+            "Telah disemak",
+            "已审核",
+        ),
+        "completed": ("Completed", "Selesai", "已完成"),
+        "cancelled": ("Cancelled", "Dibatalkan", "已取消"),
+    }
+
+    language = language if language in labels else "en"
+    index = {"en": 0, "ms": 1, "zh": 2}[language]
+    text = labels[language]
+
+    if pet_name is None:
+        return text["select"]
+
+    if not tasks:
+        return text["empty"].format(name=pet_name)
+
+    sections = [text["heading"].format(name=pet_name)]
+
+    for task in tasks:
+        state = states.get(task["state"])
+        status = state[index] if state else text["missing"]
+
+        section = (
+            f"{text['task']} #{task['followup_id']}\n"
+            f"{text['clinic']}: {task['clinic_name']}\n"
+            f"{text['status']}: {status}\n"
+            f"{text['date']}: {task['date'] or text['missing']}\n"
+            f"{text['reason']}: {task['reason'] or text['missing']}\n"
+            f"{text['care']}: "
+            f"{task['care_instructions'] or text['missing']}"
+        )
+
+        if task["photos_required"]:
+            section += (
+                f"\n{text['photos']}: "
+                f"{task['photo_instructions'] or text['missing']}"
+            )
+
+        section += "\n" + (
+            text["submit"] if task["can_submit"] else text["wait"]
+        )
+
+        if task["visit_required"]:
+            section += "\n" + text["visit"]
+
+        sections.append(section)
+
+    sections.append(text["footer"])
+    return "\n\n".join(sections)
+
+FAQ_QUESTIONS.update({
+    "查看后续护理": ("show my pet follow up instructions", "zh"),
+    "我的复查情况": ("show my pet follow up instructions", "zh"),
+    "follow up现在怎样": ("show my pet follow up instructions", "zh"),
+    "semak penjagaan susulan": ("show my pet follow up instructions", "ms"),
+    "status follow up saya": ("show my pet follow up instructions", "ms"),
+})
+
+def render_product_match_reason(
+    *,
+    species,
+    age_months,
+    minimum_age_months,
+    category_name,
+    category_requested,
+    budget,
+    matched_tags,
+    source,
+    language="en",
+):
+    if language not in {"ms", "zh"}:
+        return None
+
+    index = 0 if language == "ms" else 1
+
+    phrases = {
+        "unknown_age": (
+            "Disenaraikan untuk {species} tanpa had umur minimum. "
+            "Umur haiwan belum direkodkan; semak label penuh.",
+            "产品适用于{species}，且未设最低年龄限制。"
+            "宠物年龄未记录；请查看完整产品标签。",
+        ),
+        "known_age": (
+            "Sepadan dengan spesies ({species}) dan umur "
+            "({age} bulan) yang direkodkan. "
+            "Umur minimum produk: {minimum} bulan.",
+            "符合记录的物种（{species}）和年龄（{age}个月）。"
+            "产品最低适用年龄：{minimum}个月。",
+        ),
+        "category": (
+            "Sepadan dengan kategori yang diminta: {category}.",
+            "符合所请求的类别：{category}。",
+        ),
+        "budget": (
+            "Dalam bajet RM {budget:.2f} bagi setiap item.",
+            "在每件 RM {budget:.2f} 的预算内。",
+        ),
+        "purpose": (
+            "Tujuan penjagaan yang sepadan: {purposes}. "
+            "Sumber: {source}.",
+            "匹配的护理用途：{purposes}。依据：{source}。",
+        ),
+        "warning": (
+            "Dipilih secara automatik oleh chatbot sebagai pilihan "
+            "penjagaan sokongan, bukan preskripsi atau pengganti "
+            "rawatan. Semak label dan arahan veterinar. Produk "
+            "kawalan plak tidak ditunjukkan sebagai membuang "
+            "karang gigi sedia ada.",
+            "由聊天机器人自动匹配，作为辅助护理选择，"
+            "并非处方或治疗替代品。请查看产品标签和兽医指示。"
+            "控菌斑产品不代表能够去除已有牙结石。",
+        ),
+    }
+
+    species_names = {
+        "cat": ("kucing", "猫"),
+        "dog": ("anjing", "狗"),
+    }
+
+    purpose_names = {
+        "routine_oral_hygiene": (
+            "kebersihan mulut rutin", "日常口腔清洁"
+        ),
+        "plaque_control": ("kawalan plak", "牙菌斑控制"),
+        "breath_freshening": ("penjagaan bau nafas", "口气护理"),
+    }
+
+    species_name = species_names.get(
+        species, (species, species)
+    )[index]
+
+    if age_months is None:
+        sections = [
+            phrases["unknown_age"][index].format(
+                species=species_name
+            )
+        ]
+    else:
+        sections = [
+            phrases["known_age"][index].format(
+                species=species_name,
+                age=age_months,
+                minimum=minimum_age_months,
+            )
+        ]
+
+    if category_requested:
+        sections.append(
+            phrases["category"][index].format(
+                category=category_name
+            )
+        )
+
+    if budget is not None:
+        sections.append(
+            phrases["budget"][index].format(budget=budget)
+        )
+
+    purposes = [
+        purpose_names[tag][index]
+        for tag in matched_tags
+        if tag in purpose_names
+    ]
+
+    if purposes:
+        sections.append(
+            phrases["purpose"][index].format(
+                purposes=", ".join(purposes),
+                source=source,
+            )
+        )
+
+    sections.append(phrases["warning"][index])
+    return " ".join(sections)
+
+def render_product_search_reply(
+    *,
+    language="en",
+    pet_name="",
+    count=0,
+    source="",
+    categories=(),
+    budget=None,
+    review_note=None,
+    explanation=None,
+    no_match=False,
+):
+    if language not in {"ms", "zh"}:
+        return None
+
+    index = 0 if language == "ms" else 1
+
+    text = {
+        "no_match": (
+            "Tiada produk tersedia yang sepadan dengan jenis produk, "
+            "bajet dan kriteria spesies/umur haiwan yang direkodkan. "
+            "Cuba jenis produk atau bajet lain, atau semak kedai klinik.",
+            "没有可用产品符合所请求的产品类型、预算，"
+            "以及宠物记录中的物种和年龄条件。"
+            "可尝试其他产品类型或预算，或浏览诊所商店。",
+        ),
+        "found": (
+            "Saya menemui {count} pilihan produk penjagaan untuk "
+            "{name}. Sumber padanan: {source}.",
+            "为{name}找到{count}个护理产品选项。匹配依据：{source}。",
+        ),
+        "review": (
+            "Nota semakan/rekod — teks asal:",
+            "审核／记录说明 — 原文：",
+        ),
+        "explanation": (
+            "Penjelasan padanan — teks asal:",
+            "匹配说明 — 原文：",
+        ),
+        "categories": (
+            "Jenis produk: {categories}.",
+            "产品类型：{categories}。",
+        ),
+        "budget": (
+            "Bajet: sehingga RM {budget:.2f} bagi setiap item.",
+            "预算：每件最高 RM {budget:.2f}。",
+        ),
+        "footer": (
+            "Kad di bawah menerangkan setiap padanan. Ini ialah "
+            "cadangan penjagaan di rumah secara automatik, bukan "
+            "preskripsi atau pengganti rawatan. Semak label produk "
+            "dan arahan veterinar.",
+            "下方卡片说明每个匹配原因。这些是自动生成的居家护理建议，"
+            "并非处方或治疗替代品。请查看产品标签和兽医指示。",
+        ),
+    }
+
+    if no_match:
+        return text["no_match"][index]
+
+    sections = []
+
+    if review_note:
+        sections.append(
+            text["review"][index] + "\n" + review_note
+        )
+
+    sections.append(
+        text["found"][index].format(
+            count=count,
+            name=pet_name,
+            source=source,
+        )
+    )
+
+    if explanation:
+        sections.append(
+            text["explanation"][index] + "\n" + explanation
+        )
+
+    if categories:
+        sections.append(
+            text["categories"][index].format(
+                categories=", ".join(categories)
+            )
+        )
+
+    if budget is not None:
+        sections.append(
+            text["budget"][index].format(budget=budget)
+        )
+
+    sections.append(text["footer"][index])
+    return "\n\n".join(sections)
+
+FAQ_QUESTIONS.update({
+    "推荐牙齿护理产品": (
+        "recommend dental care products", "zh"
+    ),
+    "推荐刷牙用品": (
+        "recommend products for routine brushing", "zh"
+    ),
+    "推荐控制牙菌斑的产品": (
+        "recommend products for plaque control", "zh"
+    ),
+    "cadangkan produk penjagaan gigi": (
+        "recommend dental care products", "ms"
+    ),
+    "cadangkan produk untuk memberus gigi": (
+        "recommend products for routine brushing", "ms"
+    ),
+    "cadangkan produk untuk kawalan plak": (
+        "recommend products for plaque control", "ms"
+    ),
+})

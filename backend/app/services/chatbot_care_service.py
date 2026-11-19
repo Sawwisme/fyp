@@ -12,7 +12,9 @@ from app.services.followup_submission_service import (
     get_owner_submission_state,
 )
 from app.services.pet_service import get_owner_profile, get_pet
-
+from app.services.chatbot_language_service import (
+    render_followup_care,
+)
 
 STATE_LABELS = {
     "action_needed": "An owner update can be submitted",
@@ -25,7 +27,12 @@ STATE_LABELS = {
 }
 
 
-def followup_care_reply(db, current_user, pet_id):
+def followup_care_reply(
+    db,
+    current_user,
+    pet_id,
+    language="en",
+):
     if current_user.role != "pet_owner":
         raise HTTPException(
             403,
@@ -35,9 +42,8 @@ def followup_care_reply(db, current_user, pet_id):
     owner = get_owner_profile(db, current_user)
 
     if pet_id is None:
-        return (
-            "Start a chat linked to your pet so I can "
-            "check its follow-up instructions."
+        return render_followup_care(
+            None, [], language=language
         )
 
     pet = get_pet(db, current_user, pet_id)
@@ -81,16 +87,9 @@ def followup_care_reply(db, current_user, pet_id):
         .limit(3)
     ).all()
 
-    if not records:
-        return (
-            f"I do not see an open follow-up task for {pet.pet_name}. "
-            "Open Follow-up Care in Booking to check completed "
-            "or cancelled tasks."
-        )
 
-    sections = [
-        f"Recent open follow-up tasks for {pet.pet_name}:"
-    ]
+
+    tasks = []
 
     for followup, clinic_name in records:
         state = get_owner_submission_state(
@@ -99,58 +98,25 @@ def followup_care_reply(db, current_user, pet_id):
             followup.followup_care_id,
         )
 
-        progress = STATE_LABELS.get(
-            state["submission_state"],
-            "Check the task details",
-        )
+        tasks.append({
+            "followup_id": followup.followup_care_id,
+            "clinic_name": clinic_name,
+            "state": state["submission_state"],
+            "can_submit": state["can_submit"],
+            "date": (
+                followup.recommended_date.strftime("%d %b %Y")
+                if followup.recommended_date is not None
+                else None
+            ),
+            "reason": followup.reason,
+            "care_instructions": followup.care_instructions,
+            "photos_required": followup.photos_required,
+            "photo_instructions": followup.photo_instructions,
+            "visit_required": followup.visit_required,
+        })
 
-        date = (
-            followup.recommended_date.strftime("%d %b %Y")
-            if followup.recommended_date is not None
-            else "Not recorded"
-        )
-
-        section = (
-            f"Follow-up #{followup.followup_care_id}\n"
-            f"Clinic: {clinic_name}\n"
-            f"Status: {progress}\n"
-            f"Recommended review date: {date}\n"
-            f"Reason: {followup.reason or 'Not recorded'}\n"
-            f"Vet's home-care instructions: "
-            f"{followup.care_instructions or 'Not recorded'}"
-        )
-
-        if followup.photos_required:
-            section += (
-                "\nPhotos requested: Yes\n"
-                "Photo instructions: "
-                f"{followup.photo_instructions or 'Check with the clinic'}"
-            )
-
-        if state["can_submit"]:
-            section += (
-                "\nYou can submit an update through this task "
-                "in Follow-up Care."
-            )
-        else:
-            section += (
-                "\nAnother submission is not currently allowed. "
-                "Check the task for feedback or further instructions."
-            )
-
-        if followup.visit_required:
-            section += (
-                "\nAn in-clinic review is required. "
-                "Check the linked appointment in the task, "
-                "or choose a time if none is booked."
-            )
-
-        sections.append(section)
-
-    sections.append(
-        "A recommended review date is not a booked appointment. "
-        "This chat has not submitted photos, booked a visit "
-        "or completed a follow-up."
+    return render_followup_care(
+        pet.pet_name,
+        tasks,
+        language=language,
     )
-
-    return "\n\n".join(sections)

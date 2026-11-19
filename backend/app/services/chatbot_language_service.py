@@ -4,6 +4,10 @@ from app.models import ChatbotMessage
 from app.services.chatbot_engine_service import load_chatbot_module
 
 _language = load_chatbot_module("chatbot_language")
+render_upcoming_appointments = _language.render_upcoming_appointments
+render_followup_care = _language.render_followup_care
+render_product_match_reason = _language.render_product_match_reason
+render_product_search_reply = _language.render_product_search_reply
 SUPPORTED_LANGUAGES = _language.SUPPORTED_LANGUAGES
 requested_language = _language.requested_language
 language_preference_reply = _language.language_preference_reply

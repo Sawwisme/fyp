@@ -25,6 +25,7 @@ from app.services.followup_uploads import (
     UPLOAD_DIRECTORY,
     prepare_photo,
     save_photo,
+    validate_prepared_photos,
 )
 from app.services.pet_service import get_owner_profile
 
@@ -53,12 +54,52 @@ def owner_followup_query(owner_id: int, followup_id: int):
     )
 
 
+
+
 def create_submission(
     db: Session,
     current_user: User,
     followup_id: int,
     owner_comment: str | None,
     files: list[UploadFile],
+):
+    try:
+        # Authorise before expensive inference; the final locked function
+        # repeats ownership and state checks to handle concurrent changes.
+        owner = get_owner_profile(db, current_user)
+        followup = db.scalar(owner_followup_query(owner.pet_owner_id, followup_id))
+        if followup is None:
+            raise HTTPException(404, "Follow-up not found.")
+        if followup.status != "pending":
+            raise HTTPException(409, "This follow-up no longer accepts submissions.")
+        if len(files) > 4:
+            raise HTTPException(422, "Submit up to four photos at a time.")
+        comment = (owner_comment or "").strip() or None
+        if comment and len(comment) > 5000:
+            raise HTTPException(422, "The comment is too long.")
+        if followup.photos_required and not files:
+            raise HTTPException(422, "Your veterinarian requires a photo submission.")
+        if not files and not comment:
+            raise HTTPException(422, "Add a photo or a progress comment.")
+        prepared = [prepare_photo(photo) for photo in files]
+        # No row lock or read transaction remains open during inference.
+        db.rollback()
+        validate_prepared_photos(prepared)
+        return _create_validated_submission(
+            db, current_user, followup_id, owner_comment, files, prepared
+        )
+    except Exception:
+        db.rollback()
+        raise
+
+
+def _create_validated_submission(
+    db: Session,
+    current_user: User,
+    followup_id: int,
+    owner_comment: str | None,
+    files: list[UploadFile],
+    prepared: list[bytes],
 ):
     written_files = []
     committing = False
@@ -147,8 +188,7 @@ def create_submission(
                 "Add a photo or a progress comment.",
             )
 
-        # Validate every photo before writing any files.
-        prepared = [prepare_photo(photo) for photo in files]
+        # Photos have passed file, quality and trained-model validation.
         
 
         now = datetime.now(timezone.utc).replace(tzinfo=None)

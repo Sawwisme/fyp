@@ -9,6 +9,11 @@ from app.services.product_recommendation_rules import (
     build_product_match,
 )
 
+from app.services.chatbot_language_service import (
+    render_product_match_reason,
+    render_product_search_reply,
+)
+
 def pet_age_months(pet):
     value = pet.get("date_of_birth")
 
@@ -126,8 +131,15 @@ def consultation_covers_analysis(consultation, analysis):
         and consultation_time >= analysis_time
     )
 
-def product_reply(db, current_user, pet_id, *, products=None,
- request_text="",):
+def product_reply(
+    db,
+    current_user,
+    pet_id,
+    *,
+    products=None,
+    request_text="",
+    language="en",
+):
     # Checks owner access and selected-pet ownership.
     context = build_chat_context(db, current_user, pet_id)
 
@@ -387,10 +399,18 @@ def product_reply(db, current_user, pet_id, *, products=None,
     ).mappings().all()
 
     if not records:
+        translated_reply = render_product_search_reply(
+            language=language,
+            no_match=True,
+        )
+
         return (
-            "No available products match the requested product type, "
-            "budget, and this pet's recorded species/age criteria. "
-            "Try another product type or budget, or browse the clinic shops.",
+            translated_reply or (
+                "No available products match the requested product type, "
+                "budget, and this pet's recorded species/age criteria. "
+                "Try another product type or budget, "
+                "or browse the clinic shops."
+            ),
             "OPEN_SHOP",
         )
 
@@ -435,6 +455,21 @@ def product_reply(db, current_user, pet_id, *, products=None,
                     "Selected automatically by the chatbot."
                 )
 
+            translated_reason = render_product_match_reason(
+                species=species,
+                age_months=age_months,
+                minimum_age_months=product["minimum_age_months"],
+                category_name=product["category_name"],
+                category_requested=bool(requested_categories),
+                budget=budget,
+                matched_tags=matched_tags,
+                source=care_context["source"],
+                language=language,
+            )
+
+            if translated_reason is not None:
+                reason = translated_reason
+
             products.append({
                 "product_id": product["product_id"],
                 "clinic_id": product["clinic_id"],
@@ -477,4 +512,20 @@ def product_reply(db, current_user, pet_id, *, products=None,
         "not prescriptions or replacements for treatment."
     )
 
-    return "\n\n".join(sections), "OPEN_SHOP"
+    translated_reply = render_product_search_reply(
+        language=language,
+        pet_name=pet["name"],
+        count=len(records),
+        source=care_context["source"],
+        categories=requested_categories,
+        budget=budget,
+        review_note=review_note,
+        explanation=care_context["explanation"],
+    )
+
+    return (
+        translated_reply
+        if translated_reply is not None
+        else "\n\n".join(sections),
+        "OPEN_SHOP",
+    )

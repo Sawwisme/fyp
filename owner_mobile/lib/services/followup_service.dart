@@ -59,6 +59,7 @@ class FollowupService {
 
     final data = await api.postMultipart(
       '/owner-followups/$followupId/submissions',
+      timeout: const Duration(seconds: 150),
       fields: {'owner_comment': comment.trim()},
       files: [
         for (var index = 0; index < photos.length; index++)

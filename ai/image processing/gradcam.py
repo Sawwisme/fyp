@@ -1,3 +1,8 @@
+import dental_image_validation as _dental_validation
+from dental_image_validation import (
+    IMAGE_SIZE, MIN_WIDTH, MIN_HEIGHT, BLUR_THRESHOLD,
+    MIN_BRIGHTNESS, MAX_BRIGHTNESS, DENTAL_CONTENT_THRESHOLD,
+)
 import os
 import cv2
 import numpy as np
@@ -40,7 +45,6 @@ os.makedirs(
     exist_ok=True
 )
 
-IMAGE_SIZE = (224, 224)
 
 LABELS = [
     "healthy",
@@ -71,15 +75,9 @@ ALLOWED_EXTENSIONS = {
 
 MAX_FILE_SIZE_MB = 10
 
-MIN_WIDTH = 150
-MIN_HEIGHT = 150
 
-BLUR_THRESHOLD = 25.0
 
-MIN_BRIGHTNESS = 25
-MAX_BRIGHTNESS = 235
 
-DENTAL_CONTENT_THRESHOLD = 0.70
 
 
 # =========================================================
@@ -188,211 +186,24 @@ def validate_file(
 # Validate image quality
 # =========================================================
 
-def validate_image_quality(
-    image_path
-):
-
-    image = cv2.imread(
-        image_path
-    )
-
-    if image is None:
-
-        return False, (
-            "The uploaded file cannot be "
-            "decoded as a valid image."
-        )
-
-    height, width = (
-        image.shape[:2]
-    )
-
-    # -----------------------------------------------------
-    # Resolution
-    # -----------------------------------------------------
-
-    if (
-        width < MIN_WIDTH
-        or height < MIN_HEIGHT
-    ):
-
-        return False, (
-            f"Image resolution is too low. "
-            f"Minimum recommended resolution "
-            f"is {MIN_WIDTH}x{MIN_HEIGHT}."
-        )
-
-    gray = cv2.cvtColor(
-        image,
-        cv2.COLOR_BGR2GRAY
-    )
-
-    # -----------------------------------------------------
-    # Blur detection
-    # -----------------------------------------------------
-
-    blur_score = cv2.Laplacian(
-        gray,
-        cv2.CV_64F
-    ).var()
-
-    if (
-        blur_score
-        < BLUR_THRESHOLD
-    ):
-
-        return False, (
-            f"Image appears too blurry "
-            f"(blur score="
-            f"{blur_score:.2f}). "
-            f"Please retake the photo "
-            f"with better focus."
-        )
-
-    # -----------------------------------------------------
-    # Brightness detection
-    # -----------------------------------------------------
-
-    brightness = float(
-        np.mean(gray)
-    )
-
-    if (
-        brightness
-        < MIN_BRIGHTNESS
-    ):
-
-        return False, (
-            f"Image appears too dark "
-            f"(brightness="
-            f"{brightness:.2f}). "
-            f"Please capture the image "
-            f"with better lighting."
-        )
-
-    if (
-        brightness
-        > MAX_BRIGHTNESS
-    ):
-
-        return False, (
-            f"Image appears too bright "
-            f"(brightness="
-            f"{brightness:.2f}). "
-            f"Please avoid excessive lighting "
-            f"or flash."
-        )
-
-    quality_info = {
-        "width": width,
-        "height": height,
-        "blur_score": blur_score,
-        "brightness": brightness
-    }
-
-    return True, quality_info
+def validate_image_quality(image_path):
+    return _dental_validation.validate_image_quality(image_path)
 
 
 # =========================================================
 # Load image for model
 # =========================================================
 
-def load_image(
-    image_path
-):
-
-    image = tf.io.read_file(
-        image_path
-    )
-
-    image = tf.image.decode_image(
-        image,
-        channels=3,
-        expand_animations=False
-    )
-
-    original_image = (
-        image.numpy()
-    )
-
-    image = tf.image.resize(
-        image,
-        IMAGE_SIZE
-    )
-
-    image = tf.cast(
-        image,
-        tf.float32
-    )
-
-    # IMPORTANT:
-    # Keep image in 0-255 range.
-    #
-    # Your EfficientNet-B0 training pipeline
-    # used the Keras EfficientNet model,
-    # which already contains internal rescaling.
-
-    input_image = tf.expand_dims(
-        image,
-        axis=0
-    )
-
-    return (
-        original_image,
-        input_image
-    )
+def load_image(image_path):
+    return _dental_validation.load_image(image_path)
 
 
 # =========================================================
 # Validate pet dental image content
 # =========================================================
 
-def validate_pet_dental_content(
-    input_image
-):
-
-    if (
-        dental_validator_model
-        is None
-    ):
-
-        return None, (
-            "Dental content validation skipped "
-            "because the validator model "
-            "has not been trained yet."
-        )
-
-    prediction = (
-        dental_validator_model.predict(
-            input_image,
-            verbose=0
-        )
-    )
-
-    score = float(
-        np.squeeze(
-            prediction
-        )
-    )
-
-    if (
-        score
-        < DENTAL_CONTENT_THRESHOLD
-    ):
-
-        return False, (
-            f"The uploaded image does not "
-            f"appear to contain a suitable "
-            f"cat or dog dental region "
-            f"(dental confidence="
-            f"{score:.4f})."
-        )
-
-    return True, (
-        f"Pet dental image detected "
-        f"(confidence="
-        f"{score:.4f})."
-    )
+def validate_pet_dental_content(input_image):
+    return _dental_validation.validate_pet_dental_content(input_image, dental_validator_model)
 
 
 # =========================================================

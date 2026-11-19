@@ -228,6 +228,7 @@ class ApiClient {
       String path, {
         required Map<String, String> fields,
         required List<http.MultipartFile> files,
+        Duration timeout = const Duration(seconds: 60),
       }) async {
     final request = http.MultipartRequest(
       'POST',
@@ -245,7 +246,7 @@ class ApiClient {
       response = await _client
           .send(request)
           .then((stream) => http.Response.fromStream(stream))
-          .timeout(const Duration(seconds: 60));
+          .timeout(timeout);
     } on TimeoutException {
       throw const ApiException(
         'Upload timed out. Check submission history before retrying.',

@@ -51,6 +51,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
   Map<String, dynamic>? _selected;
   PendingChatMessage? _pending;
+  String? _sidebarCommandDraft;
 
   int? _olderCursor;
   bool _busy = false;
@@ -545,7 +546,13 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
             );
 
           _pending = null;
-          _input.clear();
+          final savedDraft = _sidebarCommandDraft;
+          if (savedDraft != null) {
+            _input.text = savedDraft;
+            _sidebarCommandDraft = null;
+          } else {
+            _input.clear();
+          }
         });
 
         _scrollToLatest();
@@ -576,6 +583,9 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
         rethrow;
       }
     });
+    if (mounted && _pending == null) {
+      _sidebarCommandDraft = null;
+    }
   }
 
   Future<void> _openSource(String source) async {
@@ -715,6 +725,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
         return;
     }
 
+    if (!mounted) return;
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => page,
@@ -961,6 +972,165 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     await action();
   }
 
+
+  String get _chatReplyLanguage {
+    for (final message in _messages.reversed) {
+      if (message['sender_type'] != 'assistant') continue;
+      final metadata = message['response_metadata'];
+      final language = metadata is Map ? metadata['language'] : null;
+      return {'en', 'ms', 'zh'}.contains(language)
+          ? language as String
+          : 'en';
+    }
+    return 'en';
+  }
+
+  String get _chatReplyLanguageLabel => const {
+    'en': 'English',
+    'ms': 'Bahasa Melayu',
+    'zh': '中文',
+  }[_chatReplyLanguage]!;
+
+  bool get _canChangeChatSettings =>
+      !_busy && _pending == null && _selected?['status'] == 'active';
+
+  Future<void> _sendSidebarCommand(String command) async {
+    if (!_canChangeChatSettings) return;
+    // Settings reuse normal message IDs and retry handling. The user's
+    // unsent draft is retained while the command is confirmed.
+    _sidebarCommandDraft = _input.text;
+    _pending = PendingChatMessage(command);
+    await _send();
+  }
+
+  Future<void> _showLanguageSettings() async {
+    if (!_canChangeChatSettings) return;
+    final currentLanguage = _chatReplyLanguage;
+    final language = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => SimpleDialog(
+        title: const Text('Reply language'),
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(24, 0, 24, 12),
+            child: Text(
+              'Applies to this conversation. Mixed-language questions may '
+              'select another reply language. Some replies still use English.',
+            ),
+          ),
+          for (final option in const {
+            'en': 'English',
+            'ms': 'Bahasa Melayu',
+            'zh': '中文',
+          }.entries)
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(dialogContext, option.key),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  children: [
+                    Icon(
+                      currentLanguage == option.key
+                          ? Icons.check_circle_rounded
+                          : Icons.circle_outlined,
+                      color: _blue,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(option.value),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+    if (!mounted || language == null || language == currentLanguage) return;
+    final command = const {
+      'en': 'reply in english',
+      'ms': 'reply in malay',
+      'zh': 'reply in chinese',
+    }[language];
+    if (command != null) await _sendSidebarCommand(command);
+  }
+
+  Future<void> _showMemorySettings() async {
+    if (!_canChangeChatSettings) return;
+    final petName = _selected?['pet_name']?.toString();
+    final reset = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Chat memory'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(petName == null ? 'General conversation' : 'Selected pet: $petName'),
+              const SizedBox(height: 16),
+              const Text(
+                'The assistant remembers recent topics within this chat '
+                'so it can understand follow-up questions. Current pet '
+                'records are retrieved when needed.',
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Resetting topic memory starts a fresh topic. Your chat '
+                'history, selected pet, appointments and medical records '
+                'remain saved.',
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Close'),
+          ),
+          FilledButton.icon(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            icon: const Icon(Icons.restart_alt_rounded),
+            label: const Text('Reset topic memory'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || reset != true) return;
+    await _sendSidebarCommand('change topic');
+  }
+
+  Widget _sidebarSettings() {
+    final enabled = _canChangeChatSettings;
+    return Column(
+      children: [
+        const Divider(color: Colors.white12),
+        ListTile(
+          dense: true,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+          leading: const Icon(Icons.language_rounded, color: Colors.white70),
+          title: const Text('Language', style: TextStyle(color: Colors.white)),
+          subtitle: Text(
+            _chatReplyLanguageLabel,
+            style: const TextStyle(color: Colors.white54),
+          ),
+          enabled: enabled,
+          onTap: enabled ? () => _sidebarAction(_showLanguageSettings) : null,
+        ),
+        ListTile(
+          dense: true,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+          leading: const Icon(Icons.psychology_outlined, color: Colors.white70),
+          title: const Text('Memory', style: TextStyle(color: Colors.white)),
+          subtitle: const Text(
+            'Manage this chat’s topic',
+            style: TextStyle(color: Colors.white54),
+          ),
+          enabled: enabled,
+          onTap: enabled ? () => _sidebarAction(_showMemorySettings) : null,
+        ),
+      ],
+    );
+  }
+
   Widget _chatSidebar() {
     final query = _chatSearch.text.trim().toLowerCase();
 
@@ -1106,6 +1276,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                   },
                 ),
               ),
+              _sidebarSettings(),
               TextButton.icon(
                 onPressed: disabled ? null : _loadChats,
                 icon: const Icon(Icons.refresh, size: 18),

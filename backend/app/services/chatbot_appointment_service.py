@@ -14,6 +14,9 @@ from app.models import (
 )
 from app.services.pet_service import get_owner_profile, get_pet
 from app.services.vet_absence_service import get_rearrangement_ids
+from app.services.chatbot_language_service import (
+    render_upcoming_appointments,
+)
 
 
 MALAYSIA_TIME = timezone(timedelta(hours=8))
@@ -28,7 +31,12 @@ STATUS_TEXT = {
 }
 
 
-def upcoming_appointment_reply(db, current_user, pet_id):
+def upcoming_appointment_reply(
+    db,
+    current_user,
+    pet_id,
+    language="en",
+):
     if current_user.role != "pet_owner":
         raise HTTPException(
             403,
@@ -38,9 +46,10 @@ def upcoming_appointment_reply(db, current_user, pet_id):
     owner = get_owner_profile(db, current_user)
 
     if pet_id is None:
-        return (
-            "Select a pet by starting a new pet-linked chat "
-            "so I can check its upcoming appointments."
+        return render_upcoming_appointments(
+            None,
+            [],
+            language=language,
         )
 
     pet = get_pet(db, current_user, pet_id)
@@ -119,10 +128,10 @@ def upcoming_appointment_reply(db, current_user, pet_id):
     ).mappings().all()
 
     if not records:
-        return (
-            f"I do not see an upcoming pending, confirmed or "
-            f"unexpired payment-pending appointment for {pet.pet_name}. "
-            "Open Booking to check all appointments or choose a time."
+        return render_upcoming_appointments(
+            pet.pet_name,
+            [],
+            language=language,
         )
 
     rearrangement_ids = get_rearrangement_ids(
@@ -130,45 +139,9 @@ def upcoming_appointment_reply(db, current_user, pet_id):
         [record["appointment_id"] for record in records],
     )
 
-    sections = [
-        f"Next upcoming bookings for {pet.pet_name} "
-        "(Malaysia time):"
-    ]
-
-    for record in records:
-        appointment_id = record["appointment_id"]
-
-        status = STATUS_TEXT.get(
-            record["status"],
-            record["status"],
-        )
-
-        date = record["schedule_date"].strftime("%d %b %Y")
-        start = record["start_time"].strftime("%H:%M")
-        end = record["end_time"].strftime("%H:%M")
-
-        section = (
-            f"Appointment #{appointment_id}\n"
-            f"Date: {date}, {start}–{end}\n"
-            f"Clinic: {record['clinic_name']}\n"
-            f"Veterinarian: {record['vet_name']}\n"
-            f"Type: {record['appointment_type']}\n"
-            f"Status: {status}\n"
-            f"Address: {record['address'] or 'Not recorded'}"
-        )
-
-        if appointment_id in rearrangement_ids:
-            section += (
-                "\nAttention: this appointment needs rearrangement "
-                "because of a reported veterinarian absence. "
-                "Open its booking details or contact the clinic."
-            )
-
-        sections.append(section)
-
-    sections.append(
-        "Open Booking to view or manage these appointments. "
-        "This chat has not created or changed a booking."
+    return render_upcoming_appointments(
+        pet.pet_name,
+        records,
+        rearrangement_ids,
+        language=language,
     )
-
-    return "\n\n".join(sections)

@@ -641,6 +641,7 @@ def generate_contextual_reply(
             conversation.pet_id,
             products=products,
             request_text=effective_request,
+            language=language,
         )
 
         answer["reply"] = reply
@@ -652,6 +653,7 @@ def generate_contextual_reply(
             db,
             current_user,
             conversation.pet_id,
+            language=language,
         )
 
     elif intent == "upcoming_appointment":
@@ -659,6 +661,7 @@ def generate_contextual_reply(
             db,
             current_user,
             conversation.pet_id,
+            language=language,
         )
 
     elif intent in CONTEXT_INTENTS:

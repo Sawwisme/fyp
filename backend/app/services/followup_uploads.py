@@ -1,3 +1,7 @@
+import logging
+from tempfile import TemporaryDirectory
+from threading import Event, Lock
+from app.services.model_process_client import ModelProcessClient
 from io import BytesIO
 from pathlib import Path
 from uuid import uuid4
@@ -100,3 +104,74 @@ def save_photo(content: bytes) -> str:
         raise
 
     return filename
+
+# A single validation-only child process per API process. Requests are serialised
+# because ModelProcessClient's JSON-lines protocol is not multiplexed.
+_validation_lock = Lock()
+_validation_client = None
+_validation_stopping = Event()
+_validation_logger = logging.getLogger(__name__)
+
+
+def close_followup_validator():
+    global _validation_client
+    _validation_stopping.set()
+    with _validation_lock:
+        if _validation_client is not None:
+            _validation_client.close()
+            _validation_client = None
+
+
+def validate_prepared_photos(photos):
+    global _validation_client
+    if not photos:
+        return
+    if len(photos) > 4:
+        raise HTTPException(422, "Submit up to four photos at a time.")
+    if _validation_stopping.is_set():
+        raise HTTPException(503, "Photo validation is stopping. Please try again later.")
+    if not _validation_lock.acquire(timeout=5):
+        raise HTTPException(503, "Photo validation is busy. Please try again shortly.")
+    try:
+        if _validation_stopping.is_set():
+            raise HTTPException(503, "Photo validation is stopping. Please try again later.")
+        if _validation_client is None:
+            runner = (Path(__file__).resolve().parents[3]
+                      / "ai" / "image processing" / "followup_validation_runner.py")
+            _validation_client = ModelProcessClient(runner, timeout=120)
+
+        with TemporaryDirectory(prefix="vetdental-followup-") as directory:
+            folder = Path(directory)
+            for index, content in enumerate(photos, 1):
+                (folder / f"photo-{index}.jpg").write_bytes(content)
+            result = _validation_client.run(
+                folder, folder, _validation_stopping,
+            )
+
+        if result.get("status") == "rejected":
+            index = result.get("photo_index")
+            message = result.get("message")
+            if type(index) is not int or not 1 <= index <= len(photos):
+                raise RuntimeError("Invalid validation response.")
+            if not isinstance(message, str) or not message.strip():
+                raise RuntimeError("Missing photo validation explanation.")
+            raise HTTPException(422, f"Photo {index}: {message[:400]}")
+
+        details = result.get("result")
+        if (result.get("status") != "completed"
+                or not isinstance(details, dict)
+                or type(details.get("validated_images")) is not int
+                or details["validated_images"] != len(photos)):
+            raise RuntimeError("Incomplete photo validation.")
+    except HTTPException:
+        raise
+    except Exception:
+        _validation_logger.exception("Follow-up photo validation unavailable")
+        if _validation_client is not None:
+            _validation_client.close()
+            _validation_client = None
+        raise HTTPException(
+            503, "Photo validation could not be completed. Please try again shortly."
+        ) from None
+    finally:
+        _validation_lock.release()

@@ -1,3 +1,4 @@
+from app.services.followup_uploads import close_followup_validator
 from fastapi import FastAPI
 from pathlib import Path
 import asyncio
@@ -118,6 +119,7 @@ async def lifespan(app: FastAPI):
         yield
     finally:
         stop_event.set()
+        await asyncio.to_thread(close_followup_validator)
 
         await asyncio.gather(
             *[
