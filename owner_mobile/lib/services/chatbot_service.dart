@@ -160,4 +160,29 @@ class ChatbotService {
 
     return _asMap(data);
   }
+
+  Future<Map<String, dynamic>> saveBookingDraft(
+      int conversationId, {
+        required int expectedRevision,
+        required Map<String, dynamic>? draft,
+      }) async {
+    final data = await api.put(
+      '/chatbot/conversations/$conversationId/booking-draft',
+      {
+        'expected_revision': expectedRevision,
+        'draft': draft,
+      },
+    );
+
+    final result = _asMap(data);
+
+    if (result['conversation_id'] != conversationId ||
+        result['booking_draft_revision'] is! int) {
+      throw const ApiException(
+        'The server returned an invalid booking draft response.',
+      );
+    }
+
+    return result;
+  }
 }

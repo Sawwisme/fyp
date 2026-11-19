@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, text
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, text, JSON
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -21,6 +21,14 @@ class ChatbotConversation(Base):
         Integer,
         ForeignKey("pets.pet_id"),
         nullable=True,
+    )
+    booking_draft = Column(JSON, nullable=True)
+
+    booking_draft_revision = Column(
+        Integer,
+        nullable=False,
+        default=0,
+        server_default=text("0"),
     )
     started_at = Column(
         DateTime,

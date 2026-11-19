@@ -172,13 +172,63 @@ def remembered_topic(db, conversation):
 
     return None
 
+
+def normalize_followup_text(message: str) -> str:
+    text = message.casefold().strip()
+
+    # Preserve English, Malay, numbers and Chinese.
+    text = re.sub(
+        r"[^\w\u3400-\u9fff]+",
+        " ",
+        text,
+        flags=re.UNICODE,
+    )
+
+    return " ".join(text.split())
+
+
+
+MULTILINGUAL_FOLLOWUPS = {
+    # Chinese - severity
+    "严重吗": "how severe is it",
+    "会很严重吗": "how severe is it",
+    "严重不严重": "how severe is it",
+
+    # Malay - severity
+    "bahaya ke": "how severe is it",
+    "serius ke": "how severe is it",
+    "adakah ia serius": "how severe is it",
+
+    # Chinese - repeat/explain
+    "再解释一次": "explain that",
+    "可以再解释吗": "explain that",
+    "再说明一下": "explain that",
+
+    # Malay - repeat/explain
+    "boleh terangkan lagi": "explain that",
+    "boleh jelaskan lagi": "explain that",
+    "terangkan lagi": "explain that",
+
+    # Chinese - previous assessment
+    "之前的结果呢": "what about the previous result",
+    "上一次的结果呢": "what about the previous result",
+
+    # Malay - previous assessment
+    "keputusan sebelum ini": "what about the previous result",
+}
+
+
+
 def resolve_followup(db, conversation, message, answer):
     # Never replace an urgent, medication or other rule response.
     if answer.get("mode") == "rule":
         return answer
+    
+    text = normalize_followup_text(message)
 
-    text = " ".join(
-        re.findall(r"[a-z0-9]+", message.casefold())
+    text = MULTILINGUAL_FOLLOWUPS.get(
+        text,
+        text,
     )
 
     followup_phrases = (

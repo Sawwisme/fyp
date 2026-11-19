@@ -36,7 +36,7 @@ def validate_recommendation_tags(value):
 def prepare_care_text(value):
     import re
 
-    text = (value or "").lower().replace("’", "'")
+    text = (value or "").lower().replace("â€™", "'")
     clauses = re.split(r"[,.;!?\n]+", text)
 
     # Recognize only complete, explicit negative observations.
@@ -191,6 +191,26 @@ def build_product_match(context, request_text):
     # Explicit care instructions narrow the matching purpose.
     # Otherwise use the supported diagnosis mapping.
     tags = instruction_tags or diagnosis_tags
+
+    # Routine visit labels describe preventive care, not confirmed health.
+    # Map only explicit routine labels; unknown diagnoses still do not match.
+    routine_assessment = " ".join(diagnosis_text.split()).rstrip(".") in {
+        "routine dental assessment",
+        "routine dental check",
+        "routine dental checkup",
+        "routine dental check-up",
+        "routine dental care",
+        "preventive dental care",
+        "preventive dental assessment",
+    }
+    if not tags and not instructions and routine_assessment:
+        tags = {"routine_oral_hygiene"}
+        notes.append(
+            "The consultation records a routine dental-care visit. "
+            "Matching products support routine oral hygiene; "
+            "this does not establish healthy dentition or a vet's "
+            "endorsement of a particular product."
+        )
 
     if instruction_tags:
         notes.append(

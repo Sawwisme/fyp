@@ -96,8 +96,8 @@ class ShopOrderResponse(BaseModel):
 
     shipping_method: str
     shipping_address: str
-    recipient_name: str
-    recipient_phone: str
+    recipient_name: str | None = None
+    recipient_phone: str | None = None
     owner_note: str | None
 
     subtotal: Decimal

@@ -122,9 +122,15 @@ def resolve_product_budget(db, conversation, message, answer):
 
     return f"{text}\n{previous_request}"[:2000]
 
-def explain_previous_products(db, conversation, message):
+def explain_previous_products(
+    db, conversation, message, *, language="en"
+):
     text = " ".join(
-        re.findall(r"[a-z0-9]+", message.casefold())
+        re.sub(
+            r"[^\w\s]|_",
+            " ",
+            message.casefold(),
+        ).split()
     )
 
     supported = {
@@ -133,6 +139,14 @@ def explain_previous_products(db, conversation, message):
         "why recommend this",
         "why did you recommend these",
         "explain these recommendations",
+        "kenapa produk ini",
+        "mengapa produk ini",
+        "kenapa cadangkan produk ini",
+        "jelaskan cadangan produk ini",
+        "为什么推荐这个产品",
+        "为什么推荐这些产品",
+        "为什么推荐这些",
+        "解释这些推荐",
     }
 
     if text not in supported:
@@ -171,9 +185,12 @@ def explain_previous_products(db, conversation, message):
         return None
 
     snapshots = []
-    sections = [
-        "Here is why the previously shown products matched:"
-    ]
+    headings = {
+        "en": "Why the previously shown products matched:",
+        "ms": "Sebab produk yang dipaparkan sebelum ini sepadan:",
+        "zh": "之前展示的产品为何匹配：",
+    }
+    sections = [headings.get(language, headings["en"])]
 
     for product in products[:6]:
         if not isinstance(product, dict):
@@ -195,11 +212,24 @@ def explain_previous_products(db, conversation, message):
     if not snapshots:
         return None
 
-    sections.append(
-        "These explain the matches when the products were shown. "
-        "Price, stock and suitability information may change. "
-        "The suggestions do not replace prescribed treatment."
-    )
+    notices = {
+        "en": (
+            "The saved matching reasons are reproduced as originally shown. "
+            "Price, stock and suitability information may change. "
+            "These suggestions do not replace prescribed treatment."
+        ),
+        "ms": (
+            "Sebab padanan tersimpan dipaparkan seperti asal. "
+            "Harga, stok dan maklumat kesesuaian mungkin berubah. "
+            "Cadangan ini tidak menggantikan rawatan yang dipreskripsikan."
+        ),
+        "zh": (
+            "已保存的匹配理由按当时展示的原文保留。"
+            "价格、库存和适用信息可能变化。"
+            "这些建议不能替代已开具的治疗方案。"
+        ),
+    }
+    sections.append(notices.get(language, notices["en"]))
 
     return {
         "intent": "product_explanation",

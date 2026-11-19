@@ -582,6 +582,7 @@ def generate_contextual_reply(
             db,
             conversation,
             message,
+            language=language,
         )
 
         if explanation is not None:
@@ -620,6 +621,7 @@ def generate_contextual_reply(
             current_user,
             conversation.pet_id,
             intent,
+            language=language,
         )
 
         answer["recommended_action"] = (
@@ -681,12 +683,11 @@ def generate_contextual_reply(
                 context,
             )
 
-        if answer.get("mode") != "rule":
-            translated_reply = _assessment_text.render_assessment_reply(
-                intent, context, language
-            )
-            if translated_reply is not None:
-                answer["reply"] = translated_reply
+        translated_reply = _assessment_text.render_assessment_reply(
+            intent, context, language
+        )
+        if translated_reply is not None:
+            answer["reply"] = translated_reply
 
         latest = context.get("latest_analysis")
 

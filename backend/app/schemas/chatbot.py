@@ -23,3 +23,9 @@ class MessageCreate(BaseModel):
         min_length=1,
         max_length=2000,
     )
+
+class BookingDraftUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    expected_revision: int = Field(ge=0)
+    draft: dict | None = None

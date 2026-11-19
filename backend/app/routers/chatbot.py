@@ -7,6 +7,7 @@ from app.models import User
 from app.schemas.chatbot import (
     ConversationCreate,
     MessageCreate,
+    BookingDraftUpdate,
 )
 from app.services import chatbot_service
 
@@ -104,4 +105,18 @@ def close_conversation(
         db,
         current_user,
         conversation_id,
+    )
+
+@router.put("/conversations/{conversation_id}/booking-draft")
+def save_booking_draft(
+    data: BookingDraftUpdate,
+    conversation_id: int = Path(ge=1, le=2147483647),
+    current_user: User = Depends(require_roles("pet_owner")),
+    db: Session = Depends(get_db),
+):
+    return chatbot_service.save_booking_draft(
+        db,
+        current_user,
+        conversation_id,
+        data,
     )

@@ -38,25 +38,74 @@ def localize_faq_answer(answer, language):
     result = dict(answer)
     intent = result.get("intent")
 
-    # Translate only known navigation rules. Never overwrite an urgent
-    # or medication rule response with a general-purpose translation.
-    control_translation = CONVERSATION_TRANSLATIONS.get(intent, {}).get(language)
+    # Known navigation commands have explicit translations.
+    control_translation = (
+        CONVERSATION_TRANSLATIONS.get(intent, {}).get(language)
+    )
+
     if control_translation and result.get("mode") == "rule":
         result["reply"] = control_translation
         return result
 
+    # Preserve urgent, medication and other safety-rule replies.
     if result.get("mode") == "rule":
         return result
 
-    if intent == "clarify" and result.get("reply") == FOLLOWUP_CLARIFICATION:
-        result["reply"] = FOLLOWUP_CLARIFICATION_TRANSLATIONS.get(
-            language, result["reply"]
+    if intent == "clarify":
+        # Preserve the existing, more specific follow-up clarification.
+        if result.get("reply") == FOLLOWUP_CLARIFICATION:
+            result["reply"] = (
+                FOLLOWUP_CLARIFICATION_TRANSLATIONS.get(
+                    language, result["reply"]
+                )
+            )
+            return result
+
+        original_reply = result.get("reply", "")
+
+        generic_fallback = (
+            original_reply.startswith(
+                "I’m not sure which question you mean."
+            )
+            or original_reply.startswith(
+                "Could you describe what you need help with?"
+            )
         )
+
+        # Preserve specific errors and clarification instructions.
+        if not generic_fallback:
+            return result       
+
+        has_choices = bool(result.get("suggested_questions"))
+
+        translations = {
+            "ms": (
+                "Saya belum pasti maksud soalan ini. "
+                "Pilih soalan cadangan atau nyatakan semula soalan anda."
+                if has_choices else
+                "Saya belum pasti maksud soalan ini. "
+                "Adakah anda bertanya tentang penjagaan gigi, "
+                "keputusan AI, rekod perubatan, janji temu atau produk?"
+            ),
+            "zh": (
+                "我还不确定您的意思。请选择建议的问题，"
+                "或换一种方式描述您的问题。"
+                if has_choices else
+                "我还不确定您的意思。您想询问牙齿护理、"
+                "AI 结果、医疗记录、预约，还是产品？"
+            ),
+        }
+
+        if language in translations:
+            result["reply"] = translations[language]
+
+        # Keep suggested questions and routing metadata intact.
         return result
 
     translation = FAQ_TRANSLATIONS.get(intent, {}).get(language)
     if translation:
         result["reply"] = translation
+
     return result
 
 

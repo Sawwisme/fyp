@@ -3,6 +3,8 @@
 SUPPORTED_INTENTS = {
     "explain_latest_analysis", "explain_pet_severity", "pet_next_steps",
     "dental_analysis_history", "compare_analysis_progress",
+    "pet_prediction_scores",
+    "pet_segmentation_values",
 }
 
 # Each pair is (Bahasa Melayu, Chinese). Record values are interpolated,
@@ -125,6 +127,12 @@ def render_assessment_reply(intent, context, language):
     latest = context.get("latest_analysis")
     if not isinstance(latest, dict):
         return text("missing", name=name)
+
+    if intent == "pet_prediction_scores":
+        return render_prediction_scores(context, language)
+
+    if intent == "pet_segmentation_values":
+        return render_segmentation_values(context, language)
 
     if intent in {"dental_analysis_history", "compare_analysis_progress"}:
         return render_history_reply(intent, context, language)
@@ -265,4 +273,175 @@ def render_history_reply(intent, context, language):
             change = "lower" if new < old else "higher" if new > old else "unchanged"
             lines.append(text(change))
             lines.append(text("caution"))
+    return "\n\n".join(lines)
+
+def render_prediction_scores(context, language):
+    import math
+
+    ms = language == "ms"
+    latest = context["latest_analysis"]
+    name = context["pet"].get("name", "")
+
+    labels = {
+        "healthy": "Sihat" if ms else "健康",
+        "plaque": "Plak gigi" if ms else "牙菌斑",
+        "gingivitis": "Gingivitis" if ms else "牙龈炎",
+        "calculus": "Karang gigi" if ms else "牙结石",
+    }
+
+    heading = (
+        f"Skor model tersimpan untuk {name}"
+        if ms else
+        f"{name} 已保存的模型分数"
+    )
+    lines = [
+        f"{heading} — #{latest.get('analysis_id')}"
+    ]
+
+    predictions = latest.get("predictions") or []
+
+    for prediction in predictions:
+        if not isinstance(prediction, dict):
+            continue
+
+        condition = prediction.get("condition")
+        if condition not in labels:
+            continue
+
+        assessed = (
+            prediction.get("assessed", True) is True
+            and prediction.get("supported", True) is True
+            and type(prediction.get("positive")) is bool
+        )
+
+        if not assessed:
+            state = (
+                "Tidak dinilai untuk spesies ini; bukan bermaksud tiada penyakit."
+                if ms else
+                "未对该物种进行评估；这不代表没有该疾病。"
+            )
+            lines.append(f"• {labels[condition]}: {state}")
+            continue
+
+        score = prediction.get("confidence")
+        valid_score = (
+            type(score) in (int, float)
+            and math.isfinite(score)
+            and 0 <= score <= 1
+        )
+        score_text = (
+            f"{score * 100:.1f}%"
+            if valid_score else
+            ("Tidak direkodkan" if ms else "未记录")
+        )
+
+        if ms:
+            state = (
+                "Melebihi ambang model"
+                if prediction["positive"] else
+                "Di bawah ambang model"
+            )
+        else:
+            state = (
+                "达到模型判定阈值"
+                if prediction["positive"] else
+                "低于模型判定阈值"
+            )
+
+        lines.append(
+            f"• {labels[condition]}: {score_text} — {state}"
+        )
+
+    if len(lines) == 1:
+        lines.append(
+            "Tiada skor pengelasan direkodkan."
+            if ms else "未记录分类分数。"
+        )
+
+    lines.append(
+        "Ini ialah skor model, bukan tahap keterukan atau kebarangkalian "
+        "diagnosis yang dijamin. Keputusan negatif tidak menolak penyakit."
+        if ms else
+        "这些是模型分数，不是严重程度或保证准确的诊断概率。"
+        "未被模型标记不代表可以排除疾病。"
+    )
+
+    for review in context.get("vet_reviews") or []:
+        if (
+            isinstance(review, dict)
+            and review.get("analysis_id") == latest.get("analysis_id")
+        ):
+            label = "Maklum balas veterinar asal" if ms else "兽医反馈原文"
+            lines.append(
+                f"{label} #{review.get('review_id')} "
+                f"(clinic #{review.get('clinic_id')}):\n"
+                f"{review.get('feedback') or ''}"
+            )
+
+    return "\n\n".join(lines)
+
+def render_segmentation_values(context, language):
+    import math
+
+    ms = language == "ms"
+    latest = context["latest_analysis"]
+    name = context["pet"].get("name", "")
+    segmentation = latest.get("segmentation") or {}
+
+    heading = (
+        f"Anggaran segmentasi tersimpan untuk {name}"
+        if ms else
+        f"{name} 已保存的图像分割估计"
+    )
+    lines = [
+        f"{heading} — #{latest.get('analysis_id')}"
+    ]
+
+    for key, label_ms, label_zh in [
+        (
+            "gingivitis_area_percent",
+            "Kawasan topeng berkaitan gingivitis",
+            "牙龈炎相关掩膜区域",
+        ),
+        (
+            "calculus_area_percent",
+            "Kawasan topeng berkaitan karang gigi",
+            "牙结石相关掩膜区域",
+        ),
+    ]:
+        value = segmentation.get(key)
+        valid = (
+            type(value) in (int, float)
+            and math.isfinite(value)
+            and 0 <= value <= 100
+        )
+
+        label = label_ms if ms else label_zh
+
+        if valid:
+            measurement = (
+                f"kira-kira {value:.2f}% daripada piksel imej dianalisis"
+                if ms else
+                f"约占已分析图像像素的 {value:.2f}%"
+            )
+        else:
+            measurement = (
+                "Tidak direkodkan atau tidak tersedia"
+                if ms else
+                "未记录或不可用"
+            )
+
+        lines.append(f"• {label}: {measurement}")
+
+    lines.append(
+        "Ini ialah kawasan imej yang dianggarkan oleh model, bukan "
+        "peratusan seluruh mulut yang terjejas atau ukuran keterukan klinikal. "
+        "Topeng mungkin tersalah menandakan kawasan. "
+        "Nilai yang tiada tidak bermaksud sifar."
+        if ms else
+        "这些是模型估计的图像区域，并非整个口腔的患病比例，"
+        "也不是临床严重程度指标。掩膜可能遗漏或错误标记区域。"
+        "缺失的数值不代表零。"
+    )
+
     return "\n\n".join(lines)

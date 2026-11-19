@@ -38,6 +38,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   static const _blue = Color(0xFF2549C7);
   static const _navy = Color(0xFF172333);
   final Set<int> _bookingChatIds = {};
+  final Map<int, int?> _bookingPetIds = {};
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _chatSearch = TextEditingController();
@@ -152,6 +153,11 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
       setState(() {
         _selected = conversation;
+        if (conversation['status'] == 'active' &&
+            conversation['booking_draft'] is Map) {
+          _bookingChatIds.add(id);
+          _bookingPetIds[id] = conversation['pet_id'] as int?;
+        }
         _messages = _messageItems(page);
         _hasOlder = page['has_more'] == true;
         _olderCursor = page['next_before_message_id'] as int?;
@@ -650,6 +656,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
         setState(() {
           _bookingChatIds.add(conversationId);
+          _bookingPetIds[conversationId] =
+          _selected?['pet_id'] as int?;
         });
 
         _scrollToLatest();
@@ -759,6 +767,132 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
         ),
       ),
     );
+  }
+
+  String _suggestionLabel(String question, dynamic metadata) {
+    final language = metadata is Map ? metadata['language'] : 'en';
+
+    final index = switch (language) {
+      'ms' => 0,
+      'zh' => 1,
+      _ => -1,
+    };
+
+    if (index == -1) return question;
+
+    const labels = <String, List<String>>{
+      'what is dental plaque': [
+        'Apakah plak gigi?',
+        '什么是牙菌斑？',
+      ],
+      'what is calculus': [
+        'Apakah karang gigi?',
+        '什么是牙结石？',
+      ],
+      'what is gingivitis': [
+        'Apakah gingivitis?',
+        '什么是牙龈炎？',
+      ],
+      'is the ai scan a diagnosis': [
+        'Adakah imbasan AI merupakan diagnosis?',
+        'AI 扫描属于诊断吗？',
+      ],
+      'how do i request a vet review': [
+        'Bagaimanakah saya meminta semakan veterinar?',
+        '如何申请兽医审核？',
+      ],
+      'how do i book an appointment': [
+        'Bagaimanakah saya membuat janji temu?',
+        '如何预约？',
+      ],
+      'how do i cancel an appointment': [
+        'Bagaimanakah saya membatalkan janji temu?',
+        '如何取消预约？',
+      ],
+      'how do i send follow up photos': [
+        'Bagaimanakah saya menghantar foto susulan?',
+        '如何提交随访照片？',
+      ],
+      'explain my latest result': [
+        'Terangkan keputusan terkini saya',
+        '解释最新的评估结果',
+      ],
+      'how severe is my pet condition': [
+        'Apakah anggaran tahap keterukan haiwan saya?',
+        '宠物的估计严重程度是多少？',
+      ],
+      'show my pet previous results': [
+        'Tunjukkan keputusan terdahulu haiwan saya',
+        '查看宠物以前的评估结果',
+      ],
+      'has my pet improved': [
+        'Bandingkan keputusan penilaian haiwan saya',
+        '比较宠物的评估结果',
+      ],
+      'what does the heatmap mean': [
+        'Apakah maksud peta haba?',
+        '热力图代表什么？',
+      ],
+      'what does segmentation mean': [
+        'Apakah maksud segmentasi?',
+        '什么是图像分割？',
+      ],
+      'what is classification confidence': [
+        'Apakah skor keyakinan pengelasan?',
+        '什么是分类置信分数？',
+      ],
+      'do i have an appointment': [
+        'Adakah saya mempunyai janji temu?',
+        '我有预约吗？',
+      ],
+      'show my pet follow up instructions': [
+        'Tunjukkan arahan susulan haiwan saya',
+        '查看宠物的随访说明',
+      ],
+      'what should i do next': [
+        'Apakah langkah seterusnya?',
+        '下一步应该怎么做？',
+      ],
+      'recommend dental care products': [
+        'Cadangkan produk penjagaan gigi',
+        '推荐牙齿护理产品',
+      ],
+      'how often should i brush my dog teeth': [
+        'Berapa kerap gigi anjing perlu diberus?',
+        '多久应给狗刷一次牙？',
+      ],
+      'how do i clean my cat teeth': [
+        'Bagaimanakah saya membersihkan gigi kucing?',
+        '如何清洁猫的牙齿？',
+      ],
+      'is bad breath normal': [
+        'Adakah nafas berbau normal?',
+        '口臭正常吗？',
+      ],
+      'what are signs of dental problems': [
+        'Apakah tanda masalah pergigian?',
+        '牙齿问题有哪些表现？',
+      ],
+      'show my pet medical history': [
+        'Tunjukkan sejarah perubatan haiwan saya',
+        '查看宠物的医疗历史',
+      ],
+      'show my pet recorded prescriptions': [
+        'Tunjukkan preskripsi haiwan saya',
+        '查看宠物已记录的处方',
+      ],
+      'show my pet segmentation percentages': [
+        'Tunjukkan peratusan segmentasi haiwan saya',
+        '查看宠物的图像分割百分比',
+      ],
+      'show my pet classification scores': [
+        'Tunjukkan skor pengelasan haiwan saya',
+        '查看宠物的分类分数',
+      ],
+    };
+
+    final key = question.trim().toLowerCase();
+    return labels[key]?[index] ?? question;
   }
 
   Widget _messageBubble(Map<String, dynamic> message) {
@@ -873,7 +1007,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                         color: _blue,
                       ),
                       label: Text(
-                        question,
+                        _suggestionLabel(question, metadata),
                         style: const TextStyle(
                           color: _blue,
                           fontSize: 12,
@@ -1363,12 +1497,17 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                   offstage:
                   _selected?['conversation_id'] != conversationId,
                   child: ChatBookingFlow(
+                    chatbot: widget.service,
+                    conversationId: conversationId,
+                    initialPetId: _bookingPetIds[conversationId],
+                    language: _chatReplyLanguage,
                     appointments: AppointmentService(widget.service.api),
                     pets: PetService(widget.service.api),
                     onOpenBookingPage: _openRegularBookingPage,
                     onCancel: () {
                       setState(() {
                         _bookingChatIds.remove(conversationId);
+                        _bookingPetIds.remove(conversationId);
                       });
                     },
                   ),

@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-
+import json
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -70,6 +70,8 @@ def conversation_dict(record):
             if record.pet is not None
             else None
         ),
+        "booking_draft": record.booking_draft,
+        "booking_draft_revision": record.booking_draft_revision,
         "status": record.status,
         "started_at": timestamp(record.started_at),
         "ended_at": timestamp(record.ended_at),
@@ -433,6 +435,87 @@ def close_conversation(
 
         response = conversation_dict(conversation)
 
+        db.commit()
+        return response
+
+    except Exception:
+        db.rollback()
+        raise
+
+def save_booking_draft(
+    db, current_user, conversation_id, data
+):
+    try:
+        conversation = owned_conversation(
+            db,
+            current_user,
+            conversation_id,
+            lock=True,
+        )
+
+        if conversation.status != "active":
+            raise HTTPException(409, "This conversation is closed.")
+
+        if conversation.booking_draft_revision != data.expected_revision:
+            raise HTTPException(
+                409,
+                "Booking draft changed. Reload this conversation.",
+            )
+
+        draft = data.draft
+
+        if draft is not None:
+            try:
+                encoded = json.dumps(
+                    draft,
+                    ensure_ascii=False,
+                    allow_nan=False,
+                )
+            except (TypeError, ValueError, RecursionError):
+                raise HTTPException(422, "Invalid booking draft.")
+
+            if len(encoded.encode("utf-8")) > 16384:
+                raise HTTPException(422, "Booking draft is too large.")
+
+            if (
+                draft.get("schema_version") != 1
+                or draft.get("conversation_id") != conversation_id
+                or draft.get("pet_context_id") != conversation.pet_id
+            ):
+                raise HTTPException(
+                    422,
+                    "Booking draft does not match this conversation.",
+                )
+
+            state = draft.get("state")
+            if not isinstance(state, dict):
+                raise HTTPException(422, "Invalid booking state.")
+
+            selected_pet = state.get("pet")
+            if selected_pet is not None:
+                if not isinstance(selected_pet, dict):
+                    raise HTTPException(422, "Invalid selected pet.")
+
+                selected_pet_id = selected_pet.get("pet_id")
+                if type(selected_pet_id) is not int:
+                    raise HTTPException(422, "Invalid selected pet.")
+
+                get_pet(db, current_user, selected_pet_id)
+
+                if (
+                    conversation.pet_id is not None
+                    and selected_pet_id != conversation.pet_id
+                ):
+                    raise HTTPException(
+                        422,
+                        "Selected pet differs from this chat's pet.",
+                    )
+
+        conversation.booking_draft = draft
+        conversation.booking_draft_revision += 1
+        db.flush()
+
+        response = conversation_dict(conversation)
         db.commit()
         return response
 

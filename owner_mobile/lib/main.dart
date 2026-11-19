@@ -6,6 +6,7 @@ import 'screens/login.dart';
 import 'services/api_client.dart';
 import 'services/auth_service.dart';
 import 'services/token_storage.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -171,6 +172,12 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       home: _buildHome(),
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      supportedLocales: const [
+        Locale('en'),
+        Locale('ms'),
+        Locale('zh', 'CN'),
+      ],
     );
   }
 }
