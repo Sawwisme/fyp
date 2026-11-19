@@ -209,7 +209,46 @@
     function updateTitle() {
         if (data) {
             get('report-document-title').textContent = title();
+            if (get('report-cover-title')) {
+                get('report-cover-title').textContent = title();
+            }
         }
+    }
+
+    function renderCover(report) {
+        get('report-cover')?.remove();
+        const cover = node('section', undefined, 'report-cover');
+        cover.id = 'report-cover';
+        cover.setAttribute('aria-labelledby', 'report-cover-title');
+
+        const brand = node('div', undefined, 'report-cover-brand');
+        brand.append(node('strong', 'VetDental'), node('span', 'VETERINARY DENTAL CARE'));
+
+        const heading = node('div', undefined, 'report-cover-heading');
+        const reportTitle = node('h2', title());
+        reportTitle.id = 'report-cover-title';
+        heading.append(node('p', names[report.report_type], 'report-cover-eyebrow'),
+            reportTitle, node('p', report.clinic_name, 'report-cover-clinic'));
+
+        const details = node('dl', undefined, 'report-cover-details');
+        for (const [term, value] of [
+            ['Reporting period', `${displayDate(report.date_from)} - ${displayDate(report.date_to)}`],
+            ['Applied filters', filterDescription(report)],
+            ['Prepared by', report.prepared_by],
+            ['Generated', new Date(report.generated_at).toLocaleString('en-MY', {
+                timeZone: 'Asia/Kuala_Lumpur', dateStyle: 'medium', timeStyle: 'short'
+            }) + ' MYT']
+        ]) {
+            const item = node('div');
+            item.append(node('dt', term), node('dd', value));
+            details.appendChild(item);
+        }
+
+        const footer = node('div', undefined, 'report-cover-footer');
+        footer.append(node('span', 'Charts, detailed figures and explanations'),
+            node('span', 'Confidential | For authorised use'));
+        cover.append(brand, heading, details, footer);
+        get('report-results').prepend(cover);
     }
 
     function addCards(items) {
@@ -1059,6 +1098,7 @@
             get('report-definition').textContent =
                 notes.overview.split(' Collections use')[0];
         }
+        renderCover(report);
     }
 
     async function load() {
@@ -1220,7 +1260,7 @@
     document.querySelectorAll('[data-report-period]').forEach(button =>
         button.addEventListener('click', () => {
             dates(button.dataset.reportPeriod);
-            load();
+            invalidate();
         })
     );
 
@@ -1257,7 +1297,8 @@
             ready = true;
             dates('month');
             configure();
-            load();
+            get('report-message').textContent =
+                'Choose your report settings, then click Generate report.';
 
         } catch (error) {
             get('report-message').textContent = error.message;

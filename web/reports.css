@@ -1125,3 +1125,94 @@
         -webkit-print-color-adjust: exact;
     }
 }
+.report-cover {
+    display: none;
+}
+
+@media print {
+    .reports-page .report-cover {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        min-height: 260mm;
+        padding: 15mm 12mm 10mm;
+        margin: 0;
+        border: 1px solid #dce3f0;
+        border-top: 7px solid #2549c7;
+        background: linear-gradient(145deg, #f1f5ff, #fff 60%);
+        break-after: page;
+        page-break-after: always;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .report-cover-brand strong {
+        display: block;
+        color: #172333;
+        font-size: 25pt;
+        letter-spacing: -1px;
+    }
+
+    .report-cover-brand span,
+    .report-cover-eyebrow {
+        color: #2549c7;
+        font-size: 8pt;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+    }
+
+    .report-cover-heading {
+        margin: 25mm 0 15mm;
+    }
+
+    .reports-page .report-cover h2 {
+        color: #172333;
+        font-size: 30pt;
+        line-height: 1.18;
+        letter-spacing: -.7px;
+        margin: 6mm 0;
+        overflow-wrap: anywhere;
+    }
+
+    .report-cover-clinic {
+        color: #536580;
+        font-size: 13pt;
+        overflow-wrap: anywhere;
+    }
+
+    .report-cover-details {
+        margin: 0 0 12mm;
+        border-top: 1px solid #ccd7ed;
+    }
+
+    .report-cover-details > div {
+        padding: 4mm 0;
+        border-bottom: 1px solid #dce3f0;
+        break-inside: avoid;
+    }
+
+    .report-cover-details dt {
+        color: #65748c;
+        font-size: 8pt;
+        margin: 0 0 2mm;
+    }
+
+    .report-cover-details dd {
+        color: #172333;
+        font-size: 10pt;
+        line-height: 1.45;
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .report-cover-footer {
+        display: flex;
+        flex-direction: column;
+        gap: 2mm;
+        margin-top: auto;
+        padding-top: 5mm;
+        color: #65748c;
+        font-size: 8pt;
+    }
+}
+
