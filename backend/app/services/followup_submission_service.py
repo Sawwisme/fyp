@@ -28,7 +28,7 @@ from app.services.followup_uploads import (
     validate_prepared_photos,
 )
 from app.services.pet_service import get_owner_profile
-
+from app.services.notification_service import notify_followup_reviewed
 
 def owner_followup_query(owner_id: int, followup_id: int):
     return (
@@ -500,24 +500,21 @@ def review_submission(
                     "completing the follow-up.",
                 )
 
-        db.add(
-            FollowupReviewDecision(
-                correction_reason=data.correction_reason,
-                submission_id=submission.submission_id,
-                veterinarian_id=veterinarian.veterinarian_id,
-                previous_visit_required=followup.visit_required,
-                visit_waiver_reason=data.visit_waiver_reason,
-                outcome=data.outcome,
-                veterinarian_comment=data.veterinarian_comment,
-                decided_at=now,
-                previous_review_status=submission.review_status,
-                previous_comment=submission.veterinarian_comment,
-                previous_reviewed_at=submission.reviewed_at,
-                previous_reviewer_id=(
-                    submission.reviewed_by_veterinarian_id
-                ),
-            )
+        decision = FollowupReviewDecision(
+            correction_reason=data.correction_reason,
+            submission_id=submission.submission_id,
+            veterinarian_id=veterinarian.veterinarian_id,
+            previous_visit_required=followup.visit_required,
+            visit_waiver_reason=data.visit_waiver_reason,
+            outcome=data.outcome,
+            veterinarian_comment=data.veterinarian_comment,
+            decided_at=now,
+            previous_review_status=submission.review_status,
+            previous_comment=submission.veterinarian_comment,
+            previous_reviewed_at=submission.reviewed_at,
+            previous_reviewer_id=submission.reviewed_by_veterinarian_id,
         )
+        db.add(decision)
 
         if data.outcome == "complete":
             submission.review_status = "reviewed"
@@ -543,6 +540,10 @@ def review_submission(
         db.expire(submission, ["decision_outcome"])
 
         result = FollowupSubmissionResponse.model_validate(submission)
+
+        notify_followup_reviewed(
+            db, followup, submission, decision
+        )
 
         db.commit()
         return result

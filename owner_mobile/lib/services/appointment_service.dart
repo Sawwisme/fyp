@@ -378,4 +378,23 @@ class AppointmentService {
 
     return Map<String, dynamic>.from(data);
   }
+
+  Future<Map<String, dynamic>?> getMyAppointmentById(
+      int appointmentId,
+      ) async {
+    for (var offset = 0; ; offset += 100) {
+      final page = await getMyAppointments(
+        offset: offset,
+        limit: 100,
+      );
+
+      for (final appointment in page) {
+        if (appointment['appointment_id'] == appointmentId) {
+          return appointment;
+        }
+      }
+
+      if (page.length < 100) return null;
+    }
+  }
 }

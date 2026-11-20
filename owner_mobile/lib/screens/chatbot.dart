@@ -39,6 +39,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   static const _navy = Color(0xFF172333);
   final Set<int> _bookingChatIds = {};
   final Map<int, int?> _bookingPetIds = {};
+  final Map<int, GlobalKey<ChatBookingFlowState>> _bookingKeys = {};
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _chatSearch = TextEditingController();
@@ -521,6 +522,31 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   Future<void> _send() async {
     if (_busy || _selected == null) return;
     if (_pending == null && _input.text.trim().isEmpty) return;
+
+    if (_pending == null) {
+      final conversationId = _selected!['conversation_id'] as int;
+      final booking = _bookingKeys[conversationId]?.currentState;
+
+      if (booking != null) {
+        final originalText = _input.text;
+        var handled = false;
+        var completed = false;
+
+        await _run(() async {
+          handled = await booking.handleTypedInput(originalText);
+          completed = true;
+
+          if (handled &&
+              mounted &&
+              _selected?['conversation_id'] == conversationId &&
+              _input.text == originalText) {
+            _input.clear();
+          }
+        });
+
+        if (!completed || handled) return;
+      }
+    }
 
     await _run(() async {
       final conversationId = _selected!['conversation_id'] as int;
@@ -1497,6 +1523,10 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                   offstage:
                   _selected?['conversation_id'] != conversationId,
                   child: ChatBookingFlow(
+                    key: _bookingKeys.putIfAbsent(
+                      conversationId,
+                          () => GlobalKey<ChatBookingFlowState>(),
+                    ),
                     chatbot: widget.service,
                     conversationId: conversationId,
                     initialPetId: _bookingPetIds[conversationId],
@@ -1506,6 +1536,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                     onOpenBookingPage: _openRegularBookingPage,
                     onCancel: () {
                       setState(() {
+                        _bookingKeys.remove(conversationId);
                         _bookingChatIds.remove(conversationId);
                         _bookingPetIds.remove(conversationId);
                       });

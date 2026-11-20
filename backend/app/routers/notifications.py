@@ -47,6 +47,15 @@ def get_my_unread_count(
         current_user,
     )
 
+@router.get("/updates")
+def get_notification_updates(
+    after_id: int | None = Query(default=None, ge=0, le=2147483647),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return notification_service.get_notification_updates(
+        db, current_user, after_id
+    )
 
 @router.post(
     "/{notification_id}/read",

@@ -1325,6 +1325,8 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: const Icon(Icons.chat_bubble_outline_rounded),
             ),
             OwnerNotificationBell(
+              key: ValueKey('notifications-${_user['user_id']}'),
+              userId: _user['user_id'] as int,
               service: NotificationService(widget.auth.api),
               enabled: !_loggingOut,
             ),

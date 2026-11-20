@@ -50,4 +50,18 @@ class NotificationService {
 
     return data['unread_count'] as int;
   }
+
+  Future<Map<String, dynamic>> getUpdates({int? afterId}) async {
+    final query = afterId == null ? '' : '?after_id=$afterId';
+    final data = await api.get('/notifications/updates$query');
+
+    if (data is! Map ||
+        data['items'] is! List ||
+        data['cursor'] is! int ||
+        (data['cursor'] as int) < 0) {
+      throw const ApiException('Invalid notification update response.');
+    }
+
+    return Map<String, dynamic>.from(data);
+  }
 }

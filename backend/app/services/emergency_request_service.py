@@ -16,6 +16,11 @@ from app.models import (
     Veterinarian,
 )
 
+from app.services.notification_service import (
+    notify_emergency_approved,
+    notify_emergency_rejected,
+)
+
 from app.schemas.emergency_requests import EmergencyRequestCreate
 from app.services.admin_profile_service import get_admin_record
 from app.services.pet_service import get_owner_profile
@@ -405,6 +410,9 @@ def approve_request(
         )
         request.rejection_reason = None
 
+        db.flush()
+        notify_emergency_approved(db, request)
+
         db.commit()
         db.refresh(request)
 
@@ -432,6 +440,9 @@ def reject_request(
         request.reviewed_at = datetime.now(timezone.utc).replace(
             tzinfo=None
         )
+
+        db.flush()
+        notify_emergency_rejected(db, request)
 
         db.commit()
         db.refresh(request)

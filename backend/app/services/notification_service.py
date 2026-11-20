@@ -11,6 +11,9 @@ from app.models import (
     PetOwner,
     User,
     VeterinarianAbsence,
+    Consultation,
+    DentalImage,
+    Pet,
 )
 from app.schemas.notifications import NotificationResponse
 
@@ -194,3 +197,266 @@ def notify_absence_reported(
         )
 
     # Do not commit here. The calling service owns the transaction.
+
+def notify_emergency_approved(db, request):
+    if (
+        request.approval_status != "approved"
+        or request.appointment_id is None
+    ):
+        raise ValueError(
+            "Emergency approval notification requires an appointment."
+        )
+
+    user_id = db.scalar(
+        select(PetOwner.user_id)
+        .join(User, User.user_id == PetOwner.user_id)
+        .where(
+            PetOwner.pet_owner_id == request.pet_owner_id,
+            User.role == "pet_owner",
+            User.status == "active",
+        )
+    )
+
+    if user_id is None:
+        return
+
+    event_key = (
+        f"emergency:{request.emergency_appointment_id}:approved"
+    )
+
+    existing = db.scalar(
+        select(Notification.notification_id).where(
+            Notification.user_id == user_id,
+            Notification.event_key == event_key,
+        )
+    )
+
+    if existing is not None:
+        return
+
+    db.add(
+        Notification(
+            user_id=user_id,
+            event_key=event_key,
+            notification_type="emergency_request_approved",
+            title="Emergency appointment confirmed",
+            message=(
+                "Your clinic approved emergency request "
+                f"#{request.emergency_appointment_id}. "
+                f"Appointment #{request.appointment_id} is confirmed. "
+                "Open the appointment to check its time and veterinarian."
+            ),
+            resource_type="appointment",
+            resource_id=request.appointment_id,
+        )
+    )
+
+    # The approval service commits the appointment and notification together.
+
+def notify_emergency_rejected(db, request):
+    if request.approval_status != "rejected":
+        raise ValueError("Emergency request must be rejected.")
+
+    user_id = db.scalar(
+        select(PetOwner.user_id)
+        .join(User, User.user_id == PetOwner.user_id)
+        .where(
+            PetOwner.pet_owner_id == request.pet_owner_id,
+            User.role == "pet_owner",
+            User.status == "active",
+        )
+    )
+
+    if user_id is None:
+        return
+
+    event_key = f"emergency:{request.emergency_appointment_id}:rejected"
+
+    if db.scalar(
+        select(Notification.notification_id).where(
+            Notification.user_id == user_id,
+            Notification.event_key == event_key,
+        )
+    ) is not None:
+        return
+
+    db.add(Notification(
+        user_id=user_id,
+        event_key=event_key,
+        notification_type="emergency_request_rejected",
+        title="Emergency request not accepted",
+        message=(
+            f"Your clinic did not accept emergency request "
+            f"#{request.emergency_appointment_id}. "
+            "Open the request to read the clinic's reason. "
+            "This does not mean it is safe to delay veterinary care."
+        ),
+        resource_type="emergency_request",
+        resource_id=request.emergency_appointment_id,
+    ))
+
+def notify_followup_reviewed(db, followup, submission, decision):
+    messages = {
+        "complete": (
+            "Follow-up review completed",
+            "Your veterinarian completed this follow-up review.",
+        ),
+        "request_update": (
+            "Another follow-up update requested",
+            "Your veterinarian requested another progress update.",
+        ),
+        "in_clinic": (
+            "Clinic visit recommended",
+            "Your veterinarian recommended an in-clinic review.",
+        ),
+    }
+
+    if decision.outcome not in messages:
+        raise ValueError("Unsupported follow-up review outcome.")
+
+    recipient = db.execute(
+        select(PetOwner.user_id, Appointment.appointment_id)
+        .select_from(Appointment)
+        .join(
+            Consultation,
+            Consultation.appointment_id == Appointment.appointment_id,
+        )
+        .join(
+            PetOwner,
+            PetOwner.pet_owner_id == Appointment.pet_owner_id,
+        )
+        .join(User, User.user_id == PetOwner.user_id)
+        .where(
+            Consultation.consultation_id == followup.consultation_id,
+            Consultation.status == "completed",
+            Appointment.pet_id == followup.pet_id,
+            PetOwner.pet_owner_id == submission.pet_owner_id,
+            User.role == "pet_owner",
+            User.status == "active",
+        )
+    ).first()
+
+    if recipient is None:
+        return
+
+    user_id, appointment_id = recipient
+    event_key = f"followup-review:{decision.decision_id}"
+
+    if db.scalar(
+        select(Notification.notification_id).where(
+            Notification.user_id == user_id,
+            Notification.event_key == event_key,
+        )
+    ) is not None:
+        return
+
+    title, description = messages[decision.outcome]
+
+    if decision.correction_reason:
+        title = "Follow-up review updated"
+
+    db.add(Notification(
+        user_id=user_id,
+        event_key=event_key,
+        notification_type="followup_reviewed",
+        title=title,
+        message=(
+            f"{description} Follow-up #{followup.followup_care_id}. "
+            "Open the appointment, then View updates to read "
+            "the recorded feedback and instructions."
+        ),
+        resource_type="appointment",
+        resource_id=appointment_id,
+    ))
+
+def notify_assessment_finished(db, job):
+    messages = {
+        "completed": (
+            "Dental assessment ready",
+            "Your AI dental assessment is ready. "
+            "Open it to view the screening result and its limitations.",
+        ),
+        "rejected": (
+            "Dental photo needs attention",
+            "Your photo did not pass assessment validation. "
+            "Open the assessment to read the reason.",
+        ),
+        "failed": (
+            "Dental assessment could not finish",
+            "Your assessment could not be completed. "
+            "Open it to check the status before trying again.",
+        ),
+    }
+
+    if job.status not in messages:
+        return
+
+    # Notify only the uploader who still owns the image's pet.
+    user_id = db.scalar(
+        select(User.user_id)
+        .select_from(DentalImage)
+        .join(Pet, Pet.pet_id == DentalImage.pet_id)
+        .join(PetOwner, PetOwner.pet_owner_id == Pet.pet_owner_id)
+        .join(User, User.user_id == DentalImage.uploaded_by)
+        .where(
+            DentalImage.dental_image_id == job.dental_image_id,
+            PetOwner.user_id == User.user_id,
+            User.role == "pet_owner",
+            User.status == "active",
+        )
+    )
+
+    if user_id is None:
+        return
+
+    event_key = f"assessment:{job.assessment_job_id}:{job.status}"
+
+    if db.scalar(
+        select(Notification.notification_id).where(
+            Notification.user_id == user_id,
+            Notification.event_key == event_key,
+        )
+    ) is not None:
+        return
+
+    title, message = messages[job.status]
+
+    db.add(Notification(
+        user_id=user_id,
+        event_key=event_key,
+        notification_type=f"dental_assessment_{job.status}",
+        title=title,
+        message=message,
+        resource_type="dental_assessment",
+        resource_id=job.assessment_job_id,
+    ))
+
+def get_notification_updates(db, current_user, after_id=None):
+    owned = Notification.user_id == current_user.user_id
+
+    # First connection establishes a baseline without replaying old alerts.
+    if after_id is None:
+        latest = db.scalar(
+            select(func.max(Notification.notification_id)).where(owned)
+        )
+        return {"items": [], "cursor": int(latest or 0)}
+
+    records = db.scalars(
+        select(Notification)
+        .where(
+            owned,
+            Notification.notification_id > after_id,
+        )
+        .order_by(Notification.notification_id.asc())
+        .limit(100)
+    ).all()
+
+    return {
+        "items": [
+            NotificationResponse.model_validate(record)
+            for record in records
+        ],
+        "cursor": (
+            records[-1].notification_id if records else after_id
+        ),
+    }

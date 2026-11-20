@@ -29,10 +29,10 @@ class ChatBookingFlow extends StatefulWidget {
   });
 
   @override
-  State<ChatBookingFlow> createState() => _ChatBookingFlowState();
+  State<ChatBookingFlow> createState() => ChatBookingFlowState();
 }
 
-class _ChatBookingFlowState extends State<ChatBookingFlow> with AutomaticKeepAliveClientMixin<ChatBookingFlow> {
+class ChatBookingFlowState extends State<ChatBookingFlow> with AutomaticKeepAliveClientMixin<ChatBookingFlow> {
   @override
   bool get wantKeepAlive => true;
   static const _blue = Color(0xFF2549C7);
@@ -237,7 +237,7 @@ class _ChatBookingFlowState extends State<ChatBookingFlow> with AutomaticKeepAli
 
         final appointmentId = state['appointment_id'];
         if (appointmentId != null) {
-          _appointment = await widget.appointments.getAppointmentRecord(
+          _appointment = await widget.appointments.getMyAppointmentById(
             appointmentId as int,
           );
 
@@ -380,6 +380,27 @@ class _ChatBookingFlowState extends State<ChatBookingFlow> with AutomaticKeepAli
       '请核对预约信息后再确认。',
     ),
   ];
+
+  List<String> get _displayHistory {
+    final answers = <String?>[
+      _pet?['pet_name']?.toString(),
+      _clinic?['clinic_name']?.toString(),
+      switch (_type) {
+        'dental_checkup' => _bookingLabel('Dental checkup'),
+        'consultation' => _bookingLabel('Consultation'),
+        _ => null,
+      },
+      _vet?['full_name']?.toString(),
+      _date == null ? null : _dateLabel(_date!),
+      _slot == null ? null : _timeLabel(_slot!),
+    ];
+
+    return [
+      for (var i = 0; i < _step && i < answers.length; i++)
+        if (answers[i] != null)
+          '${_questions[i]}\n${answers[i]}',
+    ];
+  }
 
   String _bookingLabel(String english) {
     const translations = <String, List<String>>{
@@ -839,6 +860,252 @@ class _ChatBookingFlowState extends State<ChatBookingFlow> with AutomaticKeepAli
     }
   }
 
+  void _bookingNotice(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  DateTime? _typedDate(String text) {
+    final today = _today();
+
+    if ({
+      'today', 'hari ini', '今天',
+    }.contains(text)) {
+      return today;
+    }
+
+    if ({
+      'tomorrow', 'esok', '明天',
+    }.contains(text)) {
+      return today.add(const Duration(days: 1));
+    }
+
+    final iso = RegExp(
+      r'^(\d{4})-(\d{1,2})-(\d{1,2})$',
+    ).firstMatch(text);
+
+    final local = RegExp(
+      r'^(\d{1,2})/(\d{1,2})/(\d{4})$',
+    ).firstMatch(text);
+
+    if (iso == null && local == null) return null;
+
+    final year = int.parse(
+      iso != null ? iso.group(1)! : local!.group(3)!,
+    );
+    final month = int.parse(
+      iso != null ? iso.group(2)! : local!.group(2)!,
+    );
+    final day = int.parse(
+      iso != null ? iso.group(3)! : local!.group(1)!,
+    );
+
+    final date = DateTime(year, month, day);
+
+    // DateTime otherwise normalises invalid dates automatically.
+    if (date.year != year ||
+        date.month != month ||
+        date.day != day) {
+      return null;
+    }
+
+    return date;
+  }
+
+  Future<bool> handleTypedInput(String input) async {
+    if (_appointment != null) return false;
+
+    final text = input
+        .trim()
+        .toLowerCase()
+        .replaceAll(RegExp(r'[.!?。！？]+$'), '')
+        .replaceAll(RegExp(r'\s+'), ' ');
+
+    const cancelCommands = {
+      'cancel',
+      'cancel booking',
+      'cancel booking steps',
+      'batal',
+      'batalkan tempahan',
+      '取消',
+      '取消预约步骤',
+    };
+
+    const backCommands = {
+      'back', 'go back', 'kembali', 'undur', '返回', '上一步',
+    };
+
+    const restartCommands = {
+      'restart', 'start over', 'mula semula', '重新开始', '重来',
+    };
+
+    const confirmCommands = {
+      'confirm',
+      'confirm booking',
+      'sahkan',
+      'sahkan janji temu',
+      '确认',
+      '确认预约',
+      'retry same booking',
+      'cuba semula janji temu yang sama',
+      '重试同一预约',
+    };
+
+    final isCommand =
+        cancelCommands.contains(text) ||
+            backCommands.contains(text) ||
+            restartCommands.contains(text) ||
+            confirmCommands.contains(text);
+
+    final isNumber = RegExp(r'^\d+$').hasMatch(text);
+    final date = _step == 4 ? _typedDate(text) : null;
+    final looksLikeDate = _step == 4 &&
+        RegExp(r'^[\d/-]+$').hasMatch(text);
+
+    final matches = <Map<String, dynamic>>[];
+
+    for (final choice in _choices) {
+      final labels = <String>{
+        _choiceLabel(choice).trim().toLowerCase(),
+        '${choice['label'] ?? ''}'.trim().toLowerCase(),
+      };
+
+      if (_step == 2) {
+        if (choice['value'] == 'dental_checkup') {
+          labels.addAll({
+            'dental checkup',
+            'dental check-up',
+            'pemeriksaan pergigian',
+            '牙齿检查',
+          });
+        } else if (choice['value'] == 'consultation') {
+          labels.addAll({
+            'consultation', 'konsultasi', '诊疗咨询',
+          });
+        }
+      }
+
+      if (_step == 5) {
+        final start = '${choice['start_time']}';
+        if (start.length >= 5) labels.add(start.substring(0, 5));
+      }
+
+      if (text.isNotEmpty && labels.contains(text)) {
+        matches.add(choice);
+      }
+    }
+
+    // Unrelated messages still reach the chatbot, including safety triage.
+    if (!isCommand &&
+        !isNumber &&
+        date == null &&
+        !looksLikeDate &&
+        matches.isEmpty) {
+      return false;
+    }
+
+    if (_busy) {
+      _bookingNotice(_text(
+        'Please wait for the current booking step.',
+        'Sila tunggu langkah janji temu semasa selesai.',
+        '请等待当前预约步骤完成。',
+      ));
+      return true;
+    }
+
+    if (confirmCommands.contains(text)) {
+      if (_step == 6 && (_quote != null || _request != null)) {
+        await _confirm();
+      } else {
+        _bookingNotice(_text(
+          'Complete the booking choices before confirming.',
+          'Lengkapkan pilihan janji temu sebelum mengesahkan.',
+          '请先完成预约选项，再确认预约。',
+        ));
+      }
+      return true;
+    }
+
+    // Never discard an uncertain submitted request.
+    if (_request != null) {
+      _bookingNotice(_resumeWarning);
+      return true;
+    }
+
+    if (cancelCommands.contains(text)) {
+      await _closeBooking();
+      return true;
+    }
+
+    if (backCommands.contains(text)) {
+      await _back();
+      return true;
+    }
+
+    if (restartCommands.contains(text)) {
+      setState(() {
+        _step = 0;
+        _pet = null;
+        _clinic = null;
+        _vet = null;
+        _slot = null;
+        _quote = null;
+        _date = null;
+        _type = null;
+        _error = null;
+        _uncertain = false;
+        _history.clear();
+      });
+      await _loadStep();
+      return true;
+    }
+
+    if (_step == 4) {
+      final today = _today();
+
+      if (date == null ||
+          date.isBefore(today) ||
+          date.isAfter(today.add(const Duration(days: 90)))) {
+        _bookingNotice(_text(
+          'Enter a valid date within 90 days: YYYY-MM-DD or DD/MM/YYYY.',
+          'Masukkan tarikh sah dalam 90 hari: YYYY-MM-DD atau DD/MM/YYYY.',
+          '请输入未来90天内的有效日期：YYYY-MM-DD 或 DD/MM/YYYY。',
+        ));
+        return true;
+      }
+
+      setState(() {
+        _date = date;
+        _history.add('${_questions[4]}\n${_dateLabel(date)}');
+        _step = 5;
+      });
+      await _loadStep();
+      return true;
+    }
+
+    if (isNumber) {
+      final number = int.tryParse(text);
+      if (number != null &&
+          number >= 1 &&
+          number <= _choices.length) {
+        await _choose(_choices[number - 1]);
+        return true;
+      }
+    } else if (matches.length == 1) {
+      await _choose(matches.single);
+      return true;
+    }
+
+    _bookingNotice(_text(
+      'Enter an available choice number or its exact label.',
+      'Masukkan nombor pilihan tersedia atau label yang tepat.',
+      '请输入可用选项的编号或完整名称。',
+    ));
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     final appointment = _appointment;
@@ -897,7 +1164,7 @@ class _ChatBookingFlowState extends State<ChatBookingFlow> with AutomaticKeepAli
           ),
           const SizedBox(height: 16),
 
-          for (final answer in _history)
+          for (final answer in _displayHistory)
             Container(
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.all(12),

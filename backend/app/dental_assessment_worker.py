@@ -12,6 +12,7 @@ from threading import local
 from app.services.model_process_client import ModelProcessClient
 
 from sqlalchemy import and_, or_, select
+from app.services.notification_service import notify_assessment_finished
 
 from app.database import SessionLocal
 from app.models import (
@@ -140,6 +141,8 @@ def finish_without_result(job_id, token, status, message):
         job.error_message = message
         job.finished_at = utc_now()
         job.locked_until = None
+
+        notify_assessment_finished(db, job)
 
         db.commit()
 
@@ -411,6 +414,8 @@ def save_result(job_id, token, payload, attempt_directory):
                 job.result_summary,
                 image_kind,
             )
+
+        notify_assessment_finished(db, job)       
 
         db.commit()
 
