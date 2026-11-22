@@ -71,3 +71,19 @@ def mark_notification_as_read(
         current_user,
         notification_id,
     )
+
+
+@router.get(
+    "/{notification_id}",
+    response_model=NotificationResponse,
+)
+def get_my_notification(
+    notification_id: int = Path(ge=1, le=2147483647),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return notification_service.get_notification_by_id(
+        db,
+        current_user,
+        notification_id,
+    )

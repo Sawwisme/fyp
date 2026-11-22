@@ -8,6 +8,13 @@ import 'services/auth_service.dart';
 import 'services/token_storage.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'dart:convert';
+
+import 'services/notification_service.dart';
+import 'services/phone_notification_service.dart';
+import 'screens/notifications.dart';
+
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
@@ -28,12 +35,148 @@ class _MyAppState extends State<MyApp> {
   bool _restoring = true;
   String? _restoreError;
 
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+
+  final PhoneNotificationService _phone = PhoneNotificationService.instance;
+
+  int? _pendingNotificationId;
+  int? _pendingNotificationUserId;
+  bool _openingNotification = false;
+
+  void _handleNotificationTap(String? payload) {
+    if (payload == null || payload.isEmpty) return;
+
+    try {
+      final decoded = jsonDecode(payload);
+
+      if (decoded is! Map) return;
+
+      final notificationId = decoded['notification_id'];
+      final userId = decoded['user_id'];
+
+      if (notificationId is! int ||
+          notificationId < 1 ||
+          notificationId > 2147483647 ||
+          userId is! int ||
+          userId < 1) {
+        return;
+      }
+
+      _pendingNotificationId = notificationId;
+      _pendingNotificationUserId = userId;
+
+      _schedulePendingNotification();
+    } catch (_) {
+      // Ignore malformed or unrelated notification payloads.
+    }
+  }
+
+  void _schedulePendingNotification() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _openPendingNotification();
+    });
+  }
+
+  Future<void> _openPendingNotification() async {
+    if (_openingNotification ||
+        _restoring ||
+        _restoreError != null ||
+        _user == null) {
+      return;
+    }
+
+    final notificationId = _pendingNotificationId;
+    final targetUserId = _pendingNotificationUserId;
+
+    if (notificationId == null || targetUserId == null) {
+      return;
+    }
+
+    final currentUserId = _user!['user_id'];
+
+    // Never route a notification belonging to another account.
+    if (currentUserId != targetUserId) {
+      _pendingNotificationId = null;
+      _pendingNotificationUserId = null;
+
+
+      final context = _navigatorKey.currentContext;
+
+      if (context != null) {
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+          const SnackBar(
+            content: Text(
+              'This notification belongs to another account.',
+            ),
+          ),
+        );
+      }
+
+
+      return;
+    }
+
+    final navigator = _navigatorKey.currentState;
+
+    if (navigator == null) {
+      _schedulePendingNotification();
+      return;
+    }
+
+    _openingNotification = true;
+
+    // Consume before navigation to prevent duplicate opening.
+    _pendingNotificationId = null;
+    _pendingNotificationUserId = null;
+
+    try {
+      await navigator.push<void>(
+        MaterialPageRoute(
+          builder: (_) => OwnerNotificationsScreen(
+            service: NotificationService(_api),
+            initialNotificationId: notificationId,
+          ),
+        ),
+      );
+    } finally {
+      _openingNotification = false;
+
+      if (_pendingNotificationId != null && mounted) {
+        _schedulePendingNotification();
+      }
+    }
+  }
+
+
+
   @override
   void initState() {
     super.initState();
+
     _api = ApiClient(tokenStorage: TokenStorage());
     _auth = AuthService(_api);
+
+    _phone.onTap = _handleNotificationTap;
+
+    _initializeNotificationNavigation();
     _restoreSession();
+  }
+
+  Future<void> _initializeNotificationNavigation() async {
+    try {
+      await _phone.initialize();
+
+      final launchPayload = _phone.takeLaunchPayload();
+
+      if (mounted && launchPayload != null) {
+        _handleNotificationTap(launchPayload);
+      }
+    } catch (error) {
+      debugPrint(
+        'Notification navigation initialization failed: $error',
+      );
+    }
   }
 
   Future<void> _restoreSession() async {
@@ -82,6 +225,7 @@ class _MyAppState extends State<MyApp> {
     } finally {
       if (mounted) {
         setState(() => _restoring = false);
+        _schedulePendingNotification();
       }
     }
   }
@@ -146,6 +290,7 @@ class _MyAppState extends State<MyApp> {
         auth: _auth,
         onLoggedIn: (user) {
           setState(() => _user = user);
+          _schedulePendingNotification();
         },
       );
     }
@@ -161,6 +306,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
+    _phone.onTap = null;
     _api.close();
     super.dispose();
   }
@@ -168,11 +314,13 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: _navigatorKey,
       title: 'Veterinary Dental Care',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       home: _buildHome(),
-      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      localizationsDelegates:
+      GlobalMaterialLocalizations.delegates,
       supportedLocales: const [
         Locale('en'),
         Locale('ms'),

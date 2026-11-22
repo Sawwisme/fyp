@@ -64,4 +64,25 @@ class NotificationService {
 
     return Map<String, dynamic>.from(data);
   }
+
+  Future<Map<String, dynamic>> getNotificationById(
+      int notificationId,
+      ) async {
+    if (notificationId < 1 || notificationId > 2147483647) {
+      throw const ApiException('Invalid notification ID.');
+    }
+
+    final data = await api.get(
+      '/notifications/$notificationId',
+    );
+
+    if (data is! Map) {
+      throw const ApiException(
+        'Invalid notification response.',
+      );
+    }
+
+    return Map<String, dynamic>.from(data);
+  }
+
 }

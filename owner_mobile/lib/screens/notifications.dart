@@ -16,10 +16,12 @@ import '../services/phone_notification_service.dart';
 
 class OwnerNotificationsScreen extends StatefulWidget {
   final NotificationService service;
+  final int? initialNotificationId;
 
   const OwnerNotificationsScreen({
     super.key,
     required this.service,
+    this.initialNotificationId,
   });
 
   @override
@@ -27,8 +29,7 @@ class OwnerNotificationsScreen extends StatefulWidget {
       _OwnerNotificationsScreenState();
 }
 
-class _OwnerNotificationsScreenState
-    extends State<OwnerNotificationsScreen> {
+class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
   static const _green = Color(0xFF2549C7);
   static const _pageSize = 20;
   bool _openingResource = false;
@@ -43,13 +44,110 @@ class _OwnerNotificationsScreenState
   bool get _busy =>
       _loading || _readingId != null || _openingResource;
 
+
   @override
   void initState() {
     super.initState();
+
     _load();
+
+    final notificationId = widget.initialNotificationId;
+
+    if (notificationId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+
+        _openBannerNotification(notificationId);
+      });
+    }
   }
 
   bool _enablingAlerts = false;
+
+
+  bool _handlingBanner = false;
+
+  Future<void> _openNotificationRecord(
+      Map<String, dynamic> item,
+      ) async {
+    switch (item['resource_type']) {
+      case 'shop_order':
+        await _openOrder(item);
+        break;
+
+      case 'consultation_bill':
+        await _openBill(item);
+        break;
+
+      case 'ai_assessment_review':
+        await _openAIReview(item);
+        break;
+
+      case 'appointment':
+        await _openAppointment(item);
+        break;
+
+      case 'emergency_request':
+        await _openEmergencyRequest(item);
+        break;
+
+      case 'dental_assessment':
+        await _openAssessment(item);
+        break;
+
+      default:
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'This notification has no detail page.',
+            ),
+          ),
+        );
+    }
+  }
+
+  Future<void> _openBannerNotification(
+      int notificationId,
+      ) async {
+    if (_handlingBanner || !mounted) return;
+
+    _handlingBanner = true;
+
+    try {
+      final notification =
+      await widget.service.getNotificationById(
+        notificationId,
+      );
+
+      if (!mounted) return;
+
+      // The existing record-opening methods require
+      // the screen not to be in its loading state.
+      while (_loading && mounted) {
+        await Future<void>.delayed(
+          const Duration(milliseconds: 100),
+        );
+      }
+
+      if (!mounted) return;
+
+      await _openNotificationRecord(notification);
+    } catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Could not open notification: $error',
+          ),
+        ),
+      );
+    } finally {
+      _handlingBanner = false;
+    }
+  }
 
   Future<void> _enablePhoneAlerts() async {
     if (_busy || _enablingAlerts) return;

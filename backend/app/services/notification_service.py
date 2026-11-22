@@ -460,3 +460,23 @@ def get_notification_updates(db, current_user, after_id=None):
             records[-1].notification_id if records else after_id
         ),
     }
+
+def get_notification_by_id(
+    db: Session,
+    current_user: User,
+    notification_id: int,
+):
+    notification = db.scalar(
+        select(Notification).where(
+            Notification.notification_id == notification_id,
+            Notification.user_id == current_user.user_id,
+        )
+    )
+
+    if notification is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Notification not found.",
+        )
+
+    return notification
