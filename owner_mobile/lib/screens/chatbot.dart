@@ -1219,7 +1219,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     final reset = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Chat memory'),
+        title: const Text('Reset chat topic?'),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -1279,9 +1279,12 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           dense: true,
           contentPadding: const EdgeInsets.symmetric(horizontal: 8),
           leading: const Icon(Icons.psychology_outlined, color: Colors.white70),
-          title: const Text('Memory', style: TextStyle(color: Colors.white)),
+          title: const Text(
+            'Reset chat topic',
+            style: TextStyle(color: Colors.white),
+          ),
           subtitle: const Text(
-            'Manage this chat’s topic',
+            'Start fresh without deleting messages',
             style: TextStyle(color: Colors.white54),
           ),
           enabled: enabled,
@@ -1310,13 +1313,35 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                'Your conversations',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                ),
+              Row(
+                children: [
+                  const Expanded(
+                    child: Text(
+                      'Your conversations',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Close chat history',
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      color: Colors.white70,
+                    ),
+                    onPressed: () {
+                      final scaffold = _scaffoldKey.currentState;
+
+                      if (scaffold?.isDrawerOpen ?? false) {
+                        scaffold?.closeDrawer();
+                      } else {
+                        setState(() => _sidebarVisible = false);
+                      }
+                    },
+                  ),
+                ],
               ),
               const SizedBox(height: 20),
               Tooltip(
@@ -1656,30 +1681,35 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           ),
           appBar: AppBar(
             automaticallyImplyLeading: false,
-            leading: Navigator.of(context).canPop()
-                ? const BackButton()
-                : null,
-            title: const Text('Dental care assistant'),
             backgroundColor: _navy,
             foregroundColor: Colors.white,
+            leading: IconButton(
+              tooltip: wide
+                  ? (_sidebarVisible ? 'Hide chats' : 'Show chats')
+                  : 'Chat history',
+              icon: const Icon(Icons.menu_rounded),
+              onPressed: () {
+                if (wide) {
+                  setState(() {
+                    _sidebarVisible = !_sidebarVisible;
+                  });
+                } else {
+                  _scaffoldKey.currentState?.openDrawer();
+                }
+              },
+            ),
+            title: const Text(
+              'Dental assistant',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
             actions: [
-              IconButton(
-                tooltip: wide
-                    ? (_sidebarVisible
-                    ? 'Hide chats'
-                    : 'Show chats')
-                    : 'Chat history',
-                icon: const Icon(Icons.menu_rounded),
-                onPressed: () {
-                  if (wide) {
-                    setState(() {
-                      _sidebarVisible = !_sidebarVisible;
-                    });
-                  } else {
-                    _scaffoldKey.currentState?.openDrawer();
-                  }
-                },
-              ),
+              if (Navigator.of(context).canPop())
+                IconButton(
+                  tooltip: 'Close assistant',
+                  icon: const Icon(Icons.close_rounded),
+                  onPressed: () => Navigator.of(context).maybePop(),
+                ),
             ],
           ),
           body: SafeArea(

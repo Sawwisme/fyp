@@ -5,7 +5,11 @@ CONFIRMATIONS = {'en': 'English preference saved for this chat. Translated repli
 
 def normalize_language_command(message):
     text = str(message).casefold().strip()
-    text = re.sub('[.!?。！？]+$', '', text)
+    text = re.sub(
+        '[.!?。！？]+$', 
+        '', 
+        text
+    )
     return ' '.join(text.split())
 
 def requested_language(message):
@@ -16,9 +20,312 @@ def requested_language(message):
     return None
 
 def language_preference_reply(language):
-    return {'intent': 'language_preference', 'reply': CONFIRMATIONS[language], 'mode': 'rule', 'sources': [], 'similarity': None, 'products': [], 'suggested_questions': [], 'recommended_action': 'NONE', 'language': language}
-FAQ_QUESTIONS = {'apa itu plak': ('what is dental plaque', 'ms'), 'apa itu plak gigi': ('what is dental plaque', 'ms'), '什么是牙菌斑': ('what is dental plaque', 'zh'), '牙菌斑是什么': ('what is dental plaque', 'zh'), 'apa itu gingivitis': ('what is gingivitis', 'ms'), 'apa itu radang gusi': ('what is gingivitis', 'ms'), '什么是牙龈炎': ('what is gingivitis', 'zh'), '牙龈炎是什么': ('what is gingivitis', 'zh'), 'apa itu karang gigi': ('what is calculus', 'ms'), 'apa itu tartar': ('what is calculus', 'ms'), '什么是牙结石': ('what is calculus', 'zh'), '牙结石是什么': ('what is calculus', 'zh')}
-FAQ_TRANSLATIONS = {'plaque_information': {'ms': 'Plak gigi ialah lapisan bakteria pada permukaan gigi. Apabila terkumpul, plak boleh merengsakan gusi dan menyumbang kepada penyakit periodontal. Penjelasan ini tidak mengesahkan bahawa haiwan anda mempunyai plak. Doktor veterinar boleh memeriksa mulutnya.', 'zh': '牙菌斑是附着在牙齿表面的细菌膜。积聚后可能刺激牙龈，并促使牙周疾病发生。这段说明不能确认您的宠物是否有牙菌斑；兽医可以检查其口腔。'}, 'gingivitis_information': {'ms': 'Gingivitis bermaksud keradangan gusi. Gusi mungkin kemerahan, bengkak atau berdarah, tetapi foto atau chatbot tidak boleh menentukan puncanya. Dapatkan pemeriksaan veterinar jika terdapat perubahan pada gusi haiwan anda.', 'zh': '牙龈炎是指牙龈发炎，可能出现发红、肿胀或出血。仅凭照片或聊天机器人无法确定原因。如果宠物的牙龈出现变化，请安排兽医检查。'}, 'calculus_information': {'ms': 'Karang gigi, juga dipanggil tartar, ialah plak yang mengeras bersama mendapan mineral daripada air liur. Ia berbeza daripada lapisan plak yang lebih lembut. Tanya doktor veterinar tentang pemeriksaan dan pembersihan yang sesuai untuk haiwan anda.', 'zh': '牙结石是牙菌斑与唾液中的矿物质形成的硬化沉积物，与较软的牙菌斑不同。请向兽医咨询适合宠物的检查和清洁方式。'}}
+    return {
+        'intent': 'language_preference', 
+        'reply': CONFIRMATIONS[language], 
+        'mode': 'rule', 'sources': [], 
+        'similarity': None, 'products': [], 
+        'suggested_questions': [], 
+        'recommended_action': 'NONE', 
+        'language': language
+        }
+
+FAQ_QUESTIONS = {
+    'apa itu plak': (
+        'what is dental plaque', 
+        'ms'
+    ), 
+    'apa itu plak gigi': (
+            'what is dental plaque', 
+            'ms'
+    ), 
+    '什么是牙菌斑': (
+        'what is dental plaque', 
+        'zh'
+    ),
+    '牙菌斑是什么': (
+        'what is dental plaque', 
+        'zh'
+    ), 
+    'apa itu gingivitis': (
+        'what is gingivitis', 
+        'ms'
+    ), 
+    'apa itu radang gusi': (
+        'what is gingivitis', 
+        'ms'
+    ), 
+    '什么是牙龈炎': (
+        'what is gingivitis', 
+        'zh'
+    ), 
+    '牙龈炎是什么': (
+        'what is gingivitis', 
+        'zh'
+        ), 
+    'apa itu karang gigi': (
+        'what is calculus', 
+        'ms'
+    ), 
+    'apa itu tartar': (
+        'what is calculus', 
+        'ms'
+    ), 
+    '什么是牙结石': (
+        'what is calculus', 
+        'zh'
+    ), 
+    '牙结石是什么': (
+        'what is calculus', 
+        'zh'
+    )
+}
+
+FAQ_TRANSLATIONS = {
+    "plaque_information": {
+        "ms": (
+            "Plak gigi ialah lapisan bakteria pada permukaan gigi. "
+            "Apabila terkumpul, plak boleh merengsakan gusi dan "
+            "menyumbang kepada penyakit periodontal. Penjelasan ini "
+            "tidak mengesahkan bahawa haiwan anda mempunyai plak. "
+            "Doktor veterinar boleh memeriksa mulutnya."
+        ),
+        "zh": (
+            "牙菌斑是附着在牙齿表面的细菌膜。积聚后可能刺激牙龈，"
+            "并促使牙周疾病发生。这段说明不能确认您的宠物是否有牙菌斑；"
+            "兽医可以检查其口腔。"
+        ),
+    },
+    "gingivitis_information": {
+        "ms": (
+            "Gingivitis bermaksud keradangan gusi. Gusi mungkin "
+            "kemerahan, bengkak atau berdarah, tetapi foto atau "
+            "chatbot tidak boleh menentukan puncanya. Dapatkan "
+            "pemeriksaan veterinar jika terdapat perubahan pada "
+            "gusi haiwan anda."
+        ),
+        "zh": (
+            "牙龈炎是指牙龈发炎，可能出现发红、肿胀或出血。"
+            "仅凭照片或聊天机器人无法确定原因。如果宠物的牙龈出现变化，"
+            "请安排兽医检查。"
+        ),
+    },
+    "calculus_information": {
+        "ms": (
+            "Karang gigi, juga dipanggil tartar, ialah plak yang "
+            "mengeras bersama mendapan mineral daripada air liur. "
+            "Ia berbeza daripada lapisan plak yang lebih lembut. "
+            "Tanya doktor veterinar tentang pemeriksaan dan "
+            "pembersihan yang sesuai untuk haiwan anda."
+        ),
+        "zh": (
+            "牙结石是牙菌斑与唾液中的矿物质形成的硬化沉积物，"
+            "与较软的牙菌斑不同。请向兽医咨询适合宠物的检查和清洁方式。"
+        ),
+    },
+}
+
+FAQ_TRANSLATIONS.update({
+    "ai_interpretation": {
+        "ms": (
+            "Keputusan AI VetDental ialah rujukan saringan, bukan "
+            "diagnosis yang disahkan. Skor model bukan ukuran tahap "
+            "keterukan penyakit. Jika keputusan membimbangkan anda, "
+            "gunakan Request vet review pada penilaian yang telah "
+            "selesai atau aturkan konsultasi. Maklum balas veterinar "
+            "dipaparkan secara berasingan daripada keputusan AI asal."
+        ),
+        "zh": (
+            "VetDental 的 AI 结果仅供筛查参考，并非确诊。"
+            "模型分数不代表疾病严重程度。如果结果让您担心，"
+            "请在已完成的评估中选择 Request vet review，或安排问诊。"
+            "兽医的审核意见会与原始 AI 结果分开显示。"
+        ),
+    },
+    "request_review": {
+        "ms": (
+            "Pada penilaian AI yang telah selesai, pilih Request vet "
+            "review, pilih klinik dan sahkan Share assessment & request "
+            "review. Untuk membaca maklum balas kemudian, buka My vet "
+            "reviews & feedback dalam AI Scan. Permintaan ulasan "
+            "tidak membuat tempahan janji temu."
+        ),
+        "zh": (
+            "在已完成的 AI 评估中选择 Request vet review，"
+            "选择诊所，然后确认 Share assessment & request review。"
+            "之后可在 AI Scan 中打开 My vet reviews & feedback "
+            "查看审核意见。提交审核请求不会自动预约。"
+        ),
+    },
+    "cancel_appointment": {
+        "ms": (
+            "Buka Booking dan pilih janji temu yang ingin diuruskan. "
+            "Gunakan tindakan pembatalan jika tersedia. Sistem akan "
+            "menyemak sama ada janji temu masih boleh dibatalkan. "
+            "Chatbot tidak boleh membatalkan janji temu atau mengesahkan "
+            "kelayakan bayaran balik melalui perbualan ini. Semak "
+            "butiran janji temu dan pembayaran."
+        ),
+        "zh": (
+            "打开 Booking，选择需要管理的预约。"
+            "如果提供取消操作，请使用该操作。"
+            "系统会检查预约是否仍可取消。"
+            "聊天机器人不能在此对话中取消预约或确认退款资格。"
+            "请查看预约和付款详情。"
+        ),
+    },
+    "followup_update": {
+        "ms": (
+            "Buka Follow-up Care melalui Booking dan pilih tugasan "
+            "yang berkaitan. Baca arahan veterinar dan hantar foto "
+            "atau perkembangan apabila tugasan membenarkannya. "
+            "Selepas penghantaran, semak maklum balas dalam tugasan "
+            "tersebut. Penghantaran seterusnya mungkin memerlukan "
+            "permintaan kemas kini tambahan daripada veterinar."
+        ),
+        "zh": (
+            "从 Booking 打开 Follow-up Care，选择相关任务。"
+            "阅读兽医指示，并在任务允许时提交照片或恢复情况。"
+            "提交后，请在任务中查看反馈。再次提交可能需要"
+            "兽医先请求补充更新。"
+        ),
+    },
+})
+
+FAQ_TRANSLATIONS.update({
+    "explain_gradcam": {
+        "ms": (
+            "Peta haba Grad-CAM menunjukkan kawasan imej yang paling "
+            "mempengaruhi pengelasan AI. Warna lebih panas menunjukkan "
+            "perhatian relatif yang lebih kuat. Kotak berlabel menunjukkan "
+            "kawasan perhatian berkaitan ramalan, bukan sempadan penyakit "
+            "yang disahkan. Warna merah tidak bermaksud penyakit teruk. "
+            "Peta haba tidak boleh mengukur berapa banyak bahagian mulut "
+            "haiwan anda yang terjejas."
+        ),
+        "zh": (
+            "Grad-CAM 热力图显示对 AI 分类影响较大的图像区域。"
+            "暖色表示相对较强的模型关注程度。带标签的方框表示"
+            "与预测相关的关注区域，并非已确认的病变边界。"
+            "红色不代表疾病严重，也不能用热力图测量"
+            "宠物整个口腔受影响的比例。"
+        ),
+    },
+    "explain_segmentation": {
+        "ms": (
+            "Segmentasi menganggarkan kawasan imej yang berkaitan "
+            "dengan gingivitis dan karang gigi. Berbeza daripada peta "
+            "haba pengelasan, segmentasi meramalkan topeng bagi kawasan "
+            "tersebut. Ia boleh terlepas kawasan atau menandakan objek "
+            "yang tidak berkaitan. Peratus kawasan merujuk kepada piksel "
+            "dalam foto yang dihantar, bukan peratus keseluruhan mulut "
+            "yang terjejas. Topeng ini membantu tafsiran imej dan bukan "
+            "ukuran klinikal yang tepat. Untuk nilai yang disimpan, "
+            "pilih haiwan dan tanya: Show my pet segmentation percentages. "
+            "Penilaian lama mungkin tidak mempunyai nilai tersebut."
+        ),
+        "zh": (
+            "图像分割估计照片中与牙龈炎和牙结石相关的区域。"
+            "它与分类热力图不同，会为这些区域预测分割掩膜。"
+            "模型可能漏掉区域，也可能错误标出无关物体。"
+            "面积百分比指上传照片中的像素比例，"
+            "并非宠物整个口腔受影响的比例。"
+            "分割掩膜用于辅助理解图像，并非精确的临床测量。"
+            "如需查看已保存的数值，请选择宠物并询问："
+            "Show my pet segmentation percentages。"
+            "较早的评估可能没有保存这些数值。"
+        ),
+    },
+    "explain_confidence": {
+        "ms": (
+            "Keyakinan pengelasan ialah skor model bagi sesuatu keadaan "
+            "dalam imej ini. Ia bukan tahap keterukan penyakit dan "
+            "tidak semestinya kebarangkalian yang telah ditentukur. "
+            "Contohnya, skor 95% tidak bermaksud penyakit itu 95% teruk "
+            "atau diagnosisnya pasti. Anggaran tahap keterukan ialah "
+            "rujukan berasingan yang dijana sistem. Dapatan veterinar "
+            "direkodkan secara berasingan."
+        ),
+        "zh": (
+            "分类置信度是模型针对这张图像中某种状况给出的分数。"
+            "它不代表疾病严重程度，也不一定是经过校准的概率。"
+            "例如，95% 的分数不表示疾病有 95% 严重，"
+            "也不代表诊断已经确定。"
+            "估计严重程度是系统另外生成的参考结果，"
+            "兽医检查结果则单独记录。"
+        ),
+    },
+})
+
+FAQ_TRANSLATIONS.update({
+    "daily_dental_care": {
+        "ms": (
+            "Memberus gigi setiap hari disyorkan untuk penjagaan "
+            "pencegahan apabila veterinar menganggapnya sesuai. "
+            "Gunakan berus gigi haiwan yang lembut dan ubat gigi "
+            "haiwan yang sesuai untuk spesiesnya. Perkenalkan "
+            "memberus gigi secara beransur-ansur. Jika mulut sakit, "
+            "meradang atau baru menerima rawatan, dapatkan nasihat "
+            "veterinar sebelum memberus."
+        ),
+        "zh": (
+            "在兽医认为适合的情况下，建议每天刷牙以预防牙齿问题。"
+            "使用柔软的宠物牙刷，以及适合该物种的宠物牙膏，"
+            "并逐步让宠物适应刷牙。如果口腔疼痛、发炎，"
+            "或刚接受过治疗，请先咨询兽医再刷牙。"
+        ),
+    },
+    "brushing_technique": {
+        "ms": (
+            "Mulakan secara beransur-ansur supaya haiwan selesa "
+            "dengan sentuhan di sekitar mulut dan ubat gigi haiwan. "
+            "Apabila haiwan boleh menerimanya, gunakan berus gigi "
+            "haiwan yang lembut untuk membersihkan permukaan luar "
+            "gigi dengan perlahan. Pastikan sesi tenang dan berikan "
+            "ganjaran atas kerjasamanya. Jangan paksa mulut terbuka "
+            "atau teruskan jika sakit. Minta veterinar menunjukkan "
+            "teknik yang sesuai."
+        ),
+        "zh": (
+            "逐步开始，让宠物先适应口腔周围的触碰和宠物牙膏。"
+            "在宠物能够接受时，用柔软的宠物牙刷轻轻清洁牙齿外侧。"
+            "保持过程平静，并奖励配合的行为。"
+            "不要强行掰开嘴巴，也不要在宠物疼痛时继续。"
+            "请兽医示范适合的刷牙方法。"
+        ),
+    },
+    "bad_breath": {
+        "ms": (
+            "Bau mulut yang berterusan tidak patut diabaikan. "
+            "Ia boleh berkaitan dengan penyakit pergigian atau "
+            "masalah lain, jadi aturkan pemeriksaan veterinar. "
+            "Chatbot atau foto tidak boleh menentukan puncanya. "
+            "Produk penyegar nafas tidak menggantikan usaha "
+            "mengenal pasti dan menangani masalah sebenar."
+        ),
+        "zh": (
+            "持续口臭不应被忽视。它可能与牙齿疾病或其他问题有关，"
+            "因此请安排兽医检查。聊天机器人或照片无法确定原因。"
+            "清新口气的产品不能代替查明和处理根本问题。"
+        ),
+    },
+    "dental_warning_signs": {
+        "ms": (
+            "Tanda amaran yang mungkin termasuk bau mulut berterusan, "
+            "gusi merah atau bengkak, mendapan yang kelihatan, "
+            "air liur berlebihan, kesukaran mengunyah atau perubahan "
+            "tabiat makan. Tanda ini boleh mempunyai pelbagai punca "
+            "dan memerlukan pemeriksaan veterinar. Foto yang kelihatan "
+            "normal tidak menolak masalah di bawah garis gusi."
+        ),
+        "zh": (
+            "可能的警示包括持续口臭、牙龈发红或肿胀、"
+            "可见沉积物、流口水、咀嚼困难或进食行为改变。"
+            "这些表现可能有不同原因，需要兽医检查。"
+            "照片看起来正常，也不能排除牙龈线以下的问题。"
+        ),
+    },
+})
 
 def prepare_multilingual_question(message, language):
     text = normalize_language_command(message)
@@ -728,6 +1035,103 @@ def render_product_match_reason(
     sections.append(phrases["warning"][index])
     return " ".join(sections)
 
+def translate_product_explanation(explanation, language):
+    if not explanation or language not in {"ms", "zh"}:
+        return explanation
+
+    translations = {
+        (
+            "Matched to your requested care purpose, "
+            "not a confirmed diagnosis."
+        ): (
+            "Dipadankan dengan tujuan penjagaan yang anda minta, "
+            "bukan diagnosis yang disahkan.",
+            "根据您请求的护理用途匹配，并非依据确诊结果。",
+        ),
+        (
+            "The consultation records plaque. Matching products "
+            "are labelled for plaque control."
+        ): (
+            "Konsultasi merekodkan plak. Produk yang sepadan "
+            "dilabelkan untuk kawalan plak.",
+            "问诊记录中记有牙菌斑。匹配产品的标签用途为牙菌斑控制。",
+        ),
+        (
+            "The consultation records gingivitis. Plaque-control "
+            "products are shown as supportive home-care options, "
+            "not as treatment for gum inflammation."
+        ): (
+            "Konsultasi merekodkan gingivitis. Produk kawalan plak "
+            "dipaparkan sebagai sokongan penjagaan di rumah, "
+            "bukan rawatan untuk keradangan gusi.",
+            "问诊记录中记有牙龈炎。牙菌斑控制产品仅作为辅助居家护理选项，"
+            "并非治疗牙龈炎症的产品。",
+        ),
+        (
+            "The consultation records calculus or tartar. "
+            "Plaque-control products are preventive care options; "
+            "they are not presented as removing existing calculus."
+        ): (
+            "Konsultasi merekodkan karang gigi. Produk kawalan plak "
+            "ialah pilihan penjagaan pencegahan dan tidak ditawarkan "
+            "sebagai cara membuang karang gigi yang sedia ada.",
+            "问诊记录中记有牙结石。牙菌斑控制产品用于预防性护理，"
+            "不表示能够去除已有牙结石。",
+        ),
+        (
+            "The consultation records a healthy or normal finding. "
+            "Matching products support routine oral hygiene."
+        ): (
+            "Konsultasi merekodkan dapatan sihat atau normal. "
+            "Produk yang sepadan menyokong kebersihan mulut rutin.",
+            "问诊记录中记有健康或正常的检查发现。"
+            "匹配产品用于支持日常口腔卫生。",
+        ),
+        (
+            "The consultation records a routine dental-care visit. "
+            "Matching products support routine oral hygiene; "
+            "this does not establish healthy dentition or a vet's "
+            "endorsement of a particular product."
+        ): (
+            "Konsultasi merekodkan lawatan penjagaan pergigian rutin. "
+            "Produk yang sepadan menyokong kebersihan mulut rutin. "
+            "Ini tidak mengesahkan gigi sihat atau bahawa veterinar "
+            "menyokong produk tertentu.",
+            "问诊记录中记有常规牙齿护理就诊。匹配产品用于日常口腔卫生，"
+            "这不能证明牙齿健康，也不代表兽医认可某个具体产品。",
+        ),
+        (
+            "The recorded home-care instructions were used "
+            "to select the care purpose."
+        ): (
+            "Arahan penjagaan di rumah yang direkodkan digunakan "
+            "untuk menentukan tujuan penjagaan.",
+            "护理用途依据已记录的居家护理指示确定。",
+        ),
+    }
+
+    # Translate only complete, recognized system messages.
+    # Preserve the entire original explanation if anything is unknown.
+    remaining = explanation.strip()
+    translated = []
+    index = 0 if language == "ms" else 1
+
+    while remaining:
+        for original, alternatives in translations.items():
+            if remaining == original:
+                translated.append(alternatives[index])
+                remaining = ""
+                break
+
+            if remaining.startswith(original + " "):
+                translated.append(alternatives[index])
+                remaining = remaining[len(original):].strip()
+                break
+        else:
+            return explanation
+
+    return " ".join(translated)
+
 def render_product_search_reply(
     *,
     language="en",
@@ -804,8 +1208,21 @@ def render_product_search_reply(
     )
 
     if explanation:
+        translated_explanation = translate_product_explanation(
+            explanation, language
+        )
+
+        heading = (
+            "Penjelasan padanan:"
+            if language == "ms"
+            else "匹配说明："
+        )
+
+        if translated_explanation == explanation:
+            heading = text["explanation"][index]
+
         sections.append(
-            text["explanation"][index] + "\n" + explanation
+            heading + "\n" + translated_explanation
         )
 
     if categories:

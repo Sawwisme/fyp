@@ -110,12 +110,12 @@ void main() {
 
   testWidgets('memory reset requires confirmation and retains history', (tester) async {
     final service = await openChat(tester);
-    await tester.tap(find.text('Memory'));
+    await tester.tap(find.text('Reset chat topic'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Close'));
     await tester.pumpAndSettle();
     expect(service.requests, isEmpty);
-    await tester.tap(find.text('Memory'));
+    await tester.tap(find.text('Reset chat topic'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Reset topic memory'));
     await tester.pumpAndSettle();
@@ -145,7 +145,7 @@ void main() {
     await tester.tap(find.byTooltip('Chat history'));
     await tester.pumpAndSettle();
     expect(find.text('Language'), findsOneWidget);
-    expect(find.text('Memory'), findsOneWidget);
+    expect(find.text('Reset chat topic'), findsOneWidget);
     await tester.tap(find.text('Language'));
     await tester.pumpAndSettle();
     expect(find.text('Reply language'), findsOneWidget);

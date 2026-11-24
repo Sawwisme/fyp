@@ -140,6 +140,9 @@ def product_reply(
     request_text="",
     language="en",
 ):
+    def text(en, ms, zh):
+        return {"en": en, "ms": ms, "zh": zh}.get(language, en)
+
     # Checks owner access and selected-pet ownership.
     context = build_chat_context(db, current_user, pet_id)
 
@@ -147,9 +150,16 @@ def product_reply(
 
     if pet is None:
         return (
-            "Start a pet-linked chat to filter products by "
-            "recorded species and age. You can still browse "
-            "clinic catalogues in Shop.",
+            text(
+                "Start a pet-linked chat to filter products by recorded "
+                "species and age. You can still browse clinic catalogues "
+                "in Shop.",
+                "Pilih haiwan peliharaan untuk menapis produk mengikut "
+                "spesies dan umur yang direkodkan. Anda masih boleh "
+                "melayari katalog klinik di Kedai.",
+                "请选择聊天关联的宠物，以便根据已记录的物种和年龄筛选产品。"
+                "您仍可在商城浏览诊所的产品目录。",
+            ),
             "OPEN_SHOP",
         )
 
@@ -162,9 +172,16 @@ def product_reply(
 
     if species not in {"cat", "dog"}:
         return (
-            "Product matching currently supports cats and dogs. "
-            "Check your pet profile or ask your clinic "
-            "about suitable products.",
+            text(
+                "Product matching currently supports cats and dogs. "
+                "Check your pet profile or ask your clinic about "
+                "suitable products.",
+                "Padanan produk kini menyokong kucing dan anjing. "
+                "Semak profil haiwan anda atau hubungi klinik untuk "
+                "bertanya tentang produk yang sesuai.",
+                "产品匹配目前支持猫和狗。请检查宠物资料，"
+                "或向诊所咨询适合的产品。",
+            ),
             "OPEN_SHOP",
         )
 
@@ -211,20 +228,36 @@ def product_reply(
 
         reviews = remaining_reviews
 
-        review_note = (
-            f"Using consultation "
-            f"#{consultation['consultation_id']}, "
+        consultation_id = consultation["consultation_id"]
+
+        review_note = text(
+            f"Using consultation #{consultation_id}, "
             "which is linked to this assessment. "
             "Product suggestions follow its recorded "
-            "diagnosis and care instructions."
+            "diagnosis and care instructions.",
+            f"Menggunakan konsultasi #{consultation_id} "
+            "yang dipautkan kepada penilaian ini. "
+            "Cadangan produk berdasarkan diagnosis dan "
+            "arahan penjagaan yang direkodkan.",
+            f"正在使用与本次评估关联的问诊记录 #{consultation_id}。"
+            "产品建议依据该记录中的诊断和护理指示。",
         )
 
     if len(reviews) > 1:
         return (
-            "There are multiple clinic reviews for this assessment. "
-            "Read their recorded recommendations before choosing "
-            "products. Contact the reviewing clinics if their "
-            "instructions differ.",
+            text(
+                "There are multiple clinic reviews for this assessment. "
+                "Read their recorded recommendations before choosing "
+                "products. Contact the reviewing clinics if their "
+                "instructions differ.",
+                "Penilaian ini mempunyai beberapa ulasan klinik. "
+                "Baca cadangan yang direkodkan sebelum memilih produk. "
+                "Jika arahannya berbeza, hubungi klinik yang memberikan "
+                "ulasan untuk mendapatkan penjelasan.",
+                "这项评估有多份诊所审核记录。选择产品前，"
+                "请先阅读已记录的建议。如果指示不同，"
+                "请联系审核诊所确认。",
+            ),
             "OPEN_AI_ANALYSIS",
         )
 
@@ -232,30 +265,65 @@ def product_reply(
         review = reviews[0]
         action = review.get("recommended_action")
 
-        feedback = (
+        heading = text(
             f"Recorded vet review #{review['review_id']} "
-            f"(clinic #{review['clinic_id']}): "
-            f"{review.get('feedback') or 'No feedback recorded.'}"
+            f"(clinic #{review['clinic_id']}): ",
+            f"Ulasan veterinar direkodkan #{review['review_id']} "
+            f"(klinik #{review['clinic_id']}): ",
+            f"已记录的兽医审核 #{review['review_id']} "
+            f"（诊所 #{review['clinic_id']}）：",
+        )
+
+        # Preserve the actual veterinary feedback.
+        recorded_feedback = review.get("feedback")
+        feedback = heading + (
+            recorded_feedback
+            if recorded_feedback
+            else text(
+                "No feedback recorded.",
+                "Tiada maklum balas direkodkan.",
+                "未记录审核意见。",
+            )
         )
 
         if action == "home_care":
-            review_note = (
-                feedback
-                + "\nThe catalogue below does not establish that "
-                "a particular product was endorsed by this vet."
+            review_note = feedback + "\n" + text(
+                "The catalogue below does not establish that "
+                "a particular product was endorsed by this vet.",
+                "Katalog di bawah tidak bermaksud bahawa produk "
+                "tertentu telah disyorkan oleh veterinar ini.",
+                "下方产品目录并不代表这位兽医认可或推荐了某个具体产品。",
             )
         else:
+            # Keep the recorded action value unchanged.
+            recorded_action = (
+                str(action)
+                if action
+                else text(
+                    "Not recorded",
+                    "Tidak direkodkan",
+                    "未记录",
+                )
+            )
+
             return (
                 feedback
-                + "\nThe recorded recommendation is: "
-                + (
-                    action.replace("_", " ")
-                    if action
-                    else "contact the reviewing clinic"
+                + "\n"
+                + text(
+                    f"Recorded recommendation: {recorded_action}. ",
+                    f"Cadangan direkodkan: {recorded_action}. ",
+                    f"已记录的建议：{recorded_action}。",
                 )
-                + ". Check your existing appointments and contact "
-                "the clinic about the next step. Products should "
-                "not replace the recommended assessment.",
+                + text(
+                    "Check your existing appointments and contact "
+                    "the clinic about the next step. Products should "
+                    "not replace the recommended assessment.",
+                    "Semak janji temu sedia ada dan hubungi klinik "
+                    "tentang langkah seterusnya. Produk tidak boleh "
+                    "menggantikan pemeriksaan yang disyorkan.",
+                    "请查看已有预约，并联系诊所确认下一步。"
+                    "产品不能代替建议进行的检查。",
+                ),
                 "OPEN_APPOINTMENTS",
             )
 
@@ -265,12 +333,26 @@ def product_reply(
         and not covered_by_consultation
     ):
         return (
-            "The latest AI assessment has Estimated Severity: "
-            "Severe, with no completed vet review recorded for "
-            "this assessment. Prioritize veterinary assessment "
-            "rather than choosing products as treatment. "
-            "Check existing appointments before booking another. "
-            "The AI estimate is not a confirmed diagnosis.",
+            text(
+                "The latest AI assessment has Estimated Severity: "
+                "Severe, with no completed vet review recorded for "
+                "this assessment. Prioritize veterinary assessment "
+                "rather than choosing products as treatment. "
+                "Check existing appointments before booking another. "
+                "The AI estimate is not a confirmed diagnosis.",
+                "Penilaian AI terkini mempunyai anggaran tahap "
+                "keterukan: Teruk. Tiada ulasan veterinar yang telah "
+                "selesai direkodkan untuk penilaian ini. Utamakan "
+                "pemeriksaan veterinar dan jangan gunakan produk "
+                "sebagai pengganti pemeriksaan tersebut. Semak "
+                "janji temu sedia ada sebelum membuat tempahan lain. "
+                "Anggaran AI ini bukan diagnosis yang disahkan.",
+                "最近的 AI 评估显示估计严重程度为“严重”，"
+                "但尚无针对这项评估的已完成兽医审核记录。"
+                "请优先安排兽医检查，不要用购买产品代替检查。"
+                "再次预约前，请先查看已有预约。"
+                "AI 的估计并非确诊结果。",
+            ),
             "OPEN_APPOINTMENTS",
         )
 
@@ -282,10 +364,35 @@ def product_reply(
     care_tags = care_context["tags"]
 
     if care_context["blocked_reason"]:
-        return (
-            care_context["blocked_reason"],
-            "OPEN_MEDICAL_HISTORY",
+        original_reason = care_context["blocked_reason"]
+
+        restriction_message = (
+            "Your consultation contains a restriction, "
+            "uncertainty, or a condition requiring more "
+            "individual guidance. I have not automatically "
+            "selected care products. Follow the recorded "
+            "instructions and contact your clinic if needed."
         )
+
+        # Translate only this known message.
+        # Preserve any other safety explanation unchanged.
+        if original_reason == restriction_message:
+            reply = text(
+                original_reason,
+                "Rekod konsultasi anda mengandungi sekatan, "
+                "ketidakpastian atau keadaan yang memerlukan "
+                "panduan khusus. Saya tidak memilih produk "
+                "penjagaan secara automatik. Ikuti arahan "
+                "yang direkodkan dan hubungi klinik anda "
+                "jika memerlukan penjelasan.",
+                "您的问诊记录包含使用限制、不确定情况，"
+                "或需要个别指导的状况。因此没有自动选择护理产品。"
+                "请遵循已记录的指示，如有需要，请联系诊所确认。",
+            )
+        else:
+            reply = original_reason
+
+        return reply, "OPEN_MEDICAL_HISTORY"
 
     request_filters.append(
         Product.recommendation_enabled == 1
@@ -294,17 +401,32 @@ def product_reply(
     if not care_tags:
         if context.get("latest_consultation"):
             return (
-                "I could not match the latest consultation "
-                "to a supported product-care purpose. "
-                "I have not selected unrelated products. "
-                "You can still browse the clinic shop.",
+                text(
+                    "I could not match the latest consultation "
+                    "to a supported product-care purpose. "
+                    "I have not selected unrelated products. "
+                    "You can still browse the clinic shop.",
+                    "Saya tidak dapat memadankan konsultasi terkini "
+                    "dengan tujuan penjagaan produk yang disokong. "
+                    "Saya tidak memilih produk yang tidak berkaitan. "
+                    "Anda masih boleh melayari kedai klinik.",
+                    "我无法将最近的问诊记录匹配到系统支持的产品护理用途。"
+                    "因此没有选择不相关的产品。您仍可浏览诊所商城。",
+                ),
                 "OPEN_SHOP",
             )
 
         return (
-            "What would you like help with: routine brushing, "
-            "plaque control, or breath care? "
-            "You can include a product type and budget.",
+            text(
+                "What would you like help with: routine brushing, "
+                "plaque control, or breath care? "
+                "You can include a product type and budget.",
+                "Apakah tujuan penjagaan anda: memberus gigi secara "
+                "rutin, kawalan plak atau penjagaan nafas? "
+                "Anda boleh nyatakan jenis produk dan bajet.",
+                "您需要哪方面的护理产品：日常刷牙、牙菌斑控制，"
+                "还是口气护理？您也可以说明产品类型和预算。",
+            ),
             None,
         )
 

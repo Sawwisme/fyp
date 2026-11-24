@@ -1063,6 +1063,191 @@ class _AiScanPageState extends State<AiScanPage>
     return const SizedBox.shrink();
   }
 
+  Widget _processingView() {
+    final queued = _job?['status'] == 'queued';
+    final reconnecting = _progressNote != null;
+
+    final title = _busy
+        ? 'Preparing your assessment'
+        : reconnecting
+        ? 'Reconnecting to your assessment'
+        : queued
+        ? 'Your assessment is queued'
+        : 'Analysing your pet’s photo';
+
+    final description = _busy
+        ? 'Uploading your photo and submitting the request.'
+        : queued
+        ? 'Waiting for the assessment worker to start.'
+        : 'The AI is processing the photo. Your result will '
+        'open automatically when it is ready.';
+
+    return ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFF17368F),
+                Color(0xFF4269E8),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(28),
+          ),
+          child: Column(
+            children: [
+              const Text(
+                'AI DENTAL ASSESSMENT',
+                style: TextStyle(
+                  color: Color(0xFFDCE5FF),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.5,
+                ),
+              ),
+              const SizedBox(height: 28),
+              SizedBox(
+                width: 170,
+                height: 170,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    const SizedBox.expand(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                        color: Color(0xFFB7D8FF),
+                        backgroundColor: Color(0xFF5878D2),
+                      ),
+                    ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(65),
+                      child: _photo != null
+                          ? Image.memory(
+                        _photo!,
+                        width: 130,
+                        height: 130,
+                        fit: BoxFit.cover,
+                      )
+                          : Container(
+                        width: 130,
+                        height: 130,
+                        color: const Color(0xFF3559BD),
+                        child: const Icon(
+                          Icons.image_search_rounded,
+                          color: Colors.white,
+                          size: 48,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 28),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 23,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                description,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFFE0E8FF),
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 9,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF294BAA),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  _busy
+                      ? 'SUBMITTING'
+                      : queued
+                      ? 'QUEUED'
+                      : 'PROCESSING',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        const Card(
+          child: Padding(
+            padding: EdgeInsets.all(18),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.info_outline_rounded,
+                  color: Color(0xFF2549C7),
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Processing time varies. AI results are screening '
+                        'references and do not replace a veterinary examination.',
+                    style: TextStyle(height: 1.5),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (_progressNote != null) ...[
+          const SizedBox(height: 12),
+          Text(
+            _progressNote!,
+            textAlign: TextAlign.center,
+          ),
+        ],
+        if (_error != null) ...[
+          const SizedBox(height: 12),
+          Text(
+            _error!,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.error,
+            ),
+          ),
+        ],
+        if (_processing) ...[
+          const SizedBox(height: 16),
+          OutlinedButton.icon(
+            onPressed: _checking || _accessDenied
+                ? null
+                : _checkStatus,
+            icon: const Icon(Icons.refresh_rounded),
+            label: Text(
+              _checking ? 'Checking status…' : 'Check progress',
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget._completedJob != null) {
@@ -1076,6 +1261,10 @@ class _AiScanPageState extends State<AiScanPage>
     }
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_processing || (_busy && _photo != null)) {
+      return _processingView();
     }
 
     if (_pets.isEmpty) {
