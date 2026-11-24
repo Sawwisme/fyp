@@ -32,12 +32,19 @@ TOPIC_QUESTIONS = {
     "pet_prediction_scores": "show my pet classification scores",
 }
 
+TOPIC_QUESTIONS.update({
+    "pet_next_steps":
+        "what should i do about my pet assessment",
+})
 
 ANALYSIS_TOPICS = {
     "explain_latest_analysis",
     "explain_pet_severity",
     "dental_analysis_history",
     "compare_analysis_progress",
+    "pet_prediction_scores",
+    "pet_segmentation_values",
+    "pet_next_steps",
 }
 
 
@@ -56,11 +63,24 @@ PREVIOUS_PHRASES = {
     "and the previous result",
 }
 
-
 SEVERITY_PHRASES = {
     "how severe is it",
     "and the severity",
     "what about its severity",
+}
+
+
+NEXT_STEP_PHRASES = {
+    "what should i do",
+    "what should i do now",
+    "what should i do next",
+    "what can i do",
+    "what can i do next",
+    "what is the next step",
+    "what now",
+    "any advice",
+    "any recommendations",
+    "then what",
 }
 
 
@@ -147,8 +167,20 @@ def remembered_topic(db, conversation):
         if intent == "language_preference":
             continue
 
-        # Do not revive an earlier topic after a safety/rule reply.
-        if metadata.get("mode") == "rule":
+               # Safety responses must end the previous topic.
+        if intent in {
+            "urgent_vet_contact",
+            "medication_referral",
+            "human_toothpaste_warning",
+        } or metadata.get("urgency_level"):
+            return None
+
+        # Allow recognised rule-based topics to be remembered.
+        # Unknown rule responses remain topic boundaries.
+        if (
+            metadata.get("mode") == "rule"
+            and intent not in TOPIC_QUESTIONS
+        ):
             return None
 
         # Reject references explicitly linked to another pet.
@@ -236,6 +268,7 @@ def resolve_followup(db, conversation, message, answer):
         | PREVIOUS_PHRASES
         | SEVERITY_PHRASES
         | TIME_PHRASES
+        | NEXT_STEP_PHRASES
     )
 
     is_choice = text in CHOICE_REPLIES
@@ -311,6 +344,12 @@ def resolve_followup(db, conversation, message, answer):
     elif text in SEVERITY_PHRASES:
         if previous_intent in ANALYSIS_TOPICS:
             canonical_question = "how severe is my pet condition"
+
+    elif text in NEXT_STEP_PHRASES:
+        if previous_intent in ANALYSIS_TOPICS:
+            canonical_question = (
+                "what should i do about my pet assessment"
+            )
 
     elif text in TIME_PHRASES:
         if previous_intent == "upcoming_appointment":

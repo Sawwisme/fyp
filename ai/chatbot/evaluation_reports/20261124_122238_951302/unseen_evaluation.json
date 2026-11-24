@@ -1,0 +1,294 @@
+{
+    "evaluation_type": "unseen_question_evaluation",
+    "total_questions": 25,
+    "correct": 25,
+    "incorrect": 0,
+    "intent_accuracy": 100.0,
+    "results": [
+        {
+            "question": "Could you explain what gingivitis actually is?",
+            "expected_intent": "gingivitis_information",
+            "actual_intent": "gingivitis_information",
+            "passed": true,
+            "mode": "nlp",
+            "similarity": 0.7356,
+            "nlp_metrics": {
+                "coverage": 0.6667,
+                "similarity": 0.7356,
+                "margin": 0.4156
+            }
+        },
+        {
+            "question": "What exactly is hardened dental tartar?",
+            "expected_intent": "calculus_information",
+            "actual_intent": "calculus_information",
+            "passed": true,
+            "mode": "nlp",
+            "similarity": 0.8195,
+            "nlp_metrics": {
+                "coverage": 0.5,
+                "similarity": 0.8195,
+                "margin": 0.5466
+            }
+        },
+        {
+            "question": "What is the sticky plaque on teeth?",
+            "expected_intent": "plaque_information",
+            "actual_intent": "plaque_information",
+            "passed": true,
+            "mode": "nlp",
+            "similarity": 0.7634,
+            "nlp_metrics": {
+                "coverage": 0.6667,
+                "similarity": 0.7634,
+                "margin": 0.5387
+            }
+        },
+        {
+            "question": "Why does my puppy have stinky breath?",
+            "expected_intent": "bad_breath",
+            "actual_intent": "bad_breath",
+            "passed": true,
+            "mode": "nlp",
+            "similarity": 1.0,
+            "nlp_metrics": {
+                "coverage": 1.0,
+                "similarity": 1.0,
+                "margin": 0.8239
+            }
+        },
+        {
+            "question": "Can I see the outcome of my latest scan?",
+            "expected_intent": "explain_latest_analysis",
+            "actual_intent": "explain_latest_analysis",
+            "passed": true,
+            "mode": "rule",
+            "similarity": null,
+            "nlp_metrics": null
+        },
+        {
+            "question": "Please display my previous dental assessments",
+            "expected_intent": "dental_analysis_history",
+            "actual_intent": "dental_analysis_history",
+            "passed": true,
+            "mode": "nlp",
+            "similarity": 0.7537,
+            "nlp_metrics": {
+                "coverage": 0.6667,
+                "similarity": 0.7537,
+                "margin": 0.5102
+            }
+        },
+        {
+            "question": "Is my pet's estimated condition mild or severe?",
+            "expected_intent": "explain_pet_severity",
+            "actual_intent": "explain_pet_severity",
+            "passed": true,
+            "mode": "nlp",
+            "similarity": 0.5227,
+            "nlp_metrics": {
+                "coverage": 0.8,
+                "similarity": 0.5227,
+                "margin": 0.2096
+            }
+        },
+        {
+            "question": "Compare my latest assessment with the previous result",
+            "expected_intent": "compare_analysis_progress",
+            "actual_intent": "compare_analysis_progress",
+            "passed": true,
+            "mode": "rule",
+            "similarity": null,
+            "nlp_metrics": null
+        },
+        {
+            "question": "Can I see the confidence scores from my scan?",
+            "expected_intent": "pet_prediction_scores",
+            "actual_intent": "pet_prediction_scores",
+            "passed": true,
+            "mode": "nlp",
+            "similarity": 0.4709,
+            "nlp_metrics": {
+                "coverage": 1.0,
+                "similarity": 0.4709,
+                "margin": 0.2017
+            }
+        },
+        {
+            "question": "What should I do about my latest assessment?",
+            "expected_intent": "pet_next_steps",
+            "actual_intent": "pet_next_steps",
+            "passed": true,
+            "mode": "rule",
+            "similarity": null,
+            "nlp_metrics": null
+        },
+        {
+            "question": "I wanna book an apointment",
+            "expected_intent": "book_appointment",
+            "actual_intent": "book_appointment",
+            "passed": true,
+            "mode": "nlp",
+            "similarity": 1.0,
+            "nlp_metrics": {
+                "coverage": 0.6667,
+                "similarity": 1.0,
+                "margin": 0.5804
+            }
+        },
+        {
+            "question": "Can u show my prescripton?",
+            "expected_intent": "recorded_prescriptions",
+            "actual_intent": "recorded_prescriptions",
+            "passed": true,
+            "mode": "rule",
+            "similarity": null,
+            "nlp_metrics": null
+        },
+        {
+            "question": "Pls explain gingivtis",
+            "expected_intent": "gingivitis_information",
+            "actual_intent": "gingivitis_information",
+            "passed": true,
+            "mode": "nlp",
+            "similarity": 0.7356,
+            "nlp_metrics": {
+                "coverage": 1.0,
+                "similarity": 0.7356,
+                "margin": 0.4156
+            }
+        },
+        {
+            "question": "How often should I brush my puppy's teeth?",
+            "expected_intent": "daily_dental_care",
+            "actual_intent": "daily_dental_care",
+            "passed": true,
+            "mode": "rule",
+            "similarity": null,
+            "nlp_metrics": null
+        },
+        {
+            "question": "My puppy is struggling to breathe",
+            "expected_intent": "urgent_vet_contact",
+            "actual_intent": "urgent_vet_contact",
+            "passed": true,
+            "mode": "rule",
+            "similarity": null,
+            "nlp_metrics": null
+        },
+        {
+            "question": "My cat has no facial swelling but has severe pain",
+            "expected_intent": "urgent_vet_contact",
+            "actual_intent": "urgent_vet_contact",
+            "passed": true,
+            "mode": "rule",
+            "similarity": null,
+            "nlp_metrics": null
+        },
+        {
+            "question": "My kitten has stopped drinking",
+            "expected_intent": "urgent_vet_contact",
+            "actual_intent": "urgent_vet_contact",
+            "passed": true,
+            "mode": "rule",
+            "similarity": null,
+            "nlp_metrics": null
+        },
+        {
+            "question": "Is ibuprofen suitable for my dog?",
+            "expected_intent": "medication_referral",
+            "actual_intent": "medication_referral",
+            "passed": true,
+            "mode": "rule",
+            "similarity": null,
+            "nlp_metrics": null
+        },
+        {
+            "question": "Is adult toothpaste suitable for my cat?",
+            "expected_intent": "human_toothpaste_warning",
+            "actual_intent": "human_toothpaste_warning",
+            "passed": true,
+            "mode": "rule",
+            "similarity": null,
+            "nlp_metrics": null
+        },
+        {
+            "question": "Can you help me repair my computer?",
+            "expected_intent": "clarify",
+            "actual_intent": "clarify",
+            "passed": true,
+            "mode": "fallback",
+            "similarity": null,
+            "nlp_metrics": {
+                "coverage": 0.0,
+                "similarity": 0.0,
+                "margin": 0.0
+            }
+        },
+        {
+            "question": "What is the capital of Japan?",
+            "expected_intent": "clarify",
+            "actual_intent": "clarify",
+            "passed": true,
+            "mode": "fallback",
+            "similarity": null,
+            "nlp_metrics": {
+                "coverage": 0.0,
+                "similarity": 0.0,
+                "margin": 0.0
+            }
+        },
+        {
+            "question": "Recommend a gaming laptop",
+            "expected_intent": "clarify",
+            "actual_intent": "clarify",
+            "passed": true,
+            "mode": "fallback",
+            "similarity": null,
+            "nlp_metrics": {
+                "coverage": 0.3333,
+                "similarity": 0.4167,
+                "margin": 0.4167
+            }
+        },
+        {
+            "question": "Can you predict tomorrow's stock market?",
+            "expected_intent": "clarify",
+            "actual_intent": "clarify",
+            "passed": true,
+            "mode": "fallback",
+            "similarity": null,
+            "nlp_metrics": {
+                "coverage": 0.0,
+                "similarity": 0.0,
+                "margin": 0.0
+            }
+        },
+        {
+            "question": "Tell me something",
+            "expected_intent": "clarify",
+            "actual_intent": "clarify",
+            "passed": true,
+            "mode": "fallback",
+            "similarity": null,
+            "nlp_metrics": {
+                "coverage": 0.0,
+                "similarity": 0.0,
+                "margin": 0.0
+            }
+        },
+        {
+            "question": "Can you help?",
+            "expected_intent": "clarify",
+            "actual_intent": "clarify",
+            "passed": true,
+            "mode": "fallback",
+            "similarity": null,
+            "nlp_metrics": {
+                "coverage": 0.0,
+                "similarity": 0.0,
+                "margin": 0.0
+            }
+        }
+    ]
+}

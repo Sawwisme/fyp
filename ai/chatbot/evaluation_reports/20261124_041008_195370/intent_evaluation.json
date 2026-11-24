@@ -1,0 +1,1779 @@
+{
+  "created_at": "2026-11-24T04:10:08.137503+00:00",
+  "scope": "Intent routing only. Does not evaluate medical correctness, database access or mobile navigation.",
+  "knowledge_example_regression": {
+    "total": 129,
+    "correct": 129,
+    "match_rate_percent": 100.0,
+    "per_intent": {
+      "ai_interpretation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 5
+      },
+      "bad_breath": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 5
+      },
+      "book_appointment": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 4
+      },
+      "brushing_technique": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 5
+      },
+      "calculus_information": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 4
+      },
+      "cancel_appointment": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 3
+      },
+      "compare_analysis_progress": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 5
+      },
+      "daily_dental_care": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 5
+      },
+      "dental_analysis_history": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 4
+      },
+      "dental_warning_signs": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 5
+      },
+      "explain_confidence": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 5
+      },
+      "explain_gradcam": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 6
+      },
+      "explain_latest_analysis": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 5
+      },
+      "explain_pet_severity": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 4
+      },
+      "explain_segmentation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 6
+      },
+      "followup_update": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 4
+      },
+      "gingivitis_information": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 4
+      },
+      "my_followup_care": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 7
+      },
+      "pet_medical_history": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 5
+      },
+      "pet_next_steps": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 5
+      },
+      "pet_prediction_scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 5
+      },
+      "pet_segmentation_values": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 4
+      },
+      "plaque_information": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 3
+      },
+      "product_recommendation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 5
+      },
+      "recorded_prescriptions": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 5
+      },
+      "request_review": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 4
+      },
+      "upcoming_appointment": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 7
+      }
+    },
+    "failures": [],
+    "results": [
+      {
+        "question": "what is dental plaque",
+        "expected_intent": "plaque_information",
+        "actual_intent": "plaque_information",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "explain plaque on pet teeth",
+        "expected_intent": "plaque_information",
+        "actual_intent": "plaque_information",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what is the soft film on teeth",
+        "expected_intent": "plaque_information",
+        "actual_intent": "plaque_information",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what is calculus",
+        "expected_intent": "calculus_information",
+        "actual_intent": "calculus_information",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what is tartar on teeth",
+        "expected_intent": "calculus_information",
+        "actual_intent": "calculus_information",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "explain hard dental deposits",
+        "expected_intent": "calculus_information",
+        "actual_intent": "calculus_information",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "difference between plaque and tartar",
+        "expected_intent": "calculus_information",
+        "actual_intent": "calculus_information",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what is gingivitis",
+        "expected_intent": "gingivitis_information",
+        "actual_intent": "gingivitis_information",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "explain inflamed gums",
+        "expected_intent": "gingivitis_information",
+        "actual_intent": "gingivitis_information",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what does gum inflammation mean",
+        "expected_intent": "gingivitis_information",
+        "actual_intent": "gingivitis_information",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "why are gums red",
+        "expected_intent": "gingivitis_information",
+        "actual_intent": "gingivitis_information",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "is the ai scan a diagnosis",
+        "expected_intent": "ai_interpretation",
+        "actual_intent": "ai_interpretation",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "can i trust the ai result",
+        "expected_intent": "ai_interpretation",
+        "actual_intent": "ai_interpretation",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what does severe ai mean",
+        "expected_intent": "ai_interpretation",
+        "actual_intent": "ai_interpretation",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what does the scan score mean",
+        "expected_intent": "ai_interpretation",
+        "actual_intent": "ai_interpretation",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "does high confidence mean severe disease",
+        "expected_intent": "ai_interpretation",
+        "actual_intent": "ai_interpretation",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "how do i request a vet review",
+        "expected_intent": "request_review",
+        "actual_intent": "request_review",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "send my scan to a veterinarian",
+        "expected_intent": "request_review",
+        "actual_intent": "request_review",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "share my assessment with a clinic",
+        "expected_intent": "request_review",
+        "actual_intent": "request_review",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "where can i read vet feedback",
+        "expected_intent": "request_review",
+        "actual_intent": "request_review",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "how do i book an appointment",
+        "expected_intent": "book_appointment",
+        "actual_intent": "book_appointment",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "make a dental appointment",
+        "expected_intent": "book_appointment",
+        "actual_intent": "book_appointment",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "choose a vet and appointment time",
+        "expected_intent": "book_appointment",
+        "actual_intent": "book_appointment",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "schedule a clinic visit",
+        "expected_intent": "book_appointment",
+        "actual_intent": "book_appointment",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "how do i cancel an appointment",
+        "expected_intent": "cancel_appointment",
+        "actual_intent": "cancel_appointment",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "cancel my booking",
+        "expected_intent": "cancel_appointment",
+        "actual_intent": "cancel_appointment",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "remove a booked appointment",
+        "expected_intent": "cancel_appointment",
+        "actual_intent": "cancel_appointment",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "how do i send follow up photos",
+        "expected_intent": "followup_update",
+        "actual_intent": "followup_update",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "upload a recovery picture",
+        "expected_intent": "followup_update",
+        "actual_intent": "followup_update",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "where is follow up care",
+        "expected_intent": "followup_update",
+        "actual_intent": "followup_update",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "send progress update to vet",
+        "expected_intent": "followup_update",
+        "actual_intent": "followup_update",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "explain my latest result",
+        "expected_intent": "explain_latest_analysis",
+        "actual_intent": "explain_latest_analysis",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "what does my pet result mean",
+        "expected_intent": "explain_latest_analysis",
+        "actual_intent": "explain_latest_analysis",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "show my latest dental analysis",
+        "expected_intent": "explain_latest_analysis",
+        "actual_intent": "explain_latest_analysis",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "how is my pet dental condition",
+        "expected_intent": "explain_latest_analysis",
+        "actual_intent": "explain_latest_analysis",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what conditions were detected in my scan",
+        "expected_intent": "explain_latest_analysis",
+        "actual_intent": "explain_latest_analysis",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "how severe is my pet condition",
+        "expected_intent": "explain_pet_severity",
+        "actual_intent": "explain_pet_severity",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what is my pet estimated severity",
+        "expected_intent": "explain_pet_severity",
+        "actual_intent": "explain_pet_severity",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what severity did my latest analysis show",
+        "expected_intent": "explain_pet_severity",
+        "actual_intent": "explain_pet_severity",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "is my pet result mild moderate or severe",
+        "expected_intent": "explain_pet_severity",
+        "actual_intent": "explain_pet_severity",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "show my pet previous results",
+        "expected_intent": "dental_analysis_history",
+        "actual_intent": "dental_analysis_history",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "what was the previous dental analysis",
+        "expected_intent": "dental_analysis_history",
+        "actual_intent": "dental_analysis_history",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "when was my pet last analysis",
+        "expected_intent": "dental_analysis_history",
+        "actual_intent": "dental_analysis_history",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "show my dental scan history",
+        "expected_intent": "dental_analysis_history",
+        "actual_intent": "dental_analysis_history",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "has my pet improved",
+        "expected_intent": "compare_analysis_progress",
+        "actual_intent": "compare_analysis_progress",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "compare with the previous result",
+        "expected_intent": "compare_analysis_progress",
+        "actual_intent": "compare_analysis_progress",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "is my pet severity getting worse",
+        "expected_intent": "compare_analysis_progress",
+        "actual_intent": "compare_analysis_progress",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "has the estimated severity changed",
+        "expected_intent": "compare_analysis_progress",
+        "actual_intent": "compare_analysis_progress",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "compare my last two scans",
+        "expected_intent": "compare_analysis_progress",
+        "actual_intent": "compare_analysis_progress",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "what does the heatmap mean",
+        "expected_intent": "explain_gradcam",
+        "actual_intent": "explain_gradcam",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "explain gradcam",
+        "expected_intent": "explain_gradcam",
+        "actual_intent": "explain_gradcam",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what do the red areas on the heatmap show",
+        "expected_intent": "explain_gradcam",
+        "actual_intent": "explain_gradcam",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "why is the heatmap red",
+        "expected_intent": "explain_gradcam",
+        "actual_intent": "explain_gradcam",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what do the disease boxes mean",
+        "expected_intent": "explain_gradcam",
+        "actual_intent": "explain_gradcam",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "does the heatmap show the exact disease area",
+        "expected_intent": "explain_gradcam",
+        "actual_intent": "explain_gradcam",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what does segmentation mean",
+        "expected_intent": "explain_segmentation",
+        "actual_intent": "explain_segmentation",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "explain the segmentation result",
+        "expected_intent": "explain_segmentation",
+        "actual_intent": "explain_segmentation",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what are the coloured masks",
+        "expected_intent": "explain_segmentation",
+        "actual_intent": "explain_segmentation",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what does the affected area percentage mean",
+        "expected_intent": "explain_segmentation",
+        "actual_intent": "explain_segmentation",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "does segmentation measure the whole mouth",
+        "expected_intent": "explain_segmentation",
+        "actual_intent": "explain_segmentation",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "difference between segmentation and heatmap",
+        "expected_intent": "explain_segmentation",
+        "actual_intent": "explain_segmentation",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what is classification confidence",
+        "expected_intent": "explain_confidence",
+        "actual_intent": "explain_confidence",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what does the confidence percentage mean",
+        "expected_intent": "explain_confidence",
+        "actual_intent": "explain_confidence",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "is confidence the same as severity",
+        "expected_intent": "explain_confidence",
+        "actual_intent": "explain_confidence",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "does a model score prove disease",
+        "expected_intent": "explain_confidence",
+        "actual_intent": "explain_confidence",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what does 95 percent confidence mean",
+        "expected_intent": "explain_confidence",
+        "actual_intent": "explain_confidence",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "do I have an appointment",
+        "expected_intent": "upcoming_appointment",
+        "actual_intent": "upcoming_appointment",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "when is my next appointment",
+        "expected_intent": "upcoming_appointment",
+        "actual_intent": "upcoming_appointment",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "show my upcoming appointments",
+        "expected_intent": "upcoming_appointment",
+        "actual_intent": "upcoming_appointment",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "which vet did I select",
+        "expected_intent": "upcoming_appointment",
+        "actual_intent": "upcoming_appointment",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "which clinic is my appointment at",
+        "expected_intent": "upcoming_appointment",
+        "actual_intent": "upcoming_appointment",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "where is my booked clinic",
+        "expected_intent": "upcoming_appointment",
+        "actual_intent": "upcoming_appointment",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what is my upcoming appointment status",
+        "expected_intent": "upcoming_appointment",
+        "actual_intent": "upcoming_appointment",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "show my pet follow up instructions",
+        "expected_intent": "my_followup_care",
+        "actual_intent": "my_followup_care",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what did the vet ask me to do",
+        "expected_intent": "my_followup_care",
+        "actual_intent": "my_followup_care",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "does my pet need follow up care",
+        "expected_intent": "my_followup_care",
+        "actual_intent": "my_followup_care",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "do I need to submit photos",
+        "expected_intent": "my_followup_care",
+        "actual_intent": "my_followup_care",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "can I submit another photo",
+        "expected_intent": "my_followup_care",
+        "actual_intent": "my_followup_care",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "is my follow up awaiting review",
+        "expected_intent": "my_followup_care",
+        "actual_intent": "my_followup_care",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what is my follow up status",
+        "expected_intent": "my_followup_care",
+        "actual_intent": "my_followup_care",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what should I do next",
+        "expected_intent": "pet_next_steps",
+        "actual_intent": "pet_next_steps",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what should I do about my pet result",
+        "expected_intent": "pet_next_steps",
+        "actual_intent": "pet_next_steps",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "should I see a vet",
+        "expected_intent": "pet_next_steps",
+        "actual_intent": "pet_next_steps",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "does my pet need a dental appointment",
+        "expected_intent": "pet_next_steps",
+        "actual_intent": "pet_next_steps",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what action should I take after the scan",
+        "expected_intent": "pet_next_steps",
+        "actual_intent": "pet_next_steps",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "recommend dental care products",
+        "expected_intent": "product_recommendation",
+        "actual_intent": "product_recommendation",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what dental products are available",
+        "expected_intent": "product_recommendation",
+        "actual_intent": "product_recommendation",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "show products for my pet teeth",
+        "expected_intent": "product_recommendation",
+        "actual_intent": "product_recommendation",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "where can I buy pet toothpaste",
+        "expected_intent": "product_recommendation",
+        "actual_intent": "product_recommendation",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "show available toothbrushes and dental products",
+        "expected_intent": "product_recommendation",
+        "actual_intent": "product_recommendation",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "how often should I brush my dog teeth",
+        "expected_intent": "daily_dental_care",
+        "actual_intent": "daily_dental_care",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "how often should I brush my cat teeth",
+        "expected_intent": "daily_dental_care",
+        "actual_intent": "daily_dental_care",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "should I brush every day",
+        "expected_intent": "daily_dental_care",
+        "actual_intent": "daily_dental_care",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "how frequently should I clean pet teeth",
+        "expected_intent": "daily_dental_care",
+        "actual_intent": "daily_dental_care",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what is a daily dental routine",
+        "expected_intent": "daily_dental_care",
+        "actual_intent": "daily_dental_care",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "how do I clean my cat teeth",
+        "expected_intent": "brushing_technique",
+        "actual_intent": "brushing_technique",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "how do I clean my dog teeth",
+        "expected_intent": "brushing_technique",
+        "actual_intent": "brushing_technique",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "how do I brush pet teeth",
+        "expected_intent": "brushing_technique",
+        "actual_intent": "brushing_technique",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "how should I introduce a toothbrush",
+        "expected_intent": "brushing_technique",
+        "actual_intent": "brushing_technique",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "my pet does not like brushing",
+        "expected_intent": "brushing_technique",
+        "actual_intent": "brushing_technique",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "is bad breath normal",
+        "expected_intent": "bad_breath",
+        "actual_intent": "bad_breath",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "why does my dog breath smell",
+        "expected_intent": "bad_breath",
+        "actual_intent": "bad_breath",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "why does my cat have bad breath",
+        "expected_intent": "bad_breath",
+        "actual_intent": "bad_breath",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "my pet has smelly breath",
+        "expected_intent": "bad_breath",
+        "actual_intent": "bad_breath",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "should I worry about persistent bad breath",
+        "expected_intent": "bad_breath",
+        "actual_intent": "bad_breath",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what are signs of dental problems",
+        "expected_intent": "dental_warning_signs",
+        "actual_intent": "dental_warning_signs",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "how can I notice dental disease",
+        "expected_intent": "dental_warning_signs",
+        "actual_intent": "dental_warning_signs",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what symptoms should I watch for",
+        "expected_intent": "dental_warning_signs",
+        "actual_intent": "dental_warning_signs",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what are common dental warning signs",
+        "expected_intent": "dental_warning_signs",
+        "actual_intent": "dental_warning_signs",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "how do I know my pet needs a dental check",
+        "expected_intent": "dental_warning_signs",
+        "actual_intent": "dental_warning_signs",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "show my pet medical history",
+        "expected_intent": "pet_medical_history",
+        "actual_intent": "pet_medical_history",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "show previous completed consultations",
+        "expected_intent": "pet_medical_history",
+        "actual_intent": "pet_medical_history",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what did the vet diagnose",
+        "expected_intent": "pet_medical_history",
+        "actual_intent": "pet_medical_history",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "show recorded diagnoses and treatments",
+        "expected_intent": "pet_medical_history",
+        "actual_intent": "pet_medical_history",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what happened at my pet last consultation",
+        "expected_intent": "pet_medical_history",
+        "actual_intent": "pet_medical_history",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "show my pet recorded prescriptions",
+        "expected_intent": "recorded_prescriptions",
+        "actual_intent": "recorded_prescriptions",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "what medicines did the vet prescribe",
+        "expected_intent": "recorded_prescriptions",
+        "actual_intent": "recorded_prescriptions",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "show prescription instructions from the last consultation",
+        "expected_intent": "recorded_prescriptions",
+        "actual_intent": "recorded_prescriptions",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "what was prescribed at the latest visit",
+        "expected_intent": "recorded_prescriptions",
+        "actual_intent": "recorded_prescriptions",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "show my pet prescription record",
+        "expected_intent": "recorded_prescriptions",
+        "actual_intent": "recorded_prescriptions",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "show my pet segmentation percentages",
+        "expected_intent": "pet_segmentation_values",
+        "actual_intent": "pet_segmentation_values",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what are my latest segmentation measurements",
+        "expected_intent": "pet_segmentation_values",
+        "actual_intent": "pet_segmentation_values",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "how much of my image was marked",
+        "expected_intent": "pet_segmentation_values",
+        "actual_intent": "pet_segmentation_values",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "show gingivitis and calculus area estimates",
+        "expected_intent": "pet_segmentation_values",
+        "actual_intent": "pet_segmentation_values",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "show my pet classification scores",
+        "expected_intent": "pet_prediction_scores",
+        "actual_intent": "pet_prediction_scores",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what scores did my latest scan produce",
+        "expected_intent": "pet_prediction_scores",
+        "actual_intent": "pet_prediction_scores",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "show confidence scores for my pet assessment",
+        "expected_intent": "pet_prediction_scores",
+        "actual_intent": "pet_prediction_scores",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "what is the gingivitis score in my latest scan",
+        "expected_intent": "pet_prediction_scores",
+        "actual_intent": "pet_prediction_scores",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "show the model scores from my dental result",
+        "expected_intent": "pet_prediction_scores",
+        "actual_intent": "pet_prediction_scores",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      }
+    ]
+  },
+  "additional_manual_cases": {
+    "total": 30,
+    "correct": 30,
+    "match_rate_percent": 100.0,
+    "per_intent": {
+      "ai_interpretation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "bad_breath": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "brushing_technique": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "calculus_information": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "clarify": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 3
+      },
+      "compare_analysis_progress": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "daily_dental_care": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "dental_analysis_history": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "dental_warning_signs": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "explain_confidence": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "explain_gradcam": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "explain_latest_analysis": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "explain_pet_severity": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "explain_segmentation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "gingivitis_information": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "greeting": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "human_toothpaste_warning": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "medication_referral": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "my_followup_care": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "pet_medical_history": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "pet_next_steps": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "pet_segmentation_values": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "plaque_information": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "product_recommendation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "recorded_prescriptions": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "upcoming_appointment": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "urgent_vet_contact": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 2
+      }
+    },
+    "failures": [],
+    "results": [
+      {
+        "question": "hello",
+        "expected_intent": "greeting",
+        "actual_intent": "greeting",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "please explain dental plaque",
+        "expected_intent": "plaque_information",
+        "actual_intent": "plaque_information",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 0.8853,
+        "error": null
+      },
+      {
+        "question": "explain dental tartar",
+        "expected_intent": "calculus_information",
+        "actual_intent": "calculus_information",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 0.6541,
+        "error": null
+      },
+      {
+        "question": "what does gingivitis mean",
+        "expected_intent": "gingivitis_information",
+        "actual_intent": "gingivitis_information",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "is the AI result a confirmed diagnosis",
+        "expected_intent": "ai_interpretation",
+        "actual_intent": "ai_interpretation",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 0.6027,
+        "error": null
+      },
+      {
+        "question": "what does the heatmap represent",
+        "expected_intent": "explain_gradcam",
+        "actual_intent": "explain_gradcam",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 0.5504,
+        "error": null
+      },
+      {
+        "question": "explain the segmentation mask",
+        "expected_intent": "explain_segmentation",
+        "actual_intent": "explain_segmentation",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 0.7701,
+        "error": null
+      },
+      {
+        "question": "what does classification confidence tell me",
+        "expected_intent": "explain_confidence",
+        "actual_intent": "explain_confidence",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "please show my latest dental analysis",
+        "expected_intent": "explain_latest_analysis",
+        "actual_intent": "explain_latest_analysis",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "show the estimated severity for my pet",
+        "expected_intent": "explain_pet_severity",
+        "actual_intent": "explain_pet_severity",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "show my previous dental scan results",
+        "expected_intent": "dental_analysis_history",
+        "actual_intent": "dental_analysis_history",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "compare my latest scan with the earlier one",
+        "expected_intent": "compare_analysis_progress",
+        "actual_intent": "compare_analysis_progress",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "what should I do after my dental scan",
+        "expected_intent": "pet_next_steps",
+        "actual_intent": "pet_next_steps",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "tell me when my next appointment is",
+        "expected_intent": "upcoming_appointment",
+        "actual_intent": "upcoming_appointment",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "show the followup instructions from my vet",
+        "expected_intent": "my_followup_care",
+        "actual_intent": "my_followup_care",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 0.7784,
+        "error": null
+      },
+      {
+        "question": "show the prescriptions recorded at my last visit",
+        "expected_intent": "recorded_prescriptions",
+        "actual_intent": "recorded_prescriptions",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "show my past completed consultations",
+        "expected_intent": "pet_medical_history",
+        "actual_intent": "pet_medical_history",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 0.8009,
+        "error": null
+      },
+      {
+        "question": "show my pet saved segmentation measurements",
+        "expected_intent": "pet_segmentation_values",
+        "actual_intent": "pet_segmentation_values",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 0.7914,
+        "error": null
+      },
+      {
+        "question": "show available pet dental products",
+        "expected_intent": "product_recommendation",
+        "actual_intent": "product_recommendation",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 0.8545,
+        "error": null
+      },
+      {
+        "question": "how frequently do I need to brush teeth",
+        "expected_intent": "daily_dental_care",
+        "actual_intent": "daily_dental_care",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "how can I brush my cat teeth",
+        "expected_intent": "brushing_technique",
+        "actual_intent": "brushing_technique",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 1.0,
+        "error": null
+      },
+      {
+        "question": "my cat breath smells bad",
+        "expected_intent": "bad_breath",
+        "actual_intent": "bad_breath",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 0.8106,
+        "error": null
+      },
+      {
+        "question": "what warning signs indicate dental problems",
+        "expected_intent": "dental_warning_signs",
+        "actual_intent": "dental_warning_signs",
+        "matched": true,
+        "mode": "nlp",
+        "similarity": 0.6766,
+        "error": null
+      },
+      {
+        "question": "my cat cannot breathe",
+        "expected_intent": "urgent_vet_contact",
+        "actual_intent": "urgent_vet_contact",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "my dog has severe pain",
+        "expected_intent": "urgent_vet_contact",
+        "actual_intent": "urgent_vet_contact",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "calculate a medication dosage",
+        "expected_intent": "medication_referral",
+        "actual_intent": "medication_referral",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "can I use human toothpaste",
+        "expected_intent": "human_toothpaste_warning",
+        "actual_intent": "human_toothpaste_warning",
+        "matched": true,
+        "mode": "rule",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "tell me a joke",
+        "expected_intent": "clarify",
+        "actual_intent": "clarify",
+        "matched": true,
+        "mode": "fallback",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "my dog likes tennis",
+        "expected_intent": "clarify",
+        "actual_intent": "clarify",
+        "matched": true,
+        "mode": "fallback",
+        "similarity": null,
+        "error": null
+      },
+      {
+        "question": "what is the weather tomorrow",
+        "expected_intent": "clarify",
+        "actual_intent": "clarify",
+        "matched": true,
+        "mode": "fallback",
+        "similarity": null,
+        "error": null
+      }
+    ]
+  }
+}

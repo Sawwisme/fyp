@@ -102,16 +102,51 @@ def _matches(text, phrase, language):
     return re.finditer(pattern, text)
 
 
+
 def _explicitly_negated(text, match, language):
     prefix = text[max(0, match.start() - 55):match.start()]
+    symptom = match.group(0)
+
+    # Symptoms containing negative words can themselves
+    # indicate an emergency or urgent condition.
+    if re.match(
+        r"^(?:cannot|can't|cant|not|unable|tidak|tak)\b",
+        symptom,
+    ):
+        return False
+
     if language == "zh":
-        # Do not confuse a negation inside a symptom phrase, e.g.
-        # 无法呼吸 / 没有呼吸, with denial of the whole symptom.
-        if re.search(r"(?:并非|並非|不是|并不是|並不是)(?:没有|沒有|无|無)\s*$", prefix):
+        if symptom.startswith((
+            "无法", "無法", "不能",
+            "没有", "沒有", "不吃", "不喝",
+        )):
             return False
-        return bool(re.search(r"(?:没有|沒有|并无|並無|无|無|不是|否认|否認)\s*$", prefix))
+
+        if re.search(
+            r"(?:并非|並非|不是|并不是|並不是)"
+            r"(?:没有|沒有|无|無)\s*$",
+            prefix,
+        ):
+            return False
+
+        return bool(re.search(
+            r"(?:没有|沒有|并无|並無|无|無|不是|否认|否認)\s*$",
+            prefix,
+        ))
+
+    # Double negatives and uncertain statements
+    # should not suppress safety warnings.
+    if re.search(
+        r"\b(?:not sure|cannot rule out|can't rule out|"
+        r"not without|not no|not really)\s*$",
+        prefix,
+    ):
+        return False
+
     return bool(re.search(
-        r"\b(?:no|not|without|denies|tidak|tak|tiada|bukan|tanpa|tidak ada|tak ada)\s*$",
+        r"\b(?:no|not|without|denies|"
+        r"tidak|tak|tiada|bukan|tanpa|"
+        r"tidak ada|tak ada)\s*$",
         prefix,
     ))
 

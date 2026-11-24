@@ -5,8 +5,10 @@ from collections import Counter
 
 if __package__:
     from .chatbot_knowledge import KNOWLEDGE
+    from .chatbot_safety import _explicitly_negated
 else:
     from chatbot_knowledge import KNOWLEDGE
+    from chatbot_safety import _explicitly_negated
 
 
 STOP_WORDS = {
@@ -76,6 +78,45 @@ CHAT_ALIASES = {
     "perscription": "prescription",
 }
 
+CHAT_ALIASES.update({
+    # Common typing mistakes
+    "apointments": "appointment",
+    "appointments": "appointment",
+    "gingivtis": "gingivitis",
+    "gingivits": "gingivitis",
+    "calclus": "calculus",
+    "calcu lus": "calculus",
+    "plaqe": "plaque",
+    "plauge": "plaque",
+    "assesment": "assessment",
+    "assessmnt": "assessment",
+    "prescripton": "prescription",
+    "tothpaste": "toothpaste",
+
+    # Dental terminology
+    "tartar": "calculus",
+    "gums": "gum",
+    "toothbrushes": "toothbrush",
+
+    # Common informal language
+    "wanna": "want to",
+    "gonna": "going to",
+    "thx": "thanks",
+    "asap": "as soon as possible",
+    "info": "information",
+    "prev": "previous",
+
+    # Additional contractions
+    "didn't": "did not",
+    "didnt": "did not",
+    "wasn't": "was not",
+    "wasnt": "was not",
+    "aren't": "are not",
+    "arent": "are not",
+    "couldn't": "could not",
+    "couldnt": "could not",
+})
+
 
 def expand_chat_text(text):
     text = text.replace("’", "'")
@@ -100,11 +141,25 @@ def normalize(text):
     phrase_aliases = {
         "stinky mouth": "bad breath",
         "smelly mouth": "bad breath",
+        "smelly breath": "bad breath",
+        "stinky breath": "bad breath",
         "tooth disease": "dental disease",
+        "gum inflammation": "gingivitis",
+        "dental tartar": "calculus",
+        "calcu lus": "calculus",
+        "check up": "checkup",
+        "last time": "previous",
+        "most recent": "latest",
+        "scan outcome": "scan result",
+        "assessment outcome": "assessment result",
     }
 
     for original, replacement in phrase_aliases.items():
-        text = text.replace(original, replacement)
+        text = re.sub(
+            r"\b" + re.escape(original) + r"\b",
+            replacement,
+            text,
+        )
 
     word_aliases = {
         "teeth": "tooth",
@@ -122,6 +177,8 @@ def normalize(text):
         "earlier": "previous",
         "scans": "scan",
         "results": "result",
+        "tartar": "calculus",
+        "gums": "gum",
     }
 
     return " ".join(
@@ -195,6 +252,35 @@ def detect_specific_intent(text):
     if comparison_question and analysis_topic and time_reference:
         return "compare_analysis_progress"
 
+    
+    # Distinguish general assessment requests from
+    # severity, confidence scores and comparison requests.
+    assessment_lookup = bool(words & {
+        "show", "view", "see", "explain",
+        "check", "display", "get",
+    })
+
+    specialised_request = bool(words & {
+        "score", "scores", "confidence",
+        "classification", "prediction",
+        "severity", "severe", "mild", "moderate",
+        "compare", "comparison", "progress",
+        "improved", "worse", "changed",
+        "next", "recommendation",
+    })
+
+    if (
+        analysis_topic
+        and assessment_lookup
+        and not specialised_request
+    ):
+        if words & {"previous", "history", "past", "older"}:
+            return "dental_analysis_history"
+
+        if "latest" in words:
+            return "explain_latest_analysis"
+
+
     dental_brushing = (
         "brush" in words
         and bool(words & {
@@ -267,7 +353,15 @@ def clarification_from_matches(ranking, entries):
 
 
 class HybridChatbot:
-    def __init__(self):
+    def __init__(
+    self,
+    min_coverage=0.50,
+    min_similarity=0.30,
+    min_margin=0.05,
+    ):
+        self.min_coverage = min_coverage
+        self.min_similarity = min_similarity
+        self.min_margin = min_margin
         documents = [
             (entry, features(question))
             for entry in KNOWLEDGE
@@ -373,14 +467,23 @@ class HybridChatbot:
             "fractured tooth",
         )
 
+
         def contains_phrase(phrases):
-            return any(
-                re.search(
-                    r"\b" + re.escape(phrase) + r"\b",
-                    text,
+            for phrase in phrases:
+                pattern = (
+                    r"\b" + re.escape(phrase) + r"\b"
                 )
-                for phrase in phrases
-            )
+
+                for match in re.finditer(pattern, text):
+                    if not _explicitly_negated(
+                        text,
+                        match,
+                        "en",
+                    ):
+                        return True
+
+            return False
+
 
         if contains_phrase(emergency_phrases):
             return response(
@@ -579,25 +682,43 @@ class HybridChatbot:
         )
 
         # Initial thresholds, to be evaluated with test questions.
+        margin = best - runner_up
+
         if (
-            coverage < 0.5
-            or best < 0.30
-            or best - runner_up < 0.05
+            coverage < self.min_coverage
+            or best < self.min_similarity
+            or margin < self.min_margin
         ):
-            return clarification_from_matches(
+            answer = clarification_from_matches(
                 ranking,
                 entries,
             )
 
+            answer["nlp_metrics"] = {
+                "coverage": round(coverage, 4),
+                "similarity": round(best, 4),
+                "margin": round(margin, 4),
+            }
+
+            return answer
+
         entry = entries[intent]
 
-        return response(
+        answer = response(
             intent=intent,
             reply=entry["reply"],
             mode="nlp",
             sources=entry["sources"],
             similarity=round(best, 4),
         )
+
+        answer["nlp_metrics"] = {
+            "coverage": round(coverage, 4),
+            "similarity": round(best, 4),
+            "margin": round(margin, 4),
+        }
+
+        return answer
 
 
 chatbot = HybridChatbot()
