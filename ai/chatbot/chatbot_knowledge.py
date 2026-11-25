@@ -67,10 +67,10 @@ KNOWLEDGE = [
         "reply": (
             "VetDental's AI results are screening references, "
             "not confirmed diagnoses. Model scores are not disease "
-            "severity measurements. If a result concerns you, use "
-            "Request vet review on the completed assessment or "
-            "arrange a consultation. The reviewing vet's feedback "
-            "is shown separately from the original AI result."
+            "severity measurements. If the findings concern you, "
+            "open the completed assessment and choose "
+            "Book a dental examination. Veterinary findings are "
+            "recorded separately from the original AI result."
         ),
         "sources": [],
     },
@@ -83,11 +83,10 @@ KNOWLEDGE = [
             "where can i read vet feedback",
         ],
         "reply": (
-            "On a completed AI assessment, choose Request vet review, "
-            "select a clinic, and confirm Share assessment & request "
-            "review. To check feedback later, open My vet reviews & "
-            "feedback in AI Scan. Sharing a review request does not "
-            "book an appointment."
+            "To discuss your AI findings with a vet, open your "
+            "completed assessment and choose Book a dental examination. "
+            "Select a clinic, veterinarian and available time, "
+            "then review the details and confirm your booking."
         ),
         "sources": [],
     },

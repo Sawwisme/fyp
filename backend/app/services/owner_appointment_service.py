@@ -1,8 +1,9 @@
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 from fastapi import HTTPException
 from sqlalchemy import and_, case, func, or_, select
 from sqlalchemy.orm import Session
+from app.services.ai_scan_booking_service import validate_scan_booking
 
 from app.clinic_time import CLINIC_TIMEZONE
 from app.models import (
@@ -41,6 +42,29 @@ def create_appointment(
 ):
     try:
         owner = get_owner_profile(db, current_user)
+
+        if data.ai_analysis_id is not None:
+            if not data.share_ai_assessment:
+                raise HTTPException(
+                    422,
+                    "Confirm sharing this assessment with the "
+                    "selected clinic before booking.",
+                )
+
+            if (
+                data.followup_care_id is not None
+                or data.ai_assessment_review_id is not None
+            ):
+                raise HTTPException(
+                    422,
+                    "Choose one assessment or follow-up booking context.",
+                )
+
+        elif data.share_ai_assessment:
+            raise HTTPException(
+                422,
+                "Choose an assessment before confirming sharing.",
+            )
 
         if (
             data.ai_assessment_review_id is not None
@@ -269,6 +293,13 @@ def create_appointment(
                 404, "Pet not found in your account."
             )
 
+        validate_scan_booking(
+            db,
+            current_user,
+            pet,
+            data.ai_analysis_id,
+        )
+
         validate_review_booking(
             db,
             current_user,
@@ -316,6 +347,12 @@ def create_appointment(
             status="confirmed",
             followup_care_id=data.followup_care_id,
             ai_assessment_review_id=data.ai_assessment_review_id,
+            ai_analysis_id=data.ai_analysis_id,
+            medical_history_shared_at=(
+                datetime.now(timezone.utc).replace(tzinfo=None)
+                if data.share_medical_history
+                else None
+            ),
             booking_request_id=(
                 str(data.booking_request_id)
                 if data.booking_request_id is not None

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Path, Query
 from sqlalchemy.orm import Session
-
+from typing import Literal
 from app.database import get_db
 from app.dependencies import require_roles
 from app.models import User
@@ -29,11 +29,19 @@ def list_shop_clinics(
     q: str = Query(default="", max_length=100),
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
+    state: str | None = Query(default=None, max_length=50),
+    fulfilment: Literal["pickup", "delivery"] | None = None,
     current_user: User = Depends(require_roles("pet_owner")),
     db: Session = Depends(get_db),
 ):
     return shop_service.list_shop_clinics(
-        db, current_user, q, offset, limit
+        db,
+        current_user,
+        q,
+        offset,
+        limit,
+        state=state,
+        fulfilment=fulfilment,
     )
 
 @router.get(

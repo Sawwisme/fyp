@@ -47,6 +47,10 @@ class Order(Base):
         server_default=text("CURRENT_TIMESTAMP"),
     )
     shipping_address = Column(String(500), nullable=False)
+    delivery_state = Column(
+        String(50),
+        nullable=True,
+    )
     shipping_method = Column(String(50), nullable=False)
     subtotal = Column(Numeric(10, 2), nullable=False)
     shipping_fee = Column(Numeric(10, 2), nullable=False)

@@ -120,6 +120,18 @@ class _ClinicPickerScreenState extends State<ClinicPickerScreen> {
                   clinic['clinic_name'] as String,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
+                if ((clinic['completed_visit_count'] as int? ?? 0) > 0)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      'Previously visited · '
+                          '${clinic['completed_visit_count']} completed visit(s)',
+                      style: const TextStyle(
+                        color: Color(0xFF2549C7),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 const SizedBox(height: 12),
                 Text(
                   clinic['address'] as String? ??
@@ -296,9 +308,30 @@ class _ClinicPickerScreenState extends State<ClinicPickerScreen> {
                   ),
                 ),
                 title: Text(clinic['clinic_name'] as String),
-                subtitle: Text(
-                  clinic['address'] as String? ??
-                      'Address not provided',
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if ((clinic['completed_visit_count'] as int? ?? 0) > 0)
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          top: 4,
+                          bottom: 4,
+                        ),
+                        child: Text(
+                          'Previously visited · '
+                              '${clinic['completed_visit_count']} '
+                              'completed visit(s)',
+                          style: const TextStyle(
+                            color: Color(0xFF2549C7),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    Text(
+                      clinic['address'] as String? ??
+                          'Address not provided',
+                    ),
+                  ],
                 ),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => _showClinic(clinic),

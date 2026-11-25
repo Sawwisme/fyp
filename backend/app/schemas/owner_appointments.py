@@ -52,6 +52,23 @@ class OwnerAppointmentCreate(BaseModel):
         le=2147483647,
     )
 
+    ai_analysis_id: int | None = Field(
+        default=None,
+        ge=1,
+        le=2147483647,
+        strict=True,
+    )
+
+    share_ai_assessment: bool = Field(
+        default=False,
+        strict=True,
+    )
+
+    share_medical_history: bool = Field(
+        default=False,
+        strict=True,
+    )
+
 
 class OwnerAppointmentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -62,12 +79,17 @@ class OwnerAppointmentResponse(BaseModel):
     time_slot_id: int
     appointment_date: date
     appointment_type: str
+    medical_history_shared_at: datetime | None = None
     status: str
     booking_deposit_amount: Decimal
     payment_expires_at: datetime | None
     ai_assessment_review_id: int | None = None
+    ai_analysis_id: int | None = None
 
-    @field_validator("payment_expires_at")
+    @field_validator(
+        "payment_expires_at",
+        "medical_history_shared_at",
+    )
     @classmethod
     def include_utc_offset(cls, value):
         if value is not None and value.tzinfo is None:

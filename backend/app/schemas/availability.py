@@ -1,4 +1,4 @@
-from datetime import date, time
+from datetime import date, datetime, time
 
 from pydantic import BaseModel
 
@@ -29,3 +29,5 @@ class ClinicSummary(BaseModel):
     phone_number: str | None
     latitude: float | None
     longitude: float | None
+    completed_visit_count: int = 0
+    last_visit_at: datetime | None = None

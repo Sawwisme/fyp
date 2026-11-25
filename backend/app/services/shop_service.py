@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session, selectinload
 from app.models import Clinic, Product, ProductCategory, User, Appointment, Consultation
 from app.services.pet_service import get_owner_profile
 from app.schemas.shop import ShopClinicResponse
-
+from app.states import MALAYSIAN_STATES
 
 def list_shop_clinics(
     db: Session,
@@ -13,8 +13,16 @@ def list_shop_clinics(
     q: str,
     offset: int,
     limit: int,
+    state: str | None = None,
+    fulfilment: str | None = None,
 ):
     owner = get_owner_profile(db, current_user)
+
+    if state is not None and state not in MALAYSIAN_STATES:
+        raise HTTPException(422, "Select a valid Malaysian state.")
+
+    if fulfilment not in {None, "pickup", "delivery"}:
+        raise HTTPException(422, "Select pickup or delivery.")
 
     # Consultation records preserve the clinic where the visit occurred.
     # Each consultation belongs to one unique appointment.
@@ -93,6 +101,18 @@ def list_shop_clinics(
             )
         )
 
+    if state is not None:
+        statement = statement.where(Clinic.state == state)
+
+    if fulfilment == "pickup":
+        statement = statement.where(
+            Clinic.shop_pickup_enabled.is_(True)
+        )
+    elif fulfilment == "delivery":
+        statement = statement.where(
+            Clinic.shop_delivery_enabled.is_(True)
+        )
+
     results = db.execute(
         statement
         .order_by(
@@ -110,6 +130,9 @@ def list_shop_clinics(
             clinic_id=clinic.clinic_id,
             clinic_name=clinic.clinic_name,
             address=clinic.address,
+            state=clinic.state,
+            shop_pickup_enabled=clinic.shop_pickup_enabled,
+            shop_delivery_enabled=clinic.shop_delivery_enabled,
             phone_number=clinic.phone_number,
             latitude=(
                 float(clinic.latitude)

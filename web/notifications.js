@@ -175,7 +175,7 @@
             const link = document.createElement('a');
 
             link.href =
-                '/web/vet/ai_assessments.html?review=' +
+                '/web/vet/assessment_review_history.html?review=' +
                 item.resource_id;
 
             link.textContent = 'Open assessment review';

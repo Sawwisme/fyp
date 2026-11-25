@@ -40,7 +40,10 @@ class TypedAppointments extends FakeAppointments {
     int? followupCareId,
     int? aiAssessmentReviewId,
     String? bookingRequestId,
+    int? aiAnalysisId,
+    bool shareAiAssessment = false,
     int? expectedPaymentVersion,
+    bool shareMedicalHistory = false,
     String? expectedDepositAmount,
   }) async {
     requestIds.add(bookingRequestId);

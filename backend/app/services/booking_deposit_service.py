@@ -96,6 +96,10 @@ def prepare_booking_request(db, owner, clinic, data):
             or existing.followup_care_id != data.followup_care_id
             or existing.ai_assessment_review_id
             != data.ai_assessment_review_id
+            or existing.ai_analysis_id != data.ai_analysis_id
+            or (
+                existing.medical_history_shared_at is not None
+            ) != data.share_medical_history
             or existing.booking_deposit_amount
             != data.expected_deposit_amount
         ):

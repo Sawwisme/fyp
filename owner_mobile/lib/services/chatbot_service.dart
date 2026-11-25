@@ -7,10 +7,16 @@ import 'api_client.dart';
 class PendingChatMessage {
   final String requestId;
   final String text;
+  final Map<String, dynamic> productPreferences;
 
-  PendingChatMessage(String message)
-      : requestId = _newRequestId(),
-        text = message.trim() {
+  PendingChatMessage(
+      String message, {
+        Map<String, dynamic>? productPreferences,
+      }) : requestId = _newRequestId(),
+        text = message.trim(),
+        productPreferences = Map<String, dynamic>.unmodifiable(
+          productPreferences ?? <String, dynamic>{},
+        ) {
     if (text.isEmpty || text.length > 2000) {
       throw ArgumentError(
         'Enter a message between 1 and 2000 characters.',
@@ -136,6 +142,8 @@ class ChatbotService {
       {
         'client_request_id': pending.requestId,
         'message': pending.text,
+        if (pending.productPreferences.isNotEmpty)
+          'product_preferences': pending.productPreferences,
       },
     );
 

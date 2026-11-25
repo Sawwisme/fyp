@@ -1,5 +1,5 @@
 from decimal import Decimal
-
+from app.states import MALAYSIAN_STATES
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -21,6 +21,7 @@ class ClinicResponse(BaseModel):
     latitude: Decimal | None
     longitude: Decimal | None
     status: str
+    state: str | None = None
 
 
 class ClinicUpdate(BaseModel):
@@ -49,6 +50,26 @@ class ClinicUpdate(BaseModel):
         max_digits=9,
         decimal_places=6,
     )
+    state: str | None = Field(default=None, max_length=50)
+
+    @field_validator("state", mode="before")
+    @classmethod
+    def validate_state(cls, value):
+        if value is None:
+            return None
+
+        if not isinstance(value, str):
+            raise ValueError("Select a valid Malaysian state.")
+
+        value = value.strip()
+
+        if not value:
+            return None
+
+        if value not in MALAYSIAN_STATES:
+            raise ValueError("Select a valid Malaysian state.")
+
+        return value
 
     @field_validator("clinic_name", mode="before")
     @classmethod

@@ -2,7 +2,7 @@ from sqlalchemy import case, func, or_, select
 from datetime import date, datetime, timedelta, timezone
 import re
 from decimal import Decimal
-
+from app.schemas.chatbot import ProductSearchPreferences
 from app.models import Clinic, Product, ProductCategory
 from app.services.chatbot_context_service import build_chat_context
 from app.services.product_recommendation_rules import (
@@ -139,6 +139,7 @@ def product_reply(
     products=None,
     request_text="",
     language="en",
+    product_preferences=None,
 ):
     def text(en, ms, zh):
         return {"en": en, "ms": ms, "zh": zh}.get(language, en)
@@ -356,9 +357,32 @@ def product_reply(
             "OPEN_APPOINTMENTS",
         )
 
+    preferences = ProductSearchPreferences.model_validate(
+        product_preferences or {}
+    )
+
     request_filters, requested_categories, budget = (
         product_request_filters(request_text)
     )
+
+    if preferences.clinic_id is not None:
+        request_filters.append(
+            Clinic.clinic_id == preferences.clinic_id
+        )
+
+    if preferences.state is not None:
+        request_filters.append(
+            Clinic.state == preferences.state
+        )
+
+    if preferences.fulfilment == "pickup":
+        request_filters.append(
+            Clinic.shop_pickup_enabled.is_(True)
+        )
+    elif preferences.fulfilment == "delivery":
+        request_filters.append(
+            Clinic.shop_delivery_enabled.is_(True)
+        )
 
     care_context = build_product_match(context, request_text)
     care_tags = care_context["tags"]
@@ -474,6 +498,9 @@ def product_reply(
             Product.price,
             ProductCategory.category_name,
             Clinic.clinic_name,
+            Clinic.state.label("clinic_state"),
+            Clinic.shop_pickup_enabled,
+            Clinic.shop_delivery_enabled,
             Product.target_species,
             Product.minimum_age_months,
             Product.suitability_notes,
@@ -601,6 +628,11 @@ def product_reply(
                 "category_name": product["category_name"],
                 "recommendation_reason": reason,
                 "suitability_notes": product["suitability_notes"],
+                "clinic_state": product["clinic_state"],
+                "shop_pickup_enabled":
+                    product["shop_pickup_enabled"],
+                "shop_delivery_enabled":
+                    product["shop_delivery_enabled"],
             })
             
     sections = []

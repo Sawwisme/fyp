@@ -61,6 +61,8 @@ class AppointmentService {
       },
     ).query;
 
+
+
     final data = await api.get(
       '/availability/veterinarians/$veterinarianId/slots?$query',
     );
@@ -77,11 +79,15 @@ class AppointmentService {
     String? bookingRequestId,
     int? expectedPaymentVersion,
     String? expectedDepositAmount,
+    int? aiAnalysisId,
+    bool shareMedicalHistory = false,
+    bool shareAiAssessment = false,
   }) async {
     final body = <String, dynamic>{
       'pet_id': petId,
       'time_slot_id': timeSlotId,
       'appointment_type': appointmentType,
+      'share_medical_history': shareMedicalHistory,
     };
 
     if (followupCareId != null) {
@@ -104,6 +110,18 @@ class AppointmentService {
       body['booking_request_id'] = bookingRequestId;
       body['expected_payment_version'] = expectedPaymentVersion;
       body['expected_deposit_amount'] = expectedDepositAmount;
+
+    }
+
+    if (aiAnalysisId != null) {
+      if (!shareAiAssessment) {
+        throw const ApiException(
+          'Confirm sharing the assessment before booking.',
+        );
+      }
+
+      body['ai_analysis_id'] = aiAnalysisId;
+      body['share_ai_assessment'] = true;
     }
 
     final data = await api.post(
@@ -125,6 +143,14 @@ class AppointmentService {
       throw const ApiException(
         'The booking response did not confirm the assessment link. '
             'Check the existing booking before trying again.',
+      );
+    }
+
+    if (aiAnalysisId != null &&
+        data['ai_analysis_id'] != aiAnalysisId) {
+      throw const ApiException(
+        'The booking response did not confirm the assessment link. '
+            'Check your existing appointment before trying again.',
       );
     }
 

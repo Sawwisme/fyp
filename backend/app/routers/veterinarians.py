@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Path
 from sqlalchemy.orm import Session
-
+from typing import Literal
+from fastapi.responses import FileResponse
 from datetime import date
 
 from fastapi import Query
@@ -10,7 +11,7 @@ from app.schemas.vet_appointments import (
     VetAppointmentResponse,
     VetCalendarEntry,
 )
-from app.services import vet_appointment_service
+from app.services import vet_appointment_service, vet_scan_service, shared_medical_history_service
 
 from app.database import get_db
 from app.dependencies import require_roles
@@ -205,4 +206,79 @@ def withdraw_my_absence(
         db,
         current_user,
         absence_id,
+    )
+
+@router.get("/me/appointments/{appointment_id}/ai-assessment")
+def get_appointment_ai_assessment(
+    appointment_id: int = Path(ge=1, le=2147483647),
+    current_user: User = Depends(require_roles("veterinarian")),
+    db: Session = Depends(get_db),
+):
+    return vet_scan_service.get_linked_scan(
+        db,
+        current_user,
+        appointment_id,
+    )
+
+@router.get(
+    "/me/appointments/{appointment_id}/ai-assessment/media/{kind}"
+)
+def get_appointment_ai_assessment_media(
+    kind: Literal["original", "heatmap", "segmentation", "summary"],
+    appointment_id: int = Path(ge=1, le=2147483647),
+    current_user: User = Depends(require_roles("veterinarian")),
+    db: Session = Depends(get_db),
+):
+    target = vet_scan_service.get_linked_scan_media(
+        db,
+        current_user,
+        appointment_id,
+        kind,
+    )
+
+    return FileResponse(
+        path=target,
+        media_type=(
+            "image/jpeg" if kind == "original" else "image/png"
+        ),
+        headers={
+            "Cache-Control": "private, no-store",
+            "X-Content-Type-Options": "nosniff",
+        },
+    )
+
+@router.get(
+    "/me/appointment-assessments",
+    response_model=list[VetAppointmentResponse],
+)
+def list_my_appointment_assessments(
+    appointment_date: date | None = None,
+    offset: int = Query(default=0, ge=0),
+    limit: int = Query(default=20, ge=1, le=100),
+    current_user: User = Depends(require_roles("veterinarian")),
+    db: Session = Depends(get_db),
+):
+    return vet_appointment_service.list_my_appointments(
+        db,
+        current_user,
+        appointment_date,
+        offset,
+        limit,
+        linked_scans_only=True,
+    )
+
+@router.get("/me/appointments/{appointment_id}/shared-history")
+def get_shared_appointment_history(
+    appointment_id: int = Path(ge=1, le=2147483647),
+    offset: int = Query(default=0, ge=0),
+    limit: int = Query(default=20, ge=1, le=100),
+    current_user: User = Depends(require_roles("veterinarian")),
+    db: Session = Depends(get_db),
+):
+    return shared_medical_history_service.list_shared_history(
+        db,
+        current_user,
+        appointment_id,
+        offset=offset,
+        limit=limit,
     )

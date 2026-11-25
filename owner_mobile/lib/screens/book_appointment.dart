@@ -15,6 +15,7 @@ class BookAppointmentScreen extends StatefulWidget {
   final Map<String, dynamic>? followupContext;
   final int? initialPetId;
   final int? aiAssessmentReviewId;
+  final int? aiAnalysisId;
 
   const BookAppointmentScreen({
     super.key,
@@ -24,6 +25,7 @@ class BookAppointmentScreen extends StatefulWidget {
     this.followupContext,
     this.initialPetId,
     this.aiAssessmentReviewId,
+    this.aiAnalysisId,
   });
 
   @override
@@ -48,6 +50,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   bool _loadingSlots = false;
   bool _saving = false;
   bool _uncertainBooking = false;
+  bool _shareMedicalHistory = false;
 
   String? _error;
   String? _slotError;
@@ -337,7 +340,29 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                       'Type: ${_type.replaceAll('_', ' ')}',
                   style: const TextStyle(height: 1.6),
                 ),
+                if (widget.aiAnalysisId != null) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    'Assessment #${widget.aiAnalysisId} and its '
+                        'images will be shared with '
+                        '${widget.clinic['clinic_name']} for this '
+                        'appointment when you confirm this booking.',
+                    style: const TextStyle(
+                      height: 1.5,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 20),
+                Text(
+                  _shareMedicalHistory
+                      ? 'Previous medical history: sharing enabled '
+                      'for the assigned vet.'
+                      : 'Previous medical history: not shared '
+                      'through this booking.',
+                  style: const TextStyle(height: 1.5),
+                ),
+                const SizedBox(height: 16),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(14),
@@ -411,6 +436,9 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
         'expected_payment_version': quote['version'],
         'expected_deposit_amount':
         quote['deposit_amount'].toString(),
+        'ai_analysis_id': widget.aiAnalysisId,
+        'share_ai_assessment': widget.aiAnalysisId != null,
+        'share_medical_history': _shareMedicalHistory,
       };
 
       shouldSubmit = true;
@@ -458,6 +486,11 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
         request['expected_payment_version'] as int,
         expectedDepositAmount:
         request['expected_deposit_amount'] as String,
+        aiAnalysisId: request['ai_analysis_id'] as int?,
+        shareAiAssessment:
+        request['share_ai_assessment'] == true,
+        shareMedicalHistory:
+        request['share_medical_history'] == true,
       );
 
       if (!mounted) return;
@@ -586,7 +619,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           }).toList(),
           onChanged: widget.followupContext != null ||
               widget.aiAssessmentReviewId != null ||
-              _saving ||
+              widget.aiAnalysisId != null ||
               _uncertainBooking
               ? null
               : (value) => setState(() => _petId = value),
@@ -695,6 +728,31 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               );
             }).toList(),
           ),
+
+        const SizedBox(height: 20),
+        Card(
+          child: CheckboxListTile(
+            value: _shareMedicalHistory,
+            onChanged: _saving ||
+                _uncertainBooking ||
+                _submittedBooking != null
+                ? null
+                : (value) {
+              setState(() {
+                _shareMedicalHistory = value ?? false;
+              });
+            },
+            controlAffinity: ListTileControlAffinity.leading,
+            title: const Text('Share previous medical history'),
+            subtitle: Text(
+              'Allow the assigned vet at '
+                  '${widget.clinic['clinic_name']} to read this pet’s '
+                  'previous completed consultation records, including '
+                  'records from other clinics, for this appointment. '
+                  'Original records cannot be edited.',
+            ),
+          ),
+        ),
 
         if (_error != null) ...[
           const SizedBox(height: 20),

@@ -54,6 +54,7 @@ class ChatBookingFlowState extends State<ChatBookingFlow> with AutomaticKeepAliv
   int _step = 0;
   bool _busy = true;
   bool _uncertain = false;
+  bool _shareMedicalHistory = false;
   String? _error;
 
   int _draftRevision = 0;
@@ -87,6 +88,7 @@ class ChatBookingFlowState extends State<ChatBookingFlow> with AutomaticKeepAliv
       'request': _request,
       'appointment_id': _appointment?['appointment_id'],
       'history': List<String>.from(_history),
+      'share_medical_history': _shareMedicalHistory,
     },
   };
 
@@ -141,6 +143,7 @@ class ChatBookingFlowState extends State<ChatBookingFlow> with AutomaticKeepAliv
       _draftRevision = revision;
 
       // Clear local state before restoring the server's version.
+      _shareMedicalHistory = false;
       _step = 0;
       _pet = null;
       _clinic = null;
@@ -190,6 +193,10 @@ class ChatBookingFlowState extends State<ChatBookingFlow> with AutomaticKeepAliv
         _slot = readMap('slot');
         _quote = readMap('quote');
         _request = readMap('request');
+        // A submitted request remains authoritative during retries.
+        _shareMedicalHistory = _request != null
+            ? _request!['share_medical_history'] == true
+            : state['share_medical_history'] == true;
         _type = state['type'] as String?;
 
         final date = state['date'];
@@ -653,9 +660,11 @@ class ChatBookingFlowState extends State<ChatBookingFlow> with AutomaticKeepAliv
 
     switch (_step) {
       case 0:
+        _shareMedicalHistory = false;
         _pet = item;
         break;
       case 1:
+        _shareMedicalHistory = false;
         _clinic = item;
         break;
       case 2:
@@ -718,6 +727,40 @@ class ChatBookingFlowState extends State<ChatBookingFlow> with AutomaticKeepAliv
     await _loadStep();
   }
 
+  Future<void> _changeHistorySharing(bool value) async {
+    if (_busy || _request != null || _appointment != null) return;
+
+    final previous = _shareMedicalHistory;
+
+    setState(() {
+      _shareMedicalHistory = value;
+      _busy = true;
+      _error = null;
+    });
+
+    try {
+      await _saveDraft();
+    } catch (_) {
+      if (!mounted) return;
+
+      setState(() => _shareMedicalHistory = previous);
+
+      _bookingNotice(
+        _text(
+          'Could not save your sharing choice. Please try again.',
+          'Pilihan perkongsian tidak dapat disimpan. Cuba lagi.',
+          '无法保存共享选择，请重试。',
+        ),
+      );
+
+      if (_usesDraftStorage) {
+        await _resumeBooking();
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   Future<void> _confirm() async {
     if (_busy ||
         (_quote == null && _request == null) ||
@@ -736,6 +779,7 @@ class ChatBookingFlowState extends State<ChatBookingFlow> with AutomaticKeepAliv
       'expected_payment_version': _quote!['version'],
       'expected_deposit_amount':
       _quote!['deposit_amount'].toString(),
+      'share_medical_history': _shareMedicalHistory,
     };
 
     setState(() {
@@ -763,6 +807,8 @@ class ChatBookingFlowState extends State<ChatBookingFlow> with AutomaticKeepAliv
         request['expected_payment_version'] as int,
         expectedDepositAmount:
         request['expected_deposit_amount'] as String,
+        shareMedicalHistory:
+        request['share_medical_history'] == true,
       );
 
       if (!mounted) return;
@@ -1047,6 +1093,7 @@ class ChatBookingFlowState extends State<ChatBookingFlow> with AutomaticKeepAliv
     if (restartCommands.contains(text)) {
       setState(() {
         _step = 0;
+        _shareMedicalHistory = false;
         _pet = null;
         _clinic = null;
         _vet = null;
@@ -1218,6 +1265,39 @@ class ChatBookingFlowState extends State<ChatBookingFlow> with AutomaticKeepAliv
                   label: Text(_bookingLabel('Choose date')),
                 )
               else if (_step == 6 && _quote != null) ...[
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  value: _shareMedicalHistory,
+                  onChanged: _busy || _request != null
+                      ? null
+                      : (value) {
+                    _changeHistorySharing(value ?? false);
+                  },
+                  title: Text(
+                    _text(
+                      'Share previous medical history',
+                      'Kongsi sejarah perubatan terdahulu',
+                      '共享以往医疗记录',
+                    ),
+                  ),
+                  subtitle: Text(
+                    _text(
+                      'Allow the assigned vet at '
+                          '${_clinic?['clinic_name']} to read this pet’s '
+                          'previous completed consultation records, '
+                          'including records from other clinics.',
+                      'Benarkan veterinar yang ditugaskan di '
+                          '${_clinic?['clinic_name']} membaca rekod '
+                          'konsultasi terdahulu yang telah selesai '
+                          'untuk haiwan ini, termasuk dari klinik lain.',
+                      '允许 ${_clinic?['clinic_name']} 的指定兽医'
+                          '查看这只宠物以往已完成的问诊记录，'
+                          '包括其他诊所的记录。',
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
                 Text(
                   '${_text('Deposit', 'Deposit', '订金')}: RM '
                       '${num.parse('${_quote!['deposit_amount']}').toStringAsFixed(2)}',
@@ -1260,7 +1340,32 @@ class ChatBookingFlowState extends State<ChatBookingFlow> with AutomaticKeepAliv
                     padding: const EdgeInsets.only(bottom: 8),
                     child: OutlinedButton(
                       onPressed: () => _choose(choice),
-                      child: Text(_choiceLabel(choice)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(_choiceLabel(choice)),
+                          if (_step == 1 &&
+                              (choice['completed_visit_count'] as int? ??
+                                  0) >
+                                  0) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              _text(
+                                'Previously visited · '
+                                    '${choice['completed_visit_count']} '
+                                    'completed visit(s)',
+                                'Pernah dikunjungi · '
+                                    '${choice['completed_visit_count']} '
+                                    'lawatan selesai',
+                                '曾就诊 · '
+                                    '${choice['completed_visit_count']} '
+                                    '次已完成就诊',
+                              ),
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ],
+                      ),
                     ),
                   ),
             ],

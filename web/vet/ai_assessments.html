@@ -1,94 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>VetDental — AI Assessments</title>
+
   <link rel="stylesheet" href="/web/styles.css?v=cobalt-components-2">
   <link rel="stylesheet" href="/web/admin/dashboard.css?v=cobalt-components-2">
   <link rel="stylesheet" href="/web/admin/layout.css?v=cobalt-components-2">
   <link rel="stylesheet" href="/web/cobalt.css?v=cobalt-components-2">
   <link rel="stylesheet" href="/web/workspace-design.css?v=1">
-  <link rel="stylesheet" href="/web/clinical-refinement.css?v=1">
   <link rel="stylesheet" href="/web/workspace-polish.css?v=1">
-  <link rel="stylesheet" href="/web/sidebar-motion.css?v=1">
+  <link rel="stylesheet" href="/web/sidebar-motion.css?v=3">
   <link rel="stylesheet" href="/web/vet/ai_assessments.css?v=1">
+
   <script src="/web/vet/layout.js" defer></script>
-  <script src="/web/sidebar-controls.js?v=2" defer></script>
-  <script src="/web/vet/ai_assessments.js?v=1" defer></script>
+  <script src="/web/sidebar-controls.js?v=3" defer></script>
+  <script src="/web/vet/appointment_scans.js?v=1" defer></script>
 </head>
+
 <body>
   <div id="vet-loading" class="loading">
-    <p id="vet-loading-message" role="status">Loading your account…</p>
-    <button id="vet-retry" type="button" class="secondary" hidden>Try again</button>
+    <p id="vet-loading-message" role="status">Loading your workspace…</p>
+    <button id="vet-retry" class="secondary" type="button" hidden>
+      Try again
+    </button>
     <a href="/web/">Back to staff login</a>
   </div>
+
   <div id="vet-workspace" class="workspace" hidden>
     <aside id="shared-sidebar" class="sidebar"></aside>
+
     <div class="content-area">
       <header id="shared-topbar" class="topbar"></header>
+
       <main class="main-content ai-review-page">
-        <h1>AI Assessments</h1>
-        <p class="subtitle">Review dental assessments shared by owners with your clinic.</p>
+        <div class="page-heading">
+          <h1>AI Assessments</h1>
+          <p class="subtitle">
+            Scans shared for appointments assigned to you.
+            Record clinical findings during consultation.
+          </p>
+        </div>
+
         <section class="panel">
           <div class="ar-toolbar">
-            <div><label for="ar-status">Review status</label>
-              <select id="ar-status"><option value="pending">Awaiting review</option><option value="reviewed">Reviewed</option><option value="">All accessible reviews</option></select>
+            <div>
+              <label for="scan-date">Appointment date</label>
+              <input id="scan-date" type="date">
             </div>
-            <button id="ar-refresh" type="button" class="secondary compact-button">Refresh</button>
+            <button id="scan-refresh" class="secondary compact-button" type="button">
+              Apply / refresh
+            </button>
+            <a href="/web/vet/assessment_review_history.html">
+              Previous review records
+            </a>
           </div>
-          <p id="ar-message" role="status" aria-live="polite"></p>
-          <div class="table-scroll"><table class="staff-table">
-            <thead><tr><th scope="col">Patient</th><th scope="col">Owner</th><th scope="col">Requested</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead>
-            <tbody id="ar-rows"></tbody>
-          </table></div>
-          <div class="ar-pagination"><button id="ar-previous" type="button" class="secondary compact-button" disabled>Previous</button><span id="ar-page">Page 1</span><button id="ar-next" type="button" class="secondary compact-button" disabled>Next</button></div>
+
+          <p id="scans-message" role="status" aria-live="polite"></p>
+
+          <div class="table-scroll">
+            <table class="staff-table">
+              <thead>
+                <tr>
+                  <th scope="col">Appointment</th>
+                  <th scope="col">Patient</th>
+                  <th scope="col">Owner</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Assessment</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody id="scans-rows"></tbody>
+            </table>
+          </div>
+
+          <div class="ar-pagination">
+            <button id="scans-previous" class="secondary compact-button" type="button" disabled>
+              Previous
+            </button>
+            <span id="scans-page">Page 1</span>
+            <button id="scans-next" class="secondary compact-button" type="button" disabled>
+              Next
+            </button>
+          </div>
         </section>
       </main>
     </div>
   </div>
-  <dialog id="ar-dialog" class="ar-dialog" aria-labelledby="ar-title">
-    <header class="ar-dialog-header"><div><h2 id="ar-title">Assessment review</h2><p id="ar-patient" class="muted"></p></div><button id="ar-close" type="button" class="secondary compact-button" aria-label="Close assessment review">×</button></header>
-    <div class="ar-dialog-body">
-      <p id="ar-detail-message" role="status" aria-live="polite"></p>
-      <button id="ar-reload" type="button" class="secondary compact-button">Reload review</button>
-      <div id="ar-detail" hidden>
-        <div class="ar-review-grid">
-          <section class="ar-block">
-            <h3>Original AI assessment</h3>
-            <p class="muted">AI screening and reference severity support review; they are not a confirmed diagnosis.</p>
-            <p id="ar-ai-severity" class="ar-severity"></p>
-            <p id="ar-ai-reason" class="muted"></p>
-            <div id="ar-predictions" class="ar-predictions"></div>
-            <h3>Owner's message</h3><p id="ar-owner-message" class="ar-preserve"></p>
-            <div class="ar-image-tabs" role="group" aria-label="Assessment image">
-              <button type="button" class="secondary compact-button" data-ar-kind="original">Original</button>
-              <button type="button" class="secondary compact-button" data-ar-kind="heatmap">Grad-CAM</button>
-              <button type="button" class="secondary compact-button" data-ar-kind="segmentation">Segmentation</button>
-              <button type="button" class="secondary compact-button" data-ar-kind="summary">Summary</button>
-            </div>
-            <p id="ar-image-message" role="status"></p>
-            <div class="ar-image-stage"><img id="ar-image" alt="" hidden></div>
-            <button id="ar-open-image" type="button" class="secondary compact-button" disabled>Open full image ↗</button>
-          </section>
-          <section class="ar-block">
-            <h3>Veterinary interpretation</h3>
-            <p class="muted">Your feedback is shown separately to the owner. Saving does not change the AI result or book an appointment.</p>
-            <div id="ar-saved" hidden></div>
-            <form id="ar-form">
-              <label for="ar-severity">Reviewed severity</label>
-              <select id="ar-severity" required><option value="">Select your interpretation</option><option value="none">No concern identified from this image</option><option value="mild">Mild</option><option value="moderate">Moderate</option><option value="severe">Severe</option><option value="unable_to_assess">Unable to assess from this image</option></select>
-              <label for="ar-action">Recommended next action</label>
-              <select id="ar-action" required><option value="">Select an action</option><option value="routine_booking">Routine appointment</option><option value="prompt_clinic_assessment">Prompt clinic assessment</option><option value="home_care">Home-care guidance</option><option value="unable_to_assess">Unable to advise from this image</option></select>
-              <label for="ar-feedback">Feedback for the owner</label>
-              <textarea id="ar-feedback" rows="6" maxlength="5000" required placeholder="Explain your interpretation, next steps and any limits of reviewing this photo."></textarea>
-              <p class="muted">The submitted review is final in this workflow. Check your interpretation before saving.</p>
-              <button id="ar-save" type="submit">Save review & notify owner</button>
-            </form>
-          </section>
-        </div>
-      </div>
-    </div>
-  </dialog>
 </body>
+
 </html>

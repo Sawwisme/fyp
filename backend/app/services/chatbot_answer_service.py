@@ -532,6 +532,7 @@ def generate_contextual_reply(
     conversation,
     message,
     language="en",
+    product_preferences=None,
 ):
     if is_topic_reset(message):
         return {
@@ -636,6 +637,9 @@ def generate_contextual_reply(
         effective_request = product_request or message
 
         reference["product_request"] = effective_request
+        reference["product_preferences"] = (
+            dict(product_preferences or {})
+        )
 
         reply, action = product_reply(
             db,
@@ -644,6 +648,7 @@ def generate_contextual_reply(
             products=products,
             request_text=effective_request,
             language=language,
+            product_preferences=product_preferences,
         )
 
         answer["reply"] = reply

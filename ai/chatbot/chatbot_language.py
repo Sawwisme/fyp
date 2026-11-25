@@ -130,31 +130,31 @@ FAQ_TRANSLATIONS.update({
         "ms": (
             "Keputusan AI VetDental ialah rujukan saringan, bukan "
             "diagnosis yang disahkan. Skor model bukan ukuran tahap "
-            "keterukan penyakit. Jika keputusan membimbangkan anda, "
-            "gunakan Request vet review pada penilaian yang telah "
-            "selesai atau aturkan konsultasi. Maklum balas veterinar "
-            "dipaparkan secara berasingan daripada keputusan AI asal."
+            "keterukan penyakit. Jika dapatan membimbangkan anda, "
+            "buka penilaian yang telah selesai dan pilih "
+            "Book a dental examination. Dapatan veterinar "
+            "direkodkan secara berasingan daripada keputusan AI asal."
         ),
         "zh": (
             "VetDental 的 AI 结果仅供筛查参考，并非确诊。"
             "模型分数不代表疾病严重程度。如果结果让您担心，"
-            "请在已完成的评估中选择 Request vet review，或安排问诊。"
-            "兽医的审核意见会与原始 AI 结果分开显示。"
+            "请打开已完成的评估，选择 Book a dental examination。"
+            "兽医检查结果会与原始 AI 结果分开记录。"
         ),
     },
     "request_review": {
         "ms": (
-            "Pada penilaian AI yang telah selesai, pilih Request vet "
-            "review, pilih klinik dan sahkan Share assessment & request "
-            "review. Untuk membaca maklum balas kemudian, buka My vet "
-            "reviews & feedback dalam AI Scan. Permintaan ulasan "
-            "tidak membuat tempahan janji temu."
+            "Untuk membincangkan dapatan AI dengan veterinar, "
+            "buka penilaian yang telah selesai dan pilih "
+            "Book a dental examination. Pilih klinik, veterinar "
+            "dan masa yang tersedia, kemudian semak butiran "
+            "dan sahkan tempahan anda."
         ),
         "zh": (
-            "在已完成的 AI 评估中选择 Request vet review，"
-            "选择诊所，然后确认 Share assessment & request review。"
-            "之后可在 AI Scan 中打开 My vet reviews & feedback "
-            "查看审核意见。提交审核请求不会自动预约。"
+            "如需与兽医讨论 AI 发现，请打开已完成的评估，"
+            "选择 Book a dental examination。"
+            "选择诊所、兽医和可预约时间，"
+            "然后检查详情并确认预约。"
         ),
     },
     "cancel_appointment": {

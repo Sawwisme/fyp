@@ -9,6 +9,7 @@ from sqlalchemy import (
     UniqueConstraint,
     Boolean,
     CheckConstraint,
+    JSON,
 )
 from sqlalchemy.orm import relationship
 
@@ -41,6 +42,7 @@ class Clinic(Base):
     osm_id = Column(BigInteger, nullable=True)
 
     address = Column(String(255), nullable=True)
+    state = Column(String(50), nullable=True)
     phone_number = Column(String(20), nullable=True)
     email = Column(String(255), nullable=True)
 
@@ -87,6 +89,11 @@ class Clinic(Base):
         server_default=text("0.00"),
     )
 
+    shop_delivery_states = Column(
+        JSON,
+        nullable=True,
+    )
+    
     shop_version = Column(
         Integer,
         nullable=False,

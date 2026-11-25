@@ -258,6 +258,11 @@ def send_message(
 
         request_id = str(data.client_request_id)
         message = data.message.strip()
+        product_preferences = (
+            data.product_preferences.model_dump(exclude_none=True)
+            if data.product_preferences is not None
+            else {}
+        )
 
         # Locking read sees committed messages after a concurrent retry.
         previous = list(
@@ -290,7 +295,17 @@ def send_message(
                     "Reload the conversation.",
                 )
 
-            if by_sender["user"].message_text != message:
+            saved_metadata = (
+                by_sender["user"].response_metadata or {}
+            )
+            saved_preferences = saved_metadata.get(
+                "product_preferences", {}
+            )
+
+            if (
+                by_sender["user"].message_text != message
+                or saved_preferences != product_preferences
+            ):
                 raise HTTPException(
                     409,
                     "This request ID was already used "
@@ -348,6 +363,7 @@ def send_message(
                     conversation,
                     engine_message,
                     language=language,
+                    product_preferences=product_preferences,
                 )
 
                 answer = localize_faq_answer(
@@ -364,6 +380,9 @@ def send_message(
             message_text=message,
             client_request_id=request_id,
             sent_at=now,
+            response_metadata={
+                "product_preferences": product_preferences,
+            },
         )
 
         db.add(user_message)

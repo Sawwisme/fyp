@@ -15,6 +15,7 @@ def list_my_appointments(
     appointment_date: date | None,
     offset: int,
     limit: int,
+    linked_scans_only: bool = False,
 ):
     
     veterinarian = get_profile(db, current_user)
@@ -34,6 +35,20 @@ def list_my_appointments(
             == veterinarian.veterinarian_id,
             Schedule.veterinarian_id
             == veterinarian.veterinarian_id,
+            (
+                Appointment.ai_analysis_id.is_not(None)
+                if linked_scans_only
+                else True
+            ),
+            (
+                Appointment.status.in_([
+                    "confirmed",
+                    "in_progress",
+                    "completed",
+                ])
+                if linked_scans_only
+                else True
+            ),
             (
                 Schedule.schedule_date == appointment_date
                 if appointment_date is not None
@@ -65,6 +80,10 @@ def list_my_appointments(
     return [
         {
             "appointment_id": record.appointment_id,
+            "ai_analysis_id": record.ai_analysis_id,
+            "medical_history_shared": (
+                record.medical_history_shared_at is not None
+            ),
             "appointment_date": record.appointment_date,
             "start_time": record.time_slot.start_time,
             "end_time": record.time_slot.end_time,

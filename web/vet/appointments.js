@@ -49,6 +49,167 @@
         }
     }
 
+    async function openSharedHistory(appointmentId) {
+        const dialog = document.createElement('dialog');
+        dialog.className = 'ar-dialog';
+        dialog.style.width = 'min(850px, calc(100vw - 32px))';
+        dialog.style.maxHeight = '85vh';
+        dialog.style.overflow = 'auto';
+        dialog.style.padding = '24px';
+
+        function node(tag, value) {
+            const element = document.createElement(tag);
+            if (value !== undefined) {
+                element.textContent = String(value);
+            }
+            return element;
+        }
+
+        const title = node('h2', 'Shared medical history');
+        const note = node(
+            'p',
+            'Read-only records from previous completed consultations. ' +
+            'Record new findings in the current consultation.'
+        );
+        const close = node('button', 'Close');
+        close.type = 'button';
+        close.className = 'secondary compact-button';
+
+        const status = node('p');
+        status.setAttribute('role', 'status');
+
+        const content = node('div');
+        const previous = node('button', 'Previous');
+        const next = node('button', 'Next');
+        const pageLabel = node('span', 'Page 1');
+
+        for (const button of [previous, next]) {
+            button.type = 'button';
+            button.className = 'secondary compact-button';
+        }
+
+        const navigation = node('div');
+        navigation.style.display = 'flex';
+        navigation.style.gap = '12px';
+        navigation.style.alignItems = 'center';
+        navigation.append(previous, pageLabel, next);
+
+        dialog.append(title, note, close, status, content, navigation);
+        document.body.appendChild(dialog);
+
+        close.addEventListener('click', () => dialog.close());
+        dialog.addEventListener('close', () => dialog.remove(), {
+            once: true
+        });
+        dialog.showModal();
+
+        let page = 0;
+        let loading = false;
+        let hasMore = false;
+
+        function controls() {
+            previous.disabled = loading || page === 0;
+            next.disabled = loading || !hasMore;
+        }
+
+        async function load(targetPage) {
+            if (loading || !dialog.open) return;
+
+            loading = true;
+            controls();
+            status.textContent = 'Loading shared history…';
+            content.replaceChildren();
+
+            try {
+                const query = new URLSearchParams({
+                    offset: String(targetPage * 20),
+                    limit: '20'
+                });
+
+                const response = await vetRequest(
+                    `/veterinarians/me/appointments/${appointmentId}` +
+                    `/shared-history?${query}`
+                );
+
+                if (!dialog.open) return;
+                if (!Array.isArray(response.items)) {
+                    throw new Error('Invalid medical history response.');
+                }
+
+                for (const record of response.items) {
+                    const section = node('section');
+                    section.className = 'panel section-panel';
+
+                    section.append(
+                        node('h3', record.clinic_name || 'Clinic not recorded'),
+                        node(
+                            'p',
+                            `${record.veterinarian_name || 'Vet not recorded'} · ` +
+                            `${record.consultation_date || 'Date not recorded'}`
+                        )
+                    );
+
+                    function detail(label, value) {
+                        const paragraph = node(
+                            'p',
+                            `${label}: ${value || 'Not recorded'}`
+                        );
+                        paragraph.style.whiteSpace = 'pre-wrap';
+                        section.appendChild(paragraph);
+                    }
+
+                    detail('Diagnosis', record.diagnosis);
+                    detail('Examination findings', record.examination_findings);
+                    detail('Follow-up instructions', record.followup_instructions);
+
+                    for (const treatment of record.treatments || []) {
+                        detail(
+                            'Treatment',
+                            [
+                                treatment.treatment_name,
+                                treatment.description,
+                                treatment.treatment_date,
+                                treatment.status
+                            ].filter(Boolean).join(' · ')
+                        );
+                    }
+
+                    for (const prescription of record.prescriptions || []) {
+                        detail(
+                            'Recorded prescription',
+                            [
+                                prescription.medication_name,
+                                prescription.dosage,
+                                prescription.administration_route,
+                                prescription.frequency,
+                                prescription.duration,
+                                prescription.instructions
+                            ].filter(Boolean).join(' · ')
+                        );
+                    }
+
+                    content.appendChild(section);
+                }
+
+                page = targetPage;
+                hasMore = response.has_more === true;
+                pageLabel.textContent = `Page ${page + 1}`;
+                status.textContent = response.items.length
+                    ? 'Original clinical wording is preserved.'
+                    : 'No previous completed records are available.';
+            } catch (error) {
+                if (dialog.open) status.textContent = error.message;
+            } finally {
+                loading = false;
+                controls();
+            }
+        }
+
+        previous.addEventListener('click', () => load(page - 1));
+        next.addEventListener('click', () => load(page + 1));
+        await load(0);
+    }
+
     function render() {
         const query = search.value.trim().toLocaleLowerCase();
 
@@ -126,6 +287,54 @@
             }
 
             row.appendChild(consultationCell);
+
+            const assessmentCell = document.createElement('td');
+
+            const canViewAssessment =
+                Number.isInteger(item.ai_analysis_id) &&
+                item.ai_analysis_id > 0 &&
+                ['confirmed', 'in_progress', 'completed']
+                    .includes(item.status);
+
+            if (canViewAssessment) {
+                const link = document.createElement('a');
+                link.className = 'secondary compact-button';
+                link.textContent = 'View AI assessment';
+
+                const query = new URLSearchParams({
+                    appointment_id: String(item.appointment_id)
+                });
+
+                link.href =
+                    `/web/vet/appointment_assessment.html?${query}`;
+
+                assessmentCell.appendChild(link);
+            } else {
+                assessmentCell.textContent = '—';
+            }
+
+            row.appendChild(assessmentCell);
+
+            const historyCell = document.createElement('td');
+            const canViewHistory =
+                item.medical_history_shared === true &&
+                ['confirmed', 'in_progress', 'completed']
+                    .includes(item.status);
+
+            if (canViewHistory) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'secondary compact-button';
+                button.textContent = 'View shared history';
+                button.addEventListener('click', () =>
+                    openSharedHistory(item.appointment_id)
+                );
+                historyCell.appendChild(button);
+            } else {
+                historyCell.textContent = '—';
+            }
+
+            row.appendChild(historyCell);
             rows.appendChild(row);
         }
 

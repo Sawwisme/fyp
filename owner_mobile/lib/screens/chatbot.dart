@@ -21,6 +21,7 @@ import 'chat_product_card.dart';
 import 'clinic_picker.dart';
 import 'book_appointment.dart';
 import 'chat_booking_flow.dart';
+import 'chat_product_preferences.dart';
 
 class ChatbotScreen extends StatefulWidget {
   final ChatbotService service;
@@ -517,6 +518,50 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
     _input.text = question;
     _send();
+  }
+
+  Future<void> _recommendWithPreferences() async {
+    if (_busy || _pending != null || _selected == null) return;
+
+    final conversationId = _selected!['conversation_id'] as int;
+
+    if (_selected!['status'] != 'active' ||
+        _bookingChatIds.contains(conversationId)) {
+      return;
+    }
+
+    if (_selected!['pet_id'] == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Select a pet before requesting recommendations.'),
+        ),
+      );
+      return;
+    }
+
+    final preferences = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (_) => ChatProductPreferences(
+        service: ShopService(widget.service.api),
+      ),
+    );
+
+    if (!mounted ||
+        preferences == null ||
+        _busy ||
+        _pending != null ||
+        _selected?['conversation_id'] != conversationId ||
+        _selected?['status'] != 'active') {
+      return;
+    }
+
+    _sidebarCommandDraft = _input.text;
+    _pending = PendingChatMessage(
+      'recommend dental care products',
+      productPreferences: preferences,
+    );
+
+    await _send();
   }
 
   Future<void> _send() async {
@@ -1512,6 +1557,21 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
             ],
           ),
         ),
+        if (canSend &&
+            !_bookingChatIds.contains(_selected?['conversation_id']))
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: _busy || _pending != null
+                    ? null
+                    : _recommendWithPreferences,
+                icon: const Icon(Icons.tune_rounded),
+                label: const Text('Find suitable products'),
+              ),
+            ),
+          ),
         if (_busy) const LinearProgressIndicator(),
         if (_error != null)
           Padding(

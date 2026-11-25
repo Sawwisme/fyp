@@ -78,4 +78,5 @@ def get_clinics(
         db,
         offset,
         limit,
+        current_user,
     )

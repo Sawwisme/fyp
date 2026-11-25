@@ -13,6 +13,13 @@ import 'ai_assessment_reviews.dart';
 
 import 'assessment_history.dart';
 
+import '../services/appointment_service.dart';
+import 'clinic_picker.dart';
+import 'book_appointment.dart';
+
+import 'package:printing/printing.dart';
+import '../services/assessment_pdf_service.dart';
+
 class AiScanPage extends StatefulWidget {
   final PetService petService;
   final DentalAssessmentService service;
@@ -40,8 +47,7 @@ class AiScanPage extends StatefulWidget {
   State<AiScanPage> createState() => _AiScanPageState();
 }
 
-class _AiScanPageState extends State<AiScanPage>
-    with WidgetsBindingObserver {
+class _AiScanPageState extends State<AiScanPage> with WidgetsBindingObserver {
   final _picker = ImagePicker();
   final Map<String, Future<Uint8List>> _images = {};
 
@@ -59,6 +65,8 @@ class _AiScanPageState extends State<AiScanPage>
   bool _checking = false;
   bool _accessDenied = false;
   bool _historyOpen = false;
+  bool _openingBooking = false;
+  bool _exportingPdf = false;
 
   String? _error;
   String? _progressNote;
@@ -738,6 +746,139 @@ class _AiScanPageState extends State<AiScanPage>
     }
   }
 
+  Future<void> _downloadAssessmentPdf() async {
+    if (_exportingPdf) return;
+
+    final jobId = _job?['assessment_job_id'];
+    if (jobId is! int) return;
+
+    setState(() => _exportingPdf = true);
+
+    try {
+      // Retrieve the authorized saved assessment before exporting.
+      final job = await widget.service.getAssessment(jobId);
+
+      if (!mounted) return;
+
+      final petId = job['pet_id'];
+      final imageId = job['dental_image_id'];
+
+      if (job['status'] != 'completed' ||
+          petId is! int ||
+          imageId is! int) {
+        throw const ApiException(
+          'This assessment is not ready for PDF export.',
+        );
+      }
+
+      final pet = await widget.petService.getPet(petId);
+      if (!mounted) return;
+
+      final original = await widget.service.api.getBytes(
+        '/dental-images/$imageId/file',
+      );
+      if (!mounted) return;
+
+      final combined = await widget.service.getResultImage(
+        jobId,
+        'summary',
+      );
+      if (!mounted) return;
+
+      final bytes = await AssessmentPdfService.build(
+        job: job,
+        pet: pet,
+        originalImage: original,
+        combinedImage: combined,
+      );
+
+      if (!mounted) return;
+
+      await Printing.sharePdf(
+        bytes: bytes,
+        filename: 'VetDental_Assessment_$jobId.pdf',
+      );
+    } catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            error is ApiException
+                ? error.message
+                : 'Could not prepare the PDF. Check your connection '
+                'and try again.',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _exportingPdf = false);
+      }
+    }
+  }
+
+  Future<void> _bookDentalExamination() async {
+    if (_openingBooking) return;
+
+    final petId = _job?['pet_id'];
+    final analysisId = _job?['analysis_id'];
+
+    if (petId is! int || analysisId is! int) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'The pet linked to this assessment could not be identified.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    setState(() => _openingBooking = true);
+
+    try {
+      final appointments = AppointmentService(widget.service.api);
+
+      final clinic = await Navigator.of(context)
+          .push<Map<String, dynamic>>(
+        MaterialPageRoute(
+          builder: (_) => ClinicPickerScreen(
+            service: appointments,
+          ),
+        ),
+      );
+
+      if (!mounted || clinic == null) return;
+
+      await Navigator.of(context).push<bool>(
+        MaterialPageRoute(
+          builder: (_) => BookAppointmentScreen(
+            clinic: clinic,
+            service: appointments,
+            petService: widget.petService,
+            initialPetId: petId,
+            aiAnalysisId: analysisId,
+          ),
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Could not open booking. Please try again.',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _openingBooking = false);
+      }
+    }
+  }
+
   Future<void> _openVetReviews({int? analysisId}) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
@@ -984,16 +1125,43 @@ class _AiScanPageState extends State<AiScanPage>
             ),
           ),
 
-          if (_job?['analysis_id'] is int) ...[
-            FilledButton.icon(
-              onPressed: () => _openVetReviews(
-                analysisId: _job!['analysis_id'] as int,
+          const Text(
+            'A photo cannot confirm dental health. If you are '
+                'concerned about the findings, arrange a dental examination.',
+            style: TextStyle(height: 1.5),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: _openingBooking
+                  ? null
+                  : _bookDentalExamination,
+              icon: const Icon(Icons.calendar_month_outlined),
+              label: Text(
+                _openingBooking
+                    ? 'Opening booking…'
+                    : 'Book a dental examination',
               ),
-              icon: const Icon(Icons.medical_services_outlined),
-              label: const Text('Request vet review'),
             ),
-            const SizedBox(height: 16),
-          ],
+          ),
+
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: _exportingPdf
+                  ? null
+                  : _downloadAssessmentPdf,
+              icon: const Icon(Icons.download_outlined),
+              label: Text(
+                _exportingPdf
+                    ? 'Preparing PDF…'
+                    : 'Download PDF',
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
 
           _resultImage('heatmap', 'Model attention'),
           _resultImage('segmentation', 'Predicted image regions'),

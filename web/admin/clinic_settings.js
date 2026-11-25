@@ -18,6 +18,7 @@ const clinicFieldDefinitions = [
     ['email', 'Clinic email address', 'email', 255],
     ['latitude', 'Latitude', 'number', null],
     ['longitude', 'Longitude', 'number', null]
+    ['state', 'State / federal territory', 'select', null],
 ];
 
 const clinicInputs = {};
@@ -29,14 +30,39 @@ const weekdayNames = [
 let clinicSettingsBusy = false;
 let clinicSettingsLoaded = false;
 
+const clinicStateOptions = [
+    'Johor', 'Kedah', 'Kelantan', 'Melaka',
+    'Negeri Sembilan', 'Pahang', 'Pulau Pinang',
+    'Perak', 'Perlis', 'Sabah', 'Sarawak',
+    'Selangor', 'Terengganu',
+    'W.P. Kuala Lumpur', 'W.P. Labuan', 'W.P. Putrajaya'
+];
+
 for (const [name, title, type, maxLength] of clinicFieldDefinitions) {
     const wrapper = document.createElement('div');
     wrapper.dataset.clinicField = name;
     const label = document.createElement('label');
-    const input = document.createElement('input');
+    const input = document.createElement(
+        type === 'select' ? 'select' : 'input'
+    );
 
     input.id = `clinic-setting-${name}`;
-    input.type = type;
+
+    if (type === 'select') {
+        const empty = document.createElement('option');
+        empty.value = '';
+        empty.textContent = 'Not specified';
+        input.appendChild(empty);
+
+        for (const state of clinicStateOptions) {
+            const option = document.createElement('option');
+            option.value = state;
+            option.textContent = state;
+            input.appendChild(option);
+        }
+    } else {
+        input.type = type;
+    }
     label.htmlFor = input.id;
     label.className = 'field-label';
     label.textContent = title;
@@ -98,6 +124,7 @@ function fillClinicInformation(clinic) {
 
     const entries = [
         ['Address', clinic.address || 'Not provided'],
+        ['State', clinic.state || 'Not provided'],
         ['Clinic phone', clinic.phone_number || 'Not provided'],
         ['Clinic email', clinic.email || 'Not provided'],
         [

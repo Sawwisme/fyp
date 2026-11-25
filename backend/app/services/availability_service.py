@@ -1,7 +1,7 @@
 from datetime import date, datetime, timedelta, timezone
 
 from fastapi import HTTPException, status
-from sqlalchemy import exists, select
+from sqlalchemy import exists, func, select
 from sqlalchemy.orm import Session
 
 from app.models import (
@@ -12,7 +12,10 @@ from app.models import (
     User,
     Veterinarian,
     VeterinarianAbsence,
+    Consultation,
 )
+
+from app.services.pet_service import get_owner_profile
 
 
 CLINIC_TIMEZONE = timezone(timedelta(hours=8))
@@ -158,7 +161,33 @@ def list_clinics(
     db: Session,
     offset: int,
     limit: int,
+    current_user,
 ):
+    owner = get_owner_profile(db, current_user)
+
+    visits = (
+        select(
+            Consultation.clinic_id.label("clinic_id"),
+            func.count(Consultation.consultation_id).label(
+                "completed_visit_count"
+            ),
+            func.max(Consultation.consultation_date).label(
+                "last_visit_at"
+            ),
+        )
+        .join(
+            Appointment,
+            Appointment.appointment_id == Consultation.appointment_id,
+        )
+        .where(
+            Appointment.pet_owner_id == owner.pet_owner_id,
+            Appointment.pet_id == Consultation.pet_id,
+            Consultation.status == "completed",
+        )
+        .group_by(Consultation.clinic_id)
+        .subquery()
+    )
+
     eligible_vet = (
         select(Veterinarian.veterinarian_id)
         .join(User, User.user_id == Veterinarian.user_id)
@@ -172,6 +201,10 @@ def list_clinics(
         .exists()
     )
 
+    visit_count = func.coalesce(
+        visits.c.completed_visit_count, 0
+    )
+
     statement = (
         select(
             Clinic.clinic_id,
@@ -180,12 +213,23 @@ def list_clinics(
             Clinic.phone_number,
             Clinic.latitude,
             Clinic.longitude,
+            visit_count.label("completed_visit_count"),
+            visits.c.last_visit_at,
+        )
+        .outerjoin(
+            visits,
+            visits.c.clinic_id == Clinic.clinic_id,
         )
         .where(
             Clinic.status == "active",
             eligible_vet,
         )
-        .order_by(Clinic.clinic_name, Clinic.clinic_id)
+        .order_by(
+            visit_count.desc(),
+            visits.c.last_visit_at.desc(),
+            Clinic.clinic_name,
+            Clinic.clinic_id,
+        )
         .offset(offset)
         .limit(limit)
     )

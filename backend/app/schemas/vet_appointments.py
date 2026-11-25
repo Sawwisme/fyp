@@ -17,12 +17,14 @@ class VetAppointmentResponse(BaseModel):
     appointment_type: str
     appointment_source: str | None
     status: str
+    ai_analysis_id: int | None = None
     emergency_reason: str | None = None
     urgency_level: str | None = None
 
     consultation_id: int | None = None
     consultation_status: str | None = None
     needs_rearrangement: bool = False
+    medical_history_shared: bool = False
 
 class VetCalendarEntry(BaseModel):
     schedule_id: int

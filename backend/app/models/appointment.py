@@ -101,6 +101,17 @@ class Appointment(Base):
         nullable=True,
     )
 
+    ai_analysis_id = Column(
+        Integer,
+        ForeignKey("ai_analysis_results.analysis_id"),
+        nullable=True,
+    )
+
+    medical_history_shared_at = Column(
+        DateTime,
+        nullable=True,
+    )
+    
     created_by_user_id = Column(
         Integer,
         ForeignKey("users.user_id"),

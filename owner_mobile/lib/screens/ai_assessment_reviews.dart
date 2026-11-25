@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../services/ai_assessment_review_service.dart';
 import '../services/api_client.dart';
 import '../services/appointment_service.dart';
-import 'clinic_picker.dart';
 
 import 'book_appointment.dart';
 import '../services/pet_service.dart';
@@ -29,19 +28,16 @@ class _AIAssessmentReviewsScreenState extends State<AIAssessmentReviewsScreen>
     with WidgetsBindingObserver {
   static const _blue = Color(0xFF2549C7);
   static const _size = 20;
-  final _message = TextEditingController();
-  final _form = GlobalKey<FormState>();
   List<Map<String, dynamic>> _reviews = [];
-  Map<String, dynamic>? _clinic;
   Map<String, dynamic>? _selected;
-  bool _loading = true, _sending = false, _reading = false, _choosing = false;
-  bool _hasNext = false, _uncertain = false;
+  bool _loading = true;
+  bool _reading = false;
+  bool _hasNext = false;
   bool _booking = false;
   int _page = 0;
-  String? _error, _notice;
+  String? _error;
 
-  bool get _busy =>
-      _loading || _sending || _reading || _choosing || _booking;
+  bool get _busy => _loading || _reading || _booking;
 
   @override
   void initState() {
@@ -58,7 +54,6 @@ class _AIAssessmentReviewsScreenState extends State<AIAssessmentReviewsScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _message.dispose();
     super.dispose();
   }
 
@@ -116,78 +111,6 @@ class _AIAssessmentReviewsScreenState extends State<AIAssessmentReviewsScreen>
     final id = _selected?['review_id'] as int?;
     await _load(_page);
     if (mounted && id != null && _error == null) await _read(id);
-  }
-
-  Future<void> _chooseClinic() async {
-    if (_busy || _uncertain) return;
-    setState(() => _choosing = true);
-    try {
-      final clinic = await Navigator.of(context).push<Map<String, dynamic>>(
-        MaterialPageRoute(
-          builder: (_) => ClinicPickerScreen(
-            service: AppointmentService(widget.service.api),
-          ),
-        ),
-      );
-      if (mounted && clinic != null) {
-        setState(() {
-          _clinic = clinic;
-          _notice = null;
-          _error = null;
-        });
-      }
-    } finally {
-      if (mounted) setState(() => _choosing = false);
-    }
-  }
-
-  Future<void> _send() async {
-    if (_busy || _clinic == null || widget.analysisId == null) return;
-    if (!(_form.currentState?.validate() ?? false)) return;
-    final analysisId = widget.analysisId!;
-    final clinicId = _clinic!['clinic_id'] as int;
-    final wasUncertain = _uncertain;
-    setState(() {
-      _sending = true;
-      _error = null;
-      _notice = null;
-    });
-    try {
-      final record = await widget.service.request(
-        analysisId: analysisId,
-        clinicId: clinicId,
-        ownerMessage: _message.text,
-      );
-      if (!mounted) return;
-      setState(() {
-        _selected = record;
-        _uncertain = false;
-        _notice = record['status'] == 'reviewed'
-            ? 'This clinic has already reviewed the assessment. View its feedback below.'
-            : 'Your request is awaiting a vet review. This does not book an appointment.';
-      });
-    } on ApiException catch (error) {
-      if (!mounted) return;
-      setState(() {
-        _uncertain =
-            wasUncertain ||
-                error.statusCode == null ||
-                (error.statusCode ?? 0) >= 500;
-        _error = _uncertain
-            ? 'The request could not be confirmed. Keep this clinic selected and retry the same request; the server prevents duplicate requests.'
-            : error.message;
-      });
-    } catch (_) {
-      if (mounted)
-        setState(() {
-          _uncertain = true;
-          _error =
-          'The request could not be confirmed. Retry the same clinic and assessment to check it.';
-        });
-    } finally {
-      if (mounted) setState(() => _sending = false);
-    }
-    if (mounted && _error == null) await _load(0);
   }
 
   String _label(Object? value) => switch (value) {
@@ -388,65 +311,13 @@ class _AIAssessmentReviewsScreenState extends State<AIAssessmentReviewsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Vet assessment reviews')),
+      appBar: AppBar(title: const Text('Vet feedback')),
       body: RefreshIndicator(
         onRefresh: _refresh,
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(20),
           children: [
-            if (widget.analysisId != null)
-              _card([
-                Text(
-                  'Request a vet review',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 8),
-                Text('Assessment #${widget.analysisId}'),
-                const SizedBox(height: 8),
-                const Text(
-                  'Choose a clinic. Sending shares this assessment’s photo and AI results with its authorised veterinarians. It does not book an appointment.',
-                ),
-                const SizedBox(height: 14),
-                OutlinedButton.icon(
-                  onPressed: _busy || _uncertain ? null : _chooseClinic,
-                  icon: const Icon(Icons.local_hospital_outlined),
-                  label: Text(
-                    _clinic?['clinic_name']?.toString() ?? 'Select clinic',
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Form(
-                  key: _form,
-                  child: TextFormField(
-                    controller: _message,
-                    maxLines: 3,
-                    maxLength: 2000,
-                    enabled: !_sending && !_uncertain,
-                    decoration: const InputDecoration(
-                      labelText: 'Message for the vet (optional)',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                FilledButton.icon(
-                  onPressed: _busy || _clinic == null ? null : _send,
-                  icon: const Icon(Icons.send_outlined),
-                  label: Text(
-                    _sending
-                        ? 'Sending…'
-                        : _uncertain
-                        ? 'Retry same request'
-                        : 'Share assessment & request review',
-                  ),
-                ),
-              ]),
-            if (_notice != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: Text(_notice!),
-              ),
             if (_error != null)
               _card([
                 Text(
@@ -465,12 +336,12 @@ class _AIAssessmentReviewsScreenState extends State<AIAssessmentReviewsScreen>
               ),
             if (_selected != null) _feedback(),
             Text(
-              'Your review requests',
+              'Assessment feedback',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 12),
             if (!_loading && _reviews.isEmpty && _error == null)
-              const Text('No review requests yet.'),
+              const Text('No assessment feedback recorded.'),
             for (final record in _reviews)
               Card(
                 color: Colors.white,

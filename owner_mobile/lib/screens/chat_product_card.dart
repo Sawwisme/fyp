@@ -86,7 +86,8 @@ class _ChatProductCardState extends State<ChatProductCard> {
           MaterialPageRoute(
             builder: (_) => CheckoutScreen(
               service: CheckoutService(widget.service.api),
-              clinicId: widget.product['clinic_id'] as int,
+              clinicId: clinicId,
+              selectedProductIds: [productId],
             ),
           ),
         );
@@ -161,8 +162,73 @@ class _ChatProductCardState extends State<ChatProductCard> {
             style: const TextStyle(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 4),
-          Text('${widget.product['clinic_name']}'),
-          const SizedBox(height: 6),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(
+                Icons.storefront_outlined,
+                size: 16,
+                color: Color(0xFF63718A),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  '${widget.product['clinic_name']}',
+                  style: const TextStyle(
+                    color: Color(0xFF63718A),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if ((widget.product['clinic_state'] ?? '')
+              .toString()
+              .trim()
+              .isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              '${widget.product['clinic_state']}',
+              style: const TextStyle(
+                fontSize: 12,
+                color: Color(0xFF63718A),
+              ),
+            ),
+          ],
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              if (widget.product['shop_pickup_enabled'] == true)
+                const Chip(
+                  avatar: Icon(
+                    Icons.store_outlined,
+                    size: 16,
+                  ),
+                  label: Text('Clinic pickup'),
+                  visualDensity: VisualDensity.compact,
+                ),
+              if (widget.product['shop_delivery_enabled'] == true)
+                const Chip(
+                  avatar: Icon(
+                    Icons.local_shipping_outlined,
+                    size: 16,
+                  ),
+                  label: Text('Delivery available'),
+                  visualDensity: VisualDensity.compact,
+                ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Confirm current fulfilment options and any delivery '
+                'charges at checkout.',
+            style: TextStyle(
+              fontSize: 11,
+              color: Color(0xFF63718A),
+            ),
+          ),
+          const SizedBox(height: 10),
           Text(
             price == null
                 ? 'Check price at checkout'

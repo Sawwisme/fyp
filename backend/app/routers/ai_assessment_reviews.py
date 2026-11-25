@@ -1,6 +1,6 @@
 from typing import Literal
 
-from fastapi import APIRouter, Depends, Path, Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
@@ -25,13 +25,13 @@ def request_review(
     data: AIAssessmentReviewRequest,
     analysis_id: int = Path(ge=1, le=2147483647),
     current_user: User = Depends(require_roles("pet_owner")),
-    db: Session = Depends(get_db),
 ):
-    return service.request_review(
-        db,
-        current_user,
-        analysis_id,
-        data,
+    raise HTTPException(
+        status_code=410,
+        detail=(
+            "Please book a dental examination from your AI "
+            "assessment result page to discuss the findings with a vet."
+        ),
     )
 
 

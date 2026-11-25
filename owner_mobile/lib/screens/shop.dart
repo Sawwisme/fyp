@@ -38,6 +38,16 @@ class _ShopScreenState extends State<ShopScreen> {
   int? _categoryId;
   Future<List<Map<String, dynamic>>>? _categoriesFuture;
   String _query = '';
+  String? _clinicState;
+  String? _fulfilment;
+
+  static const _states = [
+    'Johor', 'Kedah', 'Kelantan', 'Melaka',
+    'Negeri Sembilan', 'Pahang', 'Pulau Pinang',
+    'Perak', 'Perlis', 'Sabah', 'Sarawak',
+    'Selangor', 'Terengganu',
+    'W.P. Kuala Lumpur', 'W.P. Labuan', 'W.P. Putrajaya',
+  ];
   int _page = 0;
   bool _openingProduct = false;
 
@@ -100,6 +110,8 @@ class _ShopScreenState extends State<ShopScreen> {
         search: _query,
         offset: _page * _pageSize,
         limit: _pageSize + 1,
+        state: _clinicState,
+        fulfilment: _fulfilment,
       );
     }
 
@@ -112,6 +124,8 @@ class _ShopScreenState extends State<ShopScreen> {
         search: _query,
         offset: offset,
         limit: 100,
+        state: _clinicState,
+        fulfilment: _fulfilment,
       );
 
       clinics.addAll(page);
@@ -506,6 +520,97 @@ class _ShopScreenState extends State<ShopScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
+      ),
+    );
+  }
+
+  Widget _clinicFilters() {
+    if (_clinic != null) return const SizedBox.shrink();
+
+    void applyFilter(VoidCallback update) {
+      setState(() {
+        update();
+        _page = 0;
+        _future = _fetch();
+      });
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth < 500
+              ? constraints.maxWidth
+              : (constraints.maxWidth - 12) / 2;
+
+          return Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              SizedBox(
+                width: width,
+                child: DropdownButtonFormField<String>(
+                  key: ValueKey('clinic-state-$_clinicState'),
+                  initialValue: _clinicState ?? '',
+                  isExpanded: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Clinic state',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: [
+                    const DropdownMenuItem(
+                      value: '',
+                      child: Text('All states'),
+                    ),
+                    for (final state in _states)
+                      DropdownMenuItem(
+                        value: state,
+                        child: Text(state),
+                      ),
+                  ],
+                  onChanged: (value) {
+                    applyFilter(() {
+                      _clinicState =
+                      value == null || value.isEmpty ? null : value;
+                    });
+                  },
+                ),
+              ),
+              SizedBox(
+                width: width,
+                child: DropdownButtonFormField<String>(
+                  key: ValueKey('clinic-fulfilment-$_fulfilment'),
+                  initialValue: _fulfilment ?? '',
+                  isExpanded: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Fulfilment',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                    DropdownMenuItem(
+                      value: '',
+                      child: Text('Pickup or delivery'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'pickup',
+                      child: Text('Clinic pickup'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'delivery',
+                      child: Text('Delivery available'),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    applyFilter(() {
+                      _fulfilment =
+                      value == null || value.isEmpty ? null : value;
+                    });
+                  },
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -994,6 +1099,7 @@ class _ShopScreenState extends State<ShopScreen> {
           ),
         ),
 
+        _clinicFilters(),
         _categoryFilter(),
 
         Expanded(
@@ -1040,7 +1146,8 @@ class _ShopScreenState extends State<ShopScreen> {
                             ? (_query.trim().isEmpty
                             ? 'No clinic shops are available yet. Clinics need to enable '
                             'pickup or delivery and add products with available stock.'
-                            : 'No clinic shops match that name. Try another clinic.')
+                            : 'No clinic shops match your search and filters. '
+                            'Try another state, fulfilment option or clinic name.')
                             : (_query.trim().isEmpty && _categoryId == null
                             ? 'This clinic has no products available right now.'
                             : 'No products match your filters.'),
