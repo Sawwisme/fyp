@@ -373,6 +373,8 @@ def create_appointment(
             appointment,
         )
 
+        from app.services.staff_notification_service import notify_booking_confirmed
+        notify_booking_confirmed(db, appointment)
         db.commit()
         db.refresh(appointment)
 

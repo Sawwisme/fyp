@@ -249,6 +249,11 @@ def get_checkout_quote(
         cart_version=cart.version,
         settings_version=clinic.shop_version,
         shipping_method=data.shipping_method,
+                delivery_state=(
+            data.delivery_state
+            if data.shipping_method == "delivery"
+            else None
+        ),
         pickup_address=pickup_address,
         items=selected_items,
         subtotal=subtotal,

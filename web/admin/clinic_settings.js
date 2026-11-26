@@ -17,7 +17,7 @@ const clinicFieldDefinitions = [
     ['phone_number', 'Clinic phone number', 'tel', 20],
     ['email', 'Clinic email address', 'email', 255],
     ['latitude', 'Latitude', 'number', null],
-    ['longitude', 'Longitude', 'number', null]
+    ['longitude', 'Longitude', 'number', null],
     ['state', 'State / federal territory', 'select', null],
 ];
 
@@ -462,6 +462,13 @@ clinicSettingsForm.addEventListener('submit', async event => {
             'Clinic information saved.',
             true
         );
+
+        const editor = clinicSettingsForm.closest('details');
+
+        if (editor) {
+            editor.open = false;
+            editor.querySelector('summary')?.focus();
+        }
     } catch (error) {
         settingsMessage(clinicSettingsMessage, error.message);
     } finally {
@@ -533,6 +540,13 @@ clinicHoursForm.addEventListener('submit', async event => {
             'Weekly working hours saved.',
             true
         );
+
+        const editor = clinicHoursForm.closest('details');
+
+        if (editor) {
+            editor.open = false;
+            editor.querySelector('summary')?.focus();
+        }
     } catch (error) {
         settingsMessage(clinicHoursMessage, error.message);
     } finally {

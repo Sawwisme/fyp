@@ -226,6 +226,8 @@ def record_verified_deposit(
         return
 
     appointment.status = "confirmed"
+    from app.services.staff_notification_service import notify_booking_confirmed
+    notify_booking_confirmed(db, appointment)
 
     if payer_user_id is not None:
         db.add(

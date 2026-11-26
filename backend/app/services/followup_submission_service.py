@@ -222,6 +222,8 @@ def _create_validated_submission(
             submission
         )
 
+        from app.services.staff_notification_service import notify_followup_submitted
+        notify_followup_submitted(db, followup, submission)
         committing = True
         db.commit()
 

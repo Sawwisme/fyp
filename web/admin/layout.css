@@ -1805,3 +1805,32 @@ section:has(#schedule-form) {
 .linked-appointment-highlight>td {
     background: #e8edff;
 }
+
+#clinic-settings-fields select {
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 14px;
+    border: 1px solid #cdd8e7;
+    border-radius: 10px;
+    background-color: #f8faff;
+    color: #203a5c;
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+#clinic-settings-fields select:focus-visible {
+    outline: 3px solid rgb(37 73 199 / 15%);
+    outline-offset: 2px;
+    border-color: #2549c7;
+}
+
+#clinic-settings-fields select:disabled {
+    background-color: #eef1f5;
+    color: #718096;
+    cursor: not-allowed;
+    opacity: 0.8;
+}

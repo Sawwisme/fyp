@@ -557,6 +557,32 @@ def product_reply(
     ).mappings().all()
 
     if not records:
+        if age_months is None:
+            return (
+                text(
+                    "I couldn't find an eligible product with the "
+                    "current filters. Your pet's date of birth is "
+                    "missing or invalid, so I cannot verify "
+                    "eligibility for age-restricted products. "
+                    "Update the date of birth in My Pets if known, "
+                    "then ask again. If the age is unknown, ask "
+                    "your clinic about suitable products.",
+                    "Saya tidak menemui produk yang layak dengan "
+                    "penapis semasa. Tarikh lahir haiwan anda "
+                    "tiada atau tidak sah, jadi kelayakan untuk "
+                    "produk dengan had umur tidak dapat disahkan. "
+                    "Kemas kini tarikh lahir dalam My Pets jika "
+                    "diketahui, kemudian tanya semula. Jika umur "
+                    "tidak diketahui, dapatkan nasihat klinik.",
+                    "目前没有产品符合筛选条件。宠物的出生日期"
+                    "尚未填写或无效，因此无法确认它是否符合"
+                    "有年龄限制产品的要求。若知道出生日期，"
+                    "请到“我的宠物”更新资料后再询问。"
+                    "若年龄不确定，请向诊所咨询适合的产品。",
+                ),
+                "OPEN_SHOP",
+            )
+
         translated_reply = render_product_search_reply(
             language=language,
             no_match=True,

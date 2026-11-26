@@ -211,6 +211,19 @@
             controls.appendChild(link);
         }
 
+        const staffPages = {
+            staff_appointment: ['/web/vet/', '/web/vet/appointments.html', 'View appointments'],
+            staff_followup: ['/web/vet/', '/web/vet/followups.html', 'Review follow-ups'],
+            staff_emergency: ['/web/admin/', '/web/admin/schedules.html', 'Review emergency requests']
+        };
+        const destination = staffPages[item.resource_type];
+        if (destination && location.pathname.startsWith(destination[0])) {
+            const link = document.createElement('a');
+            link.href = destination[1];
+            link.textContent = destination[2];
+            controls.appendChild(link);
+        }
+
         if (!item.read_at) {
             const read = document.createElement('button');
             read.type = 'button';

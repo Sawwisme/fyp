@@ -101,6 +101,9 @@ def create_request(
         )
 
         db.add(request)
+        db.flush()
+        from app.services.staff_notification_service import notify_emergency_requested
+        notify_emergency_requested(db, request)
         db.commit()
         db.refresh(request)
 
@@ -411,6 +414,8 @@ def approve_request(
         request.rejection_reason = None
 
         db.flush()
+        from app.services.staff_notification_service import notify_booking_confirmed
+        notify_booking_confirmed(db, appointment)
         notify_emergency_approved(db, request)
 
         db.commit()
