@@ -5,6 +5,7 @@ import '../services/checkout_service.dart';
 import 'dart:math';
 
 import 'shop_order_details.dart';
+import '../services/profile_service.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final CheckoutService service;
@@ -44,6 +45,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
   final _noteController = TextEditingController();
+
+  String? _deliveryState;
+  bool _profilePrefilled = false;
+  int _quoteRequest = 0;
+
+  static const _states = [
+    'Johor', 'Kedah', 'Kelantan', 'Melaka',
+    'Negeri Sembilan', 'Pahang', 'Pulau Pinang',
+    'Perak', 'Perlis', 'Sabah', 'Sarawak',
+    'Selangor', 'Terengganu',
+    'W.P. Kuala Lumpur', 'W.P. Labuan', 'W.P. Putrajaya',
+  ];
 
   Map<String, dynamic>? _pendingOrder;
 
@@ -102,6 +115,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             : _noteController.text.trim(),
         if (_selectedProductIds != null)
           'selected_product_ids': _selectedProductIds,
+        if (_method == 'delivery')
+          'delivery_state': _deliveryState,
       };
     }
 
@@ -348,12 +363,29 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       final results = await Future.wait([
         widget.service.getCart(widget.clinicId),
         widget.service.getSettings(widget.clinicId),
+        ProfileService(widget.service.api).getProfile(),
       ]);
 
       if (!mounted) return;
 
       _cart = results[0];
       _settings = results[1];
+
+      if (!_profilePrefilled) {
+        final profile = results[2];
+        final user = profile['user'] as Map;
+
+        _nameController.text = user['full_name']?.toString() ?? '';
+        _phoneController.text = user['phone_number']?.toString() ?? '';
+        _addressController.text =
+            profile['default_address']?.toString() ?? '';
+
+        final state = profile['default_state'];
+        _deliveryState =
+        state is String && _states.contains(state) ? state : null;
+
+        _profilePrefilled = true;
+      }
 
       if (_settings!['pickup_enabled'] != true &&
           _settings!['delivery_enabled'] != true) {
@@ -377,6 +409,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Future<void> _loadQuote(String method) async {
+    final request = ++_quoteRequest;
+    final destination = _deliveryState;
+
     setState(() {
       _method = method;
 
@@ -389,22 +424,40 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       _quoteError = null;
     });
 
+    if (method == 'delivery' && destination == null) {
+      setState(() {
+        _quoting = false;
+        _quoteError = 'Select your delivery destination state.';
+      });
+      return;
+    }
+
     try {
       final quote = await widget.service.getQuote(
         clinicId: widget.clinicId,
         cartVersion: _cart!['version'] as int,
         shippingMethod: method,
         selectedProductIds: _selectedProductIds,
+        deliveryState: method == 'delivery' ? destination : null,
       );
 
-      if (!mounted) return;
+      if (!mounted || request != _quoteRequest) return;
+
+      if (method == 'delivery' &&
+          quote['delivery_state'] != destination) {
+        throw const ApiException(
+          'The delivery destination could not be confirmed.',
+        );
+      }
+
       setState(() => _quote = quote);
     } catch (error) {
-      if (mounted) {
-        setState(() => _quoteError = error.toString());
-      }
+      if (!mounted || request != _quoteRequest) return;
+      setState(() => _quoteError = error.toString());
     } finally {
-      if (mounted) setState(() => _quoting = false);
+      if (mounted && request == _quoteRequest) {
+        setState(() => _quoting = false);
+      }
     }
   }
 
@@ -524,6 +577,43 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   if (value != null) _loadQuote(value);
                 },
               ),
+              if (_method == 'delivery') ...[
+                const SizedBox(height: 14),
+                DropdownButtonFormField<String>(
+                  key: ValueKey('delivery-state-$_deliveryState'),
+                  initialValue: _deliveryState ?? '',
+                  isExpanded: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Delivery destination state',
+                    border: OutlineInputBorder(),
+                    helperText:
+                    'Check this matches the delivery address below.',
+                  ),
+                  items: [
+                    const DropdownMenuItem(
+                      value: '',
+                      child: Text('Select state'),
+                    ),
+                    for (final state in _states)
+                      DropdownMenuItem(
+                        value: state,
+                        child: Text(state),
+                      ),
+                  ],
+                  onChanged:
+                  _placing || _quoting || _pendingOrder != null
+                      ? null
+                      : (value) {
+                    setState(() {
+                      _deliveryState =
+                      value == null || value.isEmpty
+                          ? null
+                          : value;
+                    });
+                    _loadQuote('delivery');
+                  },
+                ),
+              ],
               if (_method == 'pickup' &&
                   _quote?['pickup_address'] != null) ...[
                 const SizedBox(height: 14),

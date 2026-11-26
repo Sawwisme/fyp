@@ -15,11 +15,20 @@ def list_shop_clinics(
     limit: int,
     state: str | None = None,
     fulfilment: str | None = None,
+    delivery_state: str | None = None,
 ):
     owner = get_owner_profile(db, current_user)
 
     if state is not None and state not in MALAYSIAN_STATES:
         raise HTTPException(422, "Select a valid Malaysian state.")
+
+    if (
+        delivery_state is not None
+        and delivery_state not in MALAYSIAN_STATES
+    ):
+        raise HTTPException(
+            422, "Select a valid delivery destination state."
+        )
 
     if fulfilment not in {None, "pickup", "delivery"}:
         raise HTTPException(422, "Select pickup or delivery.")
@@ -111,6 +120,15 @@ def list_shop_clinics(
     elif fulfilment == "delivery":
         statement = statement.where(
             Clinic.shop_delivery_enabled.is_(True)
+        )
+
+    if delivery_state is not None:
+        statement = statement.where(
+            Clinic.shop_delivery_enabled.is_(True),
+            func.json_contains(
+                Clinic.shop_delivery_states,
+                func.json_quote(delivery_state),
+            ) == 1,
         )
 
     results = db.execute(

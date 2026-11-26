@@ -1,6 +1,9 @@
 from decimal import Decimal
 from typing import Literal
 
+from pydantic import field_validator
+from app.states import MALAYSIAN_STATES
+
 from app.schemas.cart import CartItemResponse
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from app.schemas.checkout_selection import CheckoutSelection
@@ -17,10 +20,29 @@ class ShopSettingsUpdate(BaseModel):
         decimal_places=2,
     )
 
+    delivery_states: list[str] = Field(
+        default_factory=list,
+        max_length=16,
+    )
+
+    @field_validator("delivery_states")
+    @classmethod
+    def validate_delivery_states(cls, values):
+        if any(value not in MALAYSIAN_STATES for value in values):
+            raise ValueError("Select valid delivery states.")
+
+        return sorted(set(values))
+
     @model_validator(mode="after")
     def require_fulfilment_method(self):
         if not self.pickup_enabled and not self.delivery_enabled:
             raise ValueError("Enable pickup, delivery, or both.")
+
+        if self.delivery_enabled and not self.delivery_states:
+            raise ValueError(
+                "Select at least one delivery destination state."
+            )
+        
         return self
 
 
@@ -32,6 +54,7 @@ class ShopSettingsResponse(BaseModel):
     delivery_fee: Decimal
     pickup_address: str | None
     version: int
+    delivery_states: list[str] = Field(default_factory=list)
 
 class CheckoutQuoteRequest(CheckoutSelection):
     model_config = ConfigDict(extra="forbid")
@@ -42,6 +65,11 @@ class CheckoutQuoteRequest(CheckoutSelection):
         strict=True,
     )
     shipping_method: Literal["pickup", "delivery"]
+
+    delivery_state: str | None = Field(
+        default=None,
+        max_length=50,
+    )
 
 
 class CheckoutQuoteResponse(BaseModel):
@@ -55,3 +83,4 @@ class CheckoutQuoteResponse(BaseModel):
     subtotal: Decimal
     shipping_fee: Decimal
     total_amount: Decimal
+    delivery_state: str | None = None

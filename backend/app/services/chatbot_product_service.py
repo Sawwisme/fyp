@@ -384,6 +384,15 @@ def product_reply(
             Clinic.shop_delivery_enabled.is_(True)
         )
 
+    if preferences.delivery_state is not None:
+        request_filters.extend([
+            Clinic.shop_delivery_enabled.is_(True),
+            func.json_contains(
+                Clinic.shop_delivery_states,
+                func.json_quote(preferences.delivery_state),
+            ) == 1,
+        ])
+
     care_context = build_product_match(context, request_text)
     care_tags = care_context["tags"]
 

@@ -21,6 +21,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _phone = TextEditingController();
   final _address = TextEditingController();
 
+  String? _defaultState;
+
+  static const _states = [
+    'Johor', 'Kedah', 'Kelantan', 'Melaka',
+    'Negeri Sembilan', 'Pahang', 'Pulau Pinang',
+    'Perak', 'Perlis', 'Sabah', 'Sarawak',
+    'Selangor', 'Terengganu',
+    'W.P. Kuala Lumpur', 'W.P. Labuan', 'W.P. Putrajaya',
+  ];
+
   Map<String, dynamic>? _profile;
   bool _loading = true;
   bool _saving = false;
@@ -47,6 +57,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _name.text = user['full_name'] as String;
       _phone.text = user['phone_number'] as String? ?? '';
       _address.text = profile['default_address'] as String? ?? '';
+      final savedState = profile['default_state'];
+      _defaultState =
+      savedState is String && _states.contains(savedState)
+          ? savedState
+          : null;
 
       setState(() => _profile = profile);
     } on ApiException catch (error) {
@@ -82,6 +97,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         'full_name': _name.text.trim(),
         'phone_number': _optionalText(_phone),
         'default_address': _optionalText(_address),
+        'default_state': _defaultState,
       });
 
       if (!mounted) return;
@@ -183,6 +199,45 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 labelText: 'Address',
                 border: OutlineInputBorder(),
               ),
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              key: ValueKey('profile-state-$_defaultState'),
+              initialValue: _defaultState ?? '',
+              isExpanded: true,
+              decoration: const InputDecoration(
+                labelText: 'Address state / federal territory',
+                border: OutlineInputBorder(),
+                helperText: 'Used to pre-fill your delivery destination.',
+              ),
+              items: [
+                const DropdownMenuItem(
+                  value: '',
+                  child: Text('Select state'),
+                ),
+                for (final state in _states)
+                  DropdownMenuItem(
+                    value: state,
+                    child: Text(state),
+                  ),
+              ],
+              onChanged: _saving
+                  ? null
+                  : (value) {
+                setState(() {
+                  _defaultState =
+                  value == null || value.isEmpty
+                      ? null
+                      : value;
+                });
+              },
+              validator: (value) {
+                if (_address.text.trim().isNotEmpty &&
+                    (value == null || value.isEmpty)) {
+                  return 'Select the state for your address';
+                }
+                return null;
+              },
             ),
             if (_error != null) ...[
               const SizedBox(height: 16),

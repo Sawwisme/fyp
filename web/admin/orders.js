@@ -1170,6 +1170,14 @@
             detailLine(recipient, 'Phone', order.recipient_phone);
             detailLine(recipient, 'Address', order.shipping_address);
 
+            if (order.shipping_method === 'delivery') {
+                detailLine(
+                    recipient,
+                    'Destination state',
+                    order.delivery_state || 'Not recorded'
+                );
+            }
+
             if (order.owner_note) {
                 detailLine(recipient, 'Owner note', order.owner_note);
             }

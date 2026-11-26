@@ -226,6 +226,13 @@ class _ShopReceiptScreenState extends State<ShopReceiptScreen> {
                 : 'Fulfilment: Delivery',
           ),
           pw.Text('${order['shipping_address']}'),
+          if (order['shipping_method'] == 'delivery') ...[
+            pw.SizedBox(height: 5),
+            pw.Text(
+              'Destination state: '
+                  '${order['delivery_state'] ?? 'Not recorded'}',
+            ),
+          ],
           pw.SizedBox(height: 24),
 
           pw.TableHelper.fromTextArray(

@@ -362,13 +362,9 @@
     }
 
     function updateAssessmentControls() {
-        get('consultation-assessment').disabled =
-            busy ||
-            assessmentLoading ||
-            !assessmentsLoaded ||
-            needsReload ||
-            !record ||
-            record.status !== 'draft';
+        // The shared scan is inherited from the booking.
+        // Clinical findings are recorded separately.
+        get('consultation-assessment').disabled = true;
     }
 
     function assessmentDate(value) {

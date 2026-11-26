@@ -40,6 +40,8 @@ class PetOwner(Base):
 
     default_address = Column(String(255), nullable=True)
 
+    default_state = Column(String(50), nullable=True)
+
     user = relationship(
         "User",
         back_populates="pet_owner",

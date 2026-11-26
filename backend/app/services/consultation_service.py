@@ -4,6 +4,7 @@ from fastapi import HTTPException
 from sqlalchemy import case, func, or_, select
 from sqlalchemy.orm import Session, selectinload
 
+from app.services.vet_scan_service import get_linked_scan
 from app.services.vet_absence_service import reject_absent_slots
 from app.clinic_time import CLINIC_TIMEZONE
 from app.models import (
@@ -388,7 +389,15 @@ def start_consultation(
 
         linked_analysis_id = None
 
-        if appointment.ai_assessment_review_id is not None:
+        if appointment.ai_analysis_id is not None:
+            shared_scan = get_linked_scan(
+                db,
+                current_user,
+                appointment.appointment_id,
+            )
+            linked_analysis_id = shared_scan["analysis_id"]
+
+        elif appointment.ai_assessment_review_id is not None:
             review = db.scalar(
                 select(AIAssessmentReview)
                 .join(
@@ -640,6 +649,13 @@ def save_consultation(
             )
 
         if "ai_analysis_id" in data.model_fields_set:
+            if data.ai_analysis_id != record.ai_analysis_id:
+                raise HTTPException(
+                    422,
+                    "The shared assessment link cannot be changed. "
+                    "Record your clinical findings separately.",
+                )
+
             if data.ai_analysis_id is not None:
                 assessment = db.scalar(
                     select(AIAnalysisResult)
@@ -1235,6 +1251,8 @@ def list_consultation_assessments(
         )
         .where(
             DentalImage.pet_id == consultation["pet_id"],
+            AIAnalysisResult.analysis_id
+            == consultation["ai_analysis_id"],
         )
         .options(
             selectinload(AIAnalysisResult.predictions),

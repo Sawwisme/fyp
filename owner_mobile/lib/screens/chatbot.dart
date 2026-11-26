@@ -543,6 +543,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
       context: context,
       builder: (_) => ChatProductPreferences(
         service: ShopService(widget.service.api),
+        language: _chatReplyLanguage,
       ),
     );
 
@@ -1133,6 +1134,10 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                   service: CartService(widget.service.api),
                   product: product,
                   enabled: !_busy && _pending == null,
+                  language: metadata is Map &&
+                      {'en', 'ms', 'zh'}.contains(metadata['language'])
+                      ? metadata['language'] as String
+                      : 'en',
                 ),
             for (final source in sources)
               TextButton.icon(
@@ -1568,7 +1573,13 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                     ? null
                     : _recommendWithPreferences,
                 icon: const Icon(Icons.tune_rounded),
-                label: const Text('Find suitable products'),
+                label: Text(
+                  _chatReplyLanguage == 'ms'
+                      ? 'Cari produk yang sesuai'
+                      : _chatReplyLanguage == 'zh'
+                      ? '查找合适的产品'
+                      : 'Find suitable products',
+                ),
               ),
             ),
           ),

@@ -40,6 +40,11 @@ class ShopOrderCreate(CheckoutSelection):
 
     payment_method: Literal["cash", "online_banking"] = "online_banking"
 
+    delivery_state: str | None = Field(
+        default=None,
+        max_length=50,
+    )
+
     recipient_name: str = Field(
         min_length=2,
         max_length=150,
@@ -99,6 +104,8 @@ class ShopOrderResponse(BaseModel):
     recipient_name: str | None = None
     recipient_phone: str | None = None
     owner_note: str | None
+
+    delivery_state: str | None = None
 
     subtotal: Decimal
     shipping_fee: Decimal

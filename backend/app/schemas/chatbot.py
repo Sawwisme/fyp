@@ -25,7 +25,9 @@ class ProductSearchPreferences(BaseModel):
     state: str | None = Field(default=None, max_length=50)
     fulfilment: Literal["pickup", "delivery"] | None = None
 
-    @field_validator("state")
+    delivery_state: str | None = Field(default=None, max_length=50)
+
+    @field_validator("state", "delivery_state")
     @classmethod
     def validate_state(cls, value):
         if value is None:

@@ -1169,6 +1169,16 @@
                     </span>
                 </label>
 
+                                <fieldset id="shop-delivery-coverage">
+                    <legend>Delivery destination states</legend>
+                    <p>
+                        Select where your clinic can deliver.
+                        The configured flat delivery fee applies
+                        to every selected state.
+                    </p>
+                    <div id="shop-delivery-states"></div>
+                </fieldset>
+
                 <div class="shop-delivery-fee">
                     <label for="shop-delivery-fee">Delivery fee (RM)</label>
                     <input id="shop-delivery-fee"
@@ -1208,6 +1218,42 @@
 
     document.body.appendChild(shopSettingsDialog);
 
+    const deliveryStateNames = [
+        'Johor', 'Kedah', 'Kelantan', 'Melaka',
+        'Negeri Sembilan', 'Pahang', 'Pulau Pinang',
+        'Perak', 'Perlis', 'Sabah', 'Sarawak',
+        'Selangor', 'Terengganu',
+        'W.P. Kuala Lumpur', 'W.P. Labuan', 'W.P. Putrajaya'
+    ];
+
+    const deliveryStateInputs = new Map();
+    const deliveryStateContainer = get('shop-delivery-states');
+
+    deliveryStateContainer.style.display = 'grid';
+    deliveryStateContainer.style.gridTemplateColumns =
+        'repeat(auto-fit, minmax(180px, 1fr))';
+    deliveryStateContainer.style.gap = '10px';
+
+    for (const state of deliveryStateNames) {
+        const label = document.createElement('label');
+        label.style.display = 'flex';
+        label.style.alignItems = 'center';
+        label.style.gap = '8px';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = state;
+        checkbox.style.width = 'auto';
+        checkbox.style.flex = '0 0 auto';
+
+        const text = document.createElement('span');
+        text.textContent = state;
+
+        label.append(checkbox, text);
+        deliveryStateContainer.appendChild(label);
+        deliveryStateInputs.set(state, checkbox);
+    }
+
     let shopSettingsData = null;
     let shopSettingsLoading = false;
     let shopSettingsUncertain = false;
@@ -1232,6 +1278,9 @@
 
         get('shop-delivery-fee').required =
             get('shop-delivery').checked;
+
+        get('shop-delivery-coverage').disabled =
+            !get('shop-delivery').checked;
     }
 
     async function loadShopSettings() {
@@ -1254,6 +1303,12 @@
             get('shop-pickup').checked = data.pickup_enabled;
             get('shop-delivery').checked = data.delivery_enabled;
             get('shop-delivery-fee').value = data.delivery_fee;
+
+            const coveredStates = new Set(data.delivery_states || []);
+
+            for (const [state, checkbox] of deliveryStateInputs) {
+                checkbox.checked = coveredStates.has(state);
+            }
 
             get('shop-pickup-address').textContent = data.pickup_address
                 ? `Pickup address: ${data.pickup_address}`
@@ -1329,10 +1384,21 @@
             return;
         }
 
+        const deliveryStates = [...deliveryStateInputs]
+            .filter(([, checkbox]) => checkbox.checked)
+            .map(([state]) => state);
+
+        if (delivery && deliveryStates.length === 0) {
+            get('shop-settings-message').textContent =
+                'Select at least one delivery destination state.';
+            return;
+        }
+
         const body = {
             expected_version: shopSettingsData.version,
             pickup_enabled: pickup,
             delivery_enabled: delivery,
+            delivery_states: deliveryStates,
             delivery_fee: delivery
                 ? get('shop-delivery-fee').value
                 : shopSettingsData.delivery_fee

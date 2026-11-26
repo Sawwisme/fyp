@@ -506,6 +506,13 @@ class _ShopOrderDetailsScreenState
           Text(order['recipient_phone'].toString()),
           const SizedBox(height: 10),
           Text(order['shipping_address'].toString()),
+          if (order['shipping_method'] == 'delivery') ...[
+            const SizedBox(height: 6),
+            Text(
+              'Destination state: '
+                  '${order['delivery_state'] ?? 'Not recorded'}',
+            ),
+          ],
           if ((order['owner_note']?.toString() ?? '').isNotEmpty) ...[
             const Divider(height: 28),
             Text('Note: ${order['owner_note']}'),

@@ -14,6 +14,10 @@ from app.schemas.checkout import (
 from app.services.admin_profile_service import get_admin_record
 from decimal import Decimal
 
+from app.services.delivery_coverage_service import (
+    validate_delivery_destination,
+)
+
 from app.services.cart_service import _build_cart
 from app.services.pet_service import get_owner_profile
 from app.services.checkout_selection_service import (
@@ -29,6 +33,7 @@ def _settings_response(clinic: Clinic):
         delivery_fee=clinic.shop_delivery_fee,
         pickup_address=clinic.address,
         version=clinic.shop_version,
+        delivery_states=list(clinic.shop_delivery_states or []),
     )
 
 
@@ -89,6 +94,7 @@ def update_shop_settings(
         clinic.shop_pickup_enabled = data.pickup_enabled
         clinic.shop_delivery_enabled = data.delivery_enabled
         clinic.shop_delivery_fee = data.delivery_fee
+        clinic.shop_delivery_states = list(data.delivery_states)
         clinic.shop_version += 1
         clinic.updated_at = datetime.now(
             timezone.utc
@@ -221,6 +227,11 @@ def get_checkout_quote(
                 "Choose clinic pickup if available.",
             )
 
+        validate_delivery_destination(
+            clinic,
+            data.delivery_state,
+        )
+        
         fee = clinic.shop_delivery_fee
         pickup_address = None
 

@@ -33,6 +33,10 @@ def list_shop_clinics(
     fulfilment: Literal["pickup", "delivery"] | None = None,
     current_user: User = Depends(require_roles("pet_owner")),
     db: Session = Depends(get_db),
+    delivery_state: str | None = Query(
+        default=None,
+        max_length=50,
+    ),
 ):
     return shop_service.list_shop_clinics(
         db,
@@ -42,6 +46,7 @@ def list_shop_clinics(
         limit,
         state=state,
         fulfilment=fulfilment,
+        delivery_state=delivery_state,
     )
 
 @router.get(

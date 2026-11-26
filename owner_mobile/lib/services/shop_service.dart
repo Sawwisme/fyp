@@ -24,6 +24,7 @@ class ShopService {
     int limit = 11,
     String? state,
     String? fulfilment,
+    String? deliveryState,
   }) async {
     final query = Uri(queryParameters: {
       'q': search,
@@ -32,6 +33,8 @@ class ShopService {
       if (state != null && state.isNotEmpty) 'state': state,
       if (fulfilment != null && fulfilment.isNotEmpty)
         'fulfilment': fulfilment,
+      if (deliveryState != null && deliveryState.isNotEmpty)
+        'delivery_state': deliveryState,
     }).query;
 
     return _readList(await api.get('/shop/clinics?$query'));

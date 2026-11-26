@@ -12,6 +12,7 @@ def get_profile(db: Session, current_user: User) -> dict:
     return {
         "pet_owner_id": owner.pet_owner_id,
         "default_address": owner.default_address,
+        "default_state": owner.default_state,
         "user": current_user,
     }
 
@@ -30,9 +31,17 @@ def update_profile(
             detail="Provide at least one field to update.",
         )
 
+    # An address change must not silently retain an old destination state.
+    if (
+        "default_address" in changes
+        and changes["default_address"] != owner.default_address
+        and "default_state" not in changes
+    ):
+        owner.default_state = None
+
     for field, value in changes.items():
-        if field == "default_address":
-            owner.default_address = value
+        if field in {"default_address", "default_state"}:
+            setattr(owner, field, value)
         else:
             setattr(current_user, field, value)
 
@@ -49,4 +58,5 @@ def update_profile(
         "pet_owner_id": owner.pet_owner_id,
         "default_address": owner.default_address,
         "user": current_user,
+        "default_state": owner.default_state,
     }

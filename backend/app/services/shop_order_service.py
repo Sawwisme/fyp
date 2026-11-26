@@ -22,13 +22,19 @@ from app.models import (
 from app.schemas.shop_orders import ShopOrderCreate, ShopOrderResponse
 from app.services.pet_service import get_owner_profile
 from app.services.shop_notification_service import notify_shop_event
-
+from app.services.delivery_coverage_service import (
+    validate_delivery_destination,
+)
 from app.services.checkout_selection_service import (
     select_checkout_items,
 )
 
 def _fingerprint(clinic_id: int, data: ShopOrderCreate) -> str:
     payload = data.model_dump(mode="json")
+
+    # Keep old requests without a destination state replayable.
+    if data.shipping_method == "pickup" or data.delivery_state is None:
+        payload.pop("delivery_state", None)
 
     if data.selected_product_ids is None:
         # Preserve fingerprints for existing checkout retries.
@@ -96,6 +102,7 @@ def build_order_response(db: Session, order: Order):
         ),
         shipping_method=order.shipping_method,
         shipping_address=order.shipping_address,
+        delivery_state=order.delivery_state,
         recipient_name=order.recipient_name,
         recipient_phone=order.recipient_phone,
         owner_note=order.owner_note,
@@ -285,6 +292,11 @@ def create_order(
                     "Choose clinic pickup if available.",
                 )
 
+            validate_delivery_destination(
+                clinic,
+                data.delivery_state,
+            )
+
             address = data.delivery_address
             shipping_fee = clinic.shop_delivery_fee
 
@@ -317,6 +329,11 @@ def create_order(
             owner_note=data.owner_note or None,
             shipping_address=address,
             shipping_method=data.shipping_method,
+            delivery_state=(
+                data.delivery_state
+                if data.shipping_method == "delivery"
+                else None
+            ),
             subtotal=subtotal,
             shipping_fee=shipping_fee,
             total_amount=total,

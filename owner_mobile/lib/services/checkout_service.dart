@@ -28,6 +28,7 @@ class CheckoutService {
     required int cartVersion,
     required String shippingMethod,
     List<int>? selectedProductIds,
+    String? deliveryState,
   }) async {
     return _readMap(
       await api.post(
@@ -36,6 +37,8 @@ class CheckoutService {
           'expected_cart_version': cartVersion,
           'shipping_method': shippingMethod,
           'selected_product_ids': ?selectedProductIds,
+          if (shippingMethod == 'delivery')
+            'delivery_state': deliveryState,
         },
       ),
     );
