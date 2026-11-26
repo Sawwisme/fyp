@@ -12,22 +12,63 @@ DENTAL_CONTENT_THRESHOLD = 0.7
 
 def validate_image_quality(image_path):
     image = cv2.imread(image_path)
+
     if image is None:
-        return (False, 'The uploaded file cannot be decoded as a valid image.')
+        return (
+            False,
+            "We couldn't open this photo. Choose another "
+            "original JPG or PNG image.",
+        )
+
     height, width = image.shape[:2]
+
     if width < MIN_WIDTH or height < MIN_HEIGHT:
-        return (False, f'Image resolution is too low. Minimum recommended resolution is {MIN_WIDTH}x{MIN_HEIGHT}.')
+        return (
+            False,
+            "This photo is too small to assess clearly. "
+            "Use the original photo or take a new close-up "
+            "instead of enlarging this image.",
+        )
+
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    blur_score = cv2.Laplacian(gray, cv2.CV_64F).var()
+    blur_score = cv2.Laplacian(
+        gray, cv2.CV_64F
+    ).var()
+
     if blur_score < BLUR_THRESHOLD:
-        return (False, f'Image appears too blurry (blur score={blur_score:.2f}). Please retake the photo with better focus.')
+        return (
+            False,
+            "The teeth and gums aren't clear enough in this "
+            "photo. Hold the camera steady, tap to focus on "
+            "the teeth, and retake it.",
+        )
+
     brightness = float(np.mean(gray))
+
     if brightness < MIN_BRIGHTNESS:
-        return (False, f'Image appears too dark (brightness={brightness:.2f}). Please capture the image with better lighting.')
+        return (
+            False,
+            "This photo is too dark to assess reliably. "
+            "Move to a brighter area and retake it with "
+            "the teeth and gumline visible.",
+        )
+
     if brightness > MAX_BRIGHTNESS:
-        return (False, f'Image appears too bright (brightness={brightness:.2f}). Please avoid excessive lighting or flash.')
-    quality_info = {'width': width, 'height': height, 'blur_score': blur_score, 'brightness': brightness}
-    return (True, quality_info)
+        return (
+            False,
+            "This photo is too bright to assess reliably. "
+            "Avoid direct flash or glare and retake it "
+            "in softer lighting.",
+        )
+
+    quality_info = {
+        "width": width,
+        "height": height,
+        "blur_score": blur_score,
+        "brightness": brightness,
+    }
+
+    return True, quality_info
 
 def load_image(image_path):
     import tensorflow as tf

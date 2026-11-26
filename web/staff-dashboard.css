@@ -480,3 +480,20 @@
         padding: 18px;
     }
 }
+/* Prominent overview shared by both staff dashboards. */
+.staff-dash .dash-overview { min-width: 0; }
+.staff-dash .dash-overview .dash-toolbar { margin-bottom: 8px; }
+.staff-dash .dash-overview .dash-section-heading { font-size: 21px; }
+.staff-dash .dash-overview .dash-stats { margin-top: 18px; }
+.staff-dash .dash-overview .dash-stat {
+    min-height: 175px;
+    border-top: 3px solid #dce6fa;
+}
+.staff-dash .dash-overview .dash-stat:first-child {
+    background: #192737;
+    border-color: #192737;
+}
+.staff-dash .dash-overview .dash-stat:first-child p,
+.staff-dash .dash-overview .dash-stat:first-child small { color: #c5d1e2; }
+.staff-dash .dash-overview .dash-stat:first-child strong { color: #d0f54a; }
+.staff-dash .dash-overview .dash-stat strong { font-size: clamp(30px, 3vw, 40px); }

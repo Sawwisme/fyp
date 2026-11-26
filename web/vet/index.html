@@ -15,11 +15,11 @@
     <link rel="stylesheet" href="/web/cobalt.css?v=cobalt-components-2">
     <link rel="stylesheet" href="/web/workspace-design.css?v=1">
     <link rel="stylesheet" href="/web/workspace-polish.css?v=1">
-    <script src="/web/sidebar-controls.js?v=3" defer></script>
-    <link rel="stylesheet" href="/web/sidebar-motion.css?v=3">
+    <script src="/web/sidebar-controls.js?v=4" defer></script>
+    <link rel="stylesheet" href="/web/sidebar-motion.css?v=4">
     <script src="/web/staff-dashboard.js?v=1" defer></script>
-    <script src="/web/dashboard-work.js?v=1" defer></script>
-    <link rel="stylesheet" href="/web/staff-dashboard.css?v=2">
+    <script src="/web/dashboard-work.js?v=2" defer></script>
+    <link rel="stylesheet" href="/web/staff-dashboard.css?v=3">
 </head>
 
 <body>
@@ -48,6 +48,41 @@
                             A clearer day. More time for patient care.<br>
                             <span id="vet-clinic"></span>
                         </p>
+                    </section>
+
+                    <section class="dash-overview">
+                        <div class="dash-toolbar">
+                            <h2 class="dash-section-heading">Your overview</h2>
+                            <button type="button" class="secondary compact-button" data-dash-refresh>
+                                Refresh
+                            </button>
+                        </div>
+
+                        <p class="dash-note" data-dash-date></p>
+                        <p role="status" data-dash-error></p>
+
+                        <div class="dash-stats">
+                            <article class="dash-stat">
+                                <p>Today’s appointments</p>
+                                <strong data-dash-value="appointments">—</strong>
+                                <small>All statuses, including cancellations</small>
+                            </article>
+                            <article class="dash-stat">
+                                <p>Completed consultations</p>
+                                <strong data-dash-value="consultations">—</strong>
+                                <small>This month to date</small>
+                            </article>
+                            <article class="dash-stat">
+                                <p>Follow-ups due today</p>
+                                <strong data-dash-value="followups">—</strong>
+                                <small>Open tasks with today’s review date</small>
+                            </article>
+                            <article class="dash-stat">
+                                <p>Patients this month</p>
+                                <strong data-dash-value="patients">—</strong>
+                                <small>Distinct patients in your activity records</small>
+                            </article>
+                        </div>
                     </section>
 
                     <section aria-labelledby="vet-shortcuts">
@@ -83,40 +118,7 @@
                         </nav>
                     </section>
 
-                    <section>
-                        <div class="dash-toolbar">
-                            <h2 class="dash-section-heading">Your overview</h2>
-                            <button type="button" class="secondary compact-button" data-dash-refresh>
-                                Refresh
-                            </button>
-                        </div>
 
-                        <p class="dash-note" data-dash-date></p>
-                        <p role="status" data-dash-error></p>
-
-                        <div class="dash-stats">
-                            <article class="dash-stat">
-                                <p>Today’s appointments</p>
-                                <strong data-dash-value="appointments">—</strong>
-                                <small>All statuses, including cancellations</small>
-                            </article>
-                            <article class="dash-stat">
-                                <p>Completed consultations</p>
-                                <strong data-dash-value="consultations">—</strong>
-                                <small>This month to date</small>
-                            </article>
-                            <article class="dash-stat">
-                                <p>Follow-ups due today</p>
-                                <strong data-dash-value="followups">—</strong>
-                                <small>Open tasks with today’s review date</small>
-                            </article>
-                            <article class="dash-stat">
-                                <p>Patients this month</p>
-                                <strong data-dash-value="patients">—</strong>
-                                <small>Distinct patients in your activity records</small>
-                            </article>
-                        </div>
-                    </section>
 
                     <section class="dash-panel">
                         <div class="dash-toolbar">

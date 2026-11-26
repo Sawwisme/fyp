@@ -99,6 +99,72 @@ class AssessmentPdfService {
       ]);
     }
 
+    final segmentation = result['segmentation'] is Map
+        ? Map<String, dynamic>.from(result['segmentation'] as Map)
+        : <String, dynamic>{};
+
+    final rawSpecies =
+    pet['species']?.toString().trim().toLowerCase();
+
+    final species = switch (rawSpecies) {
+      'cat' || 'feline' => 'cat',
+      'dog' || 'canine' => 'dog',
+      _ => null,
+    };
+
+    final predictions = result['predictions'] is List
+        ? (result['predictions'] as List).whereType<Map>().toList()
+        : <Map>[];
+
+    String segmentationValue(String condition, String key) {
+      final speciesSupported = switch (condition) {
+        'gingivitis' => species == 'cat' || species == 'dog',
+        'calculus' => species == 'dog',
+        _ => false,
+      };
+
+      final matches = predictions
+          .where((item) => item['condition'] == condition)
+          .toList();
+
+      if (!speciesSupported) return 'Not assessed';
+
+      if (matches.length != 1) return 'Not available';
+
+      final prediction = matches.single;
+
+      if (prediction['assessed'] == false ||
+          prediction['supported'] == false) {
+        return 'Not assessed';
+      }
+
+      if (prediction['positive'] is! bool) {
+        return 'Not available';
+      }
+
+      final value = segmentation[key];
+
+      if (value is! num ||
+          !value.isFinite ||
+          value < 0 ||
+          value > 100) {
+        return 'Not available';
+      }
+
+      return '${value.toStringAsFixed(2)}%';
+    }
+
+    final segmentationRows = [
+      [
+        'Gingivitis-related mask',
+        segmentationValue('gingivitis', 'gingivitis_area_percent'),
+      ],
+      [
+        'Calculus-related mask',
+        segmentationValue('calculus', 'calculus_area_percent'),
+      ],
+    ];
+
     document.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
@@ -191,6 +257,36 @@ class AssessmentPdfService {
             'Model scores do not measure disease severity. '
                 'Not assessed means the condition was not evaluated '
                 'for this assessment.',
+            style: const pw.TextStyle(fontSize: 9),
+          ),
+          heading('Segmentation measurements'),
+          pw.TableHelper.fromTextArray(
+            headers: ['Predicted image region', 'Image area'],
+            data: segmentationRows,
+            headerDecoration: pw.BoxDecoration(color: blue),
+            headerStyle: pw.TextStyle(
+              color: PdfColors.white,
+              fontWeight: pw.FontWeight.bold,
+            ),
+            cellStyle: const pw.TextStyle(fontSize: 9),
+            cellPadding: const pw.EdgeInsets.all(8),
+            oddRowDecoration: pw.BoxDecoration(color: paleBlue),
+          ),
+          pw.SizedBox(height: 10),
+          pw.Text(
+            'These values describe model-predicted pixels in the '
+                'submitted image, not the percentage of the whole mouth '
+                'affected. They are not confirmed disease measurements '
+                'or clinical severity scores. A value of 0% does not '
+                'establish healthy tissue.',
+            style: const pw.TextStyle(fontSize: 9),
+          ),
+          pw.SizedBox(height: 6),
+          pw.Text(
+            'Not assessed: outside the supported assessment scope. '
+                'Not available: the saved measurement or interpretation '
+                'is missing or invalid. Plaque segmentation is not '
+                'provided by this model.',
             style: const pw.TextStyle(fontSize: 9),
           ),
           heading('Recommended next step'),

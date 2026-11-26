@@ -114,3 +114,34 @@
 [aria-labelledby="appointments-title"] .staff-list-toolbar {
     align-items: start;
 }
+
+.appointment-overview {
+    margin-bottom: 24px;
+}
+
+.appointment-overview .vet-appointment-summary {
+    margin: 0 0 14px;
+}
+
+.appointment-stat>span,
+.appointment-stat>small {
+    color: #64748b;
+}
+
+.appointment-stat.appointment-stat-overall {
+    background: var(--navy, #192737);
+    border-color: var(--navy, #192737);
+}
+
+.appointment-stat.appointment-stat-overall>span,
+.appointment-stat.appointment-stat-overall>small {
+    color: #c5d1e2;
+}
+
+.appointment-stat.appointment-stat-overall>strong {
+    color: var(--lime, #d0f54a);
+}
+
+.appointment-overview .appointment-filter-note {
+    margin: 0;
+}

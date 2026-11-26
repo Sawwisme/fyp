@@ -67,8 +67,12 @@ class _ChatProductCardState extends State<ChatProductCard> {
       final requestedQuantity = existingQuantity + _quantity;
 
       if (requestedQuantity > 99) {
-        throw const ApiException(
-          'The cart can contain up to 99 units of one product.',
+        throw ApiException(
+          _text(
+            'The cart can contain up to 99 units of one product.',
+            'Troli boleh mengandungi sehingga 99 unit bagi satu produk.',
+            '购物车中同一产品最多可有 99 件。',
+          ),
           statusCode: 422,
         );
       }
@@ -85,8 +89,12 @@ class _ChatProductCardState extends State<ChatProductCard> {
       if (!mounted) return;
 
       setState(() {
-        _message = '$_quantity '
-            '${_quantity == 1 ? 'item' : 'items'} added to your clinic cart.';
+        _message = _text(
+          '$_quantity ${_quantity == 1 ? 'item' : 'items'} '
+              'added to your clinic cart.',
+          '$_quantity item ditambah ke troli klinik anda.',
+          '已将 $_quantity 件产品加入诊所购物车。',
+        );
       });
 
       if (checkout) {
@@ -114,10 +122,20 @@ class _ChatProductCardState extends State<ChatProductCard> {
         _uncertain = uncertain;
 
         _message = uncertain
-            ? 'The cart update could not be confirmed. Open your cart '
-            'and check the quantity before making another change.'
+            ? _text(
+          'The cart update could not be confirmed. Open your cart '
+              'and check the quantity before making another change.',
+          'Kemas kini troli belum dapat disahkan. Buka troli '
+              'dan semak kuantiti sebelum membuat perubahan lain.',
+          '无法确认购物车更新结果。'
+              '请先打开购物车检查数量，再进行其他修改。',
+        )
             : added
-            ? 'Item added. Open your cart to continue checkout.'
+            ? _text(
+          'Item added. Open your cart to continue checkout.',
+          'Item telah ditambah. Buka troli untuk meneruskan checkout.',
+          '产品已加入购物车。请打开购物车继续结账。',
+        )
             : error.toString();
       });
     } finally {

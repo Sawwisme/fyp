@@ -93,8 +93,12 @@ def run(image_path, output_dir, species=None):
 
             elif error.stage == "content":
                 rejection_message = (
-                    "A suitable cat or dog dental region was not detected. "
-                    "Take a clear close-up of your pet's teeth and gums."
+                    "We couldn't identify a clear view of "
+                    "your pet's teeth and gums. Choose a "
+                    "close-up dental photo rather than a "
+                    "full-face or body photo. Only retake "
+                    "it if your pet is comfortable; do not "
+                    "force its mouth open."
                 )
 
             else:

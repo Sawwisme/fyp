@@ -122,6 +122,40 @@ def estimate_severity(
         )
     )
 
+    segmented_conditions = {
+        "gingivitis",
+        "calculus",
+    }.intersection(disease_conditions)
+
+    if segmented_conditions and segmentation_area == 0.0:
+        return {
+            "calculation_version": "supported-conditions-v1",
+            "scored_conditions": sorted(set(disease_conditions)),
+            "severity": "Unavailable",
+            "disease_conditions": disease_conditions,
+            "condition_count": len(disease_conditions),
+            "max_gradcam_spread_percent": round(
+                max_gradcam_spread, 2
+            ),
+            "gradcam_category": gradcam_category,
+            "segmentation_area_percent": 0.0,
+            "segmentation_category": "No region identified",
+            "gingivitis_area_percent": round(
+                float(gingivitis_area_percent), 2
+            ),
+            "calculus_area_percent": round(
+                float(calculus_area_percent), 2
+            ),
+            "reason": (
+                "Supported disease classifications passed their "
+                "thresholds, but segmentation identified no "
+                "corresponding regions. The outputs provide "
+                "inconsistent supporting evidence, so reference "
+                "severity is not assigned. This does not confirm "
+                "either disease or a healthy condition."
+            ),
+        }
+
     if segmentation_area < 5.0:
         segmentation_category = "Small"
 

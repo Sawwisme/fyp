@@ -17,7 +17,7 @@ import '../services/appointment_service.dart';
 import 'clinic_picker.dart';
 import 'book_appointment.dart';
 
-import 'package:printing/printing.dart';
+import 'pdf_preview.dart';
 import '../services/assessment_pdf_service.dart';
 
 class AiScanPage extends StatefulWidget {
@@ -794,9 +794,14 @@ class _AiScanPageState extends State<AiScanPage> with WidgetsBindingObserver {
 
       if (!mounted) return;
 
-      await Printing.sharePdf(
-        bytes: bytes,
-        filename: 'VetDental_Assessment_$jobId.pdf',
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute(
+          builder: (_) => ReportPdfPreviewPage(
+            bytes: bytes,
+            filename: 'VetDental_Assessment_$jobId.pdf',
+            title: 'AI assessment report',
+          ),
+        ),
       );
     } catch (error) {
       if (!mounted) return;
@@ -1182,11 +1187,107 @@ class _AiScanPageState extends State<AiScanPage> with WidgetsBindingObserver {
     }
 
     if (status == 'rejected' || status == 'failed') {
-      return Padding(
-        padding: const EdgeInsets.only(top: 20),
-        child: Text(
-          _job?['message']?.toString() ??
-              'The assessment could not be completed. Choose another photo.',
+      final rejected = status == 'rejected';
+      final message = _job?['message']?.toString().trim();
+
+      return Container(
+        margin: const EdgeInsets.only(top: 20),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: rejected
+              ? const Color(0xFFFFF8EB)
+              : const Color(0xFFF2F5FC),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: rejected
+                ? const Color(0xFFEAD6A8)
+                : const Color(0xFFD6E0F1),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  rejected
+                      ? Icons.add_photo_alternate_outlined
+                      : Icons.cloud_off_outlined,
+                  color: const Color(0xFF53657C),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    rejected
+                        ? 'Please try another photo'
+                        : 'Assessment could not finish',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF203A5C),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              message != null && message.isNotEmpty
+                  ? message
+                  : rejected
+                  ? 'We could not assess this photo reliably.'
+                  : 'Processing was interrupted. Please try again later.',
+              style: const TextStyle(
+                height: 1.6,
+                color: Color(0xFF53657C),
+              ),
+            ),
+            if (rejected) ...[
+              const SizedBox(height: 16),
+              const Text(
+                'For a clearer dental photo',
+                style: TextStyle(fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                '• Use an original, sharp photo in good lighting.\n'
+                    '• Include the teeth and nearby gumline clearly.\n'
+                    '• Avoid glare, heavy cropping and blurry images.\n'
+                    '• Only photograph your pet if it is comfortable. '
+                    'Do not force its mouth open.',
+                style: TextStyle(height: 1.7),
+              ),
+              const SizedBox(height: 18),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: [
+                  FilledButton.icon(
+                    onPressed: _locked
+                        ? null
+                        : () => _pickPhoto(ImageSource.camera),
+                    icon: const Icon(Icons.camera_alt_outlined),
+                    label: const Text('Retake photo'),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: _locked
+                        ? null
+                        : () => _pickPhoto(ImageSource.gallery),
+                    icon: const Icon(Icons.photo_library_outlined),
+                    label: const Text('Choose another photo'),
+                  ),
+                ],
+              ),
+            ],
+            const SizedBox(height: 12),
+            const Text(
+              'No assessment result was generated.',
+              style: TextStyle(
+                fontSize: 12,
+                color: Color(0xFF64748B),
+              ),
+            ),
+          ],
         ),
       );
     }

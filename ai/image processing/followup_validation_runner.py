@@ -49,8 +49,12 @@ def validate_batch(directory):
         if not valid:
             return {
                 "status": "rejected", "stage": "content", "photo_index": index,
-                "message": "A suitable cat or dog dental region could not be confirmed. "
-                           "Retake a clear close-up of the teeth and gums.",
+                "message": (
+                    "We couldn't identify a clear view of the teeth "
+                    "and gums in this follow-up photo. Choose a closer, "
+                    "well-lit dental photo so your vet can review the "
+                    "area. Do not force your pet's mouth open."
+                ),
             }
     return {"status": "completed", "result": {"validated_images": len(paths)}}
 

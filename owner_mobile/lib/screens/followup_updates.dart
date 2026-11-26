@@ -204,6 +204,39 @@ class _FollowupUpdatesScreenState extends State<FollowupUpdatesScreen> {
         _page = 0;
         _history = _fetch(0);
       });
+
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          icon: Icon(
+            canCorrectInput
+                ? Icons.add_photo_alternate_outlined
+                : Icons.cloud_off_outlined,
+            color: const Color(0xFF2549C7),
+            size: 36,
+          ),
+          title: Text(
+            canCorrectInput
+                ? 'Please check your update'
+                : 'Submission not confirmed',
+          ),
+          content: SingleChildScrollView(
+            child: Text(
+              _message ?? 'Please try again later.',
+              style: const TextStyle(height: 1.6),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () =>
+                  Navigator.of(dialogContext).pop(),
+              child: Text(
+                canCorrectInput ? 'Edit update' : 'OK',
+              ),
+            ),
+          ],
+        ),
+      );
     } finally {
       if (mounted) {
         await _refreshSubmissionState();
@@ -513,11 +546,32 @@ String get _submissionStatusMessage {
                 child: Text(_message!),
               ),
             const SizedBox(height: 20),
-            Text(
-              'Submission History',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            FutureBuilder<List<Map<String, dynamic>>>(
+            const SizedBox(height: 24),
+            Card(
+              clipBehavior: Clip.antiAlias,
+              child: ExpansionTile(
+                initiallyExpanded: !_canSubmit,
+                leading: const Icon(
+                  Icons.history_outlined,
+                  color: Color(0xFF2549C7),
+                ),
+                title: const Text(
+                  'Previous updates & vet feedback',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                subtitle: const Text(
+                  'View your submitted photos and review responses',
+                ),
+                tilePadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
+                children: [
+                  FutureBuilder<List<Map<String, dynamic>>>(
               future: _history,
               builder: (context, snapshot) {
                 if (snapshot.connectionState != ConnectionState.done) {
@@ -576,6 +630,9 @@ String get _submissionStatusMessage {
                   ],
                 );
               },
+                  ),
+                ],
+              ),
             ),
           ],
         ),

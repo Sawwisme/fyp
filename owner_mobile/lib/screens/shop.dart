@@ -10,6 +10,7 @@ import 'shop_orders.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'dart:async';
+import '../services/profile_service.dart';
 
 class ShopScreen extends StatefulWidget {
   final ShopService service;
@@ -40,6 +41,8 @@ class _ShopScreenState extends State<ShopScreen> {
   String _query = '';
   String? _clinicState;
   String? _fulfilment;
+  String? _deliveryState;
+  bool _destinationEdited = false;
 
   static const _states = [
     'Johor', 'Kedah', 'Kelantan', 'Melaka',
@@ -81,6 +84,7 @@ class _ShopScreenState extends State<ShopScreen> {
   @override
   void initState() {
     super.initState();
+    unawaited(_prefillDeliveryState());
     _future = _loadInitialShop();
     CartService.changes.addListener(_refreshCartCount);
     _refreshCartCount();
@@ -91,6 +95,27 @@ class _ShopScreenState extends State<ShopScreen> {
     CartService.changes.removeListener(_refreshCartCount);
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _prefillDeliveryState() async {
+    try {
+      final profile =
+      await ProfileService(widget.service.api).getProfile();
+
+      if (!mounted || _destinationEdited) return;
+
+      final state = profile['default_state'];
+
+      if (state is String && _states.contains(state)) {
+        setState(() => _deliveryState = state);
+
+        if (_clinic == null && _fulfilment == 'delivery') {
+          _load(0);
+        }
+      }
+    } catch (_) {
+      // The owner can select a destination manually.
+    }
   }
 
   Future<List<Map<String, dynamic>>> _fetch() async {
@@ -104,6 +129,10 @@ class _ShopScreenState extends State<ShopScreen> {
       );
     }
 
+    if (_fulfilment == 'delivery' && _deliveryState == null) {
+      return [];
+    }
+
     // Without location, keep the existing server search and pagination.
     if (_ownerLocation == null) {
       return widget.service.getClinics(
@@ -112,6 +141,8 @@ class _ShopScreenState extends State<ShopScreen> {
         limit: _pageSize + 1,
         state: _clinicState,
         fulfilment: _fulfilment,
+        deliveryState:
+        _fulfilment == 'delivery' ? _deliveryState : null,
       );
     }
 
@@ -126,6 +157,8 @@ class _ShopScreenState extends State<ShopScreen> {
         limit: 100,
         state: _clinicState,
         fulfilment: _fulfilment,
+        deliveryState:
+        _fulfilment == 'delivery' ? _deliveryState : null,
       );
 
       clinics.addAll(page);
@@ -608,6 +641,47 @@ class _ShopScreenState extends State<ShopScreen> {
                   },
                 ),
               ),
+              if (_fulfilment == 'delivery')
+                SizedBox(
+                  width: width,
+                  child: DropdownButtonFormField<String>(
+                    key: ValueKey('shop-destination-$_deliveryState'),
+                    initialValue: _deliveryState ?? '',
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Deliver to state',
+                      border: OutlineInputBorder(),
+                      helperText:
+                      'Filters clinics by delivery coverage.',
+                    ),
+                    items: [
+                      const DropdownMenuItem(
+                        value: '',
+                        child: Text('Select destination'),
+                      ),
+                      for (final state in _states)
+                        DropdownMenuItem(
+                          value: state,
+                          child: Text(state),
+                        ),
+                    ],
+                    onChanged: (value) {
+                      applyFilter(() {
+                        _destinationEdited = true;
+                        _deliveryState =
+                        value == null || value.isEmpty
+                            ? null
+                            : value;
+                      });
+                    },
+                  ),
+                ),
+              if (_fulfilment == 'delivery' &&
+                  _deliveryState == null)
+                const Text(
+                  'Select a destination state to find clinics '
+                      'that deliver there.',
+                ),
             ],
           );
         },

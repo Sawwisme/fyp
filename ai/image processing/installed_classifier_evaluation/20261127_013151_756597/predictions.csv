@@ -1,0 +1,169 @@
+﻿filename,species,healthy,healthy_known,healthy_confidence,healthy_assessed,healthy_positive,plaque,plaque_known,plaque_confidence,plaque_assessed,plaque_positive,gingivitis,gingivitis_known,gingivitis_confidence,gingivitis_assessed,gingivitis_positive,calculus,calculus_known,calculus_confidence,calculus_assessed,calculus_positive,supported_disease_flags,healthy_disease_conflict,healthy_label_with_disease_flags,known_negative_disease_flag
+cat_0262.jpg,cat,0,True,0.1835271120071411,True,False,0,True,0.13756173849105835,True,False,1,True,0.8422603607177734,True,True,,False,0.2556009590625763,False,,gingivitis,False,False,False
+cat_0156.jpg,cat,0,True,0.45290157198905945,True,True,0,True,0.02540374919772148,True,False,1,True,0.4385097622871399,True,False,,False,0.6186122894287109,False,,,False,False,False
+cat_0505.jpg,cat,0,True,0.3073352575302124,True,False,0,True,0.03631303459405899,True,False,1,True,0.5439900755882263,True,False,,False,0.6319546699523926,False,,,False,False,False
+cat_0139.jpg,cat,0,True,0.37382546067237854,True,True,0,True,0.018976600840687752,True,False,1,True,0.5230374932289124,True,False,,False,0.6166287660598755,False,,,False,False,False
+cat_0222.jpg,cat,0,True,0.00500038918107748,True,False,1,True,0.03692634031176567,True,False,1,True,0.9884135723114014,True,True,,False,0.8972575068473816,False,,gingivitis,False,False,False
+cat_0104.jpg,cat,0,True,0.4909227788448334,True,True,0,True,0.02857605554163456,True,False,1,True,0.4966522455215454,True,False,,False,0.8973060846328735,False,,,False,False,False
+cat_0698.jpg,cat,0,True,0.008346956223249435,True,False,0,True,0.09543295949697495,True,False,1,True,0.9962730407714844,True,True,,False,0.2906964123249054,False,,gingivitis,False,False,False
+cat_0110.jpg,cat,0,True,0.006672011222690344,True,False,0,True,0.06544177234172821,True,False,1,True,0.9958356618881226,True,True,,False,0.32010287046432495,False,,gingivitis,False,False,False
+cat_0221.jpg,cat,0,True,0.008190922439098358,True,False,0,True,0.08625347912311554,True,False,1,True,0.9959675073623657,True,True,,False,0.29190143942832947,False,,gingivitis,False,False,False
+dog_1034.jpg,dog,0,True,0.012322716414928436,True,False,,False,0.45528334379196167,False,,1,True,0.9042597413063049,True,True,1,True,0.9707521200180054,True,True,"gingivitis, calculus",False,False,False
+cat_0133.jpg,cat,0,True,0.011291050352156162,True,False,0,True,0.019956432282924652,True,False,1,True,0.9725860953330994,True,True,,False,0.7719743251800537,False,,gingivitis,False,False,False
+cat_0218.jpg,cat,0,True,0.010794124566018581,True,False,0,True,0.031686872243881226,True,False,1,True,0.9664312601089478,True,True,,False,0.8105712532997131,False,,gingivitis,False,False,False
+cat_0068.jpg,cat,0,True,0.010336018167436123,True,False,0,True,0.026377450674772263,True,False,1,True,0.9706385731697083,True,True,,False,0.790356457233429,False,,gingivitis,False,False,False
+cat_0655.jpg,cat,0,True,0.0054212333634495735,True,False,1,True,0.8484890460968018,True,True,1,True,0.897266149520874,True,True,,False,0.9969026446342468,False,,"plaque, gingivitis",False,False,False
+cat_0676.jpg,cat,0,True,0.0072053284384310246,True,False,1,True,0.8424229621887207,True,True,1,True,0.8745071291923523,True,True,,False,0.9970412850379944,False,,"plaque, gingivitis",False,False,False
+cat_0679.jpg,cat,0,True,0.004896316211670637,True,False,1,True,0.8116999268531799,True,True,1,True,0.9117485880851746,True,True,,False,0.9963351488113403,False,,"plaque, gingivitis",False,False,False
+cat_0193.jpg,cat,0,True,0.0011071163462474942,True,False,0,True,0.5529832243919373,True,True,1,True,0.9983648657798767,True,True,,False,0.6059062480926514,False,,"plaque, gingivitis",False,False,True
+cat_0005.jpg,cat,0,True,0.0011508057359606028,True,False,0,True,0.5471951961517334,True,True,1,True,0.998311460018158,True,True,,False,0.6019527912139893,False,,"plaque, gingivitis",False,False,True
+cat_0620.jpg,cat,0,True,0.009353221394121647,True,False,1,True,0.9586664438247681,True,True,0,True,0.49748495221138,True,False,,False,0.9837486743927002,False,,plaque,False,False,False
+cat_0331.jpg,cat,0,True,0.011111587285995483,True,False,1,True,0.9682818055152893,True,True,0,True,0.569616973400116,True,False,,False,0.9851851463317871,False,,plaque,False,False,False
+cat_0672.jpg,cat,0,True,0.009720069356262684,True,False,1,True,0.9531932473182678,True,True,0,True,0.4846745431423187,True,False,,False,0.9824134707450867,False,,plaque,False,False,False
+cat_0478.jpg,cat,0,True,0.14597399532794952,True,False,1,True,0.17075257003307343,True,False,0,True,0.6375964879989624,True,True,,False,0.806959867477417,False,,gingivitis,False,False,True
+cat_0238.jpg,cat,0,True,0.12837328016757965,True,False,1,True,0.14550092816352844,True,False,0,True,0.6929846405982971,True,True,,False,0.6781743764877319,False,,gingivitis,False,False,True
+cat_0501.jpg,cat,0,True,0.14210914075374603,True,False,1,True,0.18893620371818542,True,False,0,True,0.642309308052063,True,True,,False,0.8076812624931335,False,,gingivitis,False,False,True
+cat_0599.jpg,cat,0,True,0.2971585988998413,True,False,0,True,0.01799323968589306,True,False,1,True,0.6892781257629395,True,True,,False,0.8137460350990295,False,,gingivitis,False,False,False
+cat_0096.jpg,cat,0,True,0.29883095622062683,True,False,0,True,0.00990627333521843,True,False,1,True,0.7367420196533203,True,True,,False,0.7974475026130676,False,,gingivitis,False,False,False
+cat_0177.jpg,cat,1,True,0.6056779623031616,True,True,0,True,0.2706893980503082,True,False,0,True,0.36533552408218384,True,False,,False,0.4114774763584137,False,,,False,False,False
+cat_0379.jpg,cat,1,True,0.6064902544021606,True,True,0,True,0.27169355750083923,True,False,0,True,0.36196190118789673,True,False,,False,0.4171238839626312,False,,,False,False,False
+cat_0021.jpg,cat,1,True,0.6443683505058289,True,True,0,True,0.1485946625471115,True,False,0,True,0.18530283868312836,True,False,,False,0.9652906656265259,False,,,False,False,False
+cat_0035.jpg,cat,1,True,0.7499243021011353,True,True,0,True,0.12008627504110336,True,False,0,True,0.11540760844945908,True,False,,False,0.9604165554046631,False,,,False,False,False
+cat_0303.jpg,cat,1,True,0.5553305745124817,True,True,0,True,0.14553111791610718,True,False,0,True,0.23547595739364624,True,False,,False,0.9734506607055664,False,,,False,False,False
+dog_0953.jpg,dog,0,True,0.09289927780628204,True,False,,False,0.6692779064178467,False,,1,True,0.7993159890174866,True,True,1,True,0.9806572794914246,True,True,"gingivitis, calculus",False,False,False
+cat_0179.jpg,cat,1,True,0.8646563291549683,True,True,0,True,0.06615626066923141,True,False,0,True,0.07034800946712494,True,False,,False,0.9018146991729736,False,,,False,False,False
+cat_0064.jpg,cat,1,True,0.8628823757171631,True,True,0,True,0.06629910320043564,True,False,0,True,0.07154592871665955,True,False,,False,0.9044001698493958,False,,,False,False,False
+cat_0107.jpg,cat,1,True,0.8388247489929199,True,True,0,True,0.07358895987272263,True,False,0,True,0.0727635845541954,True,False,,False,0.9141141176223755,False,,,False,False,False
+dog_0816.jpg,dog,0,True,0.0043275137431919575,True,False,,False,0.6742516160011292,False,,1,True,0.8563575744628906,True,True,1,True,0.9996396899223328,True,True,"gingivitis, calculus",False,False,False
+cat_0251.jpg,cat,1,True,0.9301861524581909,True,True,0,True,0.009545129723846912,True,False,0,True,0.02770639955997467,True,False,,False,0.6896299123764038,False,,,False,False,False
+cat_0312.jpg,cat,1,True,0.9323168992996216,True,True,0,True,0.008986554108560085,True,False,0,True,0.026996802538633347,True,False,,False,0.6825968623161316,False,,,False,False,False
+cat_0257.jpg,cat,1,True,0.9084193706512451,True,True,0,True,0.011448381468653679,True,False,0,True,0.04353639483451843,True,False,,False,0.6817899942398071,False,,,False,False,False
+cat_0639.jpg,cat,0,True,9.240995132131502e-05,True,False,1,True,0.8199784755706787,True,True,1,True,0.998882532119751,True,True,,False,0.9949182271957397,False,,"plaque, gingivitis",False,False,False
+cat_0017.jpg,cat,0,True,8.988062472781166e-05,True,False,1,True,0.8344146013259888,True,True,1,True,0.9988983869552612,True,True,,False,0.9943159222602844,False,,"plaque, gingivitis",False,False,False
+cat_0333.jpg,cat,0,True,8.701862680027261e-05,True,False,1,True,0.7651587724685669,True,True,1,True,0.9992966651916504,True,True,,False,0.9930787682533264,False,,"plaque, gingivitis",False,False,False
+dog_0822.jpg,dog,0,True,0.251616895198822,True,False,,False,0.1162213385105133,False,,1,True,0.8315970301628113,True,True,1,True,0.8678110837936401,True,True,"gingivitis, calculus",False,False,False
+cat_0337.jpg,cat,0,True,0.010306496173143387,True,False,1,True,0.7986149787902832,True,True,0,True,0.7498925924301147,True,True,,False,0.9841628074645996,False,,"plaque, gingivitis",False,False,True
+cat_0141.jpg,cat,0,True,0.010564177297055721,True,False,1,True,0.7880623936653137,True,True,0,True,0.7446205019950867,True,True,,False,0.98373943567276,False,,"plaque, gingivitis",False,False,True
+cat_0721.jpg,cat,0,True,0.008232682943344116,True,False,1,True,0.8238130211830139,True,True,0,True,0.7804369330406189,True,True,,False,0.9881927967071533,False,,"plaque, gingivitis",False,False,True
+cat_0518.jpg,cat,1,True,0.8554069995880127,True,True,0,True,0.010939570143818855,True,False,0,True,0.1072363331913948,True,False,,False,0.3882923722267151,False,,,False,False,False
+dog_1255.jpg,dog,1,True,0.8564503788948059,True,True,,False,0.2980237603187561,False,,0,True,0.15044711530208588,True,False,0,True,0.4859022796154022,True,False,,False,False,False
+cat_0520.jpg,cat,0,True,0.03252072632312775,True,False,1,True,0.7790389657020569,True,True,1,True,0.8112855553627014,True,True,,False,0.9630331993103027,False,,"plaque, gingivitis",False,False,False
+cat_0316.jpg,cat,0,True,0.0498548224568367,True,False,1,True,0.8363393545150757,True,True,1,True,0.7190958261489868,True,True,,False,0.9576980471611023,False,,"plaque, gingivitis",False,False,False
+cat_0009.jpg,cat,0,True,0.049785759299993515,True,False,1,True,0.8345437049865723,True,True,1,True,0.7150329351425171,True,True,,False,0.9579455256462097,False,,"plaque, gingivitis",False,False,False
+dog_1165.jpg,dog,1,True,0.9470697641372681,True,True,,False,0.17435649037361145,False,,0,True,0.19294002652168274,True,False,0,True,0.08748994022607803,True,False,,False,False,False
+dog_0858.jpg,dog,0,True,0.009573681280016899,True,False,,False,0.5531402826309204,False,,0,True,0.4622644782066345,True,False,1,True,0.9997180104255676,True,True,calculus,False,False,False
+cat_0219.jpg,cat,1,True,0.902230441570282,True,True,0,True,0.021519353613257408,True,False,0,True,0.052385300397872925,True,False,,False,0.9465798735618591,False,,,False,False,False
+cat_0471.jpg,cat,1,True,0.8145394921302795,True,True,0,True,0.02139139175415039,True,False,0,True,0.12407370656728745,True,False,,False,0.8842934966087341,False,,,False,False,False
+cat_0290.jpg,cat,1,True,0.8933284878730774,True,True,0,True,0.0214682724326849,True,False,0,True,0.05758625641465187,True,False,,False,0.9491336345672607,False,,,False,False,False
+cat_0055.jpg,cat,0,True,0.17915023863315582,True,False,0,True,0.003928441554307938,True,False,1,True,0.8857524991035461,True,True,,False,0.5194190144538879,False,,gingivitis,False,False,False
+cat_0702.jpg,cat,0,True,0.18909604847431183,True,False,0,True,0.003527629654854536,True,False,1,True,0.8742684125900269,True,True,,False,0.6789263486862183,False,,gingivitis,False,False,False
+cat_0463.jpg,cat,0,True,0.18802626430988312,True,False,0,True,0.0035015412140637636,True,False,1,True,0.8890243768692017,True,True,,False,0.5047249794006348,False,,gingivitis,False,False,False
+dog_1246.jpg,dog,1,True,0.978282630443573,True,True,,False,0.056785035878419876,False,,0,True,0.005477237980812788,True,False,0,True,0.034312937408685684,True,False,,False,False,False
+dog_0901.jpg,dog,0,True,0.6284864544868469,True,True,,False,0.1605168730020523,False,,1,True,0.3862151503562927,True,False,1,True,0.41084161400794983,True,False,,False,False,False
+dog_1096.jpg,dog,0,True,0.001082387170754373,True,False,,False,0.32622143626213074,False,,1,True,0.9926623106002808,True,True,0,True,0.9797041416168213,True,True,"gingivitis, calculus",False,False,True
+cat_0211.jpg,cat,0,True,0.4060755968093872,True,True,0,True,0.033183567225933075,True,False,1,True,0.5424821376800537,True,False,,False,0.19259031116962433,False,,,False,False,False
+cat_0495.jpg,cat,0,True,0.4398409426212311,True,True,0,True,0.031695012003183365,True,False,1,True,0.49183815717697144,True,False,,False,0.2263834923505783,False,,,False,False,False
+cat_0642.jpg,cat,0,True,0.314363956451416,True,False,0,True,0.041562359780073166,True,False,1,True,0.6071398258209229,True,True,,False,0.23852287232875824,False,,gingivitis,False,False,False
+cat_0567.jpg,cat,1,True,0.7947118282318115,True,True,0,True,0.08357375860214233,True,False,0,True,0.1154981479048729,True,False,,False,0.9138343930244446,False,,,False,False,False
+cat_0615.jpg,cat,1,True,0.8219672441482544,True,True,0,True,0.10649830847978592,True,False,0,True,0.07638857513666153,True,False,,False,0.8788263201713562,False,,,False,False,False
+cat_0030.jpg,cat,1,True,0.8232753276824951,True,True,0,True,0.10381282866001129,True,False,0,True,0.0765308365225792,True,False,,False,0.8780127167701721,False,,,False,False,False
+dog_1216.jpg,dog,1,True,0.992694616317749,True,True,,False,0.014319864101707935,False,,0,True,0.001676936517469585,True,False,0,True,0.017712172120809555,True,False,,False,False,False
+dog_1215.jpg,dog,1,True,0.9950693249702454,True,True,,False,0.03387073799967766,False,,0,True,0.004571771714836359,True,False,0,True,0.03793603181838989,True,False,,False,False,False
+cat_0529.jpg,cat,0,True,0.06822330504655838,True,False,1,True,0.7889182567596436,True,True,0,True,0.10829132050275803,True,False,,False,0.9970362186431885,False,,plaque,False,False,False
+cat_0566.jpg,cat,0,True,0.05835286155343056,True,False,1,True,0.8101356029510498,True,True,0,True,0.11353594064712524,True,False,,False,0.996243953704834,False,,plaque,False,False,False
+cat_0703.jpg,cat,0,True,0.11325054615736008,True,False,1,True,0.7909287214279175,True,True,0,True,0.10063347965478897,True,False,,False,0.9943661689758301,False,,plaque,False,False,False
+dog_0866.jpg,dog,0,True,0.0014176024124026299,True,False,,False,0.8478485345840454,False,,1,True,0.9907318353652954,True,True,1,True,0.9946621060371399,True,True,"gingivitis, calculus",False,False,False
+cat_0091.jpg,cat,0,True,0.0050172447226941586,True,False,0,True,0.15639276802539825,True,False,1,True,0.9820188879966736,True,True,,False,0.9434098601341248,False,,gingivitis,False,False,False
+cat_0558.jpg,cat,0,True,0.0053536794148385525,True,False,0,True,0.15362043678760529,True,False,1,True,0.9807732105255127,True,True,,False,0.9440000653266907,False,,gingivitis,False,False,False
+cat_0150.jpg,cat,0,True,0.0008757718023844063,True,False,0,True,0.2100730687379837,True,False,1,True,0.9932393431663513,True,True,,False,0.9381548762321472,False,,gingivitis,False,False,False
+cat_0057.jpg,cat,0,True,0.00089696713257581,True,False,0,True,0.20873497426509857,True,False,1,True,0.9929744601249695,True,True,,False,0.9375185370445251,False,,gingivitis,False,False,False
+cat_0148.jpg,cat,0,True,0.0010064068483188748,True,False,0,True,0.21201594173908234,True,False,1,True,0.9927610158920288,True,True,,False,0.9234114289283752,False,,gingivitis,False,False,False
+dog_1213.jpg,dog,1,True,0.9919348955154419,True,True,,False,0.1749066859483719,False,,0,True,0.03284858539700508,True,False,0,True,0.021767839789390564,True,False,,False,False,False
+cat_0376.jpg,cat,0,True,0.01015899982303381,True,False,0,True,0.07224041223526001,True,False,1,True,0.9779924750328064,True,True,,False,0.74051833152771,False,,gingivitis,False,False,False
+cat_0101.jpg,cat,0,True,0.01283533126115799,True,False,0,True,0.05388372018933296,True,False,1,True,0.9732909202575684,True,True,,False,0.7475292086601257,False,,gingivitis,False,False,False
+cat_0099.jpg,cat,0,True,0.01989520899951458,True,False,0,True,0.07127098739147186,True,False,1,True,0.9438619613647461,True,True,,False,0.8222872614860535,False,,gingivitis,False,False,False
+cat_0215.jpg,cat,0,True,0.09746602922677994,True,False,0,True,0.008832556195557117,True,False,1,True,0.7997409701347351,True,True,,False,0.608729362487793,False,,gingivitis,False,False,False
+cat_0719.jpg,cat,0,True,0.01943221502006054,True,False,0,True,0.02565855346620083,True,False,1,True,0.9305324554443359,True,True,,False,0.7377839088439941,False,,gingivitis,False,False,False
+cat_0415.jpg,cat,0,True,0.08481429517269135,True,False,0,True,0.010515673086047173,True,False,1,True,0.8126230835914612,True,True,,False,0.6537007093429565,False,,gingivitis,False,False,False
+cat_0525.jpg,cat,0,True,0.016520341858267784,True,False,1,True,0.297125905752182,True,False,1,True,0.9686228632926941,True,True,,False,0.9748615026473999,False,,gingivitis,False,False,False
+cat_0608.jpg,cat,0,True,0.01131629478186369,True,False,1,True,0.22066527605056763,True,False,1,True,0.9743762612342834,True,True,,False,0.9731705188751221,False,,gingivitis,False,False,False
+dog_0881.jpg,dog,0,True,0.06807729601860046,True,False,,False,0.8379238843917847,False,,1,True,0.8041939735412598,True,True,1,True,0.9875349998474121,True,True,"gingivitis, calculus",False,False,False
+dog_1022.jpg,dog,0,True,0.004001112189143896,True,False,,False,0.6711713671684265,False,,0,True,0.8512410521507263,True,True,1,True,0.9968560338020325,True,True,"gingivitis, calculus",False,False,True
+cat_0408.jpg,cat,0,True,0.027882978320121765,True,False,0,True,0.04939460754394531,True,False,1,True,0.9209539890289307,True,True,,False,0.36435073614120483,False,,gingivitis,False,False,False
+cat_0587.jpg,cat,0,True,0.029966428875923157,True,False,0,True,0.06485272943973541,True,False,1,True,0.9312798380851746,True,True,,False,0.4404428005218506,False,,gingivitis,False,False,False
+cat_0487.jpg,cat,0,True,0.030727569013834,True,False,0,True,0.06583591550588608,True,False,1,True,0.9317663908004761,True,True,,False,0.4472387433052063,False,,gingivitis,False,False,False
+cat_0497.jpg,cat,0,True,0.004351162817329168,True,False,1,True,0.5077865123748779,True,True,1,True,0.9897449016571045,True,True,,False,0.9292441010475159,False,,"plaque, gingivitis",False,False,False
+cat_0315.jpg,cat,0,True,0.002409538719803095,True,False,1,True,0.36666736006736755,True,True,1,True,0.9936814904212952,True,True,,False,0.9295973181724548,False,,"plaque, gingivitis",False,False,False
+dog_0895.jpg,dog,0,True,0.0017954336944967508,True,False,,False,0.10010108351707458,False,,1,True,0.9943825602531433,True,True,1,True,0.9734923243522644,True,True,"gingivitis, calculus",False,False,False
+cat_0078.jpg,cat,0,True,0.010390903800725937,True,False,1,True,0.9841407537460327,True,True,0,True,0.3443542420864105,True,False,,False,0.9874175190925598,False,,plaque,False,False,False
+cat_0627.jpg,cat,0,True,0.009284863248467445,True,False,1,True,0.9846840500831604,True,True,0,True,0.4044889807701111,True,False,,False,0.9901009798049927,False,,plaque,False,False,False
+cat_0445.jpg,cat,0,True,0.012565013021230698,True,False,1,True,0.9809083938598633,True,True,0,True,0.33879271149635315,True,False,,False,0.9871282577514648,False,,plaque,False,False,False
+dog_0935.jpg,dog,0,True,0.006922782864421606,True,False,,False,0.7374940514564514,False,,0,True,0.8231366872787476,True,True,1,True,0.9919388890266418,True,True,"gingivitis, calculus",False,False,True
+dog_0837.jpg,dog,0,True,0.20581196248531342,True,False,,False,0.214188352227211,False,,1,True,0.40564677119255066,True,False,1,True,0.9670619368553162,True,True,calculus,False,False,False
+dog_1263.jpg,dog,1,True,0.1655462682247162,True,False,,False,0.3041822910308838,False,,0,True,0.9043257236480713,True,True,0,True,0.6315802335739136,True,False,gingivitis,False,True,True
+cat_0206.jpg,cat,1,True,0.7696841359138489,True,True,0,True,0.013835955411195755,True,False,0,True,0.2531346082687378,True,False,,False,0.3920583724975586,False,,,False,False,False
+cat_0554.jpg,cat,1,True,0.7216988801956177,True,True,0,True,0.016943704336881638,True,False,0,True,0.2722831666469574,True,False,,False,0.42990511655807495,False,,,False,False,False
+cat_0048.jpg,cat,1,True,0.7749911546707153,True,True,0,True,0.013469806872308254,True,False,0,True,0.2436174750328064,True,False,,False,0.4044102728366852,False,,,False,False,False
+dog_1129.jpg,dog,0,True,0.19650256633758545,True,False,,False,0.2806682288646698,False,,0,True,0.49304869771003723,True,False,1,True,0.6734856367111206,True,False,,False,False,False
+dog_0934.jpg,dog,0,True,0.1352471262216568,True,False,,False,0.27430132031440735,False,,0,True,0.4766940474510193,True,False,1,True,0.7064868807792664,True,False,,False,False,False
+cat_0747.jpg,cat,0,True,0.19030161201953888,True,False,0,True,0.5014013648033142,True,True,1,True,0.8046627044677734,True,True,0,True,0.2988430857658386,False,,"plaque, gingivitis",False,False,True
+cat_0771.jpg,cat,0,True,0.17859503626823425,True,False,0,True,0.4829225540161133,True,True,1,True,0.8199699521064758,True,True,0,True,0.3224586248397827,False,,"plaque, gingivitis",False,False,True
+dog_0943.jpg,dog,0,True,0.103263258934021,True,False,,False,0.7581546902656555,False,,1,True,0.7236239910125732,True,True,1,True,0.946277379989624,True,True,"gingivitis, calculus",False,False,False
+cat_0775.jpg,cat,1,True,0.9569364190101624,True,True,0,True,0.010930494405329227,True,False,0,True,0.0547705702483654,True,False,0,True,0.01720871776342392,False,,,False,False,False
+cat_0772.jpg,cat,1,True,0.9515628814697266,True,True,0,True,0.010507667437195778,True,False,0,True,0.06154726818203926,True,False,0,True,0.020607590675354004,False,,,False,False,False
+dog_0814.jpg,dog,0,True,0.04981517046689987,True,False,,False,0.8391218185424805,False,,1,True,0.8077354431152344,True,True,1,True,0.9063887596130371,True,True,"gingivitis, calculus",False,False,False
+dog_0841.jpg,dog,0,True,0.16154691576957703,True,False,,False,0.42044925689697266,False,,0,True,0.6700093746185303,True,True,1,True,0.8706343173980713,True,True,"gingivitis, calculus",False,False,True
+dog_1147.jpg,dog,0,True,0.22573384642601013,True,False,,False,0.15298305451869965,False,,0,True,0.22193901240825653,True,False,1,True,0.9290351271629333,True,True,calculus,False,False,False
+dog_0890.jpg,dog,0,True,4.875594822806306e-05,True,False,,False,0.9387526512145996,False,,0,True,0.9964574575424194,True,True,1,True,0.9990189075469971,True,True,"gingivitis, calculus",False,False,True
+dog_1163.jpg,dog,0,True,0.023742642253637314,True,False,,False,0.9934642910957336,False,,0,True,0.3451822102069855,True,False,1,True,0.9882677793502808,True,True,calculus,False,False,False
+dog_1112.jpg,dog,0,True,0.022090410813689232,True,False,,False,0.6909061074256897,False,,0,True,0.7586238980293274,True,True,1,True,0.9891715049743652,True,True,"gingivitis, calculus",False,False,True
+dog_0804.jpg,dog,1,True,0.8683359622955322,True,True,,False,0.0541524775326252,False,,0,True,0.09868840128183365,True,False,0,True,0.2184126228094101,True,False,,False,False,False
+dog_0973.jpg,dog,0,True,0.005547888111323118,True,False,,False,0.14599542319774628,False,,1,True,0.9720990657806396,True,True,1,True,0.9895251393318176,True,True,"gingivitis, calculus",False,False,False
+cat_0385.jpg,cat,0,True,0.19350376725196838,True,False,1,True,0.4842756390571594,True,True,0,True,0.10071423649787903,True,False,,False,0.9815707206726074,False,,plaque,False,False,False
+dog_1106.jpg,dog,0,True,0.033839151263237,True,False,,False,0.2277475893497467,False,,1,True,0.7092573046684265,True,True,0,True,0.9950176477432251,True,True,"gingivitis, calculus",False,False,True
+dog_0835.jpg,dog,0,True,0.10067582130432129,True,False,,False,0.5247594118118286,False,,0,True,0.6094982028007507,True,True,1,True,0.9673139452934265,True,True,"gingivitis, calculus",False,False,True
+dog_0928.jpg,dog,0,True,0.03368111699819565,True,False,,False,0.5608192682266235,False,,1,True,0.9418302178382874,True,True,1,True,0.9226737022399902,True,True,"gingivitis, calculus",False,False,False
+dog_1250.jpg,dog,1,True,0.09015905857086182,True,False,,False,0.29575440287590027,False,,0,True,0.6711463928222656,True,True,0,True,0.9428321123123169,True,True,"gingivitis, calculus",False,True,True
+cat_0530.jpg,cat,0,True,0.033536992967128754,True,False,0,True,0.028239339590072632,True,False,1,True,0.9005794525146484,True,True,,False,0.9372923970222473,False,,gingivitis,False,False,False
+cat_0584.jpg,cat,1,True,0.588985025882721,True,True,0,True,0.024645186960697174,True,False,0,True,0.3296489119529724,True,False,,False,0.8135029673576355,False,,,False,False,False
+cat_0438.jpg,cat,1,True,0.7607676386833191,True,True,0,True,0.01323600485920906,True,False,0,True,0.25213056802749634,True,False,,False,0.7485042810440063,False,,,False,False,False
+cat_0626.jpg,cat,1,True,0.6639264822006226,True,True,0,True,0.01587163284420967,True,False,0,True,0.3234505355358124,True,False,,False,0.7644825577735901,False,,,False,False,False
+cat_0406.jpg,cat,0,True,0.001021682284772396,True,False,0,True,0.3502679467201233,True,True,1,True,0.9820814728736877,True,True,,False,0.994799017906189,False,,"plaque, gingivitis",False,False,True
+cat_0394.jpg,cat,0,True,0.0011978363618254662,True,False,0,True,0.41194313764572144,True,True,1,True,0.9766381978988647,True,True,,False,0.9950664639472961,False,,"plaque, gingivitis",False,False,True
+dog_0929.jpg,dog,0,True,0.14504994451999664,True,False,,False,0.12008389830589294,False,,1,True,0.8865938186645508,True,True,0,True,0.4008251428604126,True,False,gingivitis,False,False,False
+cat_0581.jpg,cat,0,True,0.00012181432248326018,True,False,1,True,0.7245901823043823,True,True,1,True,0.9990953207015991,True,True,,False,0.9882696270942688,False,,"plaque, gingivitis",False,False,False
+cat_0628.jpg,cat,0,True,0.0344378761947155,True,False,1,True,0.6864334344863892,True,True,1,True,0.9623437523841858,True,True,,False,0.34972912073135376,False,,"plaque, gingivitis",False,False,False
+dog_1179.jpg,dog,1,True,0.9693708419799805,True,True,,False,0.09842846542596817,False,,0,True,0.004517409019172192,True,False,0,True,0.09747721254825592,True,False,,False,False,False
+dog_0907.jpg,dog,0,True,0.000536575447767973,True,False,,False,0.21434010565280914,False,,1,True,0.9984648823738098,True,True,1,True,0.9520570635795593,True,True,"gingivitis, calculus",False,False,False
+dog_0977.jpg,dog,0,True,0.20083807408809662,True,False,,False,0.01913621835410595,False,,1,True,0.8216648697853088,True,True,1,True,0.9765863418579102,True,True,"gingivitis, calculus",False,False,False
+cat_0641.jpg,cat,0,True,0.03257649764418602,True,False,1,True,0.5949630737304688,True,True,0,True,0.9043084383010864,True,True,,False,0.9553480744361877,False,,"plaque, gingivitis",False,False,True
+dog_1067.jpg,dog,0,True,0.00450722174718976,True,False,,False,0.6104198694229126,False,,0,True,0.9825236797332764,True,True,1,True,0.9890418648719788,True,True,"gingivitis, calculus",False,False,True
+cat_0308.jpg,cat,0,True,0.0021851167548447847,True,False,0,True,0.5916286706924438,True,True,1,True,0.9821947813034058,True,True,,False,0.9508922100067139,False,,"plaque, gingivitis",False,False,True
+dog_0949.jpg,dog,0,True,0.0032804154325276613,True,False,,False,0.2620807886123657,False,,1,True,0.9911940097808838,True,True,1,True,0.9736958742141724,True,True,"gingivitis, calculus",False,False,False
+dog_0864.jpg,dog,0,True,0.004341694992035627,True,False,,False,0.9796308875083923,False,,1,True,0.5968689918518066,True,False,1,True,0.9964088797569275,True,True,calculus,False,False,False
+dog_0961.jpg,dog,0,True,0.0025052560959011316,True,False,,False,0.6141414642333984,False,,1,True,0.9856824278831482,True,True,1,True,0.998954713344574,True,True,"gingivitis, calculus",False,False,False
+dog_1137.jpg,dog,0,True,0.0028804403264075518,True,False,,False,0.9541555047035217,False,,1,True,0.9755685925483704,True,True,1,True,0.9899708032608032,True,True,"gingivitis, calculus",False,False,False
+cat_0774.jpg,cat,1,True,0.5387632846832275,True,True,0,True,0.05316362529993057,True,False,0,True,0.36404848098754883,True,False,0,True,0.23369336128234863,False,,,False,False,False
+dog_1059.jpg,dog,0,True,0.16368085145950317,True,False,,False,0.11498339474201202,False,,1,True,0.5479297637939453,True,False,1,True,0.9309914112091064,True,True,calculus,False,False,False
+cat_0276.jpg,cat,1,True,0.49579793214797974,True,True,0,True,0.2193632274866104,True,False,0,True,0.24487784504890442,True,False,,False,0.9817627668380737,False,,,False,False,False
+cat_0207.jpg,cat,0,True,0.28917285799980164,True,False,1,True,0.24009913206100464,True,False,1,True,0.7097871899604797,True,True,,False,0.36676010489463806,False,,gingivitis,False,False,False
+dog_1169.jpg,dog,1,True,0.9713571071624756,True,True,,False,0.3031214475631714,False,,0,True,0.05260255187749863,True,False,0,True,0.02425433322787285,True,False,,False,False,False
+dog_1031.jpg,dog,0,True,0.02023155614733696,True,False,,False,0.5750867128372192,False,,1,True,0.9385958313941956,True,True,1,True,0.9670122265815735,True,True,"gingivitis, calculus",False,False,False
+dog_1265.jpg,dog,1,True,0.9557514190673828,True,True,,False,0.01888837106525898,False,,0,True,0.030274488031864166,True,False,0,True,0.15383106470108032,True,False,,False,False,False
+cat_0511.jpg,cat,0,True,0.031486574560403824,True,False,1,True,0.6009528636932373,True,True,1,True,0.9415686726570129,True,True,,False,0.9484515190124512,False,,"plaque, gingivitis",False,False,False
+dog_0918.jpg,dog,0,True,0.00035542846308089793,True,False,,False,0.9775042533874512,False,,1,True,0.9923573136329651,True,True,1,True,0.9982858300209045,True,True,"gingivitis, calculus",False,False,False
+dog_0971.jpg,dog,0,True,0.14288829267024994,True,False,,False,0.1476956605911255,False,,1,True,0.6592773199081421,True,True,1,True,0.6798075437545776,True,False,gingivitis,False,False,False
+dog_1235.jpg,dog,1,True,0.4800502359867096,True,True,,False,0.28839001059532166,False,,0,True,0.4063975214958191,True,False,0,True,0.7984593510627747,True,False,,False,False,False
+cat_0395.jpg,cat,0,True,0.010736905969679356,True,False,1,True,0.8987182974815369,True,True,0,True,0.6635845899581909,True,True,,False,0.9860427379608154,False,,"plaque, gingivitis",False,False,True
+dog_1049.jpg,dog,0,True,0.0014488418819382787,True,False,,False,0.9020178318023682,False,,1,True,0.9869053959846497,True,True,1,True,0.9990842938423157,True,True,"gingivitis, calculus",False,False,False
+dog_0830.jpg,dog,0,True,0.01816195249557495,True,False,,False,0.9723414182662964,False,,1,True,0.49937862157821655,True,False,1,True,0.9400166869163513,True,True,calculus,False,False,False
+dog_1120.jpg,dog,0,True,0.0004982591490261257,True,False,,False,0.23885366320610046,False,,1,True,0.9848871231079102,True,True,1,True,0.9918333292007446,True,True,"gingivitis, calculus",False,False,False
+cat_0086.jpg,cat,0,True,0.0014388608979061246,True,False,1,True,0.9242133498191833,True,True,0,True,0.9304002523422241,True,True,,False,0.9951896071434021,False,,"plaque, gingivitis",False,False,True
+dog_1221.jpg,dog,1,True,0.9439671635627747,True,True,,False,0.017932435497641563,False,,0,True,0.03350333124399185,True,False,0,True,0.030336949974298477,True,False,,False,False,False
+dog_1075.jpg,dog,0,True,0.0005700531764887273,True,False,,False,0.06774398684501648,False,,1,True,0.9971514344215393,True,True,1,True,0.9718664884567261,True,True,"gingivitis, calculus",False,False,False
+dog_1110.jpg,dog,0,True,0.011721815913915634,True,False,,False,0.41640743613243103,False,,1,True,0.9675112366676331,True,True,1,True,0.9825642108917236,True,True,"gingivitis, calculus",False,False,False
+dog_0801.jpg,dog,0,True,0.6304717659950256,True,True,,False,0.14571835100650787,False,,1,True,0.5398221611976624,True,False,1,True,0.8521865606307983,True,True,calculus,True,False,False
+dog_1182.jpg,dog,1,True,0.8954225182533264,True,True,,False,0.12834255397319794,False,,0,True,0.10324665904045105,True,False,0,True,0.15918050706386566,True,False,,False,False,False
+dog_1158.jpg,dog,0,True,0.01736178807914257,True,False,,False,0.3872523307800293,False,,1,True,0.915748119354248,True,True,1,True,0.9798639416694641,True,True,"gingivitis, calculus",False,False,False
+dog_0833.jpg,dog,0,True,0.0006622024811804295,True,False,,False,0.9375507235527039,False,,1,True,0.984627366065979,True,True,1,True,0.9967888593673706,True,True,"gingivitis, calculus",False,False,False
+dog_0888.jpg,dog,0,True,0.1015954241156578,True,False,,False,0.2785176932811737,False,,1,True,0.6048378944396973,True,True,1,True,0.9506533145904541,True,True,"gingivitis, calculus",False,False,False

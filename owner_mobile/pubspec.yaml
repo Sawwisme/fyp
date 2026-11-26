@@ -47,6 +47,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_local_notifications: 19.5.0
+  file_picker: 13.4.1
 
 dev_dependencies:
   flutter_test:

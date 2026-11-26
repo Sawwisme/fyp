@@ -64,6 +64,13 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
     _loadOptions();
   }
 
+  String _sharingText(String en, String ms, String zh) {
+    final language = Localizations.localeOf(context).languageCode;
+    if (language == 'ms') return ms;
+    if (language == 'zh') return zh;
+    return en;
+  }
+
   DateTime _today() {
     final malaysia = DateTime.now().toUtc().add(
       const Duration(hours: 8),
@@ -343,10 +350,19 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                 if (widget.aiAnalysisId != null) ...[
                   const SizedBox(height: 16),
                   Text(
-                    'Assessment #${widget.aiAnalysisId} and its '
-                        'images will be shared with '
-                        '${widget.clinic['clinic_name']} for this '
-                        'appointment when you confirm this booking.',
+                    _sharingText(
+                      'Assessment #${widget.aiAnalysisId} and its images '
+                          'will be shared with '
+                          '${widget.clinic['clinic_name']} for this '
+                          'appointment when you confirm this booking.',
+                      'Penilaian #${widget.aiAnalysisId} dan imejnya '
+                          'akan dikongsi dengan '
+                          '${widget.clinic['clinic_name']} untuk janji '
+                          'temu ini apabila anda mengesahkan tempahan.',
+                      '确认预约后，评估 #${widget.aiAnalysisId} '
+                          '及其图像将与 ${widget.clinic['clinic_name']} '
+                          '共享，用于本次预约。',
+                    ),
                     style: const TextStyle(
                       height: 1.5,
                       fontWeight: FontWeight.w600,
@@ -356,10 +372,20 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                 const SizedBox(height: 20),
                 Text(
                   _shareMedicalHistory
-                      ? 'Previous medical history: sharing enabled '
-                      'for the assigned vet.'
-                      : 'Previous medical history: not shared '
-                      'through this booking.',
+                      ? _sharingText(
+                    'Previous medical history: sharing enabled '
+                        'for the assigned vet.',
+                    'Sejarah perubatan terdahulu: perkongsian '
+                        'dibenarkan untuk veterinar yang ditugaskan.',
+                    '以往医疗记录：已同意与指定兽医共享。',
+                  )
+                      : _sharingText(
+                    'Previous medical history: not shared '
+                        'through this booking.',
+                    'Sejarah perubatan terdahulu: tidak dikongsi '
+                        'melalui tempahan ini.',
+                    '以往医疗记录：不通过本次预约共享。',
+                  ),
                   style: const TextStyle(height: 1.5),
                 ),
                 const SizedBox(height: 16),
@@ -743,13 +769,29 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               });
             },
             controlAffinity: ListTileControlAffinity.leading,
-            title: const Text('Share previous medical history'),
+            title: Text(
+              _sharingText(
+                'Share previous medical history',
+                'Kongsi sejarah perubatan terdahulu',
+                '共享以往医疗记录',
+              ),
+            ),
             subtitle: Text(
-              'Allow the assigned vet at '
-                  '${widget.clinic['clinic_name']} to read this pet’s '
-                  'previous completed consultation records, including '
-                  'records from other clinics, for this appointment. '
-                  'Original records cannot be edited.',
+              _sharingText(
+                'Allow the assigned vet at '
+                    '${widget.clinic['clinic_name']} to read this pet’s '
+                    'previous completed consultation records, including '
+                    'records from other clinics, for this appointment. '
+                    'Original records cannot be edited.',
+                'Benarkan veterinar yang ditugaskan di '
+                    '${widget.clinic['clinic_name']} membaca rekod '
+                    'konsultasi terdahulu yang telah selesai untuk '
+                    'haiwan ini, termasuk rekod klinik lain, bagi '
+                    'janji temu ini. Rekod asal tidak boleh diubah.',
+                '允许 ${widget.clinic['clinic_name']} 的指定兽医'
+                    '为本次预约查看这只宠物以往已完成的问诊记录，'
+                    '包括其他诊所的记录。原始记录不可修改。',
+              ),
             ),
           ),
         ),

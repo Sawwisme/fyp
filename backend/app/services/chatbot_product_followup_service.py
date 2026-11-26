@@ -29,6 +29,34 @@ CARE_REPLIES = {
     "breath care": "breath care",
     "bad breath": "breath care",
     "breath freshening": "breath freshening",
+
+        # Simplified Chinese
+    "日常刷牙": "routine brushing",
+    "刷牙": "routine brushing",
+    "日常刷牙用品": "routine brushing",
+    "日常护理": "routine dental care",
+    "日常牙齿护理": "routine dental care",
+    "口腔卫生": "oral hygiene",
+    "牙菌斑": "plaque control",
+    "牙菌斑控制": "plaque control",
+    "预防牙菌斑": "plaque prevention",
+    "口气护理": "breath care",
+    "口臭": "breath care",
+    "清新口气": "breath freshening",
+
+    # Bahasa Melayu
+    "memberus gigi": "routine brushing",
+    "berus gigi": "routine brushing",
+    "gosok gigi": "routine brushing",
+    "memberus gigi harian": "routine brushing",
+    "penjagaan gigi harian": "routine dental care",
+    "kebersihan mulut": "oral hygiene",
+    "kawalan plak": "plaque control",
+    "plak": "plaque control",
+    "pencegahan plak": "plaque prevention",
+    "penjagaan nafas": "breath care",
+    "nafas berbau": "breath care",
+    "bau mulut": "breath care",
 }
 
 
@@ -39,7 +67,7 @@ def resolve_product_budget(db, conversation, message, answer):
     care_key = re.sub(
         r"\s+(please|pls|thanks)$",
         "",
-        text.lower().rstrip(".!"),
+    text.casefold().rstrip(".!。！?？"),
     ).strip()
 
     care_reply = CARE_REPLIES.get(care_key)

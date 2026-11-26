@@ -1,0 +1,122 @@
+{
+  "split": "test",
+  "images": 168,
+  "thresholds": {
+    "healthy": 0.35,
+    "plaque": 0.35,
+    "gingivitis": 0.6,
+    "calculus": 0.8
+  },
+  "model_path": "C:\\Users\\USER\\OneDrive\\Documents\\GitHub\\fyp\\ai\\image processing\\models\\dental_classifier_grouped_candidate.keras",
+  "model_sha256": "3b829357fb18e3c1d2a78a9ba24f17f74b9431a5ba45dce49d8b6dfa08bdd4f5",
+  "labels_path": "C:\\Users\\USER\\OneDrive\\Documents\\GitHub\\fyp\\ai\\image processing\\classifier_grouped_split\\20261118_202308_559445\\labels_grouped_split.csv",
+  "images_path": "C:\\Users\\USER\\OneDrive\\Documents\\GitHub\\fyp\\ai\\image processing\\fyp final dataset\\images",
+  "scope": "Classifier only; image acceptance, segmentation, Grad-CAM and clinical severity are not evaluated.",
+  "warning": "Existing test results are descriptive; do not use them to tune thresholds. Dataset independence is not verified.",
+  "by_species": {
+    "cat": {
+      "images": 106,
+      "classes": {
+        "healthy": {
+          "known_samples": 106,
+          "tp": 28,
+          "fp": 5,
+          "fn": 0,
+          "tn": 73,
+          "precision": 0.8484848484848485,
+          "recall": 1.0,
+          "f1": 0.9180327868852459,
+          "false_positive_rate": 0.0641025641025641
+        },
+        "plaque": {
+          "known_samples": 106,
+          "tp": 30,
+          "fp": 7,
+          "fn": 7,
+          "tn": 62,
+          "precision": 0.8108108108108109,
+          "recall": 0.8108108108108109,
+          "f1": 0.8108108108108109,
+          "false_positive_rate": 0.10144927536231885
+        },
+        "gingivitis": {
+          "known_samples": 106,
+          "tp": 53,
+          "fp": 9,
+          "fn": 6,
+          "tn": 38,
+          "precision": 0.8548387096774194,
+          "recall": 0.8983050847457628,
+          "f1": 0.8760330578512396,
+          "false_positive_rate": 0.19148936170212766
+        },
+        "calculus": {
+          "known_samples": 0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null,
+          "false_positive_rate": null
+        }
+      },
+      "healthy_label_with_disease_flags": 0,
+      "healthy_label_count": 28,
+      "conflicts": 0
+    },
+    "dog": {
+      "images": 62,
+      "classes": {
+        "healthy": {
+          "known_samples": 62,
+          "tp": 13,
+          "fp": 2,
+          "fn": 2,
+          "tn": 45,
+          "precision": 0.8666666666666667,
+          "recall": 0.8666666666666667,
+          "f1": 0.8666666666666667,
+          "false_positive_rate": 0.0425531914893617
+        },
+        "plaque": {
+          "known_samples": 0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null,
+          "false_positive_rate": null
+        },
+        "gingivitis": {
+          "known_samples": 62,
+          "tp": 29,
+          "fp": 9,
+          "fn": 6,
+          "tn": 18,
+          "precision": 0.7631578947368421,
+          "recall": 0.8285714285714286,
+          "f1": 0.7945205479452054,
+          "false_positive_rate": 0.3333333333333333
+        },
+        "calculus": {
+          "known_samples": 62,
+          "tp": 40,
+          "fp": 3,
+          "fn": 4,
+          "tn": 15,
+          "precision": 0.9302325581395349,
+          "recall": 0.9090909090909091,
+          "f1": 0.9195402298850575,
+          "false_positive_rate": 0.16666666666666666
+        }
+      },
+      "healthy_label_with_disease_flags": 2,
+      "healthy_label_count": 15,
+      "conflicts": 1
+    }
+  }
+}

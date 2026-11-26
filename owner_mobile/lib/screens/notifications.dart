@@ -38,11 +38,15 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
   int _page = 0;
   bool _hasMore = false;
   bool _loading = false;
+  bool _markingAll = false;
   int? _readingId;
   String? _error;
 
   bool get _busy =>
-      _loading || _readingId != null || _openingResource;
+      _loading ||
+          _readingId != null ||
+          _openingResource ||
+          _markingAll;
 
 
   @override
@@ -189,6 +193,50 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
       }
     } finally {
       if (mounted) setState(() => _enablingAlerts = false);
+    }
+  }
+
+  Future<void> _markAllRead() async {
+    if (_busy || _enablingAlerts) return;
+
+    setState(() => _markingAll = true);
+
+    try {
+      final result = await widget.service.markAllRead();
+      if (!mounted) return;
+
+      final readAt = result['read_at'] as String;
+
+      setState(() {
+        _items = _items.map((item) {
+          if (item['read_at'] != null) return item;
+
+          return <String, dynamic>{
+            ...item,
+            'read_at': readAt,
+          };
+        }).toList();
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('All notifications marked as read.'),
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Could not confirm the update. Refresh and try again.',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _markingAll = false);
+      }
     }
   }
 
@@ -759,6 +807,17 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
       appBar: AppBar(
         title: const Text('Notifications'),
         actions: [
+          IconButton(
+            tooltip: 'Mark all as read',
+            onPressed: _busy || _enablingAlerts ? null : _markAllRead,
+            icon: _markingAll
+                ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+                : const Icon(Icons.done_all),
+          ),
           IconButton(
             tooltip: 'Refresh notifications',
             onPressed: _busy ? null : () => _load(_page),

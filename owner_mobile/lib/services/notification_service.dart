@@ -85,4 +85,17 @@ class NotificationService {
     return Map<String, dynamic>.from(data);
   }
 
+  Future<Map<String, dynamic>> markAllRead() async {
+    final data = await api.post('/notifications/read-all', {});
+
+    if (data is! Map ||
+        data['updated_count'] is! int ||
+        data['read_at'] is! String) {
+      throw const ApiException(
+        'Could not confirm notifications were marked as read.',
+      );
+    }
+
+    return Map<String, dynamic>.from(data);
+  }
 }

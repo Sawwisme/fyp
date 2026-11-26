@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from fastapi import HTTPException
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session
 
 from app.models import (
@@ -480,3 +480,27 @@ def get_notification_by_id(
         )
 
     return notification
+
+def mark_all_as_read(db: Session, current_user: User):
+    read_at = datetime.now(timezone.utc).replace(tzinfo=None)
+
+    try:
+        result = db.execute(
+            update(Notification)
+            .where(
+                Notification.user_id == current_user.user_id,
+                Notification.read_at.is_(None),
+            )
+            .values(read_at=read_at)
+        )
+        db.commit()
+
+        return {
+            "updated_count": int(result.rowcount or 0),
+            "read_at": read_at.replace(
+                tzinfo=timezone.utc
+            ).isoformat(),
+        }
+    except Exception:
+        db.rollback()
+        raise

@@ -71,8 +71,14 @@ class _OwnerNotificationBellState
       if (item['read_at'] == null) {
         await _phone.show(
           id: id,
-          title: 'VetDental update',
-          body: 'You have a new update. Open VetDental to view it.',
+          title: item['title'] is String &&
+              (item['title'] as String).trim().isNotEmpty
+              ? (item['title'] as String).trim()
+              : 'VetDental notification',
+          body: item['message'] is String &&
+              (item['message'] as String).trim().isNotEmpty
+              ? (item['message'] as String).trim()
+              : 'Open VetDental to view the details.',
           payload: jsonEncode({
             'user_id': widget.userId,
             'notification_id': id,

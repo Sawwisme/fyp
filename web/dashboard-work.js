@@ -110,12 +110,11 @@
 
     grid.append(appointmentPanel, taskPanel);
 
-    // Place the work panels before the existing statistics section.
-    const statsSection =
-        root.querySelector('.dash-stats')?.closest('section');
+    // Keep the overview above the daily work panels.
+    const overview = root.querySelector('.dash-overview');
 
-    if (statsSection) {
-        root.insertBefore(grid, statsSection);
+    if (overview) {
+        overview.after(grid);
     } else {
         root.appendChild(grid);
     }

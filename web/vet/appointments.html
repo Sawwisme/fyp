@@ -12,11 +12,11 @@
     <link rel="stylesheet" href="/web/cobalt.css?v=cobalt-components-2">
     <link rel="stylesheet" href="/web/workspace-design.css?v=1">
     <link rel="stylesheet" href="/web/workspace-polish.css?v=1">
-    <link rel="stylesheet" href="/web/sidebar-motion.css?v=3">
-    <link rel="stylesheet" href="/web/vet/appointments.css?v=1">
+    <link rel="stylesheet" href="/web/sidebar-motion.css?v=4">
+    <link rel="stylesheet" href="/web/vet/appointments.css?v=2">
 
     <script src="/web/vet/layout.js" defer></script>
-    <script src="/web/sidebar-controls.js?v=3" defer></script>
+    <script src="/web/sidebar-controls.js?v=4" defer></script>
     <script src="/web/vet/consultation_actions.js" defer></script>
     <script src="/web/vet/appointments.js?v=2" defer></script>
 </head>
@@ -46,42 +46,50 @@
                     </p>
                 </div>
 
-                <section class="panel">
-                    <h2>Overall appointments</h2>
-                    <strong id="appointment-all-time-total">—</strong>
-                    <p id="appointment-all-time-message" class="muted" role="status"></p>
-                    <button id="appointment-all-time-retry" class="secondary compact-button" type="button" hidden>
-                        Retry total
-                    </button>
-                </section>
-
-                <section class="panel section-panel">
-                    <h2>Filtered overview</h2>
-                    <div class="details-grid">
-                        <div>
-                            <dt>Total</dt>
-                            <dd id="appointment-count-total">—</dd>
-                        </div>
-                        <div>
-                            <dt>Confirmed</dt>
-                            <dd id="appointment-count-confirmed">—</dd>
-                        </div>
-                        <div>
-                            <dt>In consultation</dt>
-                            <dd id="appointment-count-progress">—</dd>
-                        </div>
-                        <div>
-                            <dt>Completed</dt>
-                            <dd id="appointment-count-completed">—</dd>
-                        </div>
+                <div class="vet-appointment-summary" aria-label="Appointment counts">
+                    <div class="appointment-stat appointment-stat-overall">
+                        <span>Overall appointments</span>
+                        <strong id="appointment-all-time-total">—</strong>
+                        <small>All dates</small>
                     </div>
-                    <p class="muted">
-                        Counts follow the date, search and status filters.
-                    </p>
-                </section>
 
-                <section class="panel section-panel">
-                    <h2>Appointments</h2>
+                    <div class="appointment-stat">
+                        <span>Filtered total</span>
+                        <strong id="appointment-count-total">—</strong>
+                        <small>Current filters</small>
+                    </div>
+
+                    <div class="appointment-stat">
+                        <span>Confirmed</span>
+                        <strong id="appointment-count-confirmed">—</strong>
+                        <small>Current filters</small>
+                    </div>
+
+                    <div class="appointment-stat">
+                        <span>In consultation</span>
+                        <strong id="appointment-count-progress">—</strong>
+                        <small>Current filters</small>
+                    </div>
+
+                    <div class="appointment-stat">
+                        <span>Completed</span>
+                        <strong id="appointment-count-completed">—</strong>
+                        <small>Current filters</small>
+                    </div>
+                </div>
+
+                <p id="appointment-all-time-message" class="muted appointment-total-message" role="status"></p>
+
+                <button id="appointment-all-time-retry" class="secondary compact-button" type="button" hidden>
+                    Retry total
+                </button>
+
+                <p class="appointment-filter-note">
+                    Filtered counts follow the date, search and status filters.
+                </p>
+
+                <section class="panel" aria-labelledby="appointments-title">
+                    <h2 id="appointments-title">Appointments</h2>
 
                     <div class="staff-list-toolbar">
                         <div>

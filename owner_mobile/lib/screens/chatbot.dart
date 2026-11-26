@@ -967,6 +967,49 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     return labels[key]?[index] ?? question;
   }
 
+  Widget _assistantReply(String text) {
+    final sections = text
+        .replaceAll('\r\n', '\n')
+        .split(RegExp(r'\n\s*\n'))
+        .where((section) => section.trim().isNotEmpty)
+        .toList();
+
+    return SelectionArea(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (var index = 0; index < sections.length; index++) ...[
+            if (index > 0) const SizedBox(height: 14),
+            Container(
+              width: double.infinity,
+              padding: sections.length > 1
+                  ? const EdgeInsets.all(12)
+                  : EdgeInsets.zero,
+              decoration: sections.length > 1
+                  ? BoxDecoration(
+                color: const Color(0xFFF5F8FD),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: const Color(0xFFE5EBF5),
+                ),
+              )
+                  : null,
+              child: Text(
+                sections[index].trim(),
+                style: const TextStyle(
+                  color: _navy,
+                  fontSize: 15,
+                  height: 1.7,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget _messageBubble(Map<String, dynamic> message) {
     final mine = message['sender_type'] == 'user';
     final metadata = message['response_metadata'];
@@ -1058,13 +1101,19 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
               ),
               const SizedBox(height: 7),
             ],
-            SelectableText(
-              message['message_text'] as String? ?? '',
-              style: TextStyle(
-                color: mine ? Colors.white : _navy,
-                height: 1.5,
+            if (mine)
+              SelectableText(
+                message['message_text'] as String? ?? '',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  height: 1.5,
+                ),
+              )
+            else
+              _assistantReply(
+                message['message_text'] as String? ?? '',
               ),
-            ),
             if (!mine && isLatestMessage && suggestions.isNotEmpty) ...[
               const SizedBox(height: 12),
               Wrap(

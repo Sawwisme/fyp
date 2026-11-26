@@ -57,6 +57,16 @@ def get_notification_updates(
         db, current_user, after_id
     )
 
+@router.post("/read-all")
+def mark_all_notifications_as_read(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return notification_service.mark_all_as_read(
+        db,
+        current_user,
+    )
+
 @router.post(
     "/{notification_id}/read",
     response_model=NotificationResponse,
