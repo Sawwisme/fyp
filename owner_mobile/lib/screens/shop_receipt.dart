@@ -329,6 +329,7 @@ class _ShopReceiptScreenState extends State<ShopReceiptScreen> {
             canChangePageFormat: false,
             allowPrinting: true,
             allowSharing: false,
+            canDebug: false,
             actions: [
               PdfPreviewAction(
                 icon: const Icon(Icons.save_alt_rounded),

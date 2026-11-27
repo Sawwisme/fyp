@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, Query, status
+from app.schemas.staff import VeterinarianStatusUpdate
+from fastapi import APIRouter, Depends, Query, Path, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -95,4 +96,15 @@ def list_administrators(
         current_user,
         offset,
         limit,
+    )
+
+@router.post("/veterinarians/{veterinarian_id}/status")
+def update_veterinarian_status(
+    data: VeterinarianStatusUpdate,
+    veterinarian_id: int = Path(ge=1, le=2147483647),
+    current_user: User = Depends(require_roles("clinic_administrator")),
+    db: Session = Depends(get_db),
+):
+    return staff_service.update_veterinarian_status(
+        db, current_user, veterinarian_id, data
     )

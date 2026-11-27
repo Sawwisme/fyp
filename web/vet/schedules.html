@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="/web/vet/absences.css?v=cobalt-components-2">
 
     <script src="/web/vet/layout.js" defer></script>
-    <script src="/web/vet/absences.js" defer></script>
+    <script src="/web/vet/absences.js?v=pagination-1" defer></script>
     <script src="/web/vet/consultation_actions.js" defer></script>
     <script src="/web/vet/schedules.js" defer></script>
     <link rel="stylesheet" href="/web/cobalt.css?v=cobalt-components-2">
@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="/web/workspace-polish.css?v=1">
     <script src="/web/sidebar-controls.js?v=4" defer></script>
     <link rel="stylesheet" href="/web/sidebar-motion.css?v=4">
+    <link rel="stylesheet" href="/web/staff-pagination.css?v=2">
 </head>
 
 <body>
@@ -71,11 +72,12 @@
                             Retry reports
                         </button>
 
-                        <div class="absence-actions">
+                        <div class="staff-pagination absence-actions" aria-label="Pagination">
                             <button id="absence-previous" type="button" class="secondary compact-button" disabled>
                                 Previous
                             </button>
-                            <button id="absence-next" type="button" class="secondary compact-button" disabled>
+                            <span id="absence-page-label" aria-live="polite">Page 1</span>
+                        <button id="absence-next" type="button" class="secondary compact-button" disabled>
                                 Next
                             </button>
                         </div>

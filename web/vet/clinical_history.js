@@ -204,6 +204,7 @@
 
             renderCounts(counts);
             page = targetPage;
+            get('history-page-label').textContent = `Page ${page + 1}`;
 
             const visible = data.slice(0, pageSize);
 

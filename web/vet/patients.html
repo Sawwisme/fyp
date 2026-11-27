@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="/web/admin/layout.css?v=cobalt-components-2">
 
     <script src="/web/vet/layout.js" defer></script>
-    <script src="/web/vet/patients.js?v=original-restored" defer></script>
+    <script src="/web/vet/patients.js?v=pagination-1" defer></script>
     <link rel="stylesheet" href="/web/cobalt.css?v=cobalt-components-2">
     <link rel="stylesheet" href="/web/workspace-design.css?v=1">
     <link rel="stylesheet" href="/web/clinical-refinement.css?v=1">
@@ -19,6 +19,7 @@
     <script src="/web/sidebar-controls.js?v=4" defer></script>
     <link rel="stylesheet" href="/web/sidebar-motion.css?v=4">
     <link rel="stylesheet" href="/web/vet/patients.css?v=original-restored">
+    <link rel="stylesheet" href="/web/staff-pagination.css?v=2">
 </head>
 
 <body>
@@ -58,8 +59,9 @@
                             <tbody id="patient-rows"></tbody>
                         </table>
                     </div>
-                    <div class="patient-pagination"><button id="patient-previous" type="button"
-                            class="secondary compact-button" disabled>Previous</button><button id="patient-next"
+                    <div class="staff-pagination patient-pagination" aria-label="Pagination"><button id="patient-previous" type="button"
+                            class="secondary compact-button" disabled>Previous</button><span id="patient-page-label" aria-live="polite">Page 1</span>
+                        <button id="patient-next"
                             type="button" class="secondary compact-button" disabled>Next</button></div>
                 </section>
             </main>
@@ -86,8 +88,9 @@
             <p id="record-message" role="status" aria-live="polite"></p><button id="record-retry" type="button"
                 class="secondary compact-button" hidden>Try again</button>
             <div id="patient-records"></div>
-            <div class="patient-pagination"><button id="record-previous" type="button" class="secondary compact-button"
-                    disabled>Previous</button><button id="record-next" type="button" class="secondary compact-button"
+            <div class="staff-pagination patient-pagination" aria-label="Pagination"><button id="record-previous" type="button" class="secondary compact-button"
+                    disabled>Previous</button><span id="record-page-label" aria-live="polite">Page 1</span>
+                        <button id="record-next" type="button" class="secondary compact-button"
                     disabled>Next</button></div>
         </div>
     </dialog>

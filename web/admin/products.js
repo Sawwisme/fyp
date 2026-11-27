@@ -465,6 +465,151 @@
     let savingCategory = false;
     const categoryDialog = get('category-dialog');
 
+    let editingCategoryId = null;
+
+    const categoryManager = get('category-manager');
+    let categoryManagerBusy = false;
+    let returnToCategoryManager = false;
+
+    function managerBusy(value) {
+        categoryManagerBusy = value;
+
+        categoryManager.querySelectorAll('button').forEach(button => {
+            button.disabled = value;
+        });
+    }
+
+    async function refreshCategoryManager() {
+        const feedback = get('category-manager-message');
+        const body = get('category-manager-rows');
+
+        managerBusy(true);
+        feedback.textContent = 'Loading categories…';
+
+        try {
+            const categories = await loadCategories();
+            body.replaceChildren();
+
+            for (const category of categories) {
+                const row = document.createElement('tr');
+
+                for (const value of [
+                    category.category_name,
+                    category.description || '—'
+                ]) {
+                    const cell = document.createElement('td');
+                    cell.textContent = value;
+                    row.appendChild(cell);
+                }
+
+                const actions = document.createElement('td');
+
+                if (category.clinic_id === null) {
+                    actions.textContent = 'Shared · read-only';
+                } else {
+                    const group = document.createElement('div');
+                    group.className = 'category-row-actions';
+
+                    const edit = document.createElement('button');
+                    edit.type = 'button';
+                    edit.className = 'secondary compact-button';
+                    edit.textContent = 'Edit';
+
+                    edit.addEventListener('click', () => {
+                        if (categoryManagerBusy || savingCategory || saving) return;
+
+                        editingCategoryId = category.category_id;
+                        get('category-dialog-title').textContent = 'Edit Category';
+                        get('category-name').value = category.category_name;
+                        get('category-description').value =
+                            category.description || '';
+                        get('category-form-message').textContent = '';
+
+                        returnToCategoryManager = true;
+                        categoryManager.close();
+                        categoryDialog.showModal();
+                        get('category-name').focus();
+                    });
+
+                    const remove = document.createElement('button');
+                    remove.type = 'button';
+                    remove.className = 'secondary compact-button';
+                    remove.textContent = 'Delete';
+
+                    remove.addEventListener('click', async () => {
+                        if (categoryManagerBusy || savingCategory || saving) return;
+
+                        if (!window.confirm(
+                            `Delete “${category.category_name}”?\n\n` +
+                            'Categories used by products cannot be deleted.'
+                        )) return;
+
+                        managerBusy(true);
+                        feedback.textContent = 'Deleting category…';
+
+                        try {
+                            await request(
+                                `/clinic-products/categories/${category.category_id}`,
+                                undefined,
+                                'DELETE'
+                            );
+
+                            await refreshCategoryManager();
+                            await loadProducts(page);
+
+                            feedback.textContent =
+                                'Category deleted successfully.';
+                        } catch (error) {
+                            feedback.textContent =
+                                `${error.message} Refresh the list before retrying.`;
+                        } finally {
+                            managerBusy(false);
+                        }
+                    });
+
+                    group.append(edit, remove);
+                    actions.appendChild(group);
+                }
+
+                row.appendChild(actions);
+                body.appendChild(row);
+            }
+
+            feedback.textContent = categories.length
+                ? `${categories.length} categories`
+                : 'No categories yet.';
+        } catch (error) {
+            feedback.textContent = error.message;
+            body.replaceChildren();
+        } finally {
+            managerBusy(false);
+        }
+    }
+
+    get('category-manage').addEventListener('click', () => {
+        if (saving || savingCategory || categoryManagerBusy) return;
+
+        categoryManager.showModal();
+        refreshCategoryManager();
+    });
+
+    get('category-manager-close').addEventListener('click', () => {
+        if (!categoryManagerBusy) categoryManager.close();
+    });
+
+    categoryManager.addEventListener('cancel', event => {
+        if (categoryManagerBusy) event.preventDefault();
+    });
+
+    categoryDialog.addEventListener('close', () => {
+        if (!returnToCategoryManager) return;
+
+        returnToCategoryManager = false;
+        categoryManager.showModal();
+        refreshCategoryManager();
+        loadProducts(page);
+    });
+
     async function loadCategories(selectedCategoryId = null) {
         const categories = await request('/clinic-products/categories');
 
@@ -516,8 +661,13 @@
     }
 
     get('category-add').addEventListener('click', () => {
-        if (savingCategory || saving) return;
+        if (savingCategory || saving || categoryManagerBusy) return;
 
+        returnToCategoryManager = true;
+        categoryManager.close();
+
+        editingCategoryId = null;
+        get('category-dialog-title').textContent = 'Add Category';
         get('category-form').reset();
         get('category-form-message').textContent = '';
         get('category-page-message').textContent = '';
@@ -568,8 +718,11 @@
 
         try {
             const category = await request(
-                '/clinic-products/categories',
-                payload
+                editingCategoryId === null
+                    ? '/clinic-products/categories'
+                    : `/clinic-products/categories/${editingCategoryId}`,
+                payload,
+                editingCategoryId === null ? 'POST' : 'PATCH'
             );
 
             if (!Number.isInteger(category.category_id)) {
@@ -583,8 +736,7 @@
             categoryDialog.close();
 
             get('category-page-message').textContent =
-                `“${category.category_name}” is ready to use. ` +
-                'Existing categories are reused instead of duplicated.';
+                `“${category.category_name}” saved successfully.`;
 
         } catch (error) {
             feedback.textContent = saved
@@ -702,7 +854,7 @@
                 </table>
             </div>
 
-            <div class="product-pagination">
+            <div class="product-pagination staff-pagination" aria-label="Stock history pagination">
                 <button id="stock-history-previous" type="button"
                         class="secondary compact-button">Previous</button>
                 <span id="stock-history-page"></span>

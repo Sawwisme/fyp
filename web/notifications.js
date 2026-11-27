@@ -45,7 +45,7 @@
         </header>
         <p class="notification-message" role="status"></p>
         <div class="notification-list"></div>
-        <footer class="notification-pagination">
+        <footer class="notification-pagination staff-pagination" aria-label="Notification pagination">
             <button type="button" data-direction="previous">Previous</button>
             <span></span>
             <button type="button" data-direction="next">Next</button>

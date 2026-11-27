@@ -209,3 +209,59 @@ def list_administrators(
     )
 
     return list(db.scalars(statement).all())
+
+def update_veterinarian_status(db, current_user, veterinarian_id, data):
+    from app.models import Clinic, Appointment, FollowupCare, Consultation
+    try:
+        admin = get_admin_record(db, current_user)
+        # Same clinic-first lock order as booking creation.
+        clinic = db.scalar(select(Clinic).where(
+            Clinic.clinic_id == admin.clinic_id,
+            Clinic.status == "active",
+        ).with_for_update())
+        if clinic is None:
+            raise HTTPException(403, "Clinic is unavailable.")
+        vet = db.scalar(select(Veterinarian).where(
+            Veterinarian.veterinarian_id == veterinarian_id,
+            Veterinarian.clinic_id == admin.clinic_id,
+        ).execution_options(populate_existing=True).with_for_update())
+        if vet is None:
+            raise HTTPException(404, "Veterinarian not found in your clinic.")
+        user = db.scalar(select(User).where(
+            User.user_id == vet.user_id,
+            User.role == "veterinarian",
+        ).execution_options(populate_existing=True).with_for_update())
+        if user is None:
+            raise HTTPException(404, "Veterinarian account not found.")
+        if user.status == data.status:
+            db.rollback()
+            return {"veterinarian_id": vet.veterinarian_id, "status": user.status}
+        if user.status != data.expected_status:
+            raise HTTPException(409, "Account status changed. Refresh the staff list.")
+        if user.status not in ("active", "inactive"):
+            raise HTTPException(409, "This account requires separate administrative review.")
+        if data.status == "active" and vet.approval_status != "approved":
+            raise HTTPException(409, "Only an approved veterinarian can be reactivated.")
+        if data.status == "inactive":
+            blockers = []
+            appointments = db.scalar(select(func.count()).select_from(Appointment).where(
+                Appointment.veterinarian_id == veterinarian_id,
+                Appointment.status.notin_(["completed", "cancelled", "rejected", "expired"])))
+            followups = db.scalar(select(func.count()).select_from(FollowupCare).where(
+                FollowupCare.veterinarian_id == veterinarian_id,
+                FollowupCare.status.notin_(["completed", "cancelled"])))
+            drafts = db.scalar(select(func.count()).select_from(Consultation).where(
+                Consultation.veterinarian_id == veterinarian_id,
+                Consultation.status != "completed"))
+            if appointments: blockers.append(f"{appointments} unresolved appointment(s)")
+            if followups: blockers.append(f"{followups} open follow-up(s)")
+            if drafts: blockers.append(f"{drafts} unfinished consultation(s)")
+            if blockers:
+                raise HTTPException(409, "Cannot deactivate: " + ", ".join(blockers) +
+                    ". Resolve or reassign this work first. No account changes were saved.")
+        user.status = data.status
+        db.commit()
+        return {"veterinarian_id": veterinarian_id, "status": data.status}
+    except Exception:
+        db.rollback()
+        raise

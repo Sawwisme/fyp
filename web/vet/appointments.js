@@ -89,9 +89,8 @@
         }
 
         const navigation = node('div');
-        navigation.style.display = 'flex';
-        navigation.style.gap = '12px';
-        navigation.style.alignItems = 'center';
+        navigation.className = 'staff-pagination';
+        navigation.setAttribute('aria-label', 'Shared history pagination');
         navigation.append(previous, pageLabel, next);
 
         dialog.append(title, note, close, status, content, navigation);

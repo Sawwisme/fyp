@@ -122,6 +122,6 @@
 
 (() => {
     const script = document.createElement('script');
-    script.src = '/web/notifications.js';
+    script.src = '/web/notifications.js?v=pagination-1';
     document.head.appendChild(script);
 })();

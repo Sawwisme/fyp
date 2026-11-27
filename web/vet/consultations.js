@@ -74,6 +74,7 @@
             if (currentVersion !== version) return;
 
             page = targetPage;
+            get('consult-page-label').textContent = `Page ${page + 1}`;
 
             renderCounts(counts);
 

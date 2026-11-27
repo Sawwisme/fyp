@@ -1,3 +1,4 @@
+from typing import Literal
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -115,3 +116,8 @@ class AdministratorResponse(BaseModel):
     clinic_name: str
     membership_status: str
     user: UserResponse
+
+class VeterinarianStatusUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    status: Literal["active", "inactive"]
+    expected_status: Literal["active", "inactive"]

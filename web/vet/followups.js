@@ -236,6 +236,7 @@
             if (request !== version) return;
 
             page = targetPage;
+            get('followups-page-label').textContent = `Page ${page + 1}`;
             const visible = data.slice(0, pageSize);
 
             for (const item of visible) {

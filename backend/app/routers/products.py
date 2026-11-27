@@ -232,3 +232,32 @@ def get_product_image(
             "X-Content-Type-Options": "nosniff",
         },
     )
+
+@router.patch(
+    "/categories/{category_id}",
+    response_model=ProductCategoryResponse,
+)
+def edit_category(
+    data: ProductCategoryCreate,
+    category_id: int = Path(ge=1, le=2147483647),
+    current_user: User = Depends(
+        require_roles("clinic_administrator")
+    ),
+    db: Session = Depends(get_db),
+):
+    return product_category_service.manage_category(
+        db, current_user, category_id, data
+    )
+
+
+@router.delete("/categories/{category_id}")
+def delete_category(
+    category_id: int = Path(ge=1, le=2147483647),
+    current_user: User = Depends(
+        require_roles("clinic_administrator")
+    ),
+    db: Session = Depends(get_db),
+):
+    return product_category_service.manage_category(
+        db, current_user, category_id
+    )

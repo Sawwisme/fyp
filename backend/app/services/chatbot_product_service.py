@@ -583,6 +583,69 @@ def product_reply(
                 "OPEN_SHOP",
             )
 
+        # Check the same filters again, relaxing only the minimum-age
+        # comparison. Products still need a recorded age requirement.
+        minimum_matching_age = db.scalar(
+            select(func.min(Product.minimum_age_months))
+            .join(
+                ProductCategory,
+                ProductCategory.category_id == Product.category_id,
+            )
+            .join(
+                Clinic,
+                Clinic.clinic_id == Product.clinic_id,
+            )
+            .where(
+                Product.status == "active",
+                Product.stock_quantity > 0,
+                *request_filters,
+                Clinic.status == "active",
+                or_(
+                    Clinic.shop_pickup_enabled.is_(True),
+                    Clinic.shop_delivery_enabled.is_(True),
+                ),
+                or_(
+                    ProductCategory.clinic_id.is_(None),
+                    ProductCategory.clinic_id == Product.clinic_id,
+                ),
+                Product.target_species.in_([species, "both"]),
+                Product.minimum_age_months.is_not(None),
+            )
+        )
+
+        if (
+            age_months is not None
+            and minimum_matching_age is not None
+            and age_months < minimum_matching_age
+        ):
+            minimum_age = int(minimum_matching_age)
+
+            return (
+                text(
+                    f"Your pet's recorded age is {age_months} "
+                    f"completed month(s). Products matching the "
+                    f"other current filters require an age of at "
+                    f"least {minimum_age} months, so I haven't "
+                    f"recommended them. Check the birth date in "
+                    f"My Pets if it is incorrect. Otherwise, ask "
+                    f"your clinic about age-appropriate care.",
+                    f"Umur haiwan anda yang direkodkan ialah "
+                    f"{age_months} bulan lengkap. Produk yang "
+                    f"sepadan dengan penapis lain memerlukan umur "
+                    f"sekurang-kurangnya {minimum_age} bulan. "
+                    f"Oleh itu, saya tidak mengesyorkannya. "
+                    f"Semak tarikh lahir dalam My Pets jika salah, "
+                    f"atau tanya klinik tentang penjagaan yang "
+                    f"sesuai dengan umurnya.",
+                    f"宠物目前记录的月龄为 {age_months} 个完整月。"
+                    f"符合其他筛选条件的产品，最低要求为 "
+                    f"{minimum_age} 个月，因此没有推荐这些产品。"
+                    f"如果出生日期填错，请到“我的宠物”修改；"
+                    f"否则，请向诊所咨询适合这个年龄的护理方式。",
+                ),
+                "OPEN_SHOP",
+            )
+
         translated_reply = render_product_search_reply(
             language=language,
             no_match=True,

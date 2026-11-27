@@ -116,6 +116,7 @@
             }
 
             page = targetPage;
+            get('absence-page-label').textContent = `Page ${page + 1}`;
             hasMore = data.length > pageSize;
 
             for (const item of data.slice(0, pageSize)) {

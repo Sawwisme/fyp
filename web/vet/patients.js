@@ -37,6 +37,7 @@
             const data = await vetRequest(`/vet-patients?${query}`);
             if (current !== version) return;
             page = target;
+            get('patient-page-label').textContent = `Page ${page + 1}`;
             get('patient-total').textContent = data.total;
             for (const patient of data.items) {
                 const row = node('tr');
@@ -80,6 +81,7 @@
             const data = await vetRequest(`/vet-patients/${selected.pet_id}/records?${query}`);
             if(current!==recordVersion || !dialog.open)return;
             recordPage=target;
+            get('record-page-label').textContent = `Page ${recordPage + 1}`;
             for(const record of data.items) {
                 const card=node('article',undefined,'patient-record');
                 card.append(node('small',date(record.date)),node('h3',record.title));

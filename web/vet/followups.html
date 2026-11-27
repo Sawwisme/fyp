@@ -14,12 +14,13 @@
     <script src="/web/vet/layout.js" defer></script>
     <script src="/web/vet/linked_visit.js" defer></script>
     <script src="/web/vet/followup_updates.js" defer></script>
-    <script src="/web/vet/followups.js" defer></script>
+    <script src="/web/vet/followups.js?v=pagination-1" defer></script>
     <link rel="stylesheet" href="/web/cobalt.css?v=cobalt-components-2">
     <link rel="stylesheet" href="/web/workspace-design.css?v=1">
     <link rel="stylesheet" href="/web/workspace-polish.css?v=1">
     <script src="/web/sidebar-controls.js?v=4" defer></script>
     <link rel="stylesheet" href="/web/sidebar-motion.css?v=4">
+    <link rel="stylesheet" href="/web/staff-pagination.css?v=2">
 </head>
 
 <body>
@@ -90,10 +91,11 @@
                         </table>
                     </div>
 
-                    <div class="staff-actions">
+                    <div class="staff-pagination staff-actions" aria-label="Pagination">
                         <button id="followups-previous" type="button" class="secondary compact-button" disabled>
                             Previous
                         </button>
+                        <span id="followups-page-label" aria-live="polite">Page 1</span>
                         <button id="followups-next" type="button" class="secondary compact-button" disabled>
                             Next
                         </button>
@@ -161,7 +163,7 @@
             <div id="followup-updates-list"></div>
         </div>
 
-        <footer class="updates-footer">
+        <footer class="staff-pagination updates-footer" aria-label="Pagination">
             <button id="followup-updates-previous" type="button" class="secondary compact-button" disabled>
                 Previous
             </button>

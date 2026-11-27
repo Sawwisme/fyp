@@ -12,12 +12,13 @@
     <link rel="stylesheet" href="/web/admin/products.css?v=cobalt-components-2">
 
     <script src="/web/admin/layout.js" defer></script>
-    <script src="/web/admin/products.js" defer></script>
+    <script src="/web/admin/products.js?v=pagination-1" defer></script>
     <link rel="stylesheet" href="/web/cobalt.css?v=cobalt-components-2">
     <link rel="stylesheet" href="/web/workspace-design.css?v=1">
     <link rel="stylesheet" href="/web/workspace-polish.css?v=1">
     <script src="/web/sidebar-controls.js?v=4" defer></script>
     <link rel="stylesheet" href="/web/sidebar-motion.css?v=4">
+    <link rel="stylesheet" href="/web/staff-pagination.css?v=2">
 </head>
 
 <body>
@@ -49,8 +50,8 @@
                             Shop Settings
                         </button>
 
-                        <button id="category-add" class="secondary compact-button" type="button">
-                            Add Category
+                        <button id="category-manage" class="secondary compact-button" type="button">
+                            Manage categories
                         </button>
 
                         <button id="product-add" class="product-primary" type="button">
@@ -128,7 +129,7 @@
                         </table>
                     </div>
 
-                    <div class="product-pagination">
+                    <div class="staff-pagination product-pagination" aria-label="Pagination">
                         <button id="product-previous" type="button" class="secondary compact-button" disabled>
                             Previous
                         </button>
@@ -300,6 +301,36 @@
                 </button>
             </footer>
         </form>
+    </dialog>
+
+    <dialog id="category-manager" aria-labelledby="category-manager-title">
+        <header class="products-heading">
+            <div>
+                <h2 id="category-manager-title">Categories</h2>
+                <p class="muted">Organise your clinic catalogue.</p>
+            </div>
+            <button id="category-manager-close" class="dialog-close" type="button"
+                aria-label="Close categories">×</button>
+        </header>
+
+        <button id="category-add" class="product-primary" type="button">
+            Add category
+        </button>
+
+        <p id="category-manager-message" role="status"></p>
+
+        <div class="product-table-wrap">
+            <table class="category-manager-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="category-manager-rows"></tbody>
+            </table>
+        </div>
     </dialog>
 </body>
 

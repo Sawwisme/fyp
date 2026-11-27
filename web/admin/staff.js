@@ -41,6 +41,7 @@ let staffRecords = [];
 let staffStarting = false;
 let vetListBusy = false;
 let vetCreating = false;
+let staffStatusBusy = false;
 
 function staffLogin() {
     sessionStorage.removeItem(staffTokenKey);
@@ -117,13 +118,17 @@ async function staffRequest(path, body) {
 }
 
 function updateStaffButtons() {
-    openVetForm.disabled = vetListBusy || vetCreating;
-    createVet.disabled = vetListBusy || vetCreating;
-    cancelVet.disabled = vetCreating;
-    vetFields.disabled = vetCreating;
-    createVet.textContent = vetCreating ? 'Creating…' : 'Create account';
-    staffSearch.disabled = vetListBusy || vetCreating;
-    staffRoleFilter.disabled = vetListBusy || vetCreating;
+    const busy = vetListBusy || vetCreating || staffStatusBusy;
+    openVetForm.disabled = busy;
+    createVet.disabled = busy;
+    cancelVet.disabled = vetCreating || staffStatusBusy;
+    vetFields.disabled = vetCreating || staffStatusBusy;
+    createVet.textContent = vetCreating ? 'Creating�' : 'Create account';
+    staffSearch.disabled = busy;
+    staffRoleFilter.disabled = busy;
+    vetTableBody.querySelectorAll('[data-staff-status-action]').forEach(button => {
+        button.disabled = busy;
+    });
 }
 
 function renderStaffList() {
@@ -177,6 +182,20 @@ function renderStaffList() {
             row.appendChild(cell);
         }
 
+        const actionCell = document.createElement('td');
+        if (person.veterinarianId && ['active', 'inactive'].includes(person.user.status)) {
+            const action = document.createElement('button');
+            action.type = 'button';
+            action.className = 'secondary compact-button';
+            action.dataset.staffStatusAction = 'true';
+            action.textContent = person.user.status === 'active' ? 'Deactivate' : 'Reactivate';
+            action.disabled = staffStatusBusy || vetListBusy || vetCreating;
+            action.addEventListener('click', () => changeVetStatus(person));
+            actionCell.appendChild(action);
+        } else {
+            actionCell.textContent = '—';
+        }
+        row.appendChild(actionCell);
         vetTableBody.appendChild(row);
     }
 
@@ -184,7 +203,7 @@ function renderStaffList() {
         const row = document.createElement('tr');
         const cell = document.createElement('td');
 
-        cell.colSpan = 5;
+        cell.colSpan = 6;
         cell.className = 'staff-empty';
         cell.textContent = staffRecords.length
             ? 'No staff match your search and role filter.'
@@ -240,7 +259,8 @@ async function loadVeterinarians() {
             ...vets.map(record => ({
                 user: record.user,
                 role: 'Veterinarian',
-                registration: record.registration_number
+                registration: record.registration_number,
+                veterinarianId: record.veterinarian_id
             }))
         ];
 
@@ -429,3 +449,37 @@ document.getElementById('staff-logout').addEventListener('click', () => {
 });
 
 startStaffPage();
+
+async function changeVetStatus(person) {
+    if (staffStatusBusy || vetListBusy || vetCreating) return;
+    const next = person.user.status === 'active' ? 'inactive' : 'active';
+    const verb = next === 'inactive' ? 'Deactivate' : 'Reactivate';
+    const detail = next === 'inactive'
+        ? 'This blocks access and new bookings. Medical records are preserved. Outstanding work must be resolved first.'
+        : 'This restores account access and eligibility for new bookings on existing schedules.';
+    if (!window.confirm(`${verb} ${person.user.full_name}?\n\n${detail}`)) return;
+    staffStatusBusy = true;
+    renderStaffList();
+    updateStaffButtons();
+    try {
+        const saved = await staffRequest(`/staff/veterinarians/${person.veterinarianId}/status`, {
+            status: next,
+            expected_status: person.user.status
+        });
+        if (saved.veterinarian_id !== person.veterinarianId || saved.status !== next) {
+            throw new Error('Status could not be confirmed. Reload the page before trying again.');
+        }
+        person.user.status = saved.status;
+        renderStaffList();
+        vetListMessage.textContent = `${person.user.full_name}: account ${next}.`;
+    } catch (error) {
+        vetListMessage.textContent = error.message;
+    } finally {
+        staffStatusBusy = false;
+        updateStaffButtons();
+        // Re-enable actions without overwriting the outcome message.
+        const outcome = vetListMessage.textContent;
+        renderStaffList();
+        vetListMessage.textContent = outcome;
+    }
+}

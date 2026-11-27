@@ -1,0 +1,70 @@
+/* Shared list pagination. Calendar navigation is intentionally excluded. */
+@media screen {
+    body .staff-pagination.staff-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 10px;
+        width: 100%;
+        box-sizing: border-box;
+        margin-top: 20px;
+        padding: 16px 0 0;
+        border-top: 1px solid #e2e8f1;
+        color: #53657c;
+    }
+    body .staff-pagination.staff-pagination > button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        width: auto;
+        flex: 0 0 auto;
+        min-width: 92px;
+        min-height: 40px;
+        margin: 0;
+        padding: 9px 16px;
+        border: 1px solid #ccd8e9;
+        border-radius: 10px;
+        background: #fff;
+        color: #2458a6;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.4;
+        box-shadow: none;
+        cursor: pointer;
+    }
+    body .staff-pagination.staff-pagination > button:hover:not(:disabled) {
+        background: #edf3ff;
+        border-color: #9db7e4;
+    }
+    body .staff-pagination.staff-pagination > button:disabled {
+        background: #f5f7fa;
+        color: #94a3b8;
+        border-color: #e2e8f0;
+        opacity: 1;
+        cursor: not-allowed;
+    }
+    body .staff-pagination.staff-pagination > button:focus-visible {
+        outline: 3px solid #bdd0ff;
+        outline-offset: 2px;
+    }
+    body .staff-pagination.staff-pagination > span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        min-width: 62px;
+        padding: 0 4px;
+        color: #53657c;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+    body .staff-pagination.staff-pagination > [hidden] { display: none; }
+}
+@media screen and (max-width: 600px) {
+    body .staff-pagination.staff-pagination { justify-content: center; gap: 8px; }
+    body .staff-pagination.staff-pagination > button { min-width: 82px; padding: 9px 12px; }
+}

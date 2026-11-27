@@ -11,13 +11,14 @@
     <link rel="stylesheet" href="/web/admin/layout.css?v=cobalt-components-2">
 
     <script src="/web/vet/layout.js" defer></script>
-    <script src="/web/vet/consultations.js" defer></script>
+    <script src="/web/vet/consultations.js?v=pagination-1" defer></script>
     <link rel="stylesheet" href="/web/cobalt.css?v=cobalt-components-2">
     <link rel="stylesheet" href="/web/workspace-design.css?v=1">
     <link rel="stylesheet" href="/web/clinical-refinement.css?v=1">
     <link rel="stylesheet" href="/web/workspace-polish.css?v=1">
     <script src="/web/sidebar-controls.js?v=4" defer></script>
     <link rel="stylesheet" href="/web/sidebar-motion.css?v=4">
+    <link rel="stylesheet" href="/web/staff-pagination.css?v=2">
 </head>
 
 <body class="clinical-list-page">
@@ -105,10 +106,11 @@
                         </table>
                     </div>
 
-                    <div class="staff-actions">
+                    <div class="staff-pagination staff-actions" aria-label="Pagination">
                         <button id="consult-previous" type="button" class="secondary compact-button" disabled>
                             Previous
                         </button>
+                        <span id="consult-page-label" aria-live="polite">Page 1</span>
                         <button id="consult-next" type="button" class="secondary compact-button" disabled>
                             Next
                         </button>

@@ -103,6 +103,17 @@ class _ShopOrderDetailsScreenState
     try {
       final order = await widget.service.getOrder(widget.orderId);
       if (!mounted) return;
+
+      final wasPending = _order?['payment_status'] == 'pending';
+      final nowPaid = order['payment_status'] == 'paid' &&
+          {
+            'paid',
+            'processing',
+            'ready_for_pickup',
+            'shipped',
+            'completed',
+          }.contains(order['order_status']);
+
       setState(() {
         _order = order;
 
@@ -116,12 +127,22 @@ class _ShopOrderDetailsScreenState
 
         if (order['payment_status'] == 'paid' &&
             acceptedStatuses.contains(order['order_status'])) {
-          _paymentMessage = 'Payment confirmed.';
+          _paymentMessage = null;
         } else if (order['order_status'] != 'pending_payment' &&
             _paymentMessage != null) {
           _paymentMessage = 'The order status has been updated.';
         }
       });
+
+      if (wasPending && nowPaid) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Payment confirmed. Your receipt is ready.'),
+            duration: Duration(seconds: 4),
+            backgroundColor: Color(0xFF237A4B),
+          ),
+        );
+      }
     } catch (error) {
       if (mounted) {
         setState(() => _error = error.toString());
@@ -275,7 +296,7 @@ class _ShopOrderDetailsScreenState
           'Could not check payment confirmation. '
               'Use Refresh order to try again.';
         } else if (paidAndAccepted) {
-          _paymentMessage = 'Payment confirmed.';
+          _paymentMessage = null;
         } else if (_order?['order_status'] != 'pending_payment') {
           _paymentMessage = 'The order status has been updated.';
         } else {
@@ -552,25 +573,67 @@ class _ShopOrderDetailsScreenState
           const Divider(),
           _amount('Total', order['total_amount'], total: true),
         ]),
-        if (order['payment_status'] == 'paid') ...[
-          OutlinedButton.icon(
-            onPressed: busy || _error != null ? null : _openReceipt,
-            icon: const Icon(Icons.receipt_long_outlined),
-            label: const Text('View / save receipt'),
+        if (order['payment_status'] != 'paid' &&
+            _paymentMessage != null) ...[
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: order['payment_status'] == 'paid'
+                  ? const Color(0xFFEDF8F1)
+                  : const Color(0xFFEEF3FF),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: order['payment_status'] == 'paid'
+                    ? const Color(0xFFCBE5D5)
+                    : const Color(0xFFD6E1FA),
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  order['payment_status'] == 'paid'
+                      ? Icons.check_circle_outline
+                      : Icons.info_outline,
+                  color: order['payment_status'] == 'paid'
+                      ? const Color(0xFF237A4B)
+                      : _green,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    order['payment_status'] == 'paid'
+                        ? 'Payment confirmed. Your receipt is available below.'
+                        : _paymentMessage!,
+                    style: const TextStyle(
+                      color: Color(0xFF203A5C),
+                      height: 1.5,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
         ],
-        if (_paymentMessage != null)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: Text(
-              _paymentMessage!,
-              style: const TextStyle(
-                color: _green,
-                height: 1.5,
+
+        if (order['payment_status'] == 'paid') ...[
+          FilledButton.icon(
+            onPressed: busy || _error != null ? null : _openReceipt,
+            icon: const Icon(Icons.receipt_long_outlined),
+            label: const Text('View receipt'),
+            style: FilledButton.styleFrom(
+              backgroundColor: _green,
+              foregroundColor: Colors.white,
+              minimumSize: const Size.fromHeight(48),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
           ),
+          const SizedBox(height: 12),
+        ],
 
         if (!cash && pending && order['payment_status'] == 'pending') ...[
           FilledButton.icon(
@@ -618,9 +681,13 @@ class _ShopOrderDetailsScreenState
             icon: const Icon(Icons.assignment_return_outlined),
             label: const Text('Refunds'),
             style: OutlinedButton.styleFrom(
-              foregroundColor: _green,
-              padding: const EdgeInsets.symmetric(vertical: 14),
+            foregroundColor: _green,
+            minimumSize: const Size.fromHeight(48),
+            side: const BorderSide(color: Color(0xFFCCD8F0)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
+          ),
           ),
           const SizedBox(height: 12),
         ],
